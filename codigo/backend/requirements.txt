@@ -1,0 +1,44 @@
+# Framework
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+python-multipart==0.0.12
+
+# Banco de dados
+sqlalchemy[asyncio]==2.0.36
+asyncpg==0.30.0
+alembic==1.14.0
+geoalchemy2==0.15.2
+psycopg2-binary==2.9.10
+
+# Cache
+redis==5.2.0
+celery[redis]==5.4.0
+
+# Auth e segurança
+python-jose[cryptography]==3.3.0
+bcrypt==4.2.1
+pyotp==2.9.0
+pydantic[email]==2.9.2
+pydantic-settings==2.6.0
+
+# HTTP client (APIs externas)
+httpx==0.27.2
+
+# IA
+anthropic==0.39.0
+
+# PDF - geracao via browser headless (replica fiel do dossie digital)
+playwright==1.48.0
+# PDF legado (WeasyPrint) - mantido ate remocao do codigo antigo
+weasyprint==62.3
+pydyf==0.11.0         # pydyf 0.12+ quebra weasyprint 62.x (AttributeError transform)
+
+# ETL / dados
+pandas==2.2.3
+geopandas==1.0.1
+shapely==2.0.6
+
+# Utils
+python-dotenv==1.0.1
+Pillow==11.0.0
+matplotlib==3.10.1

@@ -1,0 +1,2169 @@
+"use client";
+
+/**
+ * /radar/politicos/[id] - Champion Page do Politico.
+ *
+ * Pagina completa de perfil inspirada em jogos (LOL/DOTA 2):
+ * - Hero section fixa com foto + identidade + scores
+ * - Blocos modulares com TODOS os dados do dossie
+ * - Cada bloco = uma "ability" do personagem
+ */
+import { useState, useEffect, useMemo } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import dynamic from "next/dynamic";
+import useSWR from "swr";
+import { AppLayout } from "@/components/layout/AppLayout";
+import { corDoPartido } from "@/lib/farolPartido";
+import {
+  ArrowLeft, Trophy, TrendingUp, AlertTriangle,
+  DollarSign, Vote, Building2, Users, Scale,
+  MapPin, Zap, History, Briefcase, Shield,
+  ChevronRight, Target, Swords, UserCheck, Map, Crown, Clock,
+  GraduationCap, User, BookOpen, Download, Loader2,
+  Award, RotateCcw, Sparkles, Star,
+} from "lucide-react";
+import { LogoPartido } from "@/components/shared/LogoPartido";
+
+const DossieMapaCandidato = dynamic(
+  () => import("@/components/dossie/DossieMapaCandidato").then(m => m.DossieMapaCandidato),
+  { ssr: false, loading: () => <div className="w-full h-full bg-gray-100 animate-pulse rounded-xl" /> },
+);
+
+import { API_BASE } from "@/lib/apiBase";
+
+const API = API_BASE;
+const tkn = () => (typeof window === "undefined" ? "" : localStorage.getItem("ub_token") ?? "");
+const fmt = (n) => (n == null ? "-" : Number(n).toLocaleString("pt-BR"));
+const fmtMoeda = (n) => {
+  if (n == null) return "-";
+  return `R$ ${Number(n).toLocaleString("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+};
+const pct = (n) => n != null ? `${(n * 100).toFixed(0)}%` : "-";
+
+const fetcher = async (url) => {
+  const r = await fetch(url, { headers: { Authorization: `Bearer ${tkn()}` } });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json();
+};
+
+export default function PoliticoPerfilPage() {
+  const { id } = useParams();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [baixandoPdf, setBaixandoPdf] = useState(false);
+
+  // Modo print: chamado pelo browser headless do backend pra gerar PDF.
+  // Query `?print=1&token=<jwt>&ano=<ano>` - setamos o token no localStorage
+  // IMEDIATAMENTE (antes de qualquer fetch do SWR) pra autenticar as requests.
+  const isPrintMode = searchParams?.get("print") === "1";
+  const printToken = searchParams?.get("token");
+  const anoPrint = searchParams?.get("ano");
+
+  // Grava token do query string no localStorage na primeira execucao do client.
+  // Acontece ANTES do useSWR disparar porque useMemo roda durante render.
+  // Tambem seta um ub_user stub pra AppLayout nao redirecionar pra /login
+  // (o AppLayout sera escondido via CSS no modo print, o stub so evita o redirect).
+  useMemo(() => {
+    if (typeof window === "undefined") return;
+    if (isPrintMode && printToken) {
+      localStorage.setItem("ub_token", printToken);
+      if (!localStorage.getItem("ub_user")) {
+        localStorage.setItem(
+          "ub_user",
+          JSON.stringify({ id: 0, nome: "print", perfil: "PRESIDENTE" }),
+        );
+      }
+    }
+    if (isPrintMode) {
+      document.body.classList.add("exportando-pdf");
+    }
+  }, [isPrintMode, printToken]);
+
+  // Ciclo ativo: no modo print vem da query; fora dele, state normal.
+  const [anoCiclo, setAnoCiclo] = useState(
+    isPrintMode && anoPrint ? Number(anoPrint) : null,
+  );
+
+  const dossieUrl = id
+    ? `${API}/dossie/${id}${anoCiclo ? `?ano=${anoCiclo}` : ""}`
+    : null;
+
+  /**
+   * Gera PDF via backend (Chromium headless abre esta mesma pagina em modo print).
+   * Resultado: PDF vetorial com texto selecionavel, mapa funcionando e sem limite
+   * de largura acoplada ao viewport do usuario.
+   */
+  async function baixarPdf() {
+    if (!id || baixandoPdf) return;
+    setBaixandoPdf(true);
+    try {
+      const url = `${API}/dossie/${id}/pdf${anoCiclo ? `?ano=${anoCiclo}` : ""}`;
+      const r = await fetch(url, {
+        headers: { Authorization: `Bearer ${tkn()}` },
+      });
+      if (!r.ok) {
+        const detalhe = await r.text().catch(() => "");
+        throw new Error(`HTTP ${r.status} - ${detalhe.slice(0, 200)}`);
+      }
+      const blob = await r.blob();
+      const nomeBase = (nome || `dossie_${id}`)
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "_")
+        .replace(/^_|_$/g, "");
+      const cicloStr = anoCiclo ? `_${anoCiclo}` : "";
+      const objUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = objUrl;
+      a.download = `dossie_${nomeBase}${cicloStr}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(objUrl);
+    } catch (e) {
+      alert(`Erro ao gerar PDF: ${e.message}`);
+      console.error(e);
+    } finally {
+      setBaixandoPdf(false);
+    }
+  }
+
+  const { data: dossie, error, isLoading, isValidating } = useSWR(
+    dossieUrl,
+    fetcher,
+    { revalidateOnFocus: false },
+  );
+
+  // Sinal pro Playwright: dossie + charts + fontes prontos.
+  // Deve vir ANTES de qualquer `return` condicional (regra de hooks).
+  // Aguarda 2.5s apos dados carregarem pra Recharts animar + mapa baixar tiles.
+  useEffect(() => {
+    if (typeof window === "undefined" || !isPrintMode) return;
+    if (isLoading || !dossie) return;
+    const timer = setTimeout(async () => {
+      if (document.fonts && document.fonts.ready) {
+        await document.fonts.ready;
+      }
+      window.__dossieReady = true;
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, [isPrintMode, isLoading, dossie]);
+
+  if (isLoading) return (
+    <AppLayout>
+      <div className="flex items-center justify-center h-full">
+        <div className="animate-pulse space-y-3 text-center">
+          <div className="w-20 h-20 rounded-2xl bg-gray-200 mx-auto" />
+          <div className="h-4 w-32 bg-gray-200 rounded mx-auto" />
+          <p className="text-xs text-gray-400">Carregando perfil...</p>
+        </div>
+      </div>
+    </AppLayout>
+  );
+
+  if (error || !dossie) return (
+    <AppLayout>
+      <div className="flex flex-col items-center justify-center h-full gap-4">
+        <p className="text-red-600 font-semibold">Erro ao carregar perfil</p>
+        <button onClick={() => router.back()} className="text-sm text-brand-600 hover:underline flex items-center gap-1">
+          <ArrowLeft className="w-4 h-4" /> Voltar
+        </button>
+      </div>
+    </AppLayout>
+  );
+
+  // Extrair dados
+  const ident = dossie.identificacao ?? {};
+  const perfil = dossie.perfil_politico ?? {};
+  const traj = dossie.trajetoria ?? {};
+  const desemp = dossie.desempenho_eleitoral ?? {};
+  const fin = dossie.financeiro ?? {};
+  const legis = dossie.legislativo ?? {};
+  const executivo = dossie.executivo ?? {};
+  const intel = dossie.inteligencia ?? {};
+  const comport = intel.comportamento ?? {};
+  const score = intel.score ?? {};
+  const classif = intel.classificacao ?? {};
+  const juridico = dossie.juridico ?? {};
+  const cargos = traj.cargos_disputados ?? [];
+  const evolucao = desemp.evolucao_votos ?? [];
+  const cicloAtivo = dossie.ano_ciclo_ativo ?? null;
+  const ciclosDisponiveis = dossie.ciclos_disponiveis ?? [];
+  const alertas = intel.alertas ?? [];
+  const doadores = fin.principais_doadores ?? [];
+  const comp = dossie.comparativos ?? {};
+  const redutos = dossie.redutos_eleitorais ?? {};
+
+  const fotoUrl = ident.foto_url ? `${API}${ident.foto_url}` : null;
+  const nome = ident.nome_urna || ident.nome || "Politico";
+  const nomeCompleto = ident.nome || nome;
+  const partidoAtual = perfil.partido_atual ?? "?";
+  // Candidatura exibida = ciclo ativo (foto, mapa, KPIs do hero). Fallback: mais recente.
+  const ultimaCandidatura = cargos.find(c => c.ano === cicloAtivo) ?? cargos[0];
+  const numPartido = ultimaCandidatura?.partido_numero ?? 0;
+  const cor = corDoPartido(numPartido);
+  const scoreGeral = score.geral != null ? Math.round(score.geral) : null;
+  const iniciais = nome.split(" ").slice(0, 2).map(s => s?.[0] ?? "").join("").toUpperCase();
+
+  // Calcular stats resumidos
+  const totalEleicoes = cargos.length;
+  const totalVitorias = cargos.filter(c => c.resultado === "ELEITO").length;
+  const taxaVitoria = totalEleicoes > 0 ? Math.round((totalVitorias / totalEleicoes) * 100) : 0;
+  // Votos carreira: quando ciclo teve 2T, conta so o 2T (1T e 2T sao eleicoes distintas -
+  // somar os dois do mesmo ciclo dobraria os mesmos eleitores). Quando nao teve 2T, usa total.
+  const votosCarreira = cargos.reduce((s, c) => {
+    if (c.disputou_segundo_turno && c.votos_2t != null) return s + c.votos_2t;
+    return s + (c.votos || 0);
+  }, 0);
+
+  return (
+    <AppLayout>
+      {/* scrollbar-gutter: reserva espaco da barra para nao pular largura.
+          Padding direito afasta a barra visualmente do hero e do conteudo. */}
+      <div id="dossie-print"
+           className="flex flex-col w-full h-full bg-gray-50 overflow-auto pr-2"
+           style={{ scrollbarGutter: "stable" }}>
+
+        {/* ════════════════════════════════════════════════════════
+            HERO SECTION
+           ════════════════════════════════════════════════════════ */}
+        <div className="bg-white border-b border-gray-200">
+          <div className="print-hide px-4 pt-2 flex items-center justify-between gap-2">
+            <button onClick={() => router.back()}
+              className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-800 transition-colors">
+              <ArrowLeft className="w-3.5 h-3.5" /> Voltar ao Radar
+            </button>
+            <div className="flex items-center gap-2">
+              {ciclosDisponiveis.length > 1 && (
+                <div className="flex items-center gap-1">
+                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Ciclo</label>
+                  <select
+                    value={anoCiclo ?? cicloAtivo ?? ""}
+                    onChange={(e) => setAnoCiclo(Number(e.target.value))}
+                    className="text-xs font-semibold text-gray-800 bg-gray-50 border border-gray-200 rounded-md px-2 py-1 hover:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-300"
+                    disabled={isValidating}
+                  >
+                    {ciclosDisponiveis.map((ano) => (
+                      <option key={ano} value={ano}>{ano}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              <button
+                onClick={baixarPdf}
+                disabled={baixandoPdf}
+                title={`Baixar PDF${anoCiclo ? ` do ciclo ${anoCiclo}` : ""}`}
+                className="flex items-center gap-1.5 text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 disabled:bg-gray-400 px-3 py-1 rounded-md transition-colors"
+              >
+                {baixandoPdf ? (
+                  <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Gerando...</>
+                ) : (
+                  <><Download className="w-3.5 h-3.5" /> Baixar PDF</>
+                )}
+              </button>
+            </div>
+          </div>
+
+          <div className="px-4 py-3">
+            <div className="flex gap-4">
+              {/* Foto + Overall com tier (design sobrio, sem moldura grossa) */}
+              {(() => {
+                const fifa = intel.overall_fifa || {};
+                const tierStyles = {
+                  dourado: { textCor: "text-amber-700",  label: "DOURADO" },
+                  ouro:    { textCor: "text-yellow-700", label: "OURO" },
+                  prata:   { textCor: "text-gray-600",   label: "PRATA" },
+                  bronze:  { textCor: "text-orange-700", label: "BRONZE" },
+                };
+                const tierCfg = tierStyles[fifa.tier] || tierStyles.bronze;
+                const overall = fifa.overall ?? dossie.overall_ultimo_ciclo;
+                return (
+                  <div className="relative w-32 h-40 sm:w-36 sm:h-44 rounded-xl overflow-hidden border border-gray-200 bg-gray-100 flex-shrink-0 shadow-md">
+                    {fotoUrl ? (
+                      <img src={fotoUrl} alt={nome} className="w-full h-full object-cover object-top" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-400 text-4xl font-black">{iniciais}</div>
+                    )}
+                    {/* Overall canto inferior direito - fundo branco, numero em cor do tier, Inter */}
+                    {overall != null && (
+                      <div className="absolute bottom-1.5 right-1.5 w-12 h-12 rounded-lg flex flex-col items-center justify-center bg-white shadow-md border border-gray-200">
+                        <span className={`text-xl font-black leading-none tabular-nums ${tierCfg.textCor}`}>{overall}</span>
+                        <span className={`text-[7px] font-bold tracking-widest mt-0.5 ${tierCfg.textCor}`}>{tierCfg.label}</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
+              {/* Info central */}
+              <div className="flex-1 min-w-0">
+                {/* Linha 1: Nome + pill sigla partido + ideologia + traits FIFA */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h1 className="text-xl font-black text-gray-900 leading-tight">{nome}</h1>
+                  <span className="text-xs font-bold text-white px-2 py-0.5 rounded-md" style={{ backgroundColor: cor }}>
+                    {partidoAtual}
+                  </span>
+                  {perfil.ideologia_aproximada && <PillIdeologia ideologia={perfil.ideologia_aproximada} />}
+                  {(intel.overall_fifa?.traits || []).map(t => {
+                    const info = TRAIT_CONFIG[t];
+                    if (!info) return null;
+                    const Icon = info.Icon;
+                    return (
+                      <span key={t} title={info.desc} className={`text-[10px] font-bold ${info.color} ${info.bg} px-1.5 py-0.5 rounded inline-flex items-center gap-1`}>
+                        <Icon className="w-3 h-3" />
+                        <span className="uppercase tracking-wide">{info.label}</span>
+                      </span>
+                    );
+                  })}
+                </div>
+
+                {nome !== nomeCompleto && <p className="text-[10px] text-gray-500 mt-0.5">{nomeCompleto}</p>}
+
+                {/* Linha 2: Cargo do ciclo ativo */}
+                {ultimaCandidatura && (
+                  <div className="mt-1.5 text-[12px] font-semibold text-gray-700">
+                    {ultimaCandidatura.cargo} - {ultimaCandidatura.estado_uf}
+                    {ultimaCandidatura.municipio ? ` - ${ultimaCandidatura.municipio}` : ""} - {ultimaCandidatura.ano}
+                  </div>
+                )}
+
+                {/* Dados pessoais em icones - distribuidos horizontalmente */}
+                <DadosPessoaisIcones ident={ident} />
+
+                {/* Historico partidos */}
+                {perfil.historico_partidos?.length > 1 && (
+                  <div className="flex items-center gap-1 mt-1.5 flex-wrap">
+                    {perfil.historico_partidos.map((p, i) => (
+                      <span key={i} className="flex items-center gap-0.5">
+                        {i > 0 && <ChevronRight className="w-3 h-3 text-gray-300" />}
+                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${p === partidoAtual ? "bg-brand-100 text-brand-800" : "bg-gray-100 text-gray-600"}`}>{p}</span>
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* KPIs com espacamento fixo (gap equilibrado, sem justify-between exagerado) */}
+                <div className="flex items-start mt-3 gap-x-10 gap-y-2 flex-wrap">
+                  <KpiHero label={`Votos ${cicloAtivo ?? ""}`} valor={fmt(ultimaCandidatura?.disputou_segundo_turno && ultimaCandidatura?.votos_2t ? ultimaCandidatura.votos_2t : ultimaCandidatura?.votos)} desc={`Votos recebidos na eleicao de ${cicloAtivo} para ${ultimaCandidatura?.cargo}${ultimaCandidatura?.disputou_segundo_turno ? " (2T)" : ""}`} />
+                  <KpiHero label="Votos carreira" valor={fmt(votosCarreira)} desc="Soma dos votos de todas as eleicoes da carreira. Quando houve 2T, conta apenas o 2T (1T e 2T sao eleicoes distintas - nao podem ser somadas)" />
+                  <KpiHero label="Eleicoes" valor={totalEleicoes} desc="Total de eleicoes disputadas ao longo da carreira" />
+                  <KpiHero label="Vitorias" valor={totalVitorias} corValor="text-green-600" desc="Numero de vezes que foi eleito" />
+                  <KpiHero label="Taxa" valor={`${taxaVitoria}%`} desc="Vitorias dividido por eleicoes disputadas" />
+                </div>
+
+                {/* Scores + badges */}
+                <div className="flex items-center gap-2 mt-2.5 flex-wrap">
+                  <div className="flex gap-1">
+                    <MiniScore label="ELE" valor={score.eleitoral} disponivel={score.eleitoral_disponivel} desc="Performance eleitoral: taxa de vitoria, crescimento de votos, persistencia e volume" />
+                    <MiniScore label="FIN" valor={score.financeiro} disponivel={score.financeiro_disponivel} desc="Eficiencia financeira: custo por voto, equilibrio orcamentario, transparencia" />
+                    <MiniScore label="POL" valor={score.politico} disponivel={score.politico_disponivel} desc="Perfil politico: fidelidade partidaria, coerencia ideologica, experiencia" />
+                    <MiniScore label="JUR" valor={score.juridico} disponivel={score.juridico_disponivel} desc="Risco juridico: ficha limpa, processos eleitorais e criminais (em breve)" />
+                    <MiniScore label="DIG" valor={score.digital} disponivel={score.digital_disponivel} desc="Presenca digital: redes sociais, engajamento, reputacao online (em breve)" />
+                  </div>
+                  <div className="h-5 w-px bg-gray-200" />
+                  {classif.risco && <BadgeNivel label="Risco" nivel={classif.risco} />}
+                  {classif.potencial && <BadgeNivel label="Potencial" nivel={classif.potencial} />}
+                  {alertas.length > 0 && (
+                    <span className="flex items-center gap-1 text-[9px] text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">
+                      <AlertTriangle className="w-3 h-3" /> {alertas.length} alerta{alertas.length > 1 ? "s" : ""}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Logo do partido no canto direito (proporcional - aspect ratio natural) */}
+              <LogoPartidoHero sigla={partidoAtual} cor={cor} />
+            </div>
+          </div>
+        </div>
+
+        {/* ════════════════════════════════════════════════════════
+            BLOCOS DE CONTEUDO
+           ════════════════════════════════════════════════════════ */}
+        <div className="px-4 py-3 space-y-3">
+
+          {/* ── LINHA 1: 1-Trajetoria | 2-Overall ────────────── */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+            {cargos.length > 0 && (
+              <Bloco titulo="Trajetoria Eleitoral" icon={History} cor="purple" fixedH="280px">
+                <p className="text-[9px] text-gray-400 mb-2">Clique em um ciclo para ver os dados daquele periodo</p>
+                <div className="space-y-1">
+                  {cargos.map((c, i) => {
+                    const isEleito = c.resultado === "ELEITO";
+                    const isSupl = c.resultado === "SUPLENTE";
+                    const isAtivo = c.ano === cicloAtivo;
+                    return (
+                      <div
+                        key={i}
+                        onClick={() => setAnoCiclo(c.ano === anoCiclo ? null : c.ano)}
+                        className={`flex items-center gap-2.5 p-2 rounded-lg cursor-pointer transition-all ${
+                          isAtivo
+                            ? "bg-brand-50 border border-brand-200 shadow-sm"
+                            : "hover:bg-gray-50 border border-transparent"
+                        }`}
+                      >
+                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-white text-[11px] font-black flex-shrink-0 ${
+                          isAtivo ? "bg-brand-600" : isEleito ? "bg-green-500" : isSupl ? "bg-amber-500" : "bg-gray-400"
+                        }`}>
+                          {String(c.ano).slice(2)}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs font-bold text-gray-900">{c.cargo}</span>
+                            {isEleito && <Crown className="w-3.5 h-3.5 text-amber-500" />}
+                            {isSupl && <Clock className="w-3.5 h-3.5 text-amber-500" />}
+                          </div>
+                          <p className="text-[10px] text-gray-500 truncate">
+                            {c.partido}{c.estado_uf ? ` - ${c.estado_uf}` : ""}{c.municipio ? ` - ${c.municipio}` : ""}
+                          </p>
+                        </div>
+                        <div className="text-right flex-shrink-0">
+                          {c.disputou_segundo_turno && c.votos_2t != null ? (
+                            <div className="flex flex-col items-end leading-tight gap-0.5">
+                              <span className="text-[8px] text-gray-400 font-bold uppercase tracking-wide">1º / 2º turno</span>
+                              <span className="text-[11px] font-semibold text-gray-600 tabular-nums">{fmt(c.votos_1t ?? 0)}</span>
+                              <span className="text-sm font-black text-gray-900 tabular-nums">{fmt(c.votos_2t)}</span>
+                            </div>
+                          ) : c.votos > 0 ? (
+                            <span className="text-sm font-black text-gray-900 tabular-nums">{fmt(c.votos)}</span>
+                          ) : (
+                            <span className="text-[9px] font-semibold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">Nao disputou</span>
+                          )}
+                        </div>
+                        {isAtivo && <ChevronRight className="w-4 h-4 text-brand-500" />}
+                      </div>
+                    );
+                  })}
+                </div>
+              </Bloco>
+            )}
+            <RadarChartFifa fifa={intel.overall_fifa} cor={cor} />
+          </div>
+
+          {/* ── LINHA 1b: Comparativos full width ── */}
+          <CardComparativos comp={comp} cicloAtivo={cicloAtivo} />
+
+          {/* ── LINHA 2: Assimetrica ─────────────────────────────
+              Esquerda: 3-Financeiro (grande) + 5-Perfil (pequeno)
+              Direita:  4-Desempenho (pequeno) + 6-Mapa (grande)
+              align-start: cada coluna tem altura independente
+             ────────────────────────────────────────────────────── */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+            {/* ── Coluna esquerda ──────────────────────────────── */}
+            <div className="flex flex-col gap-3">
+              {/* 3 - Financeiro (GRANDE) */}
+              {fin.disponivel !== false && (
+                <Bloco titulo="Financeiro" icon={DollarSign} cor="green" fixedH="480px">
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-3 gap-2">
+                      <Kpi label="Arrecadado" valor={fmtMoeda(fin.total_arrecadado)} />
+                      <Kpi label="Gasto" valor={fmtMoeda(fin.total_gasto)} />
+                      <Kpi label="Custo/voto" valor={fin.cpv_benchmark?.valor_candidato != null ? fmtMoeda(fin.cpv_benchmark.valor_candidato) : "-"} />
+                    </div>
+                    <BadgeSaldoPrestacao arrecadado={fin.total_arrecadado} gasto={fin.total_gasto} />
+                    {fin.cpv_benchmark?.leitura_curta && (
+                      <div className="bg-gray-50 rounded-lg p-2.5 text-[10px] text-gray-600">
+                        {fin.cpv_benchmark.leitura_curta}
+                        {fin.cpv_benchmark.mediana_pares != null && (
+                          <span className="ml-1 text-gray-400">
+                            (mediana: {fmtMoeda(fin.cpv_benchmark.mediana_pares)}, base: {fmt(fin.cpv_benchmark.n_pares)} candidatos)
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    {fin.origem_recursos && <BarraOrigem origem={fin.origem_recursos} />}
+                    {fin.concentracao && (
+                      <div>
+                        <p className="text-[9px] font-bold text-gray-400 uppercase mb-1.5">Concentracao de doadores</p>
+                        <div className="grid grid-cols-4 gap-2 text-center">
+                          <Kpi label="Top 1" valor={pct(fin.concentracao.top1_pct)} small />
+                          <Kpi label="Top 5" valor={pct(fin.concentracao.top5_pct)} small />
+                          <Kpi label="Top 10" valor={pct(fin.concentracao.top10_pct)} small />
+                          <Kpi label="Doadores" valor={fmt(fin.concentracao.n_doadores)} small />
+                        </div>
+                      </div>
+                    )}
+                    {doadores.length > 0 && (
+                      <div>
+                        <p className="text-[9px] font-bold text-gray-400 uppercase mb-1">Principais doadores</p>
+                        <div className="space-y-0.5">
+                          {doadores.slice(0, 10).map((d, i) => (
+                            <div key={i} className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-gray-50">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <span className="text-[9px] text-gray-400 font-bold w-4">{i + 1}</span>
+                                <span className="text-[11px] text-gray-700 truncate">{d.nome}</span>
+                              </div>
+                              <span className="text-[11px] font-bold text-gray-900 tabular-nums ml-2 flex-shrink-0">{fmtMoeda(d.valor)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </Bloco>
+              )}
+
+              {/* 3b - Redutos Eleitorais (PEQUENO) - preenche buraco abaixo do Financeiro */}
+              <CardRedutos redutos={redutos} />
+
+            </div>
+
+            {/* ── Coluna direita ───────────────────────────────── */}
+            <div className="space-y-3">
+              {/* 4 - Desempenho Eleitoral (PEQUENO) - reflete o CICLO ATIVO */}
+              <Bloco
+                titulo={desemp.ciclo_ano
+                  ? `Desempenho - ${desemp.ciclo_cargo} ${desemp.ciclo_ano}`
+                  : "Desempenho Eleitoral"}
+                icon={TrendingUp} cor="blue" fixedH="200px">
+                <div className="space-y-3">
+                  {ultimaCandidatura?.disputou_segundo_turno ? (
+                    /* Candidato foi pra 2T - mostrar turnos separados */
+                    <div>
+                      <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">
+                        Votos no ciclo (1º e 2º turno)
+                      </p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="bg-gray-50 rounded p-2">
+                          <p className="text-[8px] font-bold text-gray-500 uppercase">1º Turno</p>
+                          <p className="text-base font-black text-gray-900 tabular-nums">{fmt(ultimaCandidatura.votos_1t ?? 0)}</p>
+                        </div>
+                        <div className="bg-blue-50 border border-blue-100 rounded p-2">
+                          <p className="text-[8px] font-bold text-blue-600 uppercase">2º Turno</p>
+                          <p className="text-base font-black text-blue-900 tabular-nums">{fmt(ultimaCandidatura.votos_2t ?? 0)}</p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 mt-2">
+                        <Kpi label="Eleicoes carreira" valor={totalEleicoes} small />
+                        <Kpi label="Taxa vitoria" valor={`${taxaVitoria}%`} small />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-3 gap-2">
+                      <div>
+                        <p className="text-[8px] font-bold text-gray-400 uppercase" title="Votos recebidos no ciclo eleitoral selecionado">
+                          Votos no ciclo
+                        </p>
+                        <p className="text-lg font-black text-gray-900 tabular-nums">{fmt(desemp.total_votos)}</p>
+                        {desemp.votos_carreira > (desemp.total_votos ?? 0) && (
+                          <p className="text-[8px] text-gray-400 mt-0.5">
+                            Carreira: <span className="tabular-nums font-semibold">{fmt(desemp.votos_carreira)}</span>
+                          </p>
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-[8px] font-bold text-gray-400 uppercase">Eleicoes carreira</p>
+                        <p className="text-lg font-black text-gray-900">{totalEleicoes}</p>
+                      </div>
+                      <div>
+                        <p className="text-[8px] font-bold text-gray-400 uppercase">Taxa vitoria</p>
+                        <p className="text-lg font-black text-gray-900">{taxaVitoria}%</p>
+                      </div>
+                    </div>
+                  )}
+                  {evolucao.length > 0 && (
+                    <div>
+                      <p className="text-[9px] font-bold text-gray-400 uppercase mb-1.5">Evolucao de votos</p>
+                      <div className="space-y-1">
+                        {evolucao.map((e, i) => {
+                          const maxV = Math.max(...evolucao.map(x => x.votos || 0));
+                          const barPct = maxV > 0 ? (e.votos / maxV) * 100 : 0;
+                          const isEleito = cargos.find(c => c.ano === e.ano && c.cargo === e.cargo)?.resultado === "ELEITO";
+                          return (
+                            <div key={i} className="flex items-center gap-2">
+                              <span className="text-[10px] text-gray-500 w-8 tabular-nums">{e.ano}</span>
+                              <span className="text-[8px] text-gray-400 w-14 truncate">{e.cargo?.slice(0, 8)}</span>
+                              <div className="flex-1 h-5 bg-gray-100 rounded overflow-hidden">
+                                <div
+                                  className={`h-full rounded flex items-center justify-end pr-1.5 transition-all duration-500 ${isEleito ? "bg-green-500" : "bg-gray-400"}`}
+                                  style={{ width: `${Math.max(barPct, 5)}%` }}
+                                >
+                                  {barPct > 20 && <span className="text-[8px] font-bold text-white tabular-nums">{fmt(e.votos)}</span>}
+                                </div>
+                              </div>
+                              {barPct <= 20 && <span className="text-[9px] text-gray-500 tabular-nums w-10">{fmt(e.votos)}</span>}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                  <div className="flex gap-4">
+                    {desemp.regioes_fortes?.length > 0 && (
+                      <div className="flex-1">
+                        <p className="text-[9px] font-bold text-green-600 uppercase mb-1">Regioes fortes</p>
+                        <div className="flex flex-wrap gap-1">
+                          {desemp.regioes_fortes.map((r, i) => (
+                            <span key={i} className="text-[9px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded">{r}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {desemp.regioes_fracas?.length > 0 && (
+                      <div className="flex-1">
+                        <p className="text-[9px] font-bold text-orange-600 uppercase mb-1">Regioes fracas</p>
+                        <div className="flex flex-wrap gap-1">
+                          {desemp.regioes_fracas.map((r, i) => (
+                            <span key={i} className="text-[9px] bg-orange-50 text-orange-700 px-1.5 py-0.5 rounded">{r}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </Bloco>
+
+              {/* 6 - Mapa Eleitoral (GRANDE) - dimensoes validadas no PDF (17/04/2026) */}
+              <Bloco titulo="Mapa Eleitoral" icon={Map} cor="brand" fixedH="600px">
+                <div className="rounded-lg overflow-hidden">
+                  <DossieMapaCandidato
+                    candidatoId={Number(id)}
+                    partidoCor={cor}
+                    candidaturaId={ultimaCandidatura?.candidatura_id}
+                    alturaMapa="h-[500px]"
+                  />
+                </div>
+                <p className="text-[10px] text-gray-500 text-center mt-1.5 font-medium">
+                  {ultimaCandidatura
+                    ? `${ultimaCandidatura.cargo} - ${ultimaCandidatura.estado_uf}${ultimaCandidatura.municipio ? ` - ${ultimaCandidatura.municipio}` : ""} - ${ultimaCandidatura.ano}`
+                    : "Distribuicao de votos"
+                  }
+                </p>
+              </Bloco>
+            </div>
+          </div>
+
+          {/* ── Perfil Politico (full width - tematicamente autonomo) ─── */}
+          <Bloco titulo="Perfil Politico" icon={UserCheck} cor="indigo">
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+              <Kpi label="Partido atual" valor={partidoAtual} />
+              <Kpi label="Ideologia" valor={perfil.ideologia_aproximada ?? "Nao disponivel"} />
+              <Kpi label="Coerencia ideologica" valor={comport.coerencia_ideologica != null ? `${Math.round(comport.coerencia_ideologica)}%` : "-"} />
+              <Kpi label="Alinham. partido" valor={comport.alinhamento_partido != null ? `${Math.round(comport.alinhamento_partido)}%` : "-"} />
+              <Kpi label="Alinham. governo" valor={comport.alinhamento_governo != null ? `${Math.round(comport.alinhamento_governo)}%` : "-"} />
+            </div>
+            {perfil.historico_partidos?.length > 0 && (
+              <div className="mt-4">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Historico de partidos</p>
+                <div className="flex items-center gap-1 flex-wrap">
+                  {perfil.historico_partidos.map((p, i) => (
+                    <span key={i} className="flex items-center gap-1">
+                      {i > 0 && <ChevronRight className="w-3 h-3 text-gray-300" />}
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                        p === partidoAtual ? "bg-brand-100 text-brand-800" : "bg-gray-100 text-gray-600"
+                      }`}>{p}</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </Bloco>
+
+          {/* ── Resumo Executivo (full width) ───────────────────── */}
+          {intel.resumo_executivo && (
+            <Bloco titulo="Resumo Executivo" icon={Zap} cor="brand">
+              <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{intel.resumo_executivo}</p>
+            </Bloco>
+          )}
+
+          {/* ── Legislativo (full width - mais denso) ──────────── */}
+          {legis.disponivel && (
+            <Bloco titulo="Atividade Legislativa" icon={Building2} cor="teal">
+              <CardLegislativo legis={legis} />
+            </Bloco>
+          )}
+
+          {/* ── Executivo (Presidente/Governador) - 18/04/2026 ── */}
+          {executivo.disponivel && (
+            <Bloco titulo="Atividade no Executivo" icon={Building2} cor="indigo">
+              <CardExecutivo executivo={executivo} />
+            </Bloco>
+          )}
+
+          {/* ── Carreira + Juridico ───────────────────────────────
+              2 colunas com conteudo equilibrado. No PDF, oculta o Juridico
+              se o candidato so tem "SEM DADO" (sem ficha limpa, sem historico
+              e sem ciclos inapto) - a secao "EM BREVE" so polui. */}
+          {(() => {
+            const juridicoTemDado = juridico?.ficha_limpa != null
+              || (juridico?.historico_aptidao?.length > 0)
+              || (juridico?.ciclos_inapto ?? 0) > 0;
+            const mostraJuridico = !isPrintMode || juridicoTemDado;
+            const mostraCarreira = dossie.carreira_publica?.disponivel;
+            if (!mostraJuridico && !mostraCarreira) return null;
+            const cols2 = mostraCarreira && mostraJuridico;
+            return (
+              <div className={`grid gap-3 ${cols2 ? "grid-cols-1 lg:grid-cols-2" : "grid-cols-1"}`}>
+                {mostraCarreira && (
+                  <Bloco titulo="Carreira no Setor Publico" icon={Briefcase} cor="indigo">
+                    <TimelineCarreira cargos={dossie.carreira_publica.cargos} />
+                  </Bloco>
+                )}
+                {mostraJuridico && (
+                  <Bloco titulo="Juridico" icon={Scale} cor="red">
+                    <CardJuridico juridico={juridico} isPrintMode={isPrintMode} />
+                  </Bloco>
+                )}
+              </div>
+            );
+          })()}
+
+          {/* ── Redes Sociais (full width) ──────────────────────
+              Escondido no PDF se o candidato nao tem redes cadastradas
+              (no site fica visivel com banner "sem dado" pra sinalizar que
+              ainda nao foi enriquecido). */}
+          {(!isPrintMode || dossie.redes_sociais?.disponivel) && (
+            <Bloco titulo="Redes Sociais e Presenca Digital" icon={Users} cor="pink">
+              <CardRedesSociais redes={dossie.redes_sociais} />
+            </Bloco>
+          )}
+
+          {/* ── Alertas (full width) ─────────────────────────────── */}
+          {alertas.length > 0 && (
+            <Bloco titulo={`Alertas (${alertas.length})`} icon={AlertTriangle} cor="amber">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {alertas.map((a, i) => (
+                  <div key={i} className="flex items-start gap-2 bg-amber-50 border border-amber-100 rounded-lg p-2.5">
+                    <AlertTriangle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0 mt-0.5" />
+                    <p className="text-[11px] text-amber-800">{a}</p>
+                  </div>
+                ))}
+              </div>
+            </Bloco>
+          )}
+
+          {/* ── Biografia (rodape full-width - narrativa editorial) ──── */}
+          {ident.bio_resumida && (
+            <CardBiografia bio={ident.bio_resumida} url={ident.wikipedia_url} />
+          )}
+        </div>
+      </div>
+    </AppLayout>
+  );
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   RADAR CHART FIFA (hexagono SVG)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+// Configuracao visual dos tiers (dourado, ouro, prata, bronze)
+const TIER_STYLES = {
+  dourado: { label: "DOURADO", bgGrad: "from-yellow-300 via-amber-400 to-yellow-500", borderCor: "border-yellow-400", textCor: "text-yellow-900", badgeBg: "bg-yellow-200 text-yellow-900", hex: "#d4a84b" },
+  ouro:    { label: "OURO",    bgGrad: "from-amber-200 via-amber-300 to-amber-400",  borderCor: "border-amber-400",  textCor: "text-amber-900",  badgeBg: "bg-amber-200 text-amber-900",  hex: "#eab308" },
+  prata:   { label: "PRATA",   bgGrad: "from-gray-200 via-gray-300 to-gray-400",     borderCor: "border-gray-400",   textCor: "text-gray-900",   badgeBg: "bg-gray-200 text-gray-900",     hex: "#9ca3af" },
+  bronze:  { label: "BRONZE",  bgGrad: "from-orange-200 via-orange-300 to-orange-400", borderCor: "border-orange-400", textCor: "text-orange-900", badgeBg: "bg-orange-200 text-orange-900", hex: "#b87333" },
+};
+
+// Trait labels em linguagem política adulta (sem gamer, sem emoji)
+const TRAIT_CONFIG = {
+  LEGEND:    { Icon: Star,        label: "Veterano",      color: "text-slate-700",   bg: "bg-slate-50 border border-slate-200",     desc: "4+ eleições com 3+ vitórias na carreira" },
+  CAMPEAO:   { Icon: Award,       label: "Eleito",        color: "text-amber-800",   bg: "bg-amber-50 border border-amber-200",     desc: "Venceu a última eleição disputada" },
+  FERA:      { Icon: TrendingUp,  label: "Mais votado",   color: "text-blue-700",    bg: "bg-blue-50 border border-blue-200",       desc: "Entre os 10% mais votados do cargo no ciclo" },
+  COMEBACK:  { Icon: RotateCcw,   label: "Recuperou",     color: "text-purple-700",  bg: "bg-purple-50 border border-purple-200",   desc: "Perdeu a eleição anterior e venceu a última" },
+  ESTREANTE: { Icon: Sparkles,    label: "Estreante",     color: "text-emerald-700", bg: "bg-emerald-50 border border-emerald-200", desc: "Primeira eleição disputada" },
+};
+
+function RadarChartFifa({ fifa, cor }) {
+  if (!fifa || fifa.overall == null) return null;
+
+  // 8 dimensoes (octogono). None vira 0 visualmente mas e sinalizado.
+  const dims = [
+    { key: "votacao",     label: "VOT", valor: fifa.votacao,     desc: fifa.votacao_desc },
+    { key: "eficiencia",  label: "EFI", valor: fifa.eficiencia,  desc: fifa.eficiencia_desc },
+    { key: "articulacao", label: "ART", valor: fifa.articulacao, desc: fifa.articulacao_desc },
+    { key: "fidelidade",  label: "FID", valor: fifa.fidelidade,  desc: fifa.fidelidade_desc },
+    { key: "financeiro",  label: "FIN", valor: fifa.financeiro,  desc: fifa.financeiro_desc },
+    { key: "territorial", label: "TER", valor: fifa.territorial, desc: fifa.territorial_desc },
+    { key: "potencial",   label: "POT", valor: fifa.potencial,   desc: fifa.potencial_desc },
+    { key: "integridade", label: "INT", valor: fifa.integridade, desc: fifa.integridade_desc },
+  ];
+
+  const cx = 120, cy = 120, r = 85;
+  const n = dims.length;
+
+  const pontos = (raio) => dims.map((_, i) => {
+    const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
+    return [cx + raio * Math.cos(angle), cy + raio * Math.sin(angle)];
+  });
+
+  const gridLevels = [0.2, 0.4, 0.6, 0.8, 1.0];
+
+  const valorPontos = dims.map((d, i) => {
+    const ratio = (d.valor ?? 0) / 99;
+    const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
+    return [cx + r * ratio * Math.cos(angle), cy + r * ratio * Math.sin(angle)];
+  });
+  const valorPath = valorPontos.map(([x, y], i) => `${i === 0 ? "M" : "L"}${x},${y}`).join(" ") + " Z";
+
+  const labelPontos = pontos(r + 22);
+  const tier = TIER_STYLES[fifa.tier] || TIER_STYLES.bronze;
+  const traits = fifa.traits || [];
+
+  return (
+    <div className={`rounded-xl border border-gray-200 p-4 bg-white`} style={{ minHeight: "280px" }}>
+      {/* Header: Overall + tier + traits */}
+      <div className="flex items-start gap-3 mb-3">
+        <div className="flex-shrink-0 w-16 h-16 rounded-lg bg-white border border-gray-200 flex flex-col items-center justify-center shadow-sm">
+          <span className={`text-3xl font-black leading-none tabular-nums ${tier.textCor}`}>{fifa.overall}</span>
+          <span className={`text-[8px] font-bold tracking-[0.2em] ${tier.textCor}`}>{tier.label}</span>
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 mb-1">
+            <Shield className={`w-3.5 h-3.5 ${tier.textCor}`} />
+            <h3 className={`text-xs font-black uppercase tracking-wider ${tier.textCor}`}>Overall</h3>
+          </div>
+          {/* Traits */}
+          {traits.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {traits.map(t => {
+                const info = TRAIT_CONFIG[t];
+                if (!info) return null;
+                const Icon = info.Icon;
+                return (
+                  <span key={t} title={info.desc} className={`text-[9px] font-bold ${info.color} ${info.bg} px-1.5 py-0.5 rounded inline-flex items-center gap-1`}>
+                    <Icon className="w-3 h-3" />
+                    <span className="uppercase tracking-wide">{info.label}</span>
+                  </span>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="bg-gray-50 rounded-lg p-3">
+        <div className="flex items-center gap-4">
+          {/* SVG Radar octogonal */}
+          <svg viewBox="0 0 240 240" className="w-44 h-44 flex-shrink-0">
+            {gridLevels.map((level, gi) => {
+              const pts = pontos(r * level);
+              const d = pts.map(([x, y], i) => `${i === 0 ? "M" : "L"}${x},${y}`).join(" ") + " Z";
+              return <path key={gi} d={d} fill="none" stroke="#e5e7eb" strokeWidth={gi === gridLevels.length - 1 ? 1 : 0.5} />;
+            })}
+            {pontos(r).map(([x, y], i) => (
+              <line key={i} x1={cx} y1={cy} x2={x} y2={y} stroke="#e5e7eb" strokeWidth={0.5} />
+            ))}
+            <path d={valorPath} fill={`${cor}25`} stroke={cor} strokeWidth={2} />
+            {valorPontos.map(([x, y], i) => (
+              <circle key={i} cx={x} cy={y} r={3} fill={cor} />
+            ))}
+            {labelPontos.map(([x, y], i) => (
+              <g key={i}>
+                <text x={x} y={y - 5} textAnchor="middle" className="text-[9px] font-bold fill-gray-500">{dims[i].label}</text>
+                <text x={x} y={y + 7} textAnchor="middle" className="text-[11px] font-black fill-gray-900">
+                  {dims[i].valor != null ? dims[i].valor : "-"}
+                </text>
+              </g>
+            ))}
+          </svg>
+
+          {/* Lista de dimensoes */}
+          <div className="flex-1 space-y-1">
+            {dims.map(d => (
+              <div key={d.key} className="group relative">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 text-right">
+                    {d.valor != null ? (
+                      <span className={`text-sm font-black tabular-nums ${
+                        d.valor >= 75 ? "text-green-600" : d.valor >= 50 ? "text-amber-600" : d.valor >= 25 ? "text-orange-600" : "text-red-600"
+                      }`}>{d.valor}</span>
+                    ) : (
+                      <span className="text-xs text-gray-300">-</span>
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                      <div className="h-full rounded-full transition-all duration-700" style={{ width: `${d.valor ?? 0}%`, backgroundColor: cor }} />
+                    </div>
+                  </div>
+                  <span className="text-[9px] font-bold text-gray-400 w-6">{d.label}</span>
+                </div>
+                <div className="absolute left-0 bottom-full mb-1 hidden group-hover:block z-20 pointer-events-none">
+                  <div className="bg-gray-900 text-white text-[10px] px-2.5 py-1.5 rounded-lg shadow-lg max-w-[240px]">
+                    <p className="font-bold">{d.label} - {d.valor != null ? `${d.valor}/99` : "sem dados"}</p>
+                    <p className="text-gray-300 mt-0.5">{d.desc}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Bonus e penalidades aplicados (transparencia + gamificacao) */}
+        {(fifa.bonus_aplicados?.length > 0 || fifa.penalidades_aplicadas?.length > 0) && (
+          <div className="mt-3 pt-2 border-t border-gray-100 space-y-0.5">
+            {fifa.bonus_aplicados?.map((b, i) => (
+              <p key={`b${i}`} className="text-[10px] text-green-700">
+                <span className="font-bold">+</span> {b}
+              </p>
+            ))}
+            {fifa.penalidades_aplicadas?.map((p, i) => (
+              <p key={`p${i}`} className="text-[10px] text-red-700">
+                <span className="font-bold">-</span> {p}
+              </p>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   SUB-COMPONENTES
+   ══════════════════════════════════════════════════════════════════════════ */
+
+function Bloco({ titulo, icon: Icon, children, cor = "brand", className = "", fixedH }) {
+  const cores = {
+    brand: "text-brand-600", purple: "text-purple-600", blue: "text-blue-600",
+    green: "text-green-600", indigo: "text-indigo-600", teal: "text-teal-600",
+    red: "text-red-600", pink: "text-pink-600", amber: "text-amber-600",
+  };
+  return (
+    <div className={`bg-white rounded-xl border border-gray-200 p-4 flex flex-col ${className}`}
+      style={fixedH ? { minHeight: fixedH } : undefined}>
+      <div className="flex items-center gap-2 mb-3 flex-shrink-0">
+        <Icon className={`w-4 h-4 ${cores[cor] ?? cores.brand}`} />
+        <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wide">{titulo}</h3>
+      </div>
+      <div className="flex-1">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function KpiHero({ label, valor, desc, corValor = "text-gray-900", span2 }) {
+  return (
+    <div className={`group relative cursor-help ${span2 ? "col-span-2" : ""}`}>
+      <p className="text-[8px] font-bold text-gray-400 uppercase">{label}</p>
+      <p className={`text-xl font-black tabular-nums ${corValor}`}>{valor}</p>
+      {desc && (
+        <div className="absolute left-0 bottom-full mb-1.5 hidden group-hover:block z-30 pointer-events-none">
+          <div className="bg-gray-900 text-white text-[10px] px-2.5 py-1.5 rounded-lg shadow-lg w-52 text-left">
+            <p className="font-bold">{label}</p>
+            <p className="text-gray-300 mt-0.5 leading-relaxed">{desc}</p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Kpi({ label, valor, small }) {
+  return (
+    <div>
+      <p className="text-[8px] font-bold text-gray-400 uppercase tracking-wider">{label}</p>
+      <p className={`font-black text-gray-900 tabular-nums leading-tight ${small ? "text-xs" : "text-sm"}`}>{valor}</p>
+    </div>
+  );
+}
+
+/**
+ * Badge que interpreta a prestação de contas TSE:
+ *   - Gasto > Arrecadado = déficit (candidato pagou do proprio bolso ou ficou devendo)
+ *   - Gasto ≈ Arrecadado (±2%) = prestação equilibrada
+ *   - Gasto < Arrecadado = saldo positivo
+ * Evita que o leitor interprete déficit como má gestão sem contexto.
+ */
+function BadgeSaldoPrestacao({ arrecadado, gasto }) {
+  if (arrecadado == null || gasto == null) return null;
+  if (arrecadado <= 0 && gasto <= 0) return null;
+  const diff = gasto - arrecadado;
+  const pctDesvio = arrecadado > 0 ? Math.abs(diff) / arrecadado : 0;
+
+  let estilo, titulo, detalhe;
+  if (arrecadado > 0 && pctDesvio <= 0.02) {
+    estilo = "bg-gray-50 text-gray-700 border-gray-200";
+    titulo = "Prestação equilibrada";
+    detalhe = "Gastos e receitas declarados ao TSE em linha (±2%).";
+  } else if (diff > 0) {
+    estilo = "bg-amber-50 text-amber-900 border-amber-200";
+    titulo = `Déficit de ${fmtMoeda(diff)}`;
+    detalhe = "Gastou mais do que arrecadou. Candidato declarou recursos próprios ou dívida de campanha ao TSE.";
+  } else {
+    estilo = "bg-emerald-50 text-emerald-900 border-emerald-200";
+    titulo = `Saldo positivo de ${fmtMoeda(-diff)}`;
+    detalhe = "Arrecadou mais do que gastou na campanha.";
+  }
+
+  return (
+    <div className={`rounded-lg border px-2.5 py-1.5 flex items-start gap-2 ${estilo}`}>
+      <div className="flex-1 min-w-0">
+        <p className="text-[10px] font-bold">{titulo}</p>
+        <p className="text-[9px] opacity-80 leading-tight">{detalhe}</p>
+      </div>
+    </div>
+  );
+}
+
+function StatRapido({ label, valor }) {
+  return (
+    <div>
+      <p className="text-[8px] font-bold text-gray-400 uppercase">{label}</p>
+      <p className="text-sm font-black text-gray-900 tabular-nums leading-none">{valor}</p>
+    </div>
+  );
+}
+
+function MiniScore({ label, valor, disponivel, desc }) {
+  const v = valor != null ? Math.round(valor) : null;
+  const bg = !disponivel || v == null ? "bg-gray-100 text-gray-400"
+    : v >= 70 ? "bg-green-100 text-green-700"
+    : v >= 40 ? "bg-amber-100 text-amber-700"
+    : "bg-red-100 text-red-700";
+  return (
+    <div className={`group relative rounded-md px-1.5 py-1 text-center min-w-[36px] cursor-help ${bg}`}>
+      <p className="text-[10px] font-black tabular-nums leading-none">{v ?? "-"}</p>
+      <p className="text-[7px] font-bold uppercase leading-tight mt-0.5">{label}</p>
+      {desc && (
+        <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1.5 hidden group-hover:block z-30 pointer-events-none">
+          <div className="bg-gray-900 text-white text-[10px] px-2.5 py-1.5 rounded-lg shadow-lg w-48 text-left">
+            <p className="font-bold">{label} {v != null ? `- ${v}/100` : ""}</p>
+            <p className="text-gray-300 mt-0.5 leading-relaxed">{desc}</p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function BadgeNivel({ label, nivel }) {
+  const cores = {
+    ALTO: label === "Risco" ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700",
+    MEDIO: "bg-amber-100 text-amber-700",
+    BAIXO: label === "Risco" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700",
+  };
+  return (
+    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${cores[nivel] ?? "bg-gray-100 text-gray-600"}`}>
+      {label}: {nivel}
+    </span>
+  );
+}
+
+function BadgeResultado({ resultado }) {
+  const cfg = {
+    ELEITO: "bg-green-100 text-green-700",
+    SUPLENTE: "bg-amber-100 text-amber-700",
+    NAO_ELEITO: "bg-gray-100 text-gray-600",
+  };
+  const label = { ELEITO: "Eleito", SUPLENTE: "Suplente", NAO_ELEITO: "Nao eleito" };
+  return (
+    <span className={`text-[8px] font-bold px-1 py-0.5 rounded ${cfg[resultado] ?? cfg.NAO_ELEITO}`}>
+      {label[resultado] ?? resultado}
+    </span>
+  );
+}
+
+function PillIdeologia({ ideologia }) {
+  const cores = {
+    "esquerda": "bg-red-100 text-red-700",
+    "centro-esquerda": "bg-orange-100 text-orange-700",
+    "centro": "bg-gray-100 text-gray-700",
+    "centro-direita": "bg-sky-100 text-sky-700",
+    "direita": "bg-blue-100 text-blue-700",
+  };
+  return (
+    <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded ${cores[ideologia] ?? "bg-gray-100 text-gray-600"}`}>
+      {ideologia}
+    </span>
+  );
+}
+
+function SemDados({ texto }) {
+  return (
+    <div className="text-center py-4">
+      <Shield className="w-8 h-8 text-gray-200 mx-auto mb-1.5" />
+      <p className="text-xs text-gray-400">{texto}</p>
+    </div>
+  );
+}
+
+function CardExecutivo({ executivo }) {
+  const {
+    cargo_titulo, mandato_ano_inicio, mandato_ano_fim, uf, partido_sigla,
+    n_medidas_provisorias, n_mps_aprovadas, n_mps_rejeitadas, n_mps_caducadas,
+    n_pls_enviados, n_plps_enviados, n_pecs_enviadas, n_vetos, n_decretos,
+    total_atos, taxa_aprovacao_mps, ultimas_mps, ultimos_pls,
+  } = executivo;
+
+  const mandato = mandato_ano_fim
+    ? `${mandato_ano_inicio}-${mandato_ano_fim}`
+    : `${mandato_ano_inicio}-atual`;
+
+  const contadores = [
+    { label: "Medidas Provisorias", n: n_medidas_provisorias, cor: "bg-blue-50 text-blue-700 border-blue-200" },
+    { label: "PLs enviados", n: n_pls_enviados, cor: "bg-teal-50 text-teal-700 border-teal-200" },
+    { label: "PLPs", n: n_plps_enviados, cor: "bg-indigo-50 text-indigo-700 border-indigo-200" },
+    { label: "PECs", n: n_pecs_enviadas, cor: "bg-purple-50 text-purple-700 border-purple-200" },
+    { label: "Vetos", n: n_vetos, cor: "bg-amber-50 text-amber-700 border-amber-200" },
+    { label: "Decretos", n: n_decretos, cor: "bg-slate-50 text-slate-700 border-slate-200" },
+  ].filter(c => c.n > 0);
+
+  return (
+    <div className="space-y-3">
+      {/* Cabecalho */}
+      <div>
+        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Poder Executivo</p>
+        <p className="text-sm font-black text-gray-900 leading-tight">
+          {cargo_titulo}{uf ? ` de ${uf}` : ""}
+          {partido_sigla ? <span className="text-gray-500 font-medium"> · {partido_sigla}</span> : null}
+        </p>
+        <p className="text-[11px] text-gray-500 mt-0.5">Mandato {mandato}</p>
+      </div>
+
+      {/* Contadores */}
+      {contadores.length > 0 ? (
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+          {contadores.map(c => (
+            <div key={c.label} className={`px-2.5 py-2 rounded-md border ${c.cor}`}>
+              <p className="text-[18px] font-black leading-none tabular-nums">{fmt(c.n)}</p>
+              <p className="text-[10px] font-medium uppercase tracking-wide mt-0.5">{c.label}</p>
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      {/* Taxa de aprovacao de MPs */}
+      {n_medidas_provisorias > 0 && (
+        <div className="text-[12px] text-gray-700">
+          Das {fmt(n_medidas_provisorias)} Medidas Provisorias:{" "}
+          <span className="font-black text-green-700">{n_mps_aprovadas}</span> convertidas em lei,{" "}
+          <span className="font-black text-red-700">{n_mps_rejeitadas}</span> rejeitadas,{" "}
+          <span className="font-black text-amber-700">{n_mps_caducadas}</span> perderam eficacia.
+          {taxa_aprovacao_mps != null && (
+            <span className="ml-1 text-gray-500">
+              (Taxa de aprovacao: <span className="font-black text-gray-900">{taxa_aprovacao_mps}%</span>)
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Ultimas MPs */}
+      {ultimas_mps?.length > 0 && (
+        <div>
+          <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1">Ultimas Medidas Provisorias</p>
+          <ul className="space-y-1">
+            {ultimas_mps.slice(0, 5).map((mp, i) => (
+              <li key={i} className="text-[11px] text-gray-700 leading-snug">
+                <span className="font-bold text-gray-900">MP {mp.numero}/{mp.ano}</span>
+                {mp.ementa && <span className="text-gray-600"> — {mp.ementa.slice(0, 120)}{mp.ementa.length > 120 ? "..." : ""}</span>}
+                {mp.situacao && <span className="ml-1 text-[10px] text-gray-400 italic">· {mp.situacao}</span>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Ultimos PLs */}
+      {ultimos_pls?.length > 0 && (
+        <div>
+          <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1">Ultimos PLs enviados ao Congresso</p>
+          <ul className="space-y-1">
+            {ultimos_pls.slice(0, 5).map((pl, i) => (
+              <li key={i} className="text-[11px] text-gray-700 leading-snug">
+                <span className="font-bold text-gray-900">PL {pl.numero}/{pl.ano}</span>
+                {pl.ementa && <span className="text-gray-600"> — {pl.ementa.slice(0, 120)}{pl.ementa.length > 120 ? "..." : ""}</span>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <p className="text-[10px] text-gray-400 italic">
+        Fonte: Camara Federal (API aberta). Decretos via DOU - em implementacao.
+      </p>
+    </div>
+  );
+}
+
+
+function CardLegislativo({ legis }) {
+  const casa = legis.casa === "CAMARA" ? "Camara dos Deputados"
+    : legis.casa === "SENADO" ? "Senado Federal"
+    : legis.casa === "CAMARA_MUNICIPAL" ? "Camara Municipal"
+    : legis.casa === "ASSEMBLEIA_ESTADUAL" ? "Assembleia Legislativa"
+    : "Casa Legislativa";
+  const cargo = legis.cargo_titulo ?? (
+    legis.casa === "CAMARA" ? "Deputado Federal"
+      : legis.casa === "SENADO" ? "Senador"
+      : legis.casa === "CAMARA_MUNICIPAL" ? "Vereador"
+      : "Parlamentar"
+  );
+  const contextoLinha = [
+    cargo,
+    legis.uf,
+    legis.partido_sigla ? `pelo ${legis.partido_sigla}` : null,
+  ].filter(Boolean).join(" ");
+  const periodo = legis.periodo_legislatura
+    ? `Legislatura ${legis.legislatura} (${legis.periodo_legislatura})`
+    : (legis.legislatura ? `Legislatura ${legis.legislatura}` : null);
+
+  const sit = (legis.situacao ?? "").toLowerCase();
+  const emExercicio = sit.startsWith("exerc");
+  const licenciado = sit.startsWith("licen");
+  const suplente = sit.startsWith("supl");
+
+  // Narrativa: frase factual no topo
+  const narrativa = licenciado
+    ? `Esta LICENCIADO do cargo. Suplente ocupa a cadeira ate o retorno.`
+    : suplente
+    ? `Exerce o mandato como SUPLENTE, convocado apos vacancia ou licenca do titular.`
+    : sit.startsWith("vaca")
+    ? `Cadeira em VACANCIA (sem titular em exercicio).`
+    : sit.startsWith("susp")
+    ? `Mandato SUSPENSO (ordem administrativa ou judicial).`
+    : emExercicio
+    ? `Em exercicio do mandato no momento.`
+    : null;
+
+  const taxa = legis.projetos_apresentados > 0
+    ? Math.round(((legis.projetos_aprovados ?? 0) / legis.projetos_apresentados) * 100)
+    : 0;
+
+  // Cor de status no card
+  const statusBg = licenciado || sit.startsWith("susp") ? "bg-amber-50 border-amber-200"
+    : sit.startsWith("vaca") ? "bg-red-50 border-red-200"
+    : emExercicio ? "bg-green-50 border-green-200"
+    : "bg-gray-50 border-gray-200";
+  const statusIconCor = licenciado ? "text-amber-600"
+    : sit.startsWith("vaca") ? "text-red-600"
+    : emExercicio ? "text-green-600" : "text-gray-500";
+
+  return (
+    <div className="space-y-3">
+      {/* Hero: cargo em destaque */}
+      <div>
+        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">{casa}</p>
+        <p className="text-sm font-black text-gray-900 leading-tight">{contextoLinha}</p>
+        {periodo && <p className="text-[11px] text-gray-500 mt-0.5">{periodo}</p>}
+      </div>
+
+      {/* Status em destaque com narrativa */}
+      {narrativa && (
+        <div className={`flex items-start gap-2 rounded-lg border px-3 py-2 ${statusBg}`}>
+          <div className={`flex-shrink-0 mt-0.5 ${statusIconCor}`}>
+            {emExercicio ? <UserCheck className="w-4 h-4" /> : <AlertTriangle className="w-4 h-4" />}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <StatusMandatoPill situacao={legis.situacao} />
+              {legis.condicao_eleitoral && (
+                <span className="text-[10px] text-gray-600">{legis.condicao_eleitoral}</span>
+              )}
+            </div>
+            <p className="text-[11px] text-gray-700 mt-0.5 leading-snug">{narrativa}</p>
+            {legis.licenciado_para && (
+              <p className="text-[10px] text-gray-500 mt-1 italic">
+                Motivo registrado: {legis.licenciado_para}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Producao legislativa: breakdown visual por categoria */}
+      <div>
+        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">
+          Producao na {legis.casa === "CAMARA_MUNICIPAL" ? "Camara Municipal" : legis.casa === "CAMARA" ? "Camara" : "Casa"}
+        </p>
+        <p className="text-[12px] text-gray-700 leading-snug mb-2">
+          Apresentou <span className="font-black text-gray-900 tabular-nums">{fmt(legis.projetos_apresentados ?? 0)}</span> projetos no total.
+        </p>
+        <BreakdownProjetos legis={legis} />
+      </div>
+
+      {/* Alinhamento (quando houver) */}
+      {legis.alinhamento_votacoes != null && (
+        <div className="text-[11px] text-gray-700">
+          Alinhamento em votacoes: <span className="font-black">{Math.round(legis.alinhamento_votacoes)}%</span>
+        </div>
+      )}
+
+      {/* Temas de atuacao */}
+      {legis.temas_atuacao?.length > 0 ? (
+        <div>
+          <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1">Temas de atuacao</p>
+          <div className="flex flex-wrap gap-1">
+            {legis.temas_atuacao.map((t, i) => (
+              <span key={i} className="text-[10px] bg-teal-50 text-teal-700 px-2 py-0.5 rounded-md font-medium">{t}</span>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      {/* Comissoes + Relatorias (adicionado 18/04/2026) */}
+      {(legis.comissoes_atuais?.length > 0 || legis.n_relatorias > 0 || legis.n_comissoes_historico > 0) && (
+        <div className="pt-2 border-t border-gray-100">
+          <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Poder institucional</p>
+          <div className="grid grid-cols-3 gap-2 mb-2">
+            <div className="text-center px-2 py-1.5 rounded-md bg-teal-50 border border-teal-200">
+              <p className="text-[16px] font-black tabular-nums text-teal-700 leading-none">{legis.comissoes_atuais?.length ?? 0}</p>
+              <p className="text-[9px] font-medium text-teal-600 uppercase tracking-wide mt-0.5">Comissoes ativas</p>
+            </div>
+            <div className="text-center px-2 py-1.5 rounded-md bg-indigo-50 border border-indigo-200">
+              <p className="text-[16px] font-black tabular-nums text-indigo-700 leading-none">{legis.presidencias?.length ?? 0}</p>
+              <p className="text-[9px] font-medium text-indigo-600 uppercase tracking-wide mt-0.5">Presidencias</p>
+            </div>
+            <div className="text-center px-2 py-1.5 rounded-md bg-amber-50 border border-amber-200">
+              <p className="text-[16px] font-black tabular-nums text-amber-700 leading-none">{legis.n_relatorias ?? 0}</p>
+              <p className="text-[9px] font-medium text-amber-600 uppercase tracking-wide mt-0.5">Relatorias</p>
+            </div>
+          </div>
+
+          {/* Lista de comissoes ativas */}
+          {legis.comissoes_atuais?.length > 0 && (
+            <div className="mb-2">
+              <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1">Comissoes atuais</p>
+              <ul className="space-y-0.5">
+                {legis.comissoes_atuais.slice(0, 8).map((c, i) => (
+                  <li key={i} className="text-[11px] text-gray-700 leading-snug">
+                    <span className="font-bold text-gray-900">{c.sigla || c.nome}</span>
+                    {c.cargo && (
+                      <span className={`ml-1 text-[10px] ${c.cargo.toLowerCase().startsWith("presidente") ? "text-indigo-700 font-bold" : "text-gray-500"}`}>
+                        · {c.cargo}
+                      </span>
+                    )}
+                    {c.nome && c.sigla && c.nome !== c.sigla && (
+                      <span className="text-[10px] text-gray-500"> — {c.nome.slice(0, 60)}{c.nome.length > 60 ? "..." : ""}</span>
+                    )}
+                  </li>
+                ))}
+                {legis.comissoes_atuais.length > 8 && (
+                  <li className="text-[10px] text-gray-400 italic">+ {legis.comissoes_atuais.length - 8} comissoes</li>
+                )}
+              </ul>
+            </div>
+          )}
+
+          {/* Relatorias recentes */}
+          {legis.relatorias_recentes?.length > 0 && (
+            <div>
+              <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1">Relatorias recentes</p>
+              <ul className="space-y-0.5">
+                {legis.relatorias_recentes.map((r, i) => (
+                  <li key={i} className="text-[11px] text-gray-700 leading-snug">
+                    <span className="font-bold text-gray-900">{r.sigla_tipo} {r.numero}/{r.ano}</span>
+                    {r.situacao && <span className="text-[10px] text-gray-500"> · {r.situacao}</span>}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function BreakdownProjetos({ legis }) {
+  const tram = legis.projetos_em_tramitacao ?? 0;
+  const apr = legis.projetos_aprovados ?? 0;
+  const vet = legis.projetos_vetados ?? 0;
+  const total = tram + apr + vet;
+
+  const categorias = [
+    {
+      key: "tram", label: "Em tramitação", n: tram, lista: legis.ultimas_em_tramitacao,
+      cor: "#F59E0B", bg: "bg-amber-50", texto: "text-amber-700", border: "border-amber-200",
+    },
+    {
+      key: "apr", label: "Aprovadas", n: apr, lista: legis.ultimas_aprovadas,
+      cor: "#10B981", bg: "bg-green-50", texto: "text-green-700", border: "border-green-200",
+    },
+    {
+      key: "vet", label: "Vetadas", n: vet, lista: legis.ultimas_vetadas,
+      cor: "#EF4444", bg: "bg-red-50", texto: "text-red-700", border: "border-red-200",
+    },
+  ];
+
+  return (
+    <div className="space-y-3">
+      {/* Barra proporcional horizontal (estilo "split bar") */}
+      {total > 0 && (
+        <div className="h-2 rounded-full overflow-hidden flex bg-gray-100">
+          {categorias.map(c => c.n > 0 && (
+            <div key={c.key} style={{ width: `${(c.n / total) * 100}%`, backgroundColor: c.cor }} />
+          ))}
+        </div>
+      )}
+
+      {/* 3 cards compactos com contador e mini-lista */}
+      <div className="grid grid-cols-3 gap-2">
+        {categorias.map(c => (
+          <div key={c.key} className={`${c.bg} ${c.border} border rounded-lg p-2`}>
+            <p className={`text-[9px] font-bold uppercase tracking-wider ${c.texto}`}>{c.label}</p>
+            <p className="text-lg font-black text-gray-900 tabular-nums leading-none mt-0.5">{fmt(c.n)}</p>
+            {c.lista && c.lista.length > 0 && (
+              <div className="mt-1.5 space-y-0.5 border-t border-white/60 pt-1">
+                {c.lista.slice(0, 3).map((p, i) => (
+                  <p key={i} className="text-[9px] text-gray-600 truncate" title={`${p.sigla_tipo} ${p.numero}/${p.ano}${p.situacao ? " - " + p.situacao : ""}`}>
+                    {p.sigla_tipo} {p.numero}/{p.ano}
+                  </p>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function StatusMandatoPill({ situacao }) {
+  const cfg = {
+    "Exercício":  { bg: "bg-green-100", txt: "text-green-800", label: "Em exercicio" },
+    "Exercicio":  { bg: "bg-green-100", txt: "text-green-800", label: "Em exercicio" },
+    "Licença":    { bg: "bg-amber-100", txt: "text-amber-800", label: "Licenciado" },
+    "Licenca":    { bg: "bg-amber-100", txt: "text-amber-800", label: "Licenciado" },
+    "Suplência":  { bg: "bg-blue-100",  txt: "text-blue-800",  label: "Suplencia" },
+    "Suplencia":  { bg: "bg-blue-100",  txt: "text-blue-800",  label: "Suplencia" },
+    "Afastado":   { bg: "bg-orange-100",txt: "text-orange-800",label: "Afastado" },
+    "Vacância":   { bg: "bg-red-100",   txt: "text-red-800",   label: "Vacancia" },
+    "Vacancia":   { bg: "bg-red-100",   txt: "text-red-800",   label: "Vacancia" },
+    "Suspenso":   { bg: "bg-red-100",   txt: "text-red-800",   label: "Suspenso" },
+    "Convocado":  { bg: "bg-purple-100",txt: "text-purple-800",label: "Convocado" },
+  };
+  const c = cfg[situacao] ?? { bg: "bg-gray-100", txt: "text-gray-700", label: situacao };
+  return (
+    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${c.bg} ${c.txt}`}>
+      {c.label}
+    </span>
+  );
+}
+
+function TimelineCarreira({ cargos }) {
+  if (!cargos?.length) return <SemDados texto="Sem cargos publicos registrados" />;
+
+  const fmtData = (iso) => {
+    if (!iso) return "atual";
+    const [y, m] = iso.split("-");
+    return `${m}/${y}`;
+  };
+  const esferaCor = {
+    federal:   { bg: "bg-blue-50",   txt: "text-blue-700",   label: "Federal" },
+    estadual:  { bg: "bg-purple-50", txt: "text-purple-700", label: "Estadual" },
+    municipal: { bg: "bg-teal-50",   txt: "text-teal-700",   label: "Municipal" },
+  };
+
+  return (
+    <div className="space-y-2">
+      {cargos.map((c, i) => {
+        const esf = esferaCor[c.esfera] ?? { bg: "bg-gray-50", txt: "text-gray-700", label: c.esfera ?? "?" };
+        return (
+          <div key={i} className="flex gap-2 p-2 rounded-lg hover:bg-gray-50 border border-gray-100">
+            <div className="flex-shrink-0 w-1 rounded-full" style={{ backgroundColor: "#6366F1" }} />
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="text-xs font-bold text-gray-900 leading-tight">{c.cargo}</p>
+                  {c.orgao && <p className="text-[11px] text-gray-600 truncate">{c.orgao}</p>}
+                </div>
+                <div className="flex flex-col items-end gap-0.5 flex-shrink-0">
+                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${esf.bg} ${esf.txt}`}>
+                    {esf.label}{c.uf ? ` - ${c.uf}` : ""}
+                  </span>
+                  <span className="text-[10px] text-gray-500 tabular-nums">
+                    {fmtData(c.inicio)} - {fmtData(c.fim)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+      <p className="text-[9px] text-gray-400 pt-1">Fonte: Wikidata, API Camara, DOU</p>
+    </div>
+  );
+}
+
+function CardJuridico({ juridico, isPrintMode = false }) {
+  const fl = juridico?.ficha_limpa;
+  const historico = juridico?.historico_aptidao ?? [];
+  const ciclosInapto = juridico?.ciclos_inapto ?? 0;
+
+  const fichaInfo = fl === true
+    ? { label: "APTO", sub: "Candidatura deferida pelo TSE no ciclo atual", cor: "bg-green-50 text-green-700 border-green-200", Icon: UserCheck }
+    : fl === false
+    ? { label: "INAPTO", sub: "Candidatura indeferida pelo TSE no ciclo atual", cor: "bg-red-50 text-red-700 border-red-200", Icon: AlertTriangle }
+    : { label: "SEM DADO", sub: "TSE nao disponibilizou situacao para este ciclo", cor: "bg-gray-50 text-gray-600 border-gray-200", Icon: Shield };
+
+  const fontesPendentes = [
+    { label: "TCU", desc: "Inabilitados por tribunal de contas" },
+    { label: "TSE - Contas", desc: "Rejeicao de contas de campanha" },
+    { label: "JusBrasil", desc: "Processos judiciais (em avaliacao)" },
+    { label: "CNJ DataJud", desc: "Base nacional de processos (convenio)" },
+  ];
+
+  return (
+    <div className="space-y-3">
+      {/* Ficha limpa em destaque */}
+      <div className={`flex items-center gap-3 border rounded-lg p-3 ${fichaInfo.cor}`}>
+        <fichaInfo.Icon className="w-7 h-7 flex-shrink-0" />
+        <div className="flex-1 min-w-0">
+          <p className="text-[9px] font-bold uppercase tracking-widest opacity-70">Ficha limpa (TSE)</p>
+          <p className="text-xl font-black leading-none">{fichaInfo.label}</p>
+          <p className="text-[10px] mt-1 opacity-80">{fichaInfo.sub}</p>
+        </div>
+        {ciclosInapto > 0 && (
+          <div className="text-right">
+            <p className="text-[9px] font-bold text-red-700">HISTORICO</p>
+            <p className="text-lg font-black text-red-700 leading-none">{ciclosInapto}x</p>
+            <p className="text-[9px] text-red-600">INAPTO</p>
+          </div>
+        )}
+      </div>
+
+      {/* Timeline de aptidao por ciclo */}
+      {historico.length > 0 && (
+        <div>
+          <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">
+            Aptidao por ciclo eleitoral
+          </p>
+          <div className="flex flex-wrap gap-1">
+            {historico.map((c, i) => {
+              const cfg = c.ficha_limpa === true
+                ? { bg: "bg-green-100", txt: "text-green-700", symbol: "✓" }
+                : c.ficha_limpa === false
+                ? { bg: "bg-red-100", txt: "text-red-700", symbol: "✗" }
+                : { bg: "bg-gray-100", txt: "text-gray-400", symbol: "—" };
+              return (
+                <div key={i} className={`${cfg.bg} ${cfg.txt} rounded px-2 py-1 text-[10px] flex items-center gap-1`}
+                     title={`${c.ano} ${c.cargo}: ${c.ficha_limpa === true ? "Apto" : c.ficha_limpa === false ? "Inapto" : "Sem dado"}`}>
+                  <span className="font-bold">{cfg.symbol}</span>
+                  <span className="tabular-nums">{c.ano}</span>
+                  <span className="opacity-70 text-[9px]">{c.cargo.slice(0, 4)}</span>
+                </div>
+              );
+            })}
+          </div>
+          <p className="text-[9px] text-gray-400 mt-1">
+            ✓ Apto TSE · ✗ Inapto TSE · — Sem dado disponivel
+          </p>
+        </div>
+      )}
+
+      {/* Sancoes administrativas (CGU CEIS/CEAF) */}
+      {juridico?.sancoes?.length > 0 && (
+        <div>
+          <p className="text-[9px] font-bold text-red-700 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+            <AlertTriangle className="w-3 h-3" />
+            Sancoes administrativas ({juridico.sancoes.length}{juridico.sancoes_ativas > 0 ? ` - ${juridico.sancoes_ativas} ativas` : ""})
+          </p>
+          <div className="space-y-1.5">
+            {juridico.sancoes.slice(0, 5).map((s, i) => (
+              <div key={i} className={`rounded-lg border p-2 ${s.ativa ? "bg-red-50 border-red-200" : "bg-gray-50 border-gray-200"}`}>
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <span className="text-[9px] font-black bg-red-600 text-white px-1.5 py-0.5 rounded">{s.fonte}</span>
+                      <span className="text-[10px] font-bold text-gray-900 truncate">{s.tipo_sancao ?? "Sancao"}</span>
+                      {s.ativa && (
+                        <span className="text-[8px] font-bold text-red-700 bg-red-100 px-1 py-0.5 rounded">ATIVA</span>
+                      )}
+                    </div>
+                    {s.orgao_sancionador && (
+                      <p className="text-[10px] text-gray-600 truncate">{s.orgao_sancionador}</p>
+                    )}
+                    <p className="text-[9px] text-gray-500 tabular-nums">
+                      {s.data_inicio ?? "?"} - {s.data_fim ?? "indeterminado"}
+                    </p>
+                  </div>
+                  {s.link_publicacao && (
+                    <a href={s.link_publicacao} target="_blank" rel="noopener noreferrer"
+                       className="flex-shrink-0 text-[9px] text-brand-600 hover:underline">
+                      DOU
+                    </a>
+                  )}
+                </div>
+              </div>
+            ))}
+            {juridico.sancoes.length > 5 && (
+              <p className="text-[9px] text-gray-500 italic">+ {juridico.sancoes.length - 5} outras sancoes</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Roadmap honesto: fontes a integrar - oculto no PDF */}
+      {!isPrintMode && (
+        <div>
+          <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">
+            Em breve - fontes publicas a integrar
+          </p>
+          <div className="grid grid-cols-2 gap-1.5">
+            {fontesPendentes.map((f, i) => (
+              <div key={i} className="bg-gray-50 border border-dashed border-gray-200 rounded p-1.5 text-[10px]">
+                <p className="font-bold text-gray-600">{f.label}</p>
+                <p className="text-gray-400 text-[9px] leading-tight">{f.desc}</p>
+              </div>
+            ))}
+          </div>
+          <p className="text-[9px] text-gray-400 mt-1.5 italic">
+            Processos judiciais individuais (TJ, Justica do Trabalho) exigem integracao
+            especifica - em avaliacao.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CardRedesSociais({ redes }) {
+  if (!redes?.disponivel) {
+    return <SemDados texto="Sem redes sociais registradas (fonte: Wikidata)" />;
+  }
+
+  // YouTube: Wikidata (P2397) retorna o ID do canal (UCxxx). Sem a YouTube
+  // Data API nao conseguimos o nome, entao mostramos "Canal oficial" em
+  // vez do ID opaco.
+  const ytLabel = (id) => (id && /^UC/.test(id)) ? "Canal oficial" : id;
+
+  const links = [
+    redes.instagram && {
+      label: "Instagram", handle: `@${redes.instagram}`, cor: "#E1306C",
+      url: `https://instagram.com/${redes.instagram}`,
+    },
+    redes.twitter && {
+      label: "X / Twitter", handle: `@${redes.twitter}`, cor: "#000000",
+      url: `https://x.com/${redes.twitter}`,
+    },
+    redes.facebook && {
+      label: "Facebook", handle: redes.facebook, cor: "#1877F2",
+      url: `https://facebook.com/${redes.facebook}`,
+    },
+    redes.tiktok && {
+      label: "TikTok", handle: `@${redes.tiktok}`, cor: "#000000",
+      url: `https://tiktok.com/@${redes.tiktok}`,
+    },
+    redes.youtube && {
+      label: "YouTube", handle: ytLabel(redes.youtube), cor: "#FF0000",
+      url: `https://youtube.com/channel/${redes.youtube}`,
+    },
+    redes.website && {
+      label: "Site oficial",
+      handle: redes.website.replace(/^https?:\/\//, "").replace(/\/$/, ""),
+      cor: "#6366F1",
+      url: redes.website,
+    },
+  ].filter(Boolean);
+
+  return (
+    <div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-1">
+        {links.map((l, i) => (
+          <a key={i} href={l.url} target="_blank" rel="noopener noreferrer"
+             className="flex items-center justify-between gap-2 px-2 py-1.5 rounded hover:bg-gray-50 transition-colors min-w-0">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-1 h-5 rounded-full flex-shrink-0" style={{ backgroundColor: l.cor }} />
+              <div className="min-w-0">
+                <p className="text-[8px] font-bold text-gray-400 uppercase tracking-wider leading-none mb-0.5">{l.label}</p>
+                <p className="text-[11px] font-semibold text-gray-900 truncate leading-tight">{l.handle}</p>
+              </div>
+            </div>
+            <ChevronRight className="w-3 h-3 text-gray-300 flex-shrink-0" />
+          </a>
+        ))}
+      </div>
+      <p className="text-[9px] text-gray-400 pt-1.5 text-right">Fonte: Wikidata</p>
+    </div>
+  );
+}
+
+function LogoPartidoHero({ sigla, cor }) {
+  // Logo com aspect ratio natural e ~2 dedos de respiro (ml-8) das informacoes.
+  const siglaKey = sigla?.toUpperCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, "") ?? "";
+  const [src, setSrc] = useState(`/logos/partidos/${siglaKey}.png`);
+  const [falhou, setFalhou] = useState(false);
+
+  if (falhou) {
+    return (
+      <div className="hidden md:flex items-center justify-center flex-shrink-0 rounded-xl h-44 ml-8"
+           style={{ backgroundColor: cor, width: 120 }}>
+        <span className="font-black text-white text-3xl">{sigla}</span>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="hidden md:flex items-center justify-center flex-shrink-0 ml-8 overflow-hidden"
+      style={{ height: "120px", width: "140px" }}
+    >
+      <img
+        src={src}
+        alt={sigla}
+        onError={() => setFalhou(true)}
+        className="object-contain"
+        style={{ maxHeight: "100%", maxWidth: "100%", width: "auto", height: "auto" }}
+      />
+    </div>
+  );
+}
+
+function TierBadge({ overall }) {
+  // Tiers: Bronze 0-49, Prata 50-69, Ouro 70-84, Diamante 85+
+  const tier = overall >= 85 ? {
+    nome: "DIAMANTE",
+    cor1: "#60A5FA", cor2: "#A78BFA", corBorda: "#3B82F6", corTexto: "#1E3A8A",
+  } : overall >= 70 ? {
+    nome: "OURO",
+    cor1: "#FCD34D", cor2: "#F59E0B", corBorda: "#D97706", corTexto: "#78350F",
+  } : overall >= 50 ? {
+    nome: "PRATA",
+    cor1: "#E5E7EB", cor2: "#9CA3AF", corBorda: "#6B7280", corTexto: "#1F2937",
+  } : {
+    nome: "BRONZE",
+    cor1: "#FDBA74", cor2: "#B45309", corBorda: "#92400E", corTexto: "#431407",
+  };
+
+  return (
+    <div
+      className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-md text-[8px] font-black shadow-lg border"
+      style={{
+        background: `linear-gradient(135deg, ${tier.cor1}, ${tier.cor2})`,
+        color: tier.corTexto,
+        borderColor: tier.corBorda,
+      }}
+      title={`Tier ${tier.nome} - Overall ${overall}/99`}
+    >
+      {tier.nome}
+    </div>
+  );
+}
+
+function DadosPessoaisIcones({ ident }) {
+  const itens = [
+    { Icon: User,          label: "Idade",       valor: ident.idade != null ? `${ident.idade} anos` : null,
+      tooltip: "Idade" },
+    { Icon: UserCheck,     label: "Genero",      valor: ident.genero?.toLowerCase(),
+      tooltip: "Genero" },
+    { Icon: GraduationCap, label: "Instrucao",   valor: ident.grau_instrucao?.toLowerCase(),
+      tooltip: "Grau de instrucao" },
+    { Icon: Briefcase,     label: "Ocupacao",    valor: ident.ocupacao?.toLowerCase(),
+      tooltip: "Ocupacao declarada ao TSE" },
+    { Icon: MapPin,        label: "Natural de",  valor: [ident.naturalidade, ident.estado_nascimento].filter(Boolean).join("/") || null,
+      tooltip: "Estado de nascimento" },
+  ].filter(i => i.valor);
+
+  if (itens.length === 0) return null;
+
+  return (
+    <div className="flex items-center gap-x-8 gap-y-1 mt-2 flex-wrap">
+      {itens.map((i, k) => {
+        const Icon = i.Icon;
+        return (
+          <div key={k}
+               className="group relative flex items-center gap-1 text-[11px] text-gray-600 cursor-default">
+            <Icon className="w-3.5 h-3.5 text-gray-400" />
+            <span className="font-medium">{i.valor}</span>
+            <span className="absolute left-0 top-full mt-1 hidden group-hover:block z-30 pointer-events-none
+                             bg-gray-900 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap shadow-lg">
+              {i.tooltip}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function CardDadosPessoais({ ident }) {
+  const itens = [
+    { label: "Idade", valor: ident.idade != null ? `${ident.idade} anos` : null },
+    { label: "Genero", valor: ident.genero?.toLowerCase() },
+    { label: "Instrucao", valor: ident.grau_instrucao?.toLowerCase() },
+    { label: "Ocupacao", valor: ident.ocupacao?.toLowerCase() },
+    { label: "Natural de", valor: [ident.naturalidade, ident.estado_nascimento].filter(Boolean).join(" / ") || null },
+  ].filter(i => i.valor);
+
+  return (
+    <Bloco titulo="Dados Pessoais" icon={User} cor="indigo" fixedH="180px">
+      {itens.length === 0 ? (
+        <SemDados texto="Dados pessoais nao disponiveis" />
+      ) : (
+        <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
+          {itens.map((i, k) => (
+            <div key={k}>
+              <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">{i.label}</p>
+              <p className="text-sm font-semibold text-gray-900 truncate" title={i.valor}>{i.valor}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </Bloco>
+  );
+}
+
+function CardBiografia({ bio, url }) {
+  // Card editorial horizontal full-width: layout tipo "capitulo de livro" com
+  // texto em 2 colunas quando longo, capitular decorativa, tipografia serif.
+  const longo = bio.length > 600;
+  return (
+    <div className="relative bg-gradient-to-br from-indigo-50/40 via-white to-white rounded-xl border border-indigo-100 overflow-hidden shadow-sm">
+      {/* Barra lateral decorativa em gradiente */}
+      <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-indigo-400 via-indigo-500 to-purple-600" />
+      {/* Icone decorativo grande translucido */}
+      <BookOpen className="absolute top-4 right-4 w-24 h-24 text-indigo-50 pointer-events-none" strokeWidth={1} />
+
+      <div className="p-6 pl-8 relative">
+        {/* Header */}
+        <div className="flex items-center gap-2 mb-4">
+          <BookOpen className="w-4 h-4 text-indigo-600" />
+          <h3 className="text-xs font-bold text-gray-900 uppercase tracking-widest">Biografia</h3>
+          <div className="h-px flex-1 bg-indigo-100" />
+          {url && (
+            <a href={url} target="_blank" rel="noopener noreferrer"
+               className="text-[10px] text-gray-400 hover:text-indigo-600 flex-shrink-0">
+              Fonte: Wikipedia PT
+            </a>
+          )}
+        </div>
+
+        {/* Texto em 2 colunas quando longo (estilo jornal/revista) */}
+        <div
+          className={`text-[14px] text-gray-800 leading-[1.75] ${longo ? "md:columns-2 md:gap-8" : ""}`}
+          style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+        >
+          <p>
+            <span
+              className="text-5xl font-bold text-indigo-600 float-left mr-2 leading-[0.9] mt-1"
+              style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+            >
+              {bio.charAt(0)}
+            </span>
+            {bio.slice(1)}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CardComparativos({ comp, cicloAtivo }) {
+  const disp = comp?.disponivel === true;
+
+  // Recorte geografico explicito no titulo
+  const geo = comp?.escopo === "municipal" && comp?.municipio && comp?.estado_uf
+    ? `${comp.municipio}/${comp.estado_uf}`
+    : comp?.escopo === "nacional"
+      ? "Brasil"
+      : comp?.estado_uf ?? "";
+  const tituloCtx = comp?.cargo && comp?.ano
+    ? `${comp.cargo}${geo ? ` - ${geo}` : ""} - ${comp.ano}`
+    : cicloAtivo ? `Ciclo ${cicloAtivo}` : "Sem ciclo";
+
+  // Universo de comparacao em linguagem clara
+  const cargoLower = (comp?.cargo || "").toLowerCase();
+  const universoTxt = comp?.escopo === "municipal" && comp?.municipio
+    ? `Comparado aos candidatos a ${cargoLower} em ${comp.municipio}, no mesmo ciclo.`
+    : comp?.escopo === "nacional"
+      ? `Comparado aos candidatos a ${cargoLower} no Brasil, no mesmo ciclo.`
+      : comp?.estado_uf
+        ? `Comparado aos candidatos a ${cargoLower} em ${comp.estado_uf}, no mesmo ciclo.`
+        : null;
+
+  if (!disp) {
+    return (
+      <Bloco titulo={`Comparativos - ${tituloCtx}`} icon={Target} cor="blue" fixedH="180px">
+        <SemDados texto={
+          comp?.total_candidatos != null && comp.total_candidatos < 3
+            ? `Poucos candidatos no ciclo (${comp.total_candidatos})`
+            : "Sem dados comparativos pra este ciclo"
+        } />
+      </Bloco>
+    );
+  }
+
+  const ordinal = `${comp.posicao_ranking}º`;
+  const foiEleito = comp.foi_eleito === true;
+  const majoritario = ["PRESIDENTE", "GOVERNADOR", "PREFEITO"].includes((comp.cargo || "").toUpperCase());
+  const proporcional = comp.eh_proporcional === true;
+
+  // Badge de resultado
+  const resultadoBadge = foiEleito
+    ? { label: "ELEITO", cor: "text-green-700", bg: "bg-green-100" }
+    : { label: "NAO ELEITO", cor: "text-red-700", bg: "bg-red-100" };
+
+  // Frase de resumo narrativa amarrando tudo
+  let resumoFrase = null;
+  if (proporcional && foiEleito && comp.quociente_eleitoral) {
+    // Proporcional eleito: QE + colocacao no partido
+    resumoFrase = `Eleito pelo ${comp.partido_sigla || "partido"}, que somou ${fmt(comp.votos_partido)} votos no cargo (atingiu o quociente eleitoral de ${fmt(comp.quociente_eleitoral)}). Foi o ${comp.colocacao_no_partido}º mais votado do partido, entre ${fmt(comp.total_candidatos_partido)} candidatos.`;
+  } else if (proporcional && !foiEleito && comp.quociente_eleitoral) {
+    // Proporcional nao eleito: explica se falhou no partido ou no piso individual
+    const p = comp.partido_sigla || "partido";
+    if (comp.partido_atingiu_qe === false) {
+      resumoFrase = `Nao eleito: o ${p} somou ${fmt(comp.votos_partido)} votos e nao atingiu o quociente eleitoral de ${fmt(comp.quociente_eleitoral)}, piso minimo pro partido eleger.`;
+    } else if (comp.atingiu_piso_individual === false) {
+      resumoFrase = `Nao eleito: mesmo com o ${p} atingindo o quociente, o candidato teve ${fmt(comp.votos_candidato)} votos e nao alcancou o piso individual de ${fmt(comp.piso_individual)} (10% do QE).`;
+    } else {
+      resumoFrase = `Nao eleito: ${p} atingiu o quociente e o piso individual foi alcancado, mas a distribuicao proporcional das ${fmt(comp.vagas_cargo)} vagas priorizou colegas de chapa. Foi o ${comp.colocacao_no_partido}º mais votado do partido.`;
+    }
+  } else if (foiEleito && majoritario) {
+    resumoFrase = `Ficou em ${ordinal} de ${fmt(comp.total_candidatos)} candidatos e venceu a disputa.`;
+  } else if (!foiEleito && majoritario && comp.votos_vencedor) {
+    const dif = comp.votos_vencedor - comp.votos_candidato;
+    resumoFrase = `Ficou em ${ordinal} de ${fmt(comp.total_candidatos)}. ${comp.vencedor_nome || "O vencedor"} venceu com ${fmt(comp.votos_vencedor)} votos (diferenca de ${fmt(dif)}).`;
+  } else if (foiEleito && comp.folga_votos != null) {
+    resumoFrase = `Ficou em ${ordinal} de ${fmt(comp.total_candidatos)} candidatos e garantiu uma das ${fmt(comp.vagas_cargo || 1)} vagas.`;
+  }
+
+  return (
+    <Bloco titulo={`Comparativos - ${tituloCtx}`} icon={Target} cor="blue">
+      {universoTxt && (
+        <p className="text-[10px] text-gray-500 italic mb-3">{universoTxt}</p>
+      )}
+
+      {/* 3 KPIs grandes e auto-explicativos */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {/* 1 - Votos do candidato */}
+        <div className="bg-gray-50 rounded-lg p-3">
+          <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Votos recebidos</p>
+          <p className="text-3xl font-black text-brand-600 tabular-nums leading-none">{fmt(comp.votos_candidato)}</p>
+          <p className="text-[10px] text-gray-500 mt-1">pelo candidato no ciclo</p>
+        </div>
+
+        {/* 2 - Colocacao + vagas + resultado */}
+        <div className="bg-gray-50 rounded-lg p-3">
+          <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Colocacao</p>
+          <div className="flex items-baseline gap-1.5">
+            <p className={`text-3xl font-black tabular-nums leading-none ${foiEleito ? "text-green-700" : "text-gray-700"}`}>{ordinal}</p>
+            <p className="text-sm text-gray-500 tabular-nums">de {fmt(comp.total_candidatos)}</p>
+          </div>
+          <div className="flex items-center gap-1.5 mt-1.5">
+            <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${resultadoBadge.bg} ${resultadoBadge.cor}`}>
+              {resultadoBadge.label}
+            </span>
+            {comp.vagas_cargo != null && (
+              <span className="text-[10px] text-gray-500">
+                {comp.vagas_cargo === 1 ? "1 vaga" : `${fmt(comp.vagas_cargo)} vagas`}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* 3 - Branch por tipo de cargo */}
+        {proporcional && comp.quociente_eleitoral ? (
+          // ── Proporcional: Quociente Eleitoral (regra do TSE)
+          <div className="bg-gray-50 rounded-lg p-3">
+            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Quociente Eleitoral</p>
+            <p className="text-3xl font-black text-gray-800 tabular-nums leading-none">{fmt(comp.quociente_eleitoral)}</p>
+            <p className="text-[10px] text-gray-500 mt-0.5">votos minimos pro partido eleger</p>
+
+            <div className="mt-2 pt-2 border-t border-gray-200 space-y-1">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[10px] text-gray-600">
+                  {comp.partido_sigla || "Partido"}: <span className="font-bold tabular-nums">{fmt(comp.votos_partido)}</span>
+                </span>
+                <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${comp.partido_atingiu_qe ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                  {comp.partido_atingiu_qe ? "ATINGIU" : "NAO ATINGIU"}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[10px] text-gray-600">
+                  Piso individual (10%): <span className="font-bold tabular-nums">{fmt(comp.piso_individual)}</span>
+                </span>
+                <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${comp.atingiu_piso_individual ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                  {comp.atingiu_piso_individual ? "ATINGIU" : "NAO ATINGIU"}
+                </span>
+              </div>
+              {comp.colocacao_no_partido != null && (
+                <p className="text-[10px] text-gray-600 pt-0.5">
+                  {comp.colocacao_no_partido}º mais votado do partido (de {fmt(comp.total_candidatos_partido)} candidatos)
+                </p>
+              )}
+            </div>
+          </div>
+        ) : majoritario && !foiEleito && comp.votos_vencedor != null ? (
+          // ── Majoritario nao eleito: mostra o vencedor
+          <div className="bg-gray-50 rounded-lg p-3">
+            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Vencedor da eleicao</p>
+            <p className="text-base font-black text-gray-800 leading-tight truncate" title={comp.vencedor_nome || ""}>
+              {comp.vencedor_nome || "-"}
+            </p>
+            <p className="text-sm font-bold text-gray-600 tabular-nums mt-0.5">{fmt(comp.votos_vencedor)} votos</p>
+            <p className="text-[10px] text-red-600 mt-1 font-semibold tabular-nums">
+              -{fmt((comp.votos_vencedor || 0) - (comp.votos_candidato || 0))} de diferenca
+            </p>
+          </div>
+        ) : majoritario && comp.votos_ultimo_eleito != null ? (
+          // ── Majoritario eleito: linha de corte (vs 2º colocado)
+          <div className="bg-gray-50 rounded-lg p-3">
+            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Margem de vitoria</p>
+            <p className="text-3xl font-black text-green-700 tabular-nums leading-none">
+              +{fmt((comp.votos_candidato || 0) - (comp.votos_primeiro_nao_eleito || 0))}
+            </p>
+            <p className="text-[10px] text-gray-500 mt-1">votos a mais que o 2º colocado</p>
+            {comp.votos_primeiro_nao_eleito != null && (
+              <p className="text-[10px] text-gray-500 mt-0.5 tabular-nums">2º: {fmt(comp.votos_primeiro_nao_eleito)} votos</p>
+            )}
+          </div>
+        ) : (
+          <div className="bg-gray-50 rounded-lg p-3">
+            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Contexto do cargo</p>
+            <p className="text-sm text-gray-400 mt-2">Nao disponivel</p>
+          </div>
+        )}
+      </div>
+
+      {/* Resumo narrativo */}
+      {resumoFrase && (
+        <p className="text-[11px] text-gray-700 leading-snug mt-3 bg-blue-50 border-l-2 border-blue-400 px-2.5 py-1.5 rounded-r">
+          {resumoFrase}
+        </p>
+      )}
+    </Bloco>
+  );
+}
+
+function CardRedutos({ redutos }) {
+  const disp = redutos?.disponivel === true;
+  const lista = redutos?.redutos || [];
+  const fracos = redutos?.redutos_fracos || [];
+
+  const subtitulo = redutos?.tipo === "zona"
+    ? "Bairros e zonas onde o candidato teve mais votos"
+    : redutos?.tipo === "uf"
+      ? "Estados onde o candidato teve mais votos"
+      : "Municipios onde o candidato teve mais votos";
+
+  if (!disp || lista.length === 0) {
+    return (
+      <Bloco titulo="Redutos Eleitorais" icon={MapPin} cor="orange" fixedH="520px">
+        <SemDados texto="Sem dados de votacao regional pra este ciclo" />
+      </Bloco>
+    );
+  }
+
+  const maxVotos = Math.max(...lista.map(r => r.votos || 0));
+  const totalTop5 = lista.reduce((acc, r) => acc + (r.votos || 0), 0);
+  const pctTop5 = redutos.total_votos_ciclo > 0
+    ? (totalTop5 / redutos.total_votos_ciclo) * 100
+    : 0;
+
+  // Perfil territorial -> cor + frase analitica
+  const perfilInfo = redutos.perfil_territorial === "concentrado"
+    ? { label: "Perfil concentrado", cor: "text-purple-700", bg: "bg-purple-50", desc: "Votacao concentrada em poucas regioes - nicho forte, risco de perder base se migrar" }
+    : redutos.perfil_territorial === "equilibrado"
+      ? { label: "Perfil equilibrado", cor: "text-green-700", bg: "bg-green-50", desc: "Votacao distribuida entre regioes com concentracao saudavel em nucleos fortes" }
+      : { label: "Perfil disperso", cor: "text-blue-700", bg: "bg-blue-50", desc: "Votacao capilarizada em muitas regioes - alta abrangencia territorial" };
+
+  return (
+    <Bloco titulo="Redutos Eleitorais" icon={MapPin} cor="orange" fixedH="520px">
+      <p className="text-[10px] text-gray-500 italic mb-3">{subtitulo}</p>
+
+      {/* Top 5 fortes */}
+      <div>
+        <p className="text-[9px] font-bold text-green-700 uppercase tracking-wider mb-1.5">Top 5 redutos</p>
+        <div className="space-y-1.5">
+          {lista.map((r, i) => {
+            const barPct = maxVotos > 0 ? (r.votos / maxVotos) * 100 : 0;
+            const pctTotal = (r.pct_do_total * 100).toFixed(1);
+            return (
+              <div key={i} className="flex items-center gap-2">
+                <span className="text-[10px] font-bold text-gray-400 w-4 tabular-nums">{i + 1}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2 mb-0.5">
+                    <span className="text-[11px] font-semibold text-gray-800 truncate">{r.label}</span>
+                    <span className="text-[10px] font-bold text-gray-900 tabular-nums flex-shrink-0">
+                      {fmt(r.votos)} <span className="text-[9px] text-gray-500 font-normal">({pctTotal}%)</span>
+                    </span>
+                  </div>
+                  <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-orange-400 rounded-full transition-all duration-500"
+                      style={{ width: `${Math.max(barPct, 2)}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Indice de concentracao */}
+      {redutos.concentracao_top3_pct != null && (
+        <div className={`mt-3 ${perfilInfo.bg} rounded-lg p-2.5`}>
+          <div className="flex items-center justify-between gap-2 mb-1">
+            <span className={`text-[10px] font-bold uppercase tracking-wider ${perfilInfo.cor}`}>
+              {perfilInfo.label}
+            </span>
+            <span className={`text-lg font-black tabular-nums leading-none ${perfilInfo.cor}`}>
+              {redutos.concentracao_top3_pct.toFixed(0)}%
+            </span>
+          </div>
+          <p className="text-[9.5px] text-gray-600 leading-snug">
+            Top 3 redutos concentram <span className="font-bold">{redutos.concentracao_top3_pct.toFixed(1)}%</span> dos votos. {perfilInfo.desc}.
+          </p>
+        </div>
+      )}
+
+      {/* Regioes fracas */}
+      {fracos.length > 0 && (
+        <div className="mt-3">
+          <p className="text-[9px] font-bold text-orange-700 uppercase tracking-wider mb-1.5">Onde precisa crescer</p>
+          <div className="space-y-1">
+            {fracos.map((r, i) => {
+              const pctTotal = (r.pct_do_total * 100).toFixed(2);
+              return (
+                <div key={i} className="flex items-center justify-between text-[10px] text-gray-600">
+                  <span className="truncate pr-2">{r.label}</span>
+                  <span className="tabular-nums text-gray-500 flex-shrink-0">
+                    {fmt(r.votos)} ({pctTotal}%)
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Rodape: alcance territorial */}
+      <div className="mt-3 pt-2 border-t border-gray-100 space-y-0.5">
+        <p className="text-[10px] text-gray-500">
+          Presenca em <span className="font-bold text-gray-800 tabular-nums">{fmt(redutos.total_regioes_com_voto)}</span> {redutos.tipo === "zona" ? "bairros/zonas" : redutos.tipo === "uf" ? "estados" : "municipios"} com voto.
+        </p>
+        <p className="text-[10px] text-gray-500">
+          Top 5 somam <span className="font-bold text-gray-800 tabular-nums">{pctTop5.toFixed(0)}%</span> dos votos ({fmt(redutos.total_votos_ciclo)} no total).
+        </p>
+      </div>
+    </Bloco>
+  );
+}
+
+function BarraOrigem({ origem }) {
+  const fontes = [
+    { key: "fundo_partidario_pct", label: "Fundo Partidario", cor: "#3B82F6" },
+    { key: "fundo_eleitoral_pct", label: "Fundo Eleitoral", cor: "#8B5CF6" },
+    { key: "doacao_privada_pct", label: "Doacao Privada", cor: "#10B981" },
+    { key: "recursos_proprios_pct", label: "Recursos Proprios", cor: "#F59E0B" },
+    { key: "outros_pct", label: "Outros", cor: "#6B7280" },
+  ].filter(f => origem[f.key] != null && origem[f.key] > 0);
+
+  return (
+    <div>
+      <p className="text-[9px] font-bold text-gray-400 uppercase mb-1.5">Origem dos recursos</p>
+      <div className="h-3 rounded-full overflow-hidden flex">
+        {fontes.map(f => (
+          <div key={f.key} style={{ width: `${(origem[f.key] * 100).toFixed(0)}%`, backgroundColor: f.cor }}
+            className="h-full" title={`${f.label}: ${(origem[f.key] * 100).toFixed(1)}%`} />
+        ))}
+      </div>
+      <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1">
+        {fontes.map(f => (
+          <span key={f.key} className="flex items-center gap-1 text-[8px] text-gray-500">
+            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: f.cor }} />
+            {f.label} {(origem[f.key] * 100).toFixed(0)}%
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}

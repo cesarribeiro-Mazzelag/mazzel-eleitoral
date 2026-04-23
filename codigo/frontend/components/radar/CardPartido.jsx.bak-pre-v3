@@ -1,0 +1,219 @@
+"use client";
+
+import React from "react";
+import { useRouter } from "next/navigation";
+import { LogoPartido } from "@/components/shared/LogoPartido";
+
+const TIER_STYLES = {
+  ouro:   { color: "#C9A227", bg: "rgba(201,162,39,0.10)", label: "OURO" },
+  prata:  { color: "#8A8A8A", bg: "rgba(138,138,138,0.10)", label: "PRATA" },
+  bronze: { color: "#B26B2E", bg: "rgba(178,107,46,0.10)", label: "BRONZE" },
+  madeira:{ color: "#6B7280", bg: "rgba(107,114,128,0.10)", label: "MADEIRA" }
+};
+
+const LEVEL_BADGES = {
+  nacional:    { label: "NACIONAL",   icon: "\u25C6" },
+  estadual:    { label: null,         icon: "\u25CF" },
+  distrital:   { label: "DISTRITO",   icon: "\u25A0" },
+  territorial: { label: "TERRITORIO", icon: "\u25B2" },
+  cabo:        { label: "CABO",       icon: "\u25CB" }
+};
+
+const fmtNumero = (n) => {
+  if (n == null || Number.isNaN(Number(n))) return "\u2014";
+  return Number(n).toLocaleString("pt-BR");
+};
+
+const calcPRF = (eleitos, candidaturas) => {
+  const e = Number(eleitos), c = Number(candidaturas);
+  if (!c || !Number.isFinite(c) || c === 0) return null;
+  if (!Number.isFinite(e)) return null;
+  return Math.round((e / c) * 100);
+};
+
+export function CardPartido({ partido, escopoUF = null, alerta, onAbrirDetalhe, onDownload }) {
+  const router = useRouter();
+  if (!partido) return null;
+
+  const fifa = partido.fifa || {};
+  const tier = (fifa.tier || "madeira").toLowerCase();
+  const tierStyle = TIER_STYLES[tier] || TIER_STYLES.madeira;
+
+  const overall = Number(fifa.overall || 0);
+
+  const level = escopoUF ? "estadual" : "nacional";
+  const badge = LEVEL_BADGES[level];
+  const badgeLabel = level === "estadual" ? escopoUF : badge.label;
+
+  const attrs = [
+    { key: "ATQ", val: fifa.atq,      desc: fifa.atq_desc },
+    { key: "MEI", val: fifa.meio,     desc: fifa.meio_desc },
+    { key: "DEF", val: fifa.defe,     desc: fifa.defe_desc },
+    { key: "COE", val: fifa.coesao,   desc: fifa.coesao_desc },
+    { key: "FIN", val: fifa.fin,      desc: fifa.fin_desc },
+    { key: "MOM", val: fifa.momentum, desc: fifa.momentum_desc }
+  ];
+
+  const prf = calcPRF(partido.n_eleitos, partido.n_candidaturas);
+  const trend = Number(partido.variacao_inter_ciclo || 0);
+  const trendPct = Math.round(trend * 100);
+
+  const handleClick = () => {
+    if (onAbrirDetalhe) {
+      onAbrirDetalhe(partido);
+      return;
+    }
+    const base = `/mockup/dossie/partido/${partido.sigla}`;
+    router.push(escopoUF ? `${base}/${escopoUF}` : base);
+  };
+
+  return (
+    <div
+      onClick={handleClick}
+      className="group relative bg-white overflow-hidden cursor-pointer shadow-sm hover:shadow-xl transition-all hover:-translate-y-0.5 rounded-2xl"
+      style={{ aspectRatio: "3 / 4.2" }}
+    >
+      {/* Camada 1: fundo colorido com logo borrado */}
+      <div className="absolute inset-x-0 top-0 overflow-hidden" style={{ height: "72%" }}>
+        {partido.logo_url && (
+          <img
+            src={partido.logo_url}
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            className="absolute w-[140%] h-[140%] object-cover select-none pointer-events-none"
+            style={{
+              filter: "blur(32px) saturate(1.4) brightness(1.05)",
+              inset: "-20%"
+            }}
+          />
+        )}
+        <div
+          className="absolute inset-0 z-[1]"
+          style={{
+            background:
+              "linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.25) 75%, rgba(255,255,255,0.7) 90%, rgba(255,255,255,0.95) 100%)"
+          }}
+        />
+        <div className="absolute inset-0 z-[2] flex items-center justify-center">
+          <div className="w-[55%] h-[55%] flex items-center justify-center" style={{ filter: "drop-shadow(0 8px 24px rgba(0,0,0,0.18))" }}>
+            <LogoPartido
+              sigla={partido.sigla}
+              logoUrl={partido.logo_url}
+              cor={tierStyle.color}
+              size={120}
+              className="w-full h-full"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* OVR no topo esquerdo */}
+      <div className="absolute top-3 left-3 z-10">
+        <div className="text-left">
+          <div
+            className="font-black leading-none tabular-nums"
+            style={{
+              fontSize: "44px",
+              color: tierStyle.color,
+              letterSpacing: "-0.03em",
+              textShadow: "0 1px 3px rgba(255,255,255,0.95), 0 2px 6px rgba(255,255,255,0.7)"
+            }}
+          >
+            {overall}
+          </div>
+          <div
+            className="font-black tracking-[0.3em]"
+            style={{
+              fontSize: "10px",
+              color: tierStyle.color,
+              marginTop: "-2px",
+              textShadow: "0 1px 2px rgba(255,255,255,0.95)"
+            }}
+          >
+            OVR
+          </div>
+        </div>
+      </div>
+
+      {/* Badge de nivel hierarquico */}
+      <div className="absolute top-3 right-3 z-10">
+        <div
+          className="flex items-center gap-1 px-2 py-1 rounded-lg text-white text-[9px] font-black tracking-[0.18em] uppercase"
+          style={{ background: "rgba(17,24,39,0.85)", backdropFilter: "blur(4px)" }}
+        >
+          <span style={{ fontSize: "10px" }}>{badge.icon}</span>
+          <span>{badgeLabel}</span>
+        </div>
+      </div>
+
+      {/* Label de contexto */}
+      <div
+        className="absolute left-0 right-0 z-[5] font-black tracking-[0.22em] uppercase"
+        style={{
+          top: "66%",
+          padding: "0 14px",
+          fontSize: "11px",
+          color: "rgb(10,10,10)",
+          textShadow: "rgba(255,255,255,0.95) 0px 1px 4px"
+        }}
+      >
+        {level === "estadual" ? `DIRETORIO \u00B7 ${escopoUF}` : "PARTIDO \u00B7 NACIONAL"}
+      </div>
+
+      {/* Info area */}
+      <div
+        className="absolute left-0 right-0 bottom-0 flex flex-col justify-between"
+        style={{ top: "72%", padding: "12px 14px" }}
+      >
+        <h3
+          className="font-black text-gray-900 leading-none uppercase truncate"
+          style={{ fontSize: "20px", letterSpacing: "0.01em" }}
+          title={partido.nome}
+        >
+          {partido.sigla}
+        </h3>
+
+        <div className="grid grid-cols-6 gap-[3px]">
+          {attrs.map((a) => (
+            <div key={a.key} className="flex flex-col items-center rounded-md py-[3px]" style={{ background: "rgba(0,0,0,0.035)" }}>
+              <span className="font-bold tracking-[0.18em] leading-none text-gray-500" style={{ fontSize: "8px" }}>{a.key}</span>
+              <span className="font-black tabular-nums leading-none text-gray-900 mt-[2px]" style={{ fontSize: "13px" }}>
+                {a.val != null ? a.val : "\u2014"}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex items-center justify-between gap-1.5">
+          <div
+            className="px-1.5 py-0.5 rounded font-black tracking-[0.15em] uppercase"
+            style={{ fontSize: "9px", color: tierStyle.color, background: tierStyle.bg }}
+          >
+            {tierStyle.label}
+          </div>
+          <div className="flex items-center gap-3 text-[9px] font-bold text-gray-500 uppercase tracking-wide">
+            <div className="flex flex-col items-end leading-none">
+              <span className="text-[8px] text-gray-400">PRF</span>
+              <span className="text-[11px] text-gray-900 tabular-nums mt-[1px]">{prf != null ? `${prf}%` : "\u2014"}</span>
+            </div>
+            <div className="w-px h-6 bg-gray-200" />
+            <div className="flex flex-col items-end leading-none">
+              <span className="text-[8px] text-gray-400">VOTOS {partido.ano_referencia}</span>
+              <span className="text-[11px] text-gray-900 tabular-nums mt-[1px]">{fmtNumero(partido.votos_total)}</span>
+            </div>
+            {Number.isFinite(trend) && trend !== 0 && (
+              <div
+                className="flex items-center gap-0.5 font-black tabular-nums"
+                style={{ color: trend > 0 ? "#059669" : "#DC2626", fontSize: "11px" }}
+              >
+                <span>{trend > 0 ? "\u25B2" : "\u25BC"}</span>
+                <span>{Math.abs(trendPct)}%</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

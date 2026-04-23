@@ -1,0 +1,328 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Importa fontes do Google Fonts ───────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&family=Barlow+Condensed:wght@600;700;800;900&display=swap');
+
+/* ─── Variáveis CSS ─────────────────────────────────────────────────────────── */
+:root {
+  --font-barlow: "Barlow", sans-serif;
+  --font-barlow-condensed: "Barlow Condensed", sans-serif;
+
+  /* Cores Mazzel Tech */
+  --color-brand:   #7C3AED;
+  --color-ciano:   #A78BFA;
+  --color-dourado: #F59E0B;
+
+  /* Farol */
+  --farol-verde:    #16A34A;
+  --farol-amarelo:  #CA8A04;
+  --farol-vermelho: #DC2626;
+}
+
+/* ─── Base ──────────────────────────────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Export PDF (html2canvas) ─────────────────────────────────────────────────
+ * Quando o usuario clica "Baixar PDF" no dossie, o JS adiciona
+ * `exportando-pdf` no <body>. Elementos com classe `print-hide` desaparecem
+ * da captura. Ex.: toolbars, botao Halp, botao Baixar PDF, etc.
+ */
+body.exportando-pdf .print-hide {
+  display: none !important;
+}
+/* Durante captura: forcar overflow visible em TODOS os ancestrais ate o dossie
+ * — html2canvas usa a altura real do elemento, mas ancestrais com overflow:hidden
+ * ou height:100vh cortam o conteudo clonado para serialização. Solucao "marretada"
+ * e definir auto/visible em todos os proprios wrappers conhecidos. */
+body.exportando-pdf,
+body.exportando-pdf html,
+body.exportando-pdf main,
+body.exportando-pdf #dossie-print,
+body.exportando-pdf #dossie-print > * {
+  overflow: visible !important;
+  height: auto !important;
+  max-height: none !important;
+}
+
+/* Modo print (Playwright abrindo a pagina pra gerar PDF):
+ * - Largura fixa 1400px (meio-termo: respiro pro layout sem ficar largo demais)
+ * - Sidebar/topbar escondidos
+ * - HERO ampliado: foto maior, titulo maior, KPIs maiores, scores maiores
+ *   pra destaque visual e leitura confortavel (publico que usa oculos)
+ * - Padding lateral/logo com respiro */
+body.exportando-pdf {
+  width: 1400px !important;
+  min-width: 1400px !important;
+}
+body.exportando-pdf #dossie-print {
+  width: 1400px !important;
+  max-width: 1400px !important;
+  padding-right: 0 !important;
+}
+
+/* ─── HERO AMPLIADO (modo print) ───────────────────────────────── */
+/* Wrapper interno do hero ganha padding generoso (afasta conteudo e logo). */
+body.exportando-pdf #dossie-print > div:first-child > div:last-child {
+  padding: 2.5rem 3rem 2.25rem 3rem !important;
+}
+/* Gap maior entre foto/info/logo */
+body.exportando-pdf #dossie-print > div:first-child > div:last-child > .flex {
+  gap: 2.5rem !important;
+}
+/* Foto do candidato MAIOR (128x160 -> 200x256 = 56% maior) */
+body.exportando-pdf #dossie-print > div:first-child > div:last-child > .flex > div:first-child {
+  width: 200px !important;
+  height: 256px !important;
+}
+/* Badge overall no canto da foto - tambem aumenta */
+body.exportando-pdf #dossie-print > div:first-child > div:last-child > .flex > div:first-child > div:last-child {
+  width: 64px !important;
+  height: 64px !important;
+  font-size: 26px !important;
+  bottom: 10px !important;
+  right: 10px !important;
+}
+/* Titulo (nome) do candidato bem maior */
+body.exportando-pdf #dossie-print > div:first-child h1 {
+  font-size: 44px !important;
+  line-height: 1.05 !important;
+}
+/* Pills UNIAO + ideologia tambem maiores */
+body.exportando-pdf #dossie-print > div:first-child > div:last-child span.text-xs {
+  font-size: 14px !important;
+  padding: 4px 10px !important;
+}
+/* Nome completo (subtitulo) e cargo maiores */
+body.exportando-pdf #dossie-print > div:first-child > div:last-child .text-\[10px\] {
+  font-size: 14px !important;
+}
+body.exportando-pdf #dossie-print > div:first-child > div:last-child .text-\[11px\] {
+  font-size: 14px !important;
+}
+body.exportando-pdf #dossie-print > div:first-child > div:last-child .text-\[12px\] {
+  font-size: 15px !important;
+}
+/* Logo UNIAO BRASIL ganha margin pra respirar da margem direita */
+body.exportando-pdf #dossie-print > div:first-child > div:last-child > .flex > *:last-child {
+  margin-right: 1rem !important;
+}
+
+/* ─── CORPO DO DOSSIE ──────────────────────────────────────────── */
+/* Padding lateral e vertical maior pro respiro */
+body.exportando-pdf #dossie-print > div:nth-child(2) {
+  padding: 1.75rem 2.25rem !important;
+}
+/* Aumenta textos pequenos em cards pra leitura confortavel (oculos) */
+body.exportando-pdf #dossie-print .text-\[10px\] {
+  font-size: 13px !important;
+}
+body.exportando-pdf #dossie-print .text-\[11px\] {
+  font-size: 13px !important;
+}
+body.exportando-pdf #dossie-print .text-\[12px\] {
+  font-size: 14px !important;
+}
+body.exportando-pdf #dossie-print .text-\[9px\] {
+  font-size: 12px !important;
+}
+/* text-xs (0.75rem=12px) → 14px | text-sm (14px) → 15px - textos corridos */
+body.exportando-pdf #dossie-print .text-xs {
+  font-size: 14px !important;
+}
+body.exportando-pdf #dossie-print .text-sm {
+  font-size: 15px !important;
+}
+
+/* ─── CARDS SEM ESTICAR (inspirado no Jarbis editor) ───────────
+ * Grids com lg:grid-cols-2 forcam cards irmaos a terem a mesma altura.
+ * Solucao 1: align-items: start impede esticamento grid.
+ * Solucao 2: min-height inline dos Blocos e removido no print - cada
+ *   bloco cresce apenas ate o tamanho real do seu conteudo, sem espaco
+ *   cinza interno. Inspirado no editor CapCut-style do Jarbis: cards
+ *   adaptam-se ao conteudo, nao o contrario. */
+body.exportando-pdf #dossie-print .grid {
+  align-items: start !important;
+}
+/* Bloco components tem style={{minHeight: '420px'}} inline - overide */
+body.exportando-pdf #dossie-print [style*="min-height"] {
+  min-height: 0 !important;
+}
+/* Mapa eleitoral: altura controlada via prop `alturaMapa` no componente.
+ * Nao precisamos de override CSS aqui - o h-[500px] ja esta aplicado
+ * diretamente na instancia usada no dashboard. */
+
+/* ─── TIPOGRAFIA AMPLIADA - 3a volta (feedback: ainda pequeno) ─── */
+/* Titulo dos cards (h3) - MAIOR */
+body.exportando-pdf #dossie-print h3 {
+  font-size: 17px !important;
+}
+/* Valores grandes ficam maiores ainda */
+body.exportando-pdf #dossie-print .text-xl {
+  font-size: 26px !important;
+}
+body.exportando-pdf #dossie-print .text-2xl {
+  font-size: 32px !important;
+}
+body.exportando-pdf #dossie-print .text-3xl {
+  font-size: 40px !important;
+}
+/* Labels uppercase mais legiveis */
+body.exportando-pdf #dossie-print .uppercase {
+  font-size: 13px !important;
+  letter-spacing: 0.06em !important;
+}
+/* Text-base cresce pra leitura de quem usa oculos */
+body.exportando-pdf #dossie-print .text-base {
+  font-size: 18px !important;
+}
+/* Tabelas/listas: linhas de doadores, PLs, etc */
+body.exportando-pdf #dossie-print p,
+body.exportando-pdf #dossie-print li,
+body.exportando-pdf #dossie-print td {
+  font-size: 15px !important;
+}
+
+/* ─── CARD OVERALL: maior destaque (sugestao candidato) ────────
+ * Card Overall e elemento de impacto visual - aumenta altura e espessura
+ * das barras pra virar protagonista do dossie. */
+body.exportando-pdf #dossie-print div[style*="min-height: 280px"] {
+  /* Sobrescreve o fixedH="280px" aplicado via inline style */
+}
+/* Barras horizontais do Overall (h-2 = 8px -> h-3 = 14px) */
+body.exportando-pdf #dossie-print .h-2 {
+  height: 14px !important;
+}
+body.exportando-pdf aside,
+body.exportando-pdf header {
+  display: none !important;
+}
+body.exportando-pdf main {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 1600px !important;
+}
+
+html {
+  height: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  height: 100%;
+  @apply bg-surface-bg text-gray-900 font-sans;
+  min-height: 100dvh;
+}
+
+/* ─── Scrollbar customizado ──────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400;
+}
+
+/* ─── Utilitários de componentes ─────────────────────────────────────────────── */
+@layer components {
+  /* Input padrão */
+  .input {
+    @apply w-full border border-surface-border bg-white rounded-xl px-4 py-3 text-sm
+           placeholder-gray-400 outline-none transition-shadow
+           focus:ring-2 focus:ring-brand-500 focus:border-transparent;
+  }
+
+  /* Botões */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2
+           bg-brand-500 text-white font-semibold text-sm
+           px-5 py-2.5 rounded-xl
+           hover:bg-brand-600 active:scale-95
+           transition-all shadow-brand-sm
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2
+           bg-white text-gray-700 font-medium text-sm
+           px-5 py-2.5 rounded-xl border border-surface-border
+           hover:bg-gray-50 active:scale-95
+           transition-all;
+  }
+
+  .btn-dourado {
+    @apply inline-flex items-center justify-center gap-2
+           bg-mazzel-ambar text-white font-bold text-sm
+           px-5 py-2.5 rounded-xl
+           hover:bg-dourado-600 active:scale-95
+           transition-all shadow-brand-sm;
+  }
+
+  /* Card */
+  .card {
+    @apply bg-white rounded-2xl border border-surface-border shadow-card p-5;
+  }
+
+  /* Badge farol */
+  .farol-verde {
+    @apply inline-flex items-center gap-1.5 text-xs font-semibold
+           bg-farol-verdeBg text-farol-verde px-2.5 py-1 rounded-full;
+  }
+  .farol-amarelo {
+    @apply inline-flex items-center gap-1.5 text-xs font-semibold
+           bg-farol-amareloBg text-farol-amarelo px-2.5 py-1 rounded-full;
+  }
+  .farol-vermelho {
+    @apply inline-flex items-center gap-1.5 text-xs font-semibold
+           bg-farol-vermelhoBg text-farol-vermelho px-2.5 py-1 rounded-full;
+  }
+
+  /* KPI Card */
+  .kpi-card {
+    @apply card flex flex-col gap-1;
+  }
+  .kpi-valor {
+    @apply text-3xl font-bold text-gray-900 font-display;
+  }
+  .kpi-label {
+    @apply text-sm text-surface-muted;
+  }
+  .kpi-variacao-positiva {
+    @apply text-xs font-semibold text-farol-verde;
+  }
+  .kpi-variacao-negativa {
+    @apply text-xs font-semibold text-farol-vermelho;
+  }
+}
+
+/* ─── Animação de entrada para cards ─────────────────────────────────────────── */
+@layer utilities {
+  .animate-enter {
+    animation: fade-in 0.2s ease-out both;
+  }
+
+  /* Texto do partido em estilo display/condensado */
+  .text-partido {
+    @apply font-display font-black uppercase tracking-tight;
+  }
+}
+
+/* ─── MapLibre GL ────────────────────────────────────────────────────────────── */
+.maplibregl-ctrl-logo {
+  display: none !important;
+}
+.maplibregl-ctrl-attrib {
+  font-size: 10px !important;
+  opacity: 0.6;
+}

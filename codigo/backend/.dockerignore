@@ -1,0 +1,30 @@
+# Dados brutos do TSE (19 GB de CSVs — não vão para o container)
+dados_brutos/
+
+# Ambiente virtual local
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Arquivos de desenvolvimento
+.env
+.env.local
+*.log
+*.sqlite
+*.db
+
+# Testes e cobertura
+.pytest_cache/
+htmlcov/
+.coverage
+tests/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo

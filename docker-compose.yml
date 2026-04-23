@@ -1,0 +1,64 @@
+services:
+  ub_postgres:
+    image: postgis/postgis:16-3.4-alpine
+    container_name: ub_postgres
+    environment:
+      POSTGRES_DB: uniao_brasil
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5435:5432"
+    volumes:
+      - ub_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  ub_redis:
+    image: redis:7-alpine
+    container_name: ub_redis
+    ports:
+      - "6382:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  ub_backend:
+    build:
+      context: ./codigo/backend
+      dockerfile: Dockerfile
+    container_name: ub_backend
+    ports:
+      - "8002:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@ub_postgres:5432/uniao_brasil
+      REDIS_URL: redis://ub_redis:6379/0
+      SECRET_KEY: dev-secret-key-trocar-em-producao-12345678901234567890
+      ENVIRONMENT: development
+      DEBUG: "false"
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      SERPRO_API_KEY: ${SERPRO_API_KEY:-}
+      # URL do frontend (Next.js roda no host Mac na porta 3002 - Playwright
+      # dentro do container usa host.docker.internal pra alcancar)
+      FRONTEND_URL: ${FRONTEND_URL:-http://host.docker.internal:3002}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      ub_postgres:
+        condition: service_healthy
+      ub_redis:
+        condition: service_healthy
+    volumes:
+      - ./codigo/backend:/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  ub_postgres_data:
+
+networks:
+  default:
+    name: uniao_brasil_network

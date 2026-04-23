@@ -1,0 +1,326 @@
+"use client";
+
+/**
+ * Carta Politica V7 - aprovada em 17/04/2026 noite.
+ *
+ * Arquitetura final:
+ *   - Aspect 5:8 (foto de busto + info cabem sem corte)
+ *   - Borda 3px na cor do tier
+ *   - Foto area 72%: backdrop blur + foto em object-contain + object-position bottom
+ *     (mostra busto inteiro, backdrop preenche laterais com tom dominante)
+ *   - Mask radial sutil nos cantos da foto (vignette) pra fotos com fundo cinza/variado
+ *   - Fade branco nos ultimos 12% + cargo "invadindo" aos 68%
+ *   - Info area 28%: nome + 6 atributos + partido/votos
+ *   - Overall canto sup esq: bola branca opaca 50% backdrop-blur + laurel + numero cor tier-dark
+ *   - Insignia canto sup dir: bola branca opaca 70% + insignia svg
+ *   - Chip 2T quando aplicavel
+ *
+ * Zona protegida - nao alterar sem consultar Cesar.
+ */
+import { useRef, useState } from "react";
+import { Download, Swords, Loader2 } from "lucide-react";
+import { Tooltip } from "./Tooltip";
+import { LogoPartido } from "@/components/shared/LogoPartido";
+import { gerarCartaPng } from "@/lib/cartaDownload";
+
+// Paleta por tier - cores proximas mas distinguiveis pro numero do Overall
+const TIER = {
+  dourado: { color: "#b8860b", dark: "#6b4800", label: "DOURADO" },  // dark goldenrod (mais rico)
+  ouro:    { color: "#eab308", dark: "#854d0e", label: "OURO" },     // amber 500 (amarelo brilhante)
+  prata:   { color: "#6b7280", dark: "#374151", label: "PRATA" },    // gray 500 (mais contraste que 400)
+  bronze:  { color: "#92400e", dark: "#581c08", label: "BRONZE" },   // amber 800 (marrom escuro)
+};
+
+function cargoAbreviado(cargo) {
+  const c = (cargo || "").toUpperCase();
+  if (c === "DEPUTADO FEDERAL") return "DEP. FEDERAL";
+  if (c === "DEPUTADO ESTADUAL") return "DEP. ESTADUAL";
+  if (c === "DEPUTADO DISTRITAL") return "DEP. DISTRITAL";
+  return c;
+}
+
+// Se o nome tem 3+ palavras, pega apenas as 2 ultimas pra caber em 1 linha
+// Ex: "CARLOS MASSA RATINHO JUNIOR" -> "RATINHO JUNIOR"
+// Nome ja curto (LULA, RICARDO NUNES) fica intacto
+function nomeDisplay(nome) {
+  if (!nome) return "—";
+  const palavras = nome.trim().split(/\s+/);
+  if (palavras.length <= 2) return nome;
+  if (nome.length <= 22) return nome;
+  return palavras.slice(-2).join(" ");
+}
+
+// Abrevia siglas longas pra caber no pill sem bugar votos
+// Ex: "REPUBLICANOS" -> "REP", "SOLIDARIEDADE" -> "SOLID"
+const SIGLA_ABREV = {
+  "REPUBLICANOS": "REP",
+  "SOLIDARIEDADE": "SOLID",
+  "CIDADANIA": "CID",
+  "PODEMOS": "POD",
+  "PATRIOTA": "PAT",
+  "UNIAO": "UNIÃO",
+  "UNIÃO": "UNIÃO",
+  "UNIAO BRASIL": "UB",
+  "UNIÃO BRASIL": "UB",
+  "AGIR": "AGIR",
+  "AVANTE": "AVANTE",
+};
+function siglaDisplay(sigla) {
+  if (!sigla) return "";
+  const upper = sigla.toUpperCase();
+  if (SIGLA_ABREV[upper]) return SIGLA_ABREV[upper];
+  if (upper.length > 7) return upper.slice(0, 5);
+  return upper;
+}
+
+export function CardPolitico({ politico, onAbrirDossie, downloadable = true }) {
+  const p = politico;
+  const cardRef = useRef(null);
+  const [baixando, setBaixando] = useState(false);
+
+  const tierKey = p.tier || "bronze";
+  const tier = TIER[tierKey] || TIER.bronze;
+  const eleito = p.eleito === true;
+  const atributos = p.atributos_6 || {};
+  const disputou2T = p.disputou_segundo_turno === true;
+
+  const baixarCarta = async (e) => {
+    e.stopPropagation();
+    if (baixando) return;
+    setBaixando(true);
+    try {
+      await gerarCartaPng(cardRef.current, p);
+    } catch (err) {
+      console.error("Erro ao gerar carta:", err);
+      alert("Não foi possível gerar a imagem da carta.");
+    } finally {
+      setBaixando(false);
+    }
+  };
+
+  const iniciais = (p.nome || "?").split(" ").slice(0, 2).map(s => s?.[0] ?? "").join("").toUpperCase();
+  const fotoUrl = p.foto_url
+    ? (p.foto_url.startsWith("http") ? p.foto_url : `${process.env.NEXT_PUBLIC_API_URL ?? ""}${p.foto_url}`)
+    : null;
+  const votosFmt = (n) => (n == null ? "-" : Number(n).toLocaleString("pt-BR"));
+
+  // Mask radial aplicada sempre - vignette sutil que suaviza bordas de fotos com fundo variado
+  const fotoMaskStyle = {
+    WebkitMaskImage: "radial-gradient(ellipse 95% 100% at center bottom, black 65%, rgba(0,0,0,0.9) 85%, transparent 100%)",
+    maskImage: "radial-gradient(ellipse 95% 100% at center bottom, black 65%, rgba(0,0,0,0.9) 85%, transparent 100%)",
+  };
+
+  return (
+    <div
+      ref={cardRef}
+      onClick={() => onAbrirDossie?.(p.candidato_id)}
+      className="group relative bg-white overflow-hidden cursor-pointer shadow-sm hover:shadow-xl transition-all hover:-translate-y-0.5"
+      style={{
+        aspectRatio: "4 / 7",
+        borderRadius: "16px",
+        border: "1px solid #e5e7eb",
+        boxShadow: "0 2px 6px rgba(0,0,0,0.04), 0 12px 28px rgba(0,0,0,0.08)",
+      }}
+    >
+      {/* Botao download (hover) */}
+      {downloadable && (
+        <button
+          onClick={baixarCarta}
+          disabled={baixando}
+          className="absolute bottom-2 right-2 z-30 w-7 h-7 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:text-purple-600 hover:bg-purple-50 disabled:opacity-100 disabled:cursor-wait"
+          title="Baixar carta"
+          aria-label="Baixar carta"
+          data-html2canvas-ignore
+        >
+          {baixando ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
+        </button>
+      )}
+
+      {/* ═══════ FOTO AREA (72%) ═══════ */}
+      <div className="absolute inset-x-0 top-0 overflow-hidden" style={{ height: "72%" }}>
+        {fotoUrl ? (
+          <>
+            {/* Backdrop: mesma foto em blur, sem saturate excessivo (evita tom amarelado) */}
+            <img
+              src={fotoUrl}
+              aria-hidden="true"
+              loading="lazy"
+              className="absolute w-[104%] h-[104%] object-cover select-none pointer-events-none"
+              style={{ filter: "blur(26px)", inset: "-2%" }}
+            />
+            {/* Overlay branco translucido - lavado uniforme, preserva tons naturais da foto nitida */}
+            <div
+              className="absolute inset-0 z-[1]"
+              style={{
+                background: "rgba(255,255,255,0.55)",
+              }}
+            />
+            {/* Foto nitida em contain - busto inteiro ancorado no bottom, filter minimo */}
+            <img
+              src={fotoUrl}
+              alt={p.nome}
+              loading="lazy"
+              className="absolute inset-0 w-full h-full object-contain z-[2]"
+              style={{
+                objectPosition: "center bottom",
+                ...fotoMaskStyle,
+              }}
+              onError={(e) => { e.currentTarget.style.display = "none"; }}
+            />
+            {/* Fade branco nos ultimos 12% - conecta foto com area de info */}
+            <div
+              className="absolute inset-x-0 bottom-0 z-[3]"
+              style={{
+                height: "12%",
+                background: "linear-gradient(to top, white, transparent)",
+              }}
+            />
+          </>
+        ) : (
+          <div className="absolute inset-0 flex items-end justify-center bg-gradient-to-b from-gray-50 via-white to-white">
+            <div className="pb-4 text-5xl font-black text-gray-200 select-none">{iniciais}</div>
+          </div>
+        )}
+      </div>
+
+      {/* ═══════ OVERALL - apenas numero + OVR, sem bola, sem laurel, sem insignia ═══════ */}
+      <div className="absolute top-3 left-3 z-10">
+        <Tooltip
+          title={<span>OVERALL {p.overall ?? "-"} · {tier.label}</span>}
+          desc="Nota 0-99. Composta por 8 atributos (VOT/EFI/ART/FID/INT/TER/POT/FIN). Quando faltam dados jurídicos, INT fica vazio e não entra na média."
+          meta="85+ dourado · 75-84 ouro · 65-74 prata · <65 bronze"
+        >
+          <div className="cursor-help text-left">
+            <div
+              className="font-black leading-none tabular-nums"
+              style={{
+                fontSize: "30px",
+                color: eleito ? tier.color : "#9ca3af",
+                letterSpacing: "-0.03em",
+                textShadow: "0 1px 3px rgba(255,255,255,0.95), 0 2px 6px rgba(255,255,255,0.7)",
+              }}
+            >
+              {p.overall ?? "—"}
+            </div>
+            <div
+              className="font-black tracking-[0.3em]"
+              style={{
+                fontSize: "8px",
+                color: eleito ? tier.color : "#9ca3af",
+                marginTop: "-2px",
+                textShadow: "0 1px 2px rgba(255,255,255,0.95)",
+              }}
+            >
+              OVR
+            </div>
+          </div>
+        </Tooltip>
+      </div>
+
+      {/* ═══════ CHIP 2T canto sup dir ═══════ */}
+      {disputou2T && (
+        <div
+          className="absolute top-3 right-3 z-10 flex items-center gap-1 px-2 py-1 rounded-md bg-purple-600 text-white font-black tracking-widest"
+          style={{
+            fontSize: "10px",
+            boxShadow: "0 3px 8px rgba(124,58,237,0.4)",
+          }}
+        >
+          <Swords className="w-2.5 h-2.5" />
+          2T
+        </div>
+      )}
+
+      {/* ═══════ CARGO INVADINDO base da foto (68%) ═══════ */}
+      <div
+        className="absolute left-0 right-0 z-[5] font-black tracking-[0.22em] uppercase"
+        style={{
+          top: "68%",
+          padding: "0 14px",
+          fontSize: "11px",
+          color: "#0a0a0a",
+          textShadow: "0 1px 4px rgba(255,255,255,0.95)",
+        }}
+      >
+        {cargoAbreviado(p.cargo)} · {p.estado_uf}
+      </div>
+
+      {/* ═══════ INFO AREA (28%) ═══════ */}
+      <div
+        className="absolute left-0 right-0 bottom-0 flex flex-col justify-between"
+        style={{ top: "72%", padding: "12px 14px" }}
+      >
+        {/* Nome hero - nomeDisplay garante 1 linha mesmo com nome longo */}
+        <h3
+          className="font-black text-gray-900 leading-none uppercase truncate"
+          style={{ fontSize: "18px", letterSpacing: "0.01em" }}
+          title={p.nome}
+        >
+          {nomeDisplay(p.nome)}
+        </h3>
+
+        {/* 6 atributos em mini-boxes */}
+        <div className="grid grid-cols-6 gap-[3px]">
+          {["VOT", "FID", "EFI", "INT", "ART", "TER"].map((k) => (
+            <div
+              key={k}
+              className="flex flex-col items-center rounded-md"
+              style={{ background: "rgba(0,0,0,0.05)", padding: "3px 1px" }}
+            >
+              <span
+                className="font-bold tracking-[0.18em] leading-none"
+                style={{ fontSize: "8px", color: "#9ca3af" }}
+              >
+                {k}
+              </span>
+              <span
+                className="font-black text-gray-900 tabular-nums leading-none"
+                style={{ fontSize: "12px", marginTop: "2px" }}
+              >
+                {atributos[k] ?? "—"}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        {/* Rodape: partido pill (max-w pra nao bugar votos) + votos */}
+        <div className="flex items-center justify-between gap-1.5">
+          {p.partido_sigla && (
+            <div
+              className="flex items-center gap-1.5 bg-white rounded-full py-[3px] pl-[3px] pr-2.5 min-w-0 flex-shrink"
+              style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.12)", maxWidth: "55%" }}
+              title={p.partido_sigla}
+            >
+              <LogoPartido
+                sigla={p.partido_sigla}
+                logoUrl={p.partido_logo_url}
+                cor={p.partido_cor || "#6B7280"}
+                size={22}
+              />
+              <span
+                className="font-black text-gray-900 tracking-[0.08em] truncate"
+                style={{ fontSize: "11px" }}
+              >
+                {siglaDisplay(p.partido_sigla)}
+              </span>
+            </div>
+          )}
+          <div className="text-right flex-shrink-0">
+            <div
+              className="font-bold tracking-[0.22em] text-gray-500"
+              style={{ fontSize: "8px" }}
+            >
+              VOTOS {p.ano}
+            </div>
+            <div
+              className="font-black text-gray-900 tabular-nums"
+              style={{ fontSize: "13px", lineHeight: 1.1 }}
+            >
+              {votosFmt(p.votos_total)}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

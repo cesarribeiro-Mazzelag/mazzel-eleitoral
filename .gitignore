@@ -1,0 +1,65 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+.env.local
+venv/
+.venv/
+*.egg-info/
+
+# Node
+node_modules/
+.next/
+.turbo/
+dist/
+build/
+coverage/
+*.log
+
+# Editor
+.vscode/
+.idea/
+.DS_Store
+
+# Project-specific
+data-raw/
+data-dumps/
+*.dump
+*.sql.gz
+dumps/
+.playwright-mcp/
+*.png
+
+# Local postgres/redis
+postgres_data/
+redis_data/
+
+# Alembic local
+alembic.ini.local
+
+# ETL raw data (TSE/IBGE csvs)
+codigo/backend/dados_brutos/
+codigo/backend/cache/
+codigo/backend/fotos/
+etl/dados_brutos/
+etl/cache/
+etl/fotos/
+etl/csvs/
+etl/zips/
+
+# Dumps DB
+backups/
+referencias/
+
+# Next.js build
+codigo/frontend/.next/
+codigo/frontend/node_modules/
+codigo/frontend/.playwright-mcp/
+
+# ETL arquivos grandes (>50MB)
+etl/_cache_cnefe/
+etl/cache/
+etl/*.zip
+etl/*.parquet
+codigo/backend/fotos/
