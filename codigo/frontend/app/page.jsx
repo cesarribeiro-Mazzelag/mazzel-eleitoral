@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-// Raiz redireciona sempre para /dashboard
+// V2: raiz vai sempre pra plataforma nova
 export default function RootPage() {
-  redirect("/dashboard");
+  redirect("/mazzel-preview");
 }

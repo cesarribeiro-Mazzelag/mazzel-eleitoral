@@ -199,6 +199,7 @@ app = FastAPI(
 _ORIGINS = [
     "http://localhost:3000",
     "http://localhost:3002",
+    "http://localhost:3003",
     "https://app.mazzeltech.com",
     "https://www.mazzeltech.com",
     "https://mazzeltech.com",
