@@ -6,20 +6,35 @@ Oi Claude Designer. Vou te dar tudo que precisa para integrar e aplicar os desig
 
 ## ⚠️ LEITURA OBRIGATÓRIA ANTES DE TUDO (atualizado 25/04/2026 noite)
 
-Para esta sessão você vai entregar a **especificação técnica final do produto** + designs de tudo que falta. Pra fazer isso bem, abrir e absorver os 4 documentos abaixo NA ORDEM, antes de começar:
+Para esta sessão você vai entregar a **especificação técnica final do produto** + designs de tudo que falta. Pra fazer isso bem, abrir e absorver os 7 documentos abaixo NA ORDEM:
 
 | # | Documento | O que tem |
 |---|-----------|-----------|
 | 1 | `docs/BRIEFING_NARRATIVA_PROJETO.md` | Narrativa completa do projeto (origem, evolução 12/04→25/04, estado atual, roadmap, regras). 50 KB de contexto. |
 | 2 | `docs/UB_estrutura_partidaria.md` | Como o União Brasil se organiza (nominata, hierarquia Nacional→Estadual→Municipal, ficha de filiação, RBAC scoped, módulos administrativos novos, DocuSign). |
-| 3 | `docs/anderson_milton_briefing.md` | **Quem aprova o produto:** Milton Leite (perfil CEO, direto). O que ele precisa ver, crítica do mock atual, dossiê personalizado por cargo, sidebar lógica por perfil, white label UB, lista de entregáveis desta sessão. |
-| 4 | `STATUS_DADOS_V2.md` (raiz do worktree) | Qual módulo é REAL, qual é HIBRIDO (API+fallback mock), qual é MOCK puro, qual é PLACEHOLDER. Pra você não estilizar baseado em magnitudes erradas. |
+| 3 | `docs/perfis_e_paineis.md` | **Universo completo de perfis** (4 camadas): Mazzel + Política Partidária (8 cargos × 3 níveis) + Eletiva (7 cargos + gabinete) + Operacional (cascata). Cada perfil tem sidebar própria. |
+| 4 | `docs/principio_portabilidade_perfil.md` | **Político é dono do dado pessoal; partido é dono da estratégia.** Quando político troca de partido: pessoal migra, estratégia fica. Diferencial competitivo + LGPD por design. |
+| 5 | `docs/modulo_operacoes.md` | **Módulo central:** Operações estilo Facebook Ads + cascata de delegação (Pres → Coord → Cabo) + score subindo + Mapa Estratégico como base + Chat evoluído (Discord-style com salas de áudio). Substitui o nome temporário "Campanha 2026". |
+| 6 | `docs/anderson_milton_briefing.md` | **Quem aprova o produto:** Milton Leite (Pres Estadual SP, perfil CEO). Crítica do mock, dossiê personalizado por cargo, sistema de IDs+convites Discord-style, bug crítico do Mapa Eleitoral V2, lista de 13 seções de entregáveis priorizados. |
+| 7 | `STATUS_DADOS_V2.md` (raiz do worktree) | Qual módulo é REAL, qual é HIBRIDO (API+fallback mock), qual é MOCK puro, qual é PLACEHOLDER. Pra você não estilizar baseado em magnitudes erradas. |
 
 E também os **arquivos oficiais do cliente** em `docs/anderson_referencias/`:
 - `modelo_nominata_atual.docx` — papel timbrado oficial UB com logo + número 44 (extraído pra `codigo/frontend/public/branding/uniao-brasil/papel_timbrado.png`)
 - `ficha_filiacao_partidaria.pdf` — formulário oficial de filiação
 
-**Resumo dos 4 docs em uma frase:** o produto é uma plataforma de inteligência eleitoral pro União Brasil que precisa fazer sentido pra um Presidente do partido (perfil CEO) controlar/organizar/crescer o negócio dele, com dossiês personalizados por cargo, sidebar por perfil, white label azul/amarelo, e infraestrutura administrativa (nominata + DocuSign) que reflita a estrutura real do partido.
+**Resumo em 3 linhas:**
+1. O produto é uma plataforma multi-tenant de inteligência eleitoral pro União Brasil (e futuros partidos) que precisa fazer sentido pra um Presidente do partido (perfil CEO) controlar/organizar/crescer o negócio dele.
+2. **Cada perfil** (Super Admin Mazzel até Cabo Eleitoral) tem painel próprio derivado do cargo + nível + escopo. Político eleito tem painel pessoal "agente de inteligência política" que migra com ele se trocar de partido.
+3. **Operações** (estilo Facebook Ads + Discord pra comunicação) é o módulo central — onde campanhas eleitorais e cobertura territorial diária são planejadas no Mapa Estratégico, delegadas pela cascata, executadas pelos cabos, e medidas via score que sobe pela hierarquia.
+
+**Princípios não-negociáveis** (em ordem):
+1. **Imparcialidade narrativa** — plataforma narra fatos, não toma lado político
+2. **Continuidade institucional** — histórico fica vinculado ao cargo+região, não à pessoa (João sai, Maria entra, contexto continua)
+3. **Portabilidade de perfil** — político é dono do que é dele
+4. **Linguagem CEO** — pra Milton-chefe-de-estado: 3 perguntas em 3 segundos, números com delta, ações executivas
+5. **Linguagem analfabeto digital funcional** — pra cabo idoso: 1 ação por tela, zero jargão, ícones+cores semânticas, wizard guiado
+6. **Mapa central** — toda operação é desenhada e visualizada no Mapa Estratégico
+7. **Score em toda hierarquia** — não só candidato; presidente, coordenador, tesoureiro, secretário, cabo — todos têm Overall
 
 ---
 

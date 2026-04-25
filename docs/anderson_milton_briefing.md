@@ -2,6 +2,14 @@
 
 Observações capturadas em 25/04/2026 sobre **quem decide** e **o que precisa ver** pra aprovar a plataforma. Documenta o cliente real e dirige decisões de produto, UX e priorização.
 
+> **Atualização noturna 25/04/2026:** seções 7-12 adicionadas após sessão de download de visão. Consolidam universo completo de perfis, princípios estruturais (Overall por hierarquia + Portabilidade + Continuidade institucional), módulo Operações (estilo Facebook Ads), módulo Chat evoluído (Discord-style), e bug crítico do Mapa Eleitoral V2.
+
+**Documentos complementares (leitura obrigatória pelo Designer):**
+- `perfis_e_paineis.md` — universo completo de perfis (4 camadas)
+- `modulo_operacoes.md` — Operações estilo Facebook Ads + Chat evoluído
+- `principio_portabilidade_perfil.md` — separação dado pessoal vs estratégico do partido
+- `UB_estrutura_partidaria.md` — nominata, hierarquia, RBAC, DocuSign
+
 ---
 
 ## Quem é quem
@@ -245,9 +253,217 @@ César vai abrir uma sessão dedicada do Claude Designer pra resolver tudo. List
 
 ---
 
+---
+
+## 7. Universo completo de perfis (4 camadas)
+
+Milton-Pres Estadual SP foi caso real, não regra. A plataforma cobre **muito mais perfis** porque cada nó da estrutura partidária + cada político eleito + cada equipe de gabinete tem painel próprio.
+
+| Camada | Tipos de perfil | Volume potencial |
+|--------|-----------------|---|
+| 1. **Mazzel** (técnica) | Super Admin · Admin do Partido | ~10-50 pessoas |
+| 2. **Política Partidária** (institucional) | 8 cargos × 3 níveis (Nacional/Estadual/Municipal) | ~44.800 cargos |
+| 3. **Eletiva** (políticos + gabinetes) | 7 cargos × média 5-6 pessoas/gabinete | ~325.000 pessoas |
+| 4. **Operacional de Campanha** (cascata) | Coord Regional → Coord Territorial → Cabo | variável |
+| Filiado base | 1 | milhões |
+
+**Mapa completo dos painéis:** `docs/perfis_e_paineis.md` (decisão estruturante, leitura obrigatória).
+
+**Princípio crítico:** cada perfil tem **sidebar derivada do cargo + nível + escopo** — não menu universal filtrado. 3-8 itens por perfil, agrupados visualmente.
+
+---
+
+## 8. Painel Pessoal do Político = "agente de inteligência política pessoal"
+
+Quando o político (ou alguém da equipe dele) entra na plataforma, vê o **estado-maior pessoal**. Não é filtro do painel do partido — é universo próprio.
+
+Conteúdo (detalhe em `perfis_e_paineis.md` § Camada 3):
+- Cenário Político (radar dinâmico)
+- Meu Dossiê (Overall, sub-medidas, comparativo com pares)
+- Agenda (pessoal + oficial + pública)
+- Alianças (mapa + sugestões IA + alertas)
+- Lideranças da minha região
+- Estudo Político (panoramas, emendas, demografia)
+- Clipping (mídia espontânea)
+- Bancada / Votações (parlamentares) ou Atendimento à Base (executivos/vereadores)
+- Operações em mim (quem tem campanha pra me visitar)
+- Equipe de Gabinete (cadastro compartilhado: político + chefe podem adicionar)
+
+Equipe de Gabinete tem **tipos canônicos** + opção "Outro": Chefe · Comunicação · Jurídico · Articulação · Parlamentar · Base.
+
+---
+
+## 9. Princípios estruturais
+
+### A. Overall em toda a hierarquia (não só candidatos)
+
+Hoje Overall existe pra candidato (LULA=85). Vai existir pra **toda a cadeia**: Presidente Nacional, Estadual, Municipal, Tesoureiro, Secretário, Coord Regional, Territorial, Cabo. Cada cargo tem suas sub-medidas próprias (detalhe no `modulo_operacoes.md` § Score sobe pela cascata).
+
+**Vantagem CEO:** Milton abre painel, vê **um número** por subordinado direto. Score baixo? Clica pra investigar.
+
+### B. Continuidade institucional (histórico do cargo, não da pessoa)
+
+Quando muda quem ocupa um cargo (João → Maria) durante operação ativa:
+- Histórico fica vinculado ao **cargo + região**, não à pessoa
+- João tem score só do período em que ocupou
+- Maria assume com **acesso total ao contexto** (tarefas pendentes, relatórios anteriores, próximos passos)
+- Score de Maria começa a contar a partir da data que assumiu
+- Comparação justa: quem performou melhor naquele cargo?
+
+Implementação: tabela `atividade_cargo` separa QUEM executou QUANDO o QUÊ — independente de quem ocupa o cargo agora.
+
+### C. Portabilidade de Perfil + Isolamento de Dados Estratégicos
+
+Dados pessoais do político (dossiê público, agenda, alianças informais) **migram com ele** se trocar de partido. Estratégia confidencial do partido sobre ele **fica no tenant antigo**.
+
+Detalhe completo: `principio_portabilidade_perfil.md`. Diferencial competitivo: alinhamento de incentivos sem trava abusiva, atende LGPD por design.
+
+---
+
+## 10. Módulo Operações (substitui "Campanha 2026")
+
+Módulo central da plataforma — eterno, não vinculado a uma eleição. Cobre toda operação organizada do partido: campanhas eleitorais, cobertura territorial diária, ofensivas administrativas, mobilizações.
+
+**Arquitetura Facebook Ads aplicada:**
+- Campanha (objetivo) → Configuração (público no mapa + prazo + recursos) → Tarefas (ações concretas) → Score
+- Cascata de delegação (Pres Nacional → Pres Estadual → Pres Municipal → Coord Regional → Coord Territorial → Cabo)
+- Mapa Estratégico como base visual de todas as operações
+- Score sobe pela cascata em tempo real
+
+**Cabo Eleitoral integrado** — não é mais módulo separado na sidebar, vira o último nível dentro de Operações.
+
+Detalhe completo: `docs/modulo_operacoes.md`.
+
+---
+
+## 11. Módulo Chat evoluído (Discord-style)
+
+O Chat existente vai evoluir pra cobrir 2 modos:
+
+**Permanente** — conversas 1-1 e grupos, texto + mídia, histórico preservado, uso cotidiano.
+
+**Sigiloso (durante operações sensíveis)** — salas de áudio (voz tempo real), canais auto-criados por campanha, mídia com **visualização única** (Snapchat-style), watermark obrigatório (anti-leak), apaga ao concluir operação, modo radio (push-to-talk pra cabos em campo).
+
+**SOS pro cabo:** botão grande de emergência → notifica Coord Territorial + Pres Municipal imediatamente.
+
+Detalhe completo: `docs/modulo_operacoes.md` § Comunicação interna.
+
+---
+
+## 12. Sistema de IDs + Convites (Discord-style aplicado à política)
+
+**Princípio do César:** "Cada painel tem seu ID. Precisa pensar como as pessoas vão adicionar as pessoas, como fazemos no Discord. Apesar da complexidade enorme, navegação precisa ser de forma intuitiva."
+
+### Cada entidade da plataforma tem ID único
+
+| Entidade | Formato sugerido do ID | Exemplo |
+|----------|------------------------|---------|
+| **Tenant (Partido)** | `tenant:slug` | `tenant:uniao-brasil` |
+| **Diretório Nacional** | `dir:tenant:nacional` | `dir:ub:nacional` |
+| **Diretório Estadual** | `dir:tenant:UF` | `dir:ub:sp` |
+| **Diretório Municipal** | `dir:tenant:UF:cod_ibge` | `dir:ub:sp:3550308` |
+| **Comissão Executiva** | mesmo do Diretório (1:1) | `dir:ub:sp:3550308` |
+| **Cargo na Comissão** | `cargo:dir:codigo` | `cargo:dir:ub:sp:presidente` |
+| **Painel Pessoal Político** | `pol:cpf` ou `pol:slug` | `pol:milton-leite` |
+| **Equipe de Gabinete** | `gab:pol_id` | `gab:milton-leite` |
+| **Operação** | `op:tenant:hash` | `op:ub:abc123` |
+| **Sala de Chat** | `chat:contexto:hash` | `chat:op:ub:abc123` |
+
+ID curto e legível pra ser memorável e compartilhável (estilo Discord `discord.gg/xyz`).
+
+### Como pessoas entram em painéis (5 modos)
+
+#### 1. Convite por link (Discord-style)
+- Presidente Estadual gera link: `app.mazzelag.com/convite/dir:ub:sp:3550308?token=xyz`
+- Envia por WhatsApp pro novo Sec-Geral Municipal
+- Sec-Geral abre, cria conta (ou loga), aceita convite, está dentro com permissão automática
+- Convite tem **expiração** configurável (24h, 7d, sem expiração) e **uso único ou múltiplo**
+
+#### 2. Busca por CPF / Título Eleitoral
+- Tesoureiro Municipal precisa adicionar Membro à Comissão
+- Busca por CPF ou título → plataforma encontra a pessoa (se tem cadastro) ou oferece "convidar por e-mail"
+- Atribui cargo + permissões → membro recebe notificação
+
+#### 3. Auto-via filiação (TSE)
+- Pessoa se filia ao UB no município X
+- Plataforma detecta (via TSE ou cadastro próprio)
+- Auto-adiciona ao Diretório Municipal X com perfil `Filiado`
+- Notifica Presidente Municipal: "Novo filiado: João Silva (#abc123). Quer designar pra algum cargo?"
+
+#### 4. Cascata de designação
+- Presidente Estadual cadastra Presidente Municipal de cada cidade
+- Presidente Municipal cadastra Secretários, Tesoureiros, Membros
+- Presidente Municipal designa Coord Regional pras campanhas
+- Coord Regional designa Coord Territorial
+- Coord Territorial designa Cabos Eleitorais
+- Cada designado recebe notificação + onboarding curto
+
+#### 5. Equipe de Gabinete (cadastro compartilhado)
+- Político E Chefe de Gabinete podem adicionar/remover membros
+- Adicionar = busca por CPF + escolhe tipo (Comunicação/Jurídico/etc.) → permissões auto-aplicadas
+- Remover = revoga acesso imediatamente
+
+### Padrão visual de adicionar pessoas (UX)
+
+Em qualquer tela onde se adiciona pessoa, a UI é **idêntica** (consistência cognitiva):
+
+```
+┌─────────────────────────────────────┐
+│  Adicionar pessoa                   │
+│                                     │
+│  ○ Buscar (CPF ou e-mail)           │
+│  ○ Convidar por link                │
+│  ○ Designar de filiados existentes  │
+│                                     │
+│  [Próximo]                          │
+└─────────────────────────────────────┘
+```
+
+Depois disso: passo 2 é **escolher cargo/tipo** (com permissões pré-explicadas) → passo 3 é **confirmar e enviar**. Wizard de 3 passos, sempre.
+
+### Mapa de relações
+
+Cada perfil tem **dashboard de relações** mostrando:
+- Em quantos Diretórios está vinculado
+- Quantos painéis acessa
+- Quem o convidou
+- Quem ele convidou
+- Histórico de mudanças de cargo
+
+Útil pra **auditoria** (quem deu acesso a quem) e pra **transparência** (cada usuário vê tudo que pode ver e por quê).
+
+### Notificações
+
+Sistema unificado de notificações pra reduzir fricção:
+- **In-app** (sino na topbar)
+- **E-mail** (transacional via SES/Resend)
+- **WhatsApp** (templates aprovados — pra cabos e operações urgentes)
+- **Push** (mobile, quando tiver app)
+
+Cada usuário configura preferência por tipo de evento (convite recebido, operação designada, alerta crítico, etc.).
+
+---
+
+## 13. Bug crítico: Mapa Eleitoral V2 quebrado
+
+**Diagnóstico:** o mapa eleitoral foi rebatido na V2 mal feito — não acompanha o layout da V2, perdeu navegação e perdeu as automações do MapLibre que existiam na versão preservada (V1).
+
+**Funcionalidade perdida que mais machuca:** foto do candidato aparecendo na sidebar quando o usuário passa o mouse na região. Existe na V1, foi perdida no porte. César considera essa interação "muito foda" — núcleo da experiência.
+
+**Direção pra Claude Code (próxima sessão):**
+1. Auditar `/mazzel-preview/mapa` na V2 vs `/mapa` na preservada
+2. Listar uma a uma as funcionalidades perdidas (foto-on-hover, drill-down 5 níveis, sidebar contextual, escala de cores, tabs turno, etc.)
+3. Portar com cuidado — não é refazer, é trazer o que já funcionava
+4. Lembrando: o **Mapa Eleitoral** vai pro **módulo Estudo** (decisão 25/04). A sidebar principal tem o novo **Mapa Estratégico** (que o Designer está desenhando). Mas o Eleitoral em si precisa estar funcional onde quer que esteja.
+
+---
+
 ## Documentos referenciados
 
 - Narrativa completa do projeto: `docs/BRIEFING_NARRATIVA_PROJETO.md`
+- Universo completo de perfis: `docs/perfis_e_paineis.md`
+- Módulo Operações + Chat evoluído: `docs/modulo_operacoes.md`
+- Princípio portabilidade de perfil: `docs/principio_portabilidade_perfil.md`
 - Estrutura partidária UB: `docs/UB_estrutura_partidaria.md`
 - Status de dados (mock vs real): `STATUS_DADOS_V2.md` (raiz do worktree)
 - Briefing original do Designer: `BRIEFING_CLAUDE_DESIGNER.md` (raiz do worktree)
