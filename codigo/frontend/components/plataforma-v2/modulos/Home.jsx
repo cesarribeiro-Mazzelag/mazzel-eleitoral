@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { Icon } from "../Icon";
 import { usePlatform } from "../PlatformContext";
 import { makeNavigate } from "../navigate";
-import { API, ApiError } from "../api";
+import { API } from "../api";
 import {
   kpisFromDashboard, alertasFromApi,
   topCandidatosFromRadar, movimentacoesFromAuditoria,
@@ -39,7 +39,7 @@ export function Home() {
         const [dash, al, rad, audit] = await Promise.all([
           API.dashboard().catch((e) => { throw e; }),
           API.alertas({ limit: 8 }).catch(() => null),
-          API.radar({ por_pagina: 10, ordenar_por: "overall" }).catch(() => null),
+          API.dossies({ por_pagina: 10, ordenar_por: "overall_desc" }).catch(() => null),
           API.adminAuditoria().catch(() => null),
         ]);
         if (cancelled) return;
@@ -51,17 +51,17 @@ export function Home() {
         setAuthStatus("ok");
       } catch (err) {
         if (cancelled) return;
-        if (err instanceof ApiError && (err.status === 401 || err.status === 403)) {
-          setAuthStatus("unauth");
-        } else {
-          setAuthStatus("error");
-        }
+        setAuthStatus("error");
       }
     }
     load();
     return () => { cancelled = true; };
   }, [role]);
 
+  // Sem fallback de mock durante loading - mostra skeleton ate API responder.
+  // Antes: cair em HOME_KPIS causava flash de "1.247 ELEITOS UB / 51.384 candidatos"
+  // antes do dado real (141.929 / 1.079.525) carregar.
+  const carregandoInicial = authStatus === "loading" && apiKpis === null;
   const kpis = apiKpis || HOME_KPIS[role] || HOME_KPIS.presidente;
   const alertas = apiAlertas || HOME_ALERTS;
   const topCand = apiTopCand || HOME_TOP_CANDIDATOS;
@@ -92,15 +92,6 @@ export function Home() {
     <div className="bg-page-grad min-h-full">
       <div className="max-w-[1600px] mx-auto px-8 py-7">
 
-        {authStatus === "unauth" && (
-          <div
-            className="mb-4 rounded-lg px-4 py-2.5 flex items-center gap-2 text-[12px]"
-            style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.35)" }}
-          >
-            <Icon name="AlertTriangle" size={14} className="t-warn" />
-            <span className="t-fg">Sem sessão ativa. Exibindo dados fictícios. Faça login para ver a base real.</span>
-          </div>
-        )}
         {authStatus === "error" && (
           <div
             className="mb-4 rounded-lg px-4 py-2.5 flex items-center gap-2 text-[12px]"
@@ -132,31 +123,39 @@ export function Home() {
         </div>
 
         <div className="grid grid-cols-4 gap-3 mb-6">
-          {kpis.map((k, i) => (
-            <div key={i} className="kpi-card ring-soft">
-              <div className="text-[10.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">{k.k}</div>
-              <div className="flex items-end gap-2 mt-2">
+          {carregandoInicial
+            ? Array.from({ length: 4 }).map((_, i) => (
                 <div
-                  className="text-[38px] font-display font-bold tnum leading-none"
-                  style={{
-                    backgroundImage: "linear-gradient(180deg, var(--overall-from), var(--overall-to))",
-                    WebkitBackgroundClip: "text",
-                    backgroundClip: "text",
-                    color: "transparent",
-                  }}
-                >
-                  {k.v}
+                  key={`sk-${i}`}
+                  className="kpi-card ring-soft animate-pulse"
+                  style={{ minHeight: 130, background: "var(--rule)", opacity: 0.4 }}
+                />
+              ))
+            : kpis.map((k, i) => (
+                <div key={i} className="kpi-card ring-soft">
+                  <div className="text-[10.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">{k.k}</div>
+                  <div className="flex items-end gap-2 mt-2">
+                    <div
+                      className="text-[38px] font-display font-bold tnum leading-none"
+                      style={{
+                        backgroundImage: "linear-gradient(180deg, var(--overall-from), var(--overall-to))",
+                        WebkitBackgroundClip: "text",
+                        backgroundClip: "text",
+                        color: "transparent",
+                      }}
+                    >
+                      {k.v}
+                    </div>
+                  </div>
+                  <div className="text-[11px] t-fg-dim mt-2">{k.hint}</div>
+                  <div className="kpi-trend">
+                    <span className={`chip ${k.ok ? "chip-green" : "chip-red"}`} style={{ height: 20 }}>
+                      <Icon name={k.trend.startsWith("+") ? "ArrowUp" : k.trend.startsWith("-") ? "ArrowDown" : "Check"} size={10} />
+                      {k.trend}
+                    </span>
+                  </div>
                 </div>
-              </div>
-              <div className="text-[11px] t-fg-dim mt-2">{k.hint}</div>
-              <div className="kpi-trend">
-                <span className={`chip ${k.ok ? "chip-green" : "chip-red"}`} style={{ height: 20 }}>
-                  <Icon name={k.trend.startsWith("+") ? "ArrowUp" : k.trend.startsWith("-") ? "ArrowDown" : "Check"} size={10} />
-                  {k.trend}
-                </span>
-              </div>
-            </div>
-          ))}
+              ))}
         </div>
 
         <div className="grid grid-cols-3 gap-3 mb-6">

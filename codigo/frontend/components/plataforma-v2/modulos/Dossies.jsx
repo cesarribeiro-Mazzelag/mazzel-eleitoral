@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 import { Icon } from "../Icon";
 import { RADAR_CANDIDATOS, UF_LIST } from "../data";
 import { CardPolitico } from "../../radar/CardPolitico";
-import { API, ApiError } from "../api";
+import { API } from "../api";
 import { StatusBanner } from "../useApiFetch";
 import { radarCardsFromApi } from "../adapters/listagens";
 
@@ -50,21 +50,15 @@ export function Dossies() {
     if (q) params.busca = q;
     if (append) setCarregandoMais(true); else setStatus("loading");
     try {
-      const resp = await API.radar(params);
+      const resp = await API.dossies(params);
       const cards = radarCardsFromApi(resp) || [];
       setItems((prev) => append ? [...(prev || []), ...cards] : cards);
       setTotal(resp.total ?? cards.length);
       setStatus("ok");
     } catch (err) {
       const msg = err?.message || "Falha ao carregar.";
-      if (err instanceof ApiError && (err.status === 401 || err.status === 403)) {
-        setStatus("unauth");
-        setErrorMsg("Sem sessão ativa. Exibindo dados fictícios.");
-        if (!append) setItems(null);
-      } else {
-        setStatus("error");
-        setErrorMsg(msg);
-      }
+      setStatus("error");
+      setErrorMsg(msg);
     } finally {
       setCarregandoMais(false);
     }
@@ -82,7 +76,11 @@ export function Dossies() {
     fetchPagina(proxima, true);
   };
 
-  const fonte = items || RADAR_CANDIDATOS;
+  // Sempre fonte real do backend - nunca cai em mock durante loading.
+  // Antes: `items || RADAR_CANDIDATOS` causava flash de 24 mocks (LULA OVR=93,
+  // numeros V8 antigos) antes da API responder. Agora mostra skeleton.
+  const fonte = items || [];
+  const carregandoInicial = status === "loading" && items === null;
 
   const partidos = useMemo(
     () => ["TODOS", ...Array.from(new Set(fonte.map((c) => c.partido)))],
@@ -152,9 +150,15 @@ export function Dossies() {
             <div className="text-right pl-2 border-l" style={{ borderColor: "var(--rule)" }}>
               <div className="text-[9.5px] t-fg-dim uppercase tracking-wider font-semibold">Resultados</div>
               <div className="text-[18px] font-bold t-fg-strong tnum">
-                {results.length}
-                {total > 0 && total !== results.length && (
-                  <span className="t-fg-muted text-[12px] ml-1">de {total.toLocaleString("pt-BR")}</span>
+                {carregandoInicial ? (
+                  <span className="t-fg-muted">—</span>
+                ) : (
+                  <>
+                    {results.length}
+                    {total > 0 && total !== results.length && (
+                      <span className="t-fg-muted text-[12px] ml-1">de {total.toLocaleString("pt-BR")}</span>
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -162,20 +166,25 @@ export function Dossies() {
         </div>
 
         <div className="grid gap-4 justify-center" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(204px, 1fr))" }}>
-          {results.map((c) => (
-            <CardPolitico
-              key={c.candidato_id ?? c.id}
-              politico={c}
-              onAbrirDossie={(id) => {
-                // Persiste dados da cartinha pra dossie individual usar (consistencia visual).
-                // Backend /dossie/{id} retorna calculo proprio que diverge do MV/radar - bug a corrigir
-                // no backend. Enquanto isso, frontend garante que cartinha embarcada bate com a da grade.
-                try { sessionStorage.setItem(`dossie_card_${id}`, JSON.stringify(c)); } catch {}
-                router.push(`/mazzel-preview/dossies/${id}`);
+          {carregandoInicial && Array.from({ length: 12 }).map((_, i) => (
+            <div
+              key={`sk-${i}`}
+              className="rounded-xl animate-pulse"
+              style={{
+                aspectRatio: "204/360",
+                background: "var(--rule)",
+                opacity: 0.5,
               }}
             />
           ))}
-          {results.length === 0 && (
+          {!carregandoInicial && results.map((c) => (
+            <CardPolitico
+              key={c.candidato_id ?? c.id}
+              politico={c}
+              onAbrirDossie={(id) => router.push(`/mazzel-preview/dossies/${id}`)}
+            />
+          ))}
+          {!carregandoInicial && results.length === 0 && (
             <div className="col-span-full t-bg-card ring-soft rounded-xl p-12 text-center">
               <div className="text-[15px] font-semibold t-fg">Nenhum resultado.</div>
               <div className="text-[12px] t-fg-muted mt-1">Ajuste os filtros.</div>

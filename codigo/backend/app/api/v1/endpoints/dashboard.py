@@ -10,14 +10,30 @@ GET /dashboard/visao-geral
     partido_ids = "44,25"      (números dos partidos, ou vazio = todos)
     resultado   = "eleito"     (ou "todos")
 """
+import hashlib
+
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
 from typing import Optional
 
+from app.core.cache import cached_json
 from app.core.database import get_db
 from app.core.deps import requer_qualquer
 from app.models.operacional import Usuario
+
+
+# Cache TTL: 10 minutos. Os dados base (TSE) sao atualizados em batch (ETL)
+# - aceitavel ter ate 10min de defasagem em troca de latencia <50ms.
+# Cache key inclui hash dos filtros pra cobrir todas as combinacoes.
+DASHBOARD_TTL = 600
+
+
+def _cache_key(prefix: str, **filtros) -> str:
+    """Hash determinista dos filtros pra usar como key."""
+    payload = "|".join(f"{k}={v or ''}" for k, v in sorted(filtros.items()))
+    h = hashlib.sha1(payload.encode()).hexdigest()[:16]
+    return f"dashboard:{prefix}:{h}"
 
 router = APIRouter()
 
@@ -92,9 +108,33 @@ async def get_visao_geral(
     _: Usuario = Depends(requer_qualquer),
 ):
     """
-    Dashboard CEO — métricas nacionais com filtros dinâmicos.
-    Retorna big numbers, evolução por ano, breakdown por cargo e estados.
+    Dashboard CEO - metricas nacionais com filtros dinamicos.
+
+    Cacheado em Redis (TTL 10min) por hash dos filtros. Cache miss roda
+    6 queries pesadas em candidaturas (~7-12s); cache hit ~5ms.
+    Pra invalidar: `cache_invalidate("dashboard:*")` apos REFRESH das MVs.
     """
+    key = _cache_key(
+        "visao-geral",
+        anos=anos, cargo=cargo, estado=estado,
+        partido_ids=partido_ids, resultado=resultado,
+    )
+
+    async def _builder():
+        return await _compute_visao_geral(db, anos, cargo, estado, partido_ids, resultado)
+
+    return await cached_json(key, ttl=DASHBOARD_TTL, builder=_builder)
+
+
+async def _compute_visao_geral(
+    db: AsyncSession,
+    anos: Optional[str],
+    cargo: Optional[str],
+    estado: Optional[str],
+    partido_ids: Optional[str],
+    resultado: Optional[str],
+) -> dict:
+    """Executa as 6 queries agregadas. Caro - sempre via cache."""
     where, params = _build_where(anos, cargo, estado, partido_ids, resultado)
     join_partido = "JOIN partidos p ON p.id = ca.partido_id"
 
