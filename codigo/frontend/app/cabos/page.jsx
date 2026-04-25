@@ -299,7 +299,7 @@ function CardCabo({ c, onEditar, onDeletar, podeEditar }) {
           </span>
           {c.valor_contrato && (
             <span className="text-xs text-gray-400">
-              R$ {Number(c.valor_contrato).toLocaleString("pt-BR")}
+              R$ {Number(c.valor_contrato).toLocaleString("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
             </span>
           )}
         </div>

@@ -41,6 +41,7 @@ class Identificacao(BaseModel):
     estado_nascimento: Optional[str] = None
     naturalidade: Optional[str] = None  # cidade de nascimento (zero em 2026-04: campo TSE ausente)
     bio_resumida: Optional[str] = None      # primeiro paragrafo Wikipedia PT
+    bio_curta: Optional[str] = None         # max 180 chars, calculado pelo backend
     wikipedia_url: Optional[str] = None     # link para o artigo fonte
 
 
@@ -344,6 +345,15 @@ class Legislativo(BaseModel):
     Senador) ou municipal (Vereador SP).
 
     `disponivel=False` quando o candidato nunca teve mandato legislativo.
+
+    Sub-medidas de presenca (populadas pelo ETL `coletar_parlamentares`):
+      - presenca_plenario_pct   : % de sessoes plenarias em que o parlamentar esteve presente
+      - presenca_comissoes_pct  : % de reunioes de comissoes (Camara apenas; Senado = None)
+      - sessoes_plenario_total  : total de sessoes no ano de referencia (baseline global)
+      - sessoes_plenario_presente: sessoes em que o parlamentar participou
+      - cargos_lideranca        : lista de cargos (Lider de bloco, Presidente de comissao, etc.)
+
+    Fonte: APIs Camara + Senado (atualizado via app/cli/coletar_parlamentares.py).
     """
     casa: Optional[str] = None                      # CAMARA | SENADO | CAMARA_MUNICIPAL | ASSEMBLEIA_ESTADUAL
     cargo_titulo: Optional[str] = None              # "Deputado Federal" | "Senador" | "Vereador" | "Deputado Estadual"
@@ -369,6 +379,12 @@ class Legislativo(BaseModel):
     presidencias: list[str] = Field(default_factory=list)  # nomes das comissoes que preside
     n_relatorias: int = 0
     relatorias_recentes: list[ProjetoRef] = Field(default_factory=list)
+    # Sub-medidas de presenca e lideranca (populadas pelo ETL 23/04/2026)
+    presenca_plenario_pct: Optional[float] = None   # 0-100 (None = nao coletado ainda)
+    presenca_comissoes_pct: Optional[float] = None  # 0-100 (None = Senado ou nao coletado)
+    sessoes_plenario_total: Optional[int] = None    # total de sessoes no ano de referencia
+    sessoes_plenario_presente: Optional[int] = None # quantas o parlamentar esteve presente
+    cargos_lideranca: list[str] = Field(default_factory=list)  # ["Lider do Bloco X", ...]
     disponivel: bool = False
 
 
@@ -585,12 +601,55 @@ class Classificacao(BaseModel):
     potencial: Optional[NivelClassificacao] = None
 
 
+class OverallV9(BaseModel):
+    """
+    6 dimensoes visuais v9 para o Card Politico e radar hexagonal.
+    Mapeadas das 8 dimensoes FIFA (atributos_6):
+      ATV (Atividade)   <- EFI (eficiencia: taxa vitoria + custo/voto)
+      LEG (Legislativo) <- ART (articulacao: PLs aprovados)
+      BSE (Base)        <- VOT (votacao: volume eleitoral)
+      INF (Influencia)  <- FID (fidelidade: coerencia partidaria)
+      MID (Midia)       <- POT (potencial: momentum + trajetoria)
+      PAC (Pactuacao)   <- TER (territorial: alcance geografico)
+    Calculado pelo backend — o frontend NAO deve derivar este campo.
+    """
+    ATV: Optional[int] = None
+    LEG: Optional[int] = None
+    BSE: Optional[int] = None
+    INF: Optional[int] = None
+    MID: Optional[int] = None
+    PAC: Optional[int] = None
+
+
+class KpiHeader(BaseModel):
+    """Par chave-valor para o header do dossie. Varia conforme tipo de cargo."""
+    k: str
+    v: Optional[str] = None
+
+
+class CartinhaPolitico(BaseModel):
+    """Shape completo para o card/cartinha do politico (Card V2/V8)."""
+    nome: Optional[str] = None
+    partido_sigla: Optional[str] = None
+    estado_uf: Optional[str] = None
+    foto_url: Optional[str] = None
+    overall: Optional[int] = None
+    overall_v9: Optional[OverallV9] = None
+    votos_total: Optional[int] = None
+    ano: Optional[int] = None
+    tier: Optional[str] = None
+    traits: list[str] = Field(default_factory=list)
+
+
 class Inteligencia(BaseModel):
     comportamento: Comportamento = Field(default_factory=Comportamento)
     alertas: list[str] = Field(default_factory=list)
     score: Score = Field(default_factory=Score)
     overall_fifa: OverallFifa = Field(default_factory=OverallFifa)
     classificacao: Classificacao = Field(default_factory=Classificacao)
+    # Campos pre-computados para o frontend (evitar recalculo client-side)
+    overall_v9: Optional[OverallV9] = None
+    arquetipos: list[str] = Field(default_factory=list)
 
 
 # ── Modelo principal ─────────────────────────────────────────────────────────
@@ -624,6 +683,10 @@ class DossiePolitico(BaseModel):
     # Overall fixo do ultimo ciclo disponivel (para badge na foto do hero)
     # Nao muda com seletor de ciclo - mostra o "estado atual" do candidato.
     overall_ultimo_ciclo: Optional[int] = None
+    # KPIs pre-computados para o header do dossie (varia por tipo de cargo)
+    kpis_header: list[KpiHeader] = Field(default_factory=list)
+    # Cartinha completa para o Card V2/V8 (evita reconstrucao no frontend)
+    cartinha: Optional[CartinhaPolitico] = None
 
     model_config = ConfigDict(
         json_schema_extra={

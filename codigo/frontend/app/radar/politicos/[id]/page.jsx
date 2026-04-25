@@ -3,7 +3,7 @@
 /**
  * /radar/politicos/[id] - Dossie Bureau.
  * Conteudo extraido para components/dossie/DossieBureau.jsx
- * para reuso em /mazzel-preview/dossies/[id].
+ * para reuso em /v1/dossies/[id].
  */
 import { DossieBureau } from "@/components/dossie/DossieBureau";
 

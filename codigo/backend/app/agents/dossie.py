@@ -22,6 +22,7 @@ from app.schemas.dossie import (
     CargoDisputado,
     CargoHistorico,
     CarreiraPublica,
+    CartinhaPolitico,
     CicloAptidao,
     SancaoAdm,
     Classificacao,
@@ -38,8 +39,10 @@ from app.schemas.dossie import (
     Identificacao,
     Inteligencia,
     Juridico,
+    KpiHeader,
     Legislativo,
     OrigemRecursos,
+    OverallV9,
     PerfilPolitico,
     ProjetoRef,
     RedesSociais,
@@ -113,6 +116,156 @@ async def _calcular_bonus_recorde(
     except Exception:
         # Se mv nao existir ou qualquer erro, nao bloqueia o dossie
         return (0, [])
+
+
+# ── Helpers pre-computados (movidos do frontend) ─────────────────────────────
+
+_CARGOS_EXECUTIVOS = {
+    "PRESIDENTE", "GOVERNADOR", "PREFEITO",
+    "VICE-PRESIDENTE", "VICE-GOVERNADOR", "VICE-PREFEITO",
+}
+
+
+def _calcular_overall_v9(fifa) -> OverallV9 | None:
+    """
+    Mapeia as 8 dimensoes FIFA (atributos_6) para as 6 dimensoes v9 do Card.
+    Mapeamento: ATV<-EFI, LEG<-ART, BSE<-VOT, INF<-FID, MID<-POT, PAC<-TER.
+    Retorna None se o objeto fifa nao tem nenhuma dimensao preenchida.
+    """
+    if fifa is None:
+        return None
+    atv = fifa.eficiencia
+    leg = fifa.articulacao
+    bse = fifa.votacao
+    inf = fifa.fidelidade
+    mid = fifa.potencial
+    pac = fifa.territorial
+    if all(v is None for v in [atv, leg, bse, inf, mid, pac]):
+        return None
+    return OverallV9(ATV=atv, LEG=leg, BSE=bse, INF=inf, MID=mid, PAC=pac)
+
+
+def _derivar_arquetipos(fifa) -> list[str]:
+    """
+    Deriva arquetipos politicos a partir do OverallFifa.
+    Logica espelha deriveArchetypes do frontend, consolidada no backend.
+    """
+    if fifa is None:
+        return []
+    arquetipos: list[str] = []
+    vot = fifa.votacao or 0
+    art = fifa.articulacao or 0
+    fid = fifa.fidelidade or 0
+    ter = fifa.territorial or 0
+    efi = fifa.eficiencia or 0
+    pot = fifa.potencial or 0
+    tier = (fifa.tier or "").lower()
+
+    # Fenomeno: grande massa eleitoral OU tier dourado
+    if vot >= 85 or tier == "dourado":
+        arquetipos.append("fenomeno")
+    # Trabalhador: articulacao + integridade (entrega silenciosa)
+    if art >= 75 and fid >= 70:
+        arquetipos.append("trabalhador")
+    # Articulador: articulacao + fidelidade (maquina politica)
+    if art >= 70 and fid >= 75 and "trabalhador" not in arquetipos:
+        arquetipos.append("articulador")
+    # Chefe de base: capilaridade territorial + fidelidade
+    if ter >= 75 and fid >= 65:
+        arquetipos.append("chefe_de_base")
+    # Tecnico-legislador: articulacao + eficiencia (especialista produtivo)
+    if art >= 70 and efi >= 70:
+        arquetipos.append("tecnico")
+    # Potencial em ascensao: potencial alto sem ainda ter vot alto
+    if pot >= 80 and vot < 70:
+        arquetipos.append("promessa")
+    return arquetipos
+
+
+def _build_bio_curta(bio_resumida: str | None, max_len: int = 180) -> str | None:
+    """Trunca bio_resumida em max_len caracteres, cortando na ultima palavra completa."""
+    if not bio_resumida:
+        return None
+    bio = bio_resumida.strip()
+    if len(bio) <= max_len:
+        return bio
+    truncada = bio[:max_len].rsplit(" ", 1)[0]
+    return truncada.rstrip(".,;:") + "..."
+
+
+def _build_kpis_header(ultima, legislativo, executivo_block) -> list[KpiHeader]:
+    """
+    Retorna lista de KPIs para o header do dossie, variando conforme cargo.
+    - Cargo executivo: Mandatos, MPs/Decretos, PL executivos
+    - Cargo legislativo: Mandatos, PL aprovados, PL apresentados
+    """
+    if not ultima:
+        return []
+
+    cargo = (ultima.cargo or "").upper()
+    is_executivo = cargo in _CARGOS_EXECUTIVOS
+
+    # Contar mandatos (candidaturas eleitas)
+    mandatos_v = str(getattr(ultima, "_mandatos_total", None) or "")
+    # Se nao tiver campo pre-calculado, nao podemos calcular aqui (sem acesso a candidaturas)
+    # O chamador deve passar o valor. Por ora retornamos com None.
+
+    if is_executivo:
+        n_mps = executivo_block.n_medidas_provisorias if executivo_block and executivo_block.disponivel else None
+        n_decretos = executivo_block.n_decretos if executivo_block and executivo_block.disponivel else None
+        n_pls = executivo_block.n_pls_enviados if executivo_block and executivo_block.disponivel else None
+        mps_dec = None
+        if n_mps is not None and n_decretos is not None:
+            mps_dec = str(n_mps + n_decretos)
+        elif n_mps is not None:
+            mps_dec = str(n_mps)
+        elif n_decretos is not None:
+            mps_dec = str(n_decretos)
+        return [
+            KpiHeader(k="MPs / Decretos", v=mps_dec),
+            KpiHeader(k="PLs enviados", v=str(n_pls) if n_pls is not None else None),
+        ]
+    else:
+        # Legislativo
+        aprovados = legislativo.projetos_aprovados if legislativo and legislativo.disponivel else None
+        apresentados = legislativo.projetos_apresentados if legislativo and legislativo.disponivel else None
+        return [
+            KpiHeader(k="PL aprovados", v=str(aprovados) if aprovados is not None else None),
+            KpiHeader(k="PL apresentados", v=str(apresentados) if apresentados is not None else None),
+        ]
+
+
+def _build_cartinha(
+    cand,
+    ultima,
+    overall_v9: OverallV9 | None,
+    fifa,
+) -> CartinhaPolitico | None:
+    """Monta o shape completo CartinhaPolitico para consumo direto pelo Card V2/V8."""
+    if cand is None:
+        return None
+    nome = getattr(cand, "nome_completo", None) or getattr(cand, "nome", None)
+    partido_sigla = getattr(ultima, "partido_sigla", None) if ultima else None
+    estado_uf = getattr(ultima, "estado_uf", None) if ultima else None
+    foto_url = getattr(cand, "foto_url", None)
+    overall = fifa.overall if fifa else None
+    tier = fifa.tier if fifa else None
+    traits = list(fifa.traits) if fifa and fifa.traits else []
+    # Votos do ciclo ativo (melhor turno)
+    votos_total = _votos_melhor_turno(ultima) if ultima else None
+    ano = int(ultima.ano) if ultima and ultima.ano else None
+    return CartinhaPolitico(
+        nome=nome,
+        partido_sigla=partido_sigla,
+        estado_uf=estado_uf,
+        foto_url=foto_url,
+        overall=overall,
+        overall_v9=overall_v9,
+        votos_total=votos_total,
+        ano=ano,
+        tier=tier,
+        traits=traits,
+    )
 
 
 # ── Constantes de domínio ────────────────────────────────────────────────────
@@ -327,6 +480,25 @@ async def compilar_dossie(
         partido_sigla=partido_sigla,
         bonus_recorde=bonus_recorde,
     )
+
+    # ── Campos pre-computados para o frontend ────────────────────────────
+    # overall_v9: mapeamento das 8 dimensoes FIFA -> 6 dimensoes v9 do Card
+    fifa = dossie.inteligencia.overall_fifa
+    v9 = _calcular_overall_v9(fifa)
+    dossie.inteligencia.overall_v9 = v9
+
+    # arquetipos: lista de arquetipos politicos derivados do overall_fifa
+    dossie.inteligencia.arquetipos = _derivar_arquetipos(fifa)
+
+    # bio_curta: max 180 chars truncados na ultima palavra completa
+    bio_longa = dossie.identificacao.bio_resumida
+    dossie.identificacao.bio_curta = _build_bio_curta(bio_longa)
+
+    # kpis_header: KPIs do header variando por tipo de cargo (executivo vs legislativo)
+    dossie.kpis_header = _build_kpis_header(ultima, legislativo, executivo)
+
+    # cartinha: shape completo para o Card V2/V8
+    dossie.cartinha = _build_cartinha(cand, ultima, v9, fifa)
 
     # Overall fixo do ultimo ciclo disponivel (para badge na foto do hero).
     # Sem recompilar se ja estamos no ultimo ciclo OU se foi chamada recursiva.
@@ -1341,6 +1513,11 @@ async def _build_legislativo(db: AsyncSession, candidato_id: int) -> Legislativo
             m.situacao,
             m.condicao_eleitoral,
             m.licenciado_para,
+            m.presenca_plenario_pct,
+            m.presenca_comissoes_pct,
+            m.sessoes_plenario_total,
+            m.sessoes_plenario_presente,
+            m.cargos_lideranca,
             COUNT(p.id)                                         AS n_propostas,
             COUNT(p.id) FILTER (WHERE p.aprovada=true)          AS n_aprovadas,
             COUNT(p.id) FILTER (WHERE p.aprovada IS NULL)       AS n_tramitando,
@@ -1350,7 +1527,10 @@ async def _build_legislativo(db: AsyncSession, candidato_id: int) -> Legislativo
         LEFT JOIN proposicoes_legislativo p ON p.mandato_id = m.id
         WHERE m.candidato_id IN (SELECT id FROM ids_unificados)
         GROUP BY m.id, m.casa, m.uf, m.partido_sigla, m.legislatura,
-                 m.situacao, m.condicao_eleitoral, m.licenciado_para
+                 m.situacao, m.condicao_eleitoral, m.licenciado_para,
+                 m.presenca_plenario_pct, m.presenca_comissoes_pct,
+                 m.sessoes_plenario_total, m.sessoes_plenario_presente,
+                 m.cargos_lideranca
         ORDER BY m.ativo DESC NULLS LAST, m.id DESC
         LIMIT 1
     """), {"cid": candidato_id})
@@ -1458,6 +1638,13 @@ async def _build_legislativo(db: AsyncSession, candidato_id: int) -> Legislativo
     """), {"mid": row.id})
     n_relatorias = int(n_relatorias_row.scalar() or 0)
 
+    # Normalizar cargos_lideranca (pode vir como lista ou None do PostgreSQL ARRAY)
+    cargos_lideranca_raw = row.cargos_lideranca
+    if cargos_lideranca_raw:
+        cargos_lideranca_list = list(cargos_lideranca_raw)
+    else:
+        cargos_lideranca_list = []
+
     return Legislativo(
         casa=casa,
         cargo_titulo=cargo_titulo,
@@ -1482,6 +1669,12 @@ async def _build_legislativo(db: AsyncSession, candidato_id: int) -> Legislativo
         presidencias=presidencias,
         n_relatorias=n_relatorias,
         relatorias_recentes=relatorias_recentes,
+        # Sub-medidas de presenca + lideranca (ETL 23/04/2026)
+        presenca_plenario_pct=float(row.presenca_plenario_pct) if row.presenca_plenario_pct is not None else None,
+        presenca_comissoes_pct=float(row.presenca_comissoes_pct) if row.presenca_comissoes_pct is not None else None,
+        sessoes_plenario_total=int(row.sessoes_plenario_total) if row.sessoes_plenario_total is not None else None,
+        sessoes_plenario_presente=int(row.sessoes_plenario_presente) if row.sessoes_plenario_presente is not None else None,
+        cargos_lideranca=cargos_lideranca_list,
         disponivel=True,
     )
 

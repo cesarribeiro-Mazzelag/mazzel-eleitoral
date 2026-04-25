@@ -1,0 +1,2679 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mazzel · Plataforma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style id="platform-theme">
+/* ============ Mazzel theme tokens + shared styles ============ */
+
+:root, [data-theme="dark"] {
+  --bg-page: #0a0a0b; --bg-page-2: #0c0c0e;
+  --bg-card: #0e0e11; --bg-card-2: rgba(255,255,255,0.015);
+  --bg-sidebar: #0b0b0d; --bg-topbar: #09090b;
+  --bg-elevated: #131316;
+  --fg: #e4e4e7; --fg-strong: #ffffff; --fg-muted: #a1a1aa;
+  --fg-dim: #71717a; --fg-faint: #52525b; --fg-ghost: #3f3f46;
+  --rule: rgba(255,255,255,0.06); --rule-strong: rgba(255,255,255,0.10);
+  --hairline: rgba(255,255,255,0.06);
+  --accent-blue: #93c5fd; --accent-blue-strong: #60a5fa;
+  --overall-from: #ffffff; --overall-to: #d4d4d8;
+  --overall-muted-from: #71717a; --overall-muted-to: #52525b;
+  --page-grad-1: rgba(59,130,246,0.06); --page-grad-2: rgba(168,85,247,0.04);
+  --ok: #34d399; --verified: #34d399;
+  --warn: #fbbf24; --danger: #f87171;
+  --chart-hover: rgba(255,255,255,0.06);
+  --kbd-bg: rgba(255,255,255,0.08); --kbd-fg: #d4d4d8;
+}
+[data-theme="light"] {
+  --bg-page: #f4f4f5; --bg-page-2: #fafafa;
+  --bg-card: #ffffff; --bg-card-2: rgba(0,0,0,0.02);
+  --bg-sidebar: #fafafa; --bg-topbar: #ffffff;
+  --bg-elevated: #ffffff;
+  --fg: #18181b; --fg-strong: #09090b; --fg-muted: #52525b;
+  --fg-dim: #71717a; --fg-faint: #a1a1aa; --fg-ghost: #d4d4d8;
+  --rule: rgba(0,0,0,0.06); --rule-strong: rgba(0,0,0,0.10);
+  --hairline: rgba(0,0,0,0.08);
+  --accent-blue: #1d4ed8; --accent-blue-strong: #1e40af;
+  --overall-from: #09090b; --overall-to: #3f3f46;
+  --overall-muted-from: #a1a1aa; --overall-muted-to: #71717a;
+  --page-grad-1: rgba(59,130,246,0.05); --page-grad-2: rgba(168,85,247,0.04);
+  --ok: #059669; --verified: #059669;
+  --warn: #d97706; --danger: #dc2626;
+  --chart-hover: rgba(0,0,0,0.04);
+  --kbd-bg: rgba(0,0,0,0.06); --kbd-fg: #18181b;
+}
+
+/* white-label tenant tokens - overridden by JS */
+:root {
+  --tenant-primary: #002A7B;
+  --tenant-primary-rgb: 0, 42, 123;
+  --tenant-accent: #FFCC00;
+  --tenant-nome: "União Brasil";
+  --tenant-sigla: "UB";
+}
+
+html, body { background: var(--bg-page); color: var(--fg); }
+body { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
+.tnum { font-variant-numeric: tabular-nums; font-feature-settings: "tnum","cv11"; }
+.font-display { letter-spacing: -0.02em; }
+.font-mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+.t-fg{color:var(--fg)} .t-fg-strong{color:var(--fg-strong)} .t-fg-muted{color:var(--fg-muted)}
+.t-fg-dim{color:var(--fg-dim)} .t-fg-faint{color:var(--fg-faint)} .t-fg-ghost{color:var(--fg-ghost)}
+.t-accent{color:var(--accent-blue)} .t-ok{color:var(--ok)} .t-warn{color:var(--warn)} .t-danger{color:var(--danger)}
+.t-tenant{color:var(--tenant-primary)}
+.t-border{border-color:var(--rule)} .t-border-strong{border-color:var(--rule-strong)}
+.t-bg-card{background:var(--bg-card)} .t-bg-card-2{background:var(--bg-card-2)}
+.t-bg-sidebar{background:var(--bg-sidebar)} .t-bg-topbar{background:var(--bg-topbar)}
+.t-bg-elevated{background:var(--bg-elevated)}
+.t-bg-tenant{background:var(--tenant-primary)}
+.t-bg-tenant-soft{background:rgba(var(--tenant-primary-rgb),0.12)}
+
+.bg-page-grad {
+  background:
+    radial-gradient(1200px 600px at 85% -10%, var(--page-grad-1), transparent 60%),
+    radial-gradient(800px 400px at 10% 0%, var(--page-grad-2), transparent 60%),
+    linear-gradient(180deg, var(--bg-page-2) 0%, var(--bg-page) 100%);
+}
+
+.ring-soft { box-shadow: 0 0 0 1px var(--hairline); }
+[data-theme="light"] .ring-soft { box-shadow: 0 0 0 1px var(--hairline), 0 1px 2px rgba(0,0,0,0.03); }
+.ring-tenant { box-shadow: 0 0 0 1px rgba(var(--tenant-primary-rgb), 0.35); }
+
+/* chips */
+.chip { height: 22px; padding: 0 8px; border-radius: 4px;
+  font: 600 10.5px/22px 'Inter', sans-serif; letter-spacing: 0.06em; text-transform: uppercase;
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+}
+.chip-dot { width: 6px; height: 6px; border-radius: 999px; flex-shrink: 0; }
+[data-theme="dark"] .chip-blue,   :root .chip-blue   { background: rgba(59,130,246,0.12); color: #93c5fd; box-shadow: inset 0 0 0 1px rgba(59,130,246,0.25); }
+[data-theme="dark"] .chip-green,  :root .chip-green  { background: rgba(34,197,94,0.10); color: #86efac; box-shadow: inset 0 0 0 1px rgba(34,197,94,0.22); }
+[data-theme="dark"] .chip-amber,  :root .chip-amber  { background: rgba(251,191,36,0.12); color: #fcd34d; box-shadow: inset 0 0 0 1px rgba(251,191,36,0.30); }
+[data-theme="dark"] .chip-red,    :root .chip-red    { background: rgba(239,68,68,0.12); color: #fca5a5; box-shadow: inset 0 0 0 1px rgba(239,68,68,0.35); }
+[data-theme="dark"] .chip-muted,  :root .chip-muted  { background: rgba(161,161,170,0.08); color: #a1a1aa; box-shadow: inset 0 0 0 1px rgba(161,161,170,0.15); }
+[data-theme="dark"] .chip-purple, :root .chip-purple { background: rgba(168,85,247,0.12); color: #d8b4fe; box-shadow: inset 0 0 0 1px rgba(168,85,247,0.25); }
+[data-theme="light"] .chip-blue   { background: rgba(37,99,235,0.10);  color: #1d4ed8; box-shadow: inset 0 0 0 1px rgba(37,99,235,0.30); }
+[data-theme="light"] .chip-green  { background: rgba(22,163,74,0.10);  color: #15803d; box-shadow: inset 0 0 0 1px rgba(22,163,74,0.28); }
+[data-theme="light"] .chip-amber  { background: rgba(217,119,6,0.10);  color: #a16207; box-shadow: inset 0 0 0 1px rgba(217,119,6,0.35); }
+[data-theme="light"] .chip-red    { background: rgba(220,38,38,0.10);  color: #b91c1c; box-shadow: inset 0 0 0 1px rgba(220,38,38,0.40); }
+[data-theme="light"] .chip-muted  { background: rgba(82,82,91,0.06);   color: #52525b; box-shadow: inset 0 0 0 1px rgba(82,82,91,0.18); }
+[data-theme="light"] .chip-purple { background: rgba(147,51,234,0.10); color: #7e22ce; box-shadow: inset 0 0 0 1px rgba(147,51,234,0.30); }
+
+/* kbd */
+.kbd {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 1px 5px; min-width: 16px; height: 18px;
+  background: var(--kbd-bg); color: var(--kbd-fg);
+  border-radius: 3px; font: 600 10px/1 'JetBrains Mono', monospace;
+}
+
+/* sidebar nav */
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 12px 7px 14px; border-left: 2px solid transparent;
+  font: 500 13px/1.2 Inter, sans-serif;
+  color: var(--fg-muted); cursor: pointer; transition: color .15s, border-color .15s, background .15s;
+  text-decoration: none;
+}
+.nav-item:hover { color: var(--fg); }
+.nav-item.active {
+  color: var(--fg-strong); border-left-color: var(--tenant-primary);
+  background: linear-gradient(90deg, rgba(var(--tenant-primary-rgb), 0.14) 0%, transparent 100%);
+}
+
+/* generic btn */
+.btn-ghost {
+  padding: 6px 10px; border-radius: 6px; font: 600 11px/1 Inter, sans-serif;
+  background: var(--rule); color: var(--fg); cursor: pointer; transition: background .12s, color .12s;
+  border: 1px solid transparent; display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-ghost:hover { background: var(--rule-strong); color: var(--fg-strong); }
+.btn-ghost.active { background: var(--fg-strong); color: var(--bg-card); }
+.btn-primary {
+  padding: 7px 12px; border-radius: 6px; font: 700 12px/1 Inter, sans-serif;
+  background: var(--tenant-primary); color: #fff; cursor: pointer; border: none;
+  display: inline-flex; align-items: center; gap: 6px;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.15) inset, 0 4px 12px -4px rgba(var(--tenant-primary-rgb), 0.4);
+}
+.btn-primary:hover { filter: brightness(1.1); }
+
+/* shell grid */
+.shell { height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+.shell-body { display: grid; grid-template-columns: 224px 1fr; min-height: 0; flex: 1; }
+.shell-main { overflow: hidden; background: var(--bg-page); min-width: 0; display: flex; flex-direction: column; }
+.shell-main > .main-scroll { flex: 1; overflow: auto; min-height: 0; }
+@media (max-width: 860px) {
+  .shell-body { grid-template-columns: 1fr; }
+  .sidebar-col { display: none !important; }
+}
+
+/* sidebar */
+.sidebar-col {
+  background: var(--bg-sidebar); border-right: 1px solid var(--rule);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.tenant-brand {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--rule);
+  background: linear-gradient(180deg, rgba(var(--tenant-primary-rgb), 0.10) 0%, transparent 100%);
+}
+.tenant-logo {
+  width: 32px; height: 32px; border-radius: 6px;
+  background: var(--tenant-primary);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: 900; font-size: 13px; letter-spacing: 0.05em;
+  box-shadow: 0 4px 12px -4px rgba(var(--tenant-primary-rgb), 0.5);
+}
+
+/* topbar */
+.topbar {
+  height: 48px;
+  background: var(--bg-topbar);
+  border-bottom: 1px solid var(--rule);
+  display: flex; align-items: center;
+  padding: 0 16px;
+  gap: 16px;
+}
+
+/* search */
+.search-cmdk {
+  width: 440px; max-width: 50%;
+  height: 30px; border-radius: 6px;
+  background: var(--rule);
+  display: flex; align-items: center; gap: 8px;
+  padding: 0 10px; cursor: pointer;
+  transition: background .12s;
+}
+.search-cmdk:hover { background: var(--rule-strong); }
+
+/* KPI card */
+.kpi-card {
+  background: var(--bg-card); border: 1px solid var(--rule);
+  border-radius: 12px; padding: 18px 20px 14px; position: relative; overflow: hidden;
+  min-width: 0;
+}
+.kpi-card > :first-child { padding-right: 56px; }  /* reserve space for trend chip */
+.kpi-card .kpi-trend { position: absolute; right: 14px; top: 14px; }
+.kpi-card .tnum { white-space: nowrap; }  /* prevent value from wrapping */
+
+/* topbar breadcrumb nowrap */
+.topbar > * { flex-shrink: 0; }
+.topbar .breadcrumb { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+
+/* data table rows */
+.row-striped > * { border-bottom: 1px solid var(--rule); }
+.row-striped > *:nth-child(odd) { background: var(--bg-card-2); }
+.row-striped > *:last-child { border-bottom: none; }
+
+/* scroll styling */
+.sidebar-col, .shell-main { scrollbar-width: thin; scrollbar-color: var(--rule-strong) transparent; }
+.shell-main::-webkit-scrollbar { width: 10px; }
+.shell-main::-webkit-scrollbar-thumb { background: var(--rule-strong); border-radius: 5px; }
+
+/* party dots */
+.party-dot { width: 8px; height: 8px; border-radius: 999px; flex-shrink: 0; display: inline-block; }
+
+/* cmdk palette */
+.cmdk-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  display: flex; align-items: flex-start; justify-content: center;
+  padding-top: 14vh; z-index: 100; backdrop-filter: blur(4px);
+}
+[data-theme="light"] .cmdk-overlay { background: rgba(0,0,0,0.25); }
+.cmdk-panel {
+  width: 640px; max-width: 92vw; background: var(--bg-elevated);
+  border: 1px solid var(--rule-strong); border-radius: 12px; overflow: hidden;
+  box-shadow: 0 40px 80px -20px rgba(0,0,0,0.6);
+}
+
+/* tweaks */
+.tweak-panel {
+  position: fixed; bottom: 18px; right: 18px; width: 320px; z-index: 80;
+  background: var(--bg-elevated); border: 1px solid var(--rule-strong); border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: 0 20px 40px -10px rgba(0,0,0,0.6);
+}
+
+/* timeline alert row */
+.alert-row { padding: 10px 14px; display: flex; gap: 10px; border-bottom: 1px solid var(--rule); transition: background .12s; }
+.alert-row:hover { background: var(--chart-hover); }
+.alert-sev-crit { border-left: 2px solid var(--danger); }
+.alert-sev-alto { border-left: 2px solid var(--danger); opacity: 0.95; }
+.alert-sev-med  { border-left: 2px solid var(--warn); }
+.alert-sev-bx   { border-left: 2px solid var(--fg-dim); }
+
+/* map */
+.maplibregl-map { font-family: 'Inter', sans-serif; }
+.map-toolbar {
+  position: absolute; top: 16px; left: 50%; transform: translateX(-50%); z-index: 10;
+  background: var(--bg-elevated); border: 1px solid var(--rule-strong); border-radius: 10px;
+  padding: 6px; display: flex; align-items: center; gap: 4px;
+  box-shadow: 0 12px 28px -10px rgba(0,0,0,0.5);
+}
+.map-context-panel {
+  position: absolute; top: 16px; right: 16px; bottom: 16px; width: 360px; z-index: 9;
+  background: var(--bg-elevated); border: 1px solid var(--rule-strong); border-radius: 12px;
+  overflow: hidden; display: flex; flex-direction: column;
+  box-shadow: 0 12px 28px -10px rgba(0,0,0,0.5);
+}
+.map-legend {
+  position: absolute; bottom: 16px; left: 16px; z-index: 9;
+  background: var(--bg-elevated); border: 1px solid var(--rule-strong); border-radius: 10px;
+  padding: 10px 14px;
+}
+
+/* fifa card compact (radar grid) */
+.fifa-mini {
+  width: 100%; aspect-ratio: 240/360; position: relative;
+  background: linear-gradient(135deg, rgba(251,191,36,0.12) 0%, rgba(251,191,36,0.02) 40%, rgba(255,255,255,0.04) 100%),
+              linear-gradient(180deg, #1a1510 0%, #0f0d0a 100%);
+  border: 1px solid rgba(251,191,36,0.25); border-radius: 10px; padding: 12px;
+  display: flex; flex-direction: column; cursor: pointer; transition: transform .18s, border-color .18s;
+  overflow: hidden;
+}
+.fifa-mini:hover { transform: translateY(-3px); border-color: rgba(251,191,36,0.5); }
+.fifa-mini.tier-silver {
+  background: linear-gradient(135deg, rgba(203,213,225,0.14) 0%, rgba(203,213,225,0.02) 40%, rgba(255,255,255,0.04) 100%),
+              linear-gradient(180deg, #141822 0%, #0a0c10 100%);
+  border: 1px solid rgba(203,213,225,0.25);
+}
+.fifa-mini.tier-bronze {
+  background: linear-gradient(135deg, rgba(180,83,9,0.16) 0%, rgba(180,83,9,0.02) 40%, rgba(255,255,255,0.04) 100%),
+              linear-gradient(180deg, #1a1208 0%, #0f0a04 100%);
+  border: 1px solid rgba(180,83,9,0.25);
+}
+[data-theme="light"] .fifa-mini {
+  background: linear-gradient(135deg, rgba(251,191,36,0.10) 0%, rgba(251,191,36,0.02) 40%, rgba(0,0,0,0.02) 100%),
+              linear-gradient(180deg, #fffaf2 0%, #fef3c7 100%);
+  border: 1px solid rgba(180,83,9,0.30);
+}
+[data-theme="light"] .fifa-mini.tier-silver {
+  background: linear-gradient(135deg, rgba(148,163,184,0.10) 0%, rgba(148,163,184,0.02) 40%, rgba(0,0,0,0.02) 100%),
+              linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%);
+  border: 1px solid rgba(100,116,139,0.30);
+}
+[data-theme="light"] .fifa-mini.tier-bronze {
+  background: linear-gradient(135deg, rgba(180,83,9,0.10) 0%, rgba(180,83,9,0.02) 40%, rgba(0,0,0,0.02) 100%),
+              linear-gradient(180deg, #fef6ec 0%, #fed7aa 100%);
+  border: 1px solid rgba(180,83,9,0.30);
+}
+
+.tier-bar { height: 10px; border-radius: 999px; overflow: hidden; display: flex; }
+
+/* portal accent */
+[data-role="candidato"] .tenant-logo { background: #F59E0B; box-shadow: 0 4px 12px -4px rgba(245,158,11,0.5); }
+[data-role="candidato"] .nav-item.active { border-left-color: #F59E0B; background: linear-gradient(90deg, rgba(245,158,11,0.14) 0%, transparent 100%); }
+
+/* choropleth region hover */
+.region-polygon { transition: opacity .15s, transform .15s; transform-origin: center; }
+.region-polygon:hover { opacity: 0.9; }
+
+/* brasil map state labels */
+.state-label { pointer-events: none; font-family: 'Inter', sans-serif; font-weight: 800; }
+
+/* card hover */
+.card-hover { transition: border-color .15s, background .15s; }
+.card-hover:hover { border-color: var(--rule-strong); background: var(--bg-card); }
+
+</style>
+<script>
+  tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-serif','system-ui'], display: ['Inter','ui-sans-serif','system-ui'], mono: ['JetBrains Mono','ui-monospace','monospace'] } } } };
+</script>
+</head>
+<body data-theme="light">
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" data-presets="react">
+
+// ===== src/platform-data.jsx =====
+/* tenants + party colors + dataset */
+
+const TENANTS = {
+  uniao: {
+    id: "uniao",
+    nome: "União Brasil",
+    sigla: "UB",
+    primary: "#002A7B",
+    primaryRgb: "0, 42, 123",
+    accent: "#FFCC00",
+    logoText: "UB",
+    plano: "Enterprise",
+    versao: "v2.4.1",
+  },
+  mazzel: {
+    id: "mazzel",
+    nome: "Mazzel Demo",
+    sigla: "MZ",
+    primary: "#6D28D9",
+    primaryRgb: "109, 40, 217",
+    accent: "#F59E0B",
+    logoText: "MZ",
+    plano: "Demo",
+    versao: "v2.4.1",
+  },
+};
+
+const PARTY_COLORS = {
+  "PT":            "#E4142C",
+  "PL":            "#004F9F",
+  "CIDADANIA":     "#022E4A",
+  "NOVO":          "#F3702B",
+  "PV":            "#006600",
+  "UNIÃO BRASIL":  "#002A7B",
+  "UNIAO":         "#002A7B",
+  "PSDB":          "#0C2CC3",
+  "PSOL":          "#68008E",
+  "PSD":           "#FDB913",
+  "REPUBLICANOS":  "#005FAF",
+  "PP":            "#14416F",
+  "PDT":           "#033D7F",
+  "MDB":           "#4AA71E",
+  "REDE":          "#2EB5C2",
+  "PODEMOS":       "#5A8ECB",
+  "PSB":           "#E00000",
+  "PCdoB":         "#DA251C",
+  "AVANTE":        "#EE6C34",
+  "SOLIDARIEDADE": "#341214",
+  "PROS":          "#F68E21",
+};
+const partyColor = (p) => PARTY_COLORS[String(p || "").toUpperCase()] || "#6B7280";
+
+const ROLES = {
+  presidente:  { label: "Presidente",      scope: "Nacional · irrestrito",        icon: "Crown" },
+  diretoria:   { label: "Diretoria",       scope: "Nacional · sem admin",          icon: "Users" },
+  candidato:   { label: "Candidato",       scope: "Portal exclusivo · próprio",    icon: "User"  },
+};
+
+/* modules (sidebar order) */
+const MODULES = [
+  { id: "home",        label: "Dashboard",          icon: "Home",        roles: ["presidente","diretoria","candidato"] },
+  { id: "mapa",        label: "Mapa Eleitoral",     icon: "MapPin",      roles: ["presidente","diretoria","candidato"] },
+  { id: "radar",       label: "Radar Político",     icon: "Target",      roles: ["presidente","diretoria"] },
+  { id: "dossie",      label: "Dossiês",            icon: "FileSearch",  roles: ["presidente","diretoria","candidato"] },
+  { id: "estudo",      label: "Módulo Estudo",      icon: "BarChart3",   roles: ["presidente","diretoria"] },
+  { id: "delegados",   label: "Delegados",          icon: "Users",       roles: ["presidente","diretoria"] },
+  { id: "filiados",    label: "Filiados",           icon: "UserCheck",   roles: ["presidente","diretoria"] },
+  { id: "ia",          label: "IA Assistente",      icon: "Sparkles",    roles: ["presidente","diretoria","candidato"] },
+  { id: "alertas",     label: "Alertas",            icon: "Bell",        roles: ["presidente","diretoria","candidato"], badge: 7 },
+  { id: "portal",      label: "Portal do Cliente",  icon: "Briefcase",   roles: ["presidente","diretoria"] },
+  { id: "admin",       label: "Admin",              icon: "Settings",    roles: ["presidente"] },
+];
+
+/* UF + party strength dataset */
+const UF_LIST = ["AC","AL","AM","AP","BA","CE","DF","ES","GO","MA","MG","MS","MT","PA","PB","PE","PI","PR","RJ","RN","RO","RR","RS","SC","SE","SP","TO"];
+
+/* força partidária por UF (fictícia coerente) */
+const PARTY_STRENGTH = {
+  SP: "PL", RJ: "PL", MG: "UNIÃO BRASIL", BA: "PT", RS: "PL", PR: "PL",
+  CE: "PT", PE: "PSB", SC: "PL", GO: "UNIÃO BRASIL", PA: "MDB", MA: "PT",
+  PB: "PSB", ES: "UNIÃO BRASIL", MT: "UNIÃO BRASIL", MS: "PSDB", DF: "UNIÃO BRASIL",
+  PI: "PT", AL: "UNIÃO BRASIL", SE: "PSD", RN: "PT", AM: "UNIÃO BRASIL",
+  AC: "UNIÃO BRASIL", RO: "UNIÃO BRASIL", RR: "UNIÃO BRASIL", AP: "MDB", TO: "UNIÃO BRASIL",
+};
+
+/* dados KPI home */
+const HOME_KPIS = {
+  presidente: [
+    { k: "Eleitos União Brasil",  v: "1.247", hint: "59 senadores + dep fed/est + prefeitos",  trend: "+2,4%", ok: true },
+    { k: "Candidatos monitorados", v: "51.384", hint: "base TSE cruzada",                       trend: "+312",  ok: true },
+    { k: "Alertas críticos 24h",   v: "12",     hint: "exige atenção imediata",                 trend: "+3",    ok: false },
+    { k: "Score regional médio",   v: "73,8",   hint: "0-100 · agregado nacional",              trend: "+1,2",  ok: true },
+  ],
+  diretoria: [
+    { k: "Eleitos União Brasil",  v: "1.247", hint: "59 senadores + dep fed/est + prefeitos",  trend: "+2,4%", ok: true },
+    { k: "Candidatos monitorados", v: "51.384", hint: "base TSE cruzada",                       trend: "+312",  ok: true },
+    { k: "Alertas críticos 24h",   v: "12",     hint: "exige atenção imediata",                 trend: "+3",    ok: false },
+    { k: "Score regional médio",   v: "73,8",   hint: "0-100 · agregado nacional",              trend: "+1,2",  ok: true },
+  ],
+  candidato: [
+    { k: "Meu Overall",            v: "87",     hint: "Top 12% entre senadores",                trend: "+3",    ok: true },
+    { k: "Emendas executadas",     v: "R$ 42M", hint: "2024 · R$ 61M aprovado",                 trend: "+18%",  ok: true },
+    { k: "Alertas ativos",         v: "0",      hint: "Ficha limpa",                            trend: "—",     ok: true },
+    { k: "Sua base na UF",         v: "92%",    hint: "capilaridade dos municípios",            trend: "+1pp",  ok: true },
+  ],
+};
+
+/* alertas recentes */
+const HOME_ALERTS = [
+  { id:"a1", sev:"crit", tipo:"Judicial", who:"Pablo Marçal",           uf:"SP", what:"Nova ação inscrita no CEAF", when:"há 12min", tag:"CEAF" },
+  { id:"a2", sev:"alto", tipo:"Mídia",    who:"Sen. Flávio Bolsonaro",   uf:"RJ", what:"Cobertura negativa em Folha", when:"há 40min", tag:"Mídia" },
+  { id:"a3", sev:"med",  tipo:"Emenda",   who:"Dep. Júlia Rocha",        uf:"MG", what:"Emenda cancelada pela CGU",   when:"há 1h",    tag:"RP-9" },
+  { id:"a4", sev:"med",  tipo:"Processo", who:"Dep. Marcelo Queiroga",   uf:"PB", what:"TCU abriu TCE em valor de R$ 2,8M", when:"há 2h",  tag:"TCU" },
+  { id:"a5", sev:"bx",   tipo:"Filiação", who:"150 novos filiados",      uf:"BA", what:"Registrados em 14 cidades",    when:"há 3h",    tag:"Interno" },
+  { id:"a6", sev:"crit", tipo:"Processo", who:"Ex-Gov. Roberto Rocha",   uf:"MA", what:"STF recebeu denúncia — relator min. Gilmar Mendes", when:"há 4h", tag:"STF" },
+  { id:"a7", sev:"alto", tipo:"Redes",    who:"Sen. Humberto Costa",     uf:"PE", what:"Pico de menções negativas (+340%)", when:"há 5h",    tag:"X" },
+  { id:"a8", sev:"med",  tipo:"Mídia",    who:"Gov. Wanderlei Barbosa",  uf:"TO", what:"Entrevista exclusiva no CNN Brasil", when:"há 6h", tag:"TV" },
+];
+
+/* top 10 candidatos overall (home) */
+const HOME_TOP_CANDIDATOS = [
+  { nome:"Lula",                   partido:"PT",            uf:"BR", cargo:"Pres", overall:93, tier:"dourado" },
+  { nome:"Tarcísio de Freitas",    partido:"REPUBLICANOS",  uf:"SP", cargo:"Gov",  overall:91, tier:"dourado" },
+  { nome:"Ratinho Júnior",         partido:"PSD",           uf:"PR", cargo:"Gov",  overall:90, tier:"dourado" },
+  { nome:"Jaques Wagner",          partido:"PT",            uf:"BA", cargo:"Sen",  overall:87, tier:"ouro"    },
+  { nome:"Renan Calheiros",        partido:"MDB",           uf:"AL", cargo:"Sen",  overall:86, tier:"ouro"    },
+  { nome:"Davi Alcolumbre",        partido:"UNIÃO BRASIL",  uf:"AP", cargo:"Sen",  overall:85, tier:"ouro"    },
+  { nome:"Rodrigo Pacheco",        partido:"PSD",           uf:"MG", cargo:"Sen",  overall:85, tier:"ouro"    },
+  { nome:"Sergio Moro",            partido:"UNIÃO BRASIL",  uf:"PR", cargo:"Sen",  overall:82, tier:"ouro"    },
+  { nome:"Simone Tebet",           partido:"MDB",           uf:"MS", cargo:"Sen",  overall:81, tier:"ouro"    },
+  { nome:"Eduardo Braga",          partido:"MDB",           uf:"AM", cargo:"Sen",  overall:81, tier:"ouro"    },
+];
+
+/* emendas por UF */
+const HOME_EMENDAS_UF = [
+  { uf:"MG", v:"R$ 184M" }, { uf:"SP", v:"R$ 172M" }, { uf:"BA", v:"R$ 156M" }, { uf:"RJ", v:"R$ 134M" },
+  { uf:"PE", v:"R$ 108M" }, { uf:"RS", v:"R$ 92M"  }, { uf:"CE", v:"R$ 84M"  }, { uf:"PR", v:"R$ 80M"  },
+];
+
+/* movimentações do dia */
+const HOME_MOV_DIA = [
+  { hora:"14:23", evento:"Nova filiação em massa", detail:"14 prefeitos do RN migraram para UB", icon:"UserCheck" },
+  { hora:"12:08", evento:"Convenção partidária",   detail:"Homologação Fed. MG · 1.240 delegados", icon:"Users" },
+  { hora:"10:44", evento:"Emenda liberada",        detail:"R$ 8,4M · Sen. Efraim Filho · PB",      icon:"Banknote" },
+  { hora:"09:17", evento:"Sanção",                 detail:"TCU aplicou multa R$ 320k a Dep. L.Silva", icon:"AlertTriangle" },
+  { hora:"08:02", evento:"Alteração de cargo",     detail:"Elmar Nascimento reeleito líder Câmara", icon:"Briefcase" },
+];
+
+/* audit feed */
+const HOME_AUDIT = [
+  { who:"Ana Carolina (Diretoria)", what:"visualizou dossiê — Jaques Wagner",          when:"há 2min" },
+  { who:"Carlos Lima (Delegado BA)", what:"exportou relatório emendas · 2024",          when:"há 8min" },
+  { who:"Sistema",                   what:"sincronizou TSE · 48.312 registros atualizados", when:"há 14min" },
+  { who:"Maria Fernanda (Diretoria)", what:"comentou em alerta #a2 (Flávio Bolsonaro)",  when:"há 22min" },
+  { who:"João Pedro (Presidente)",   what:"alterou permissão de 3 usuários",             when:"há 34min" },
+];
+
+/* radar FIFA - 24 candidatos */
+const RADAR_CANDIDATOS = [
+  { id:1,  nome:"Lula",                partido:"PT",           uf:"BR", cargo:"PRES", overall:93, tier:"dourado", traits:["LEGEND","FENOMENO"],    pac:82, pres:95, inf:96, leg:78, bse:94, mid:89 },
+  { id:2,  nome:"Tarcísio de Freitas", partido:"REPUBLICANOS", uf:"SP", cargo:"GOV",  overall:91, tier:"dourado", traits:["FENOMENO","CAMPEAO"],    pac:78, pres:92, inf:90, leg:68, bse:88, mid:94 },
+  { id:3,  nome:"Ratinho Júnior",      partido:"PSD",          uf:"PR", cargo:"GOV",  overall:90, tier:"dourado", traits:["CAMPEAO","FERA_REG"],    pac:85, pres:90, inf:86, leg:72, bse:91, mid:82 },
+  { id:4,  nome:"Jaques Wagner",       partido:"PT",           uf:"BA", cargo:"SEN",  overall:87, tier:"ouro",    traits:["LEGEND","FERA_REG"],     pac:91, pres:94, inf:88, leg:79, bse:93, mid:72 },
+  { id:5,  nome:"Renan Calheiros",     partido:"MDB",          uf:"AL", cargo:"SEN",  overall:86, tier:"ouro",    traits:["LEGEND"],                 pac:94, pres:88, inf:92, leg:84, bse:82, mid:68 },
+  { id:6,  nome:"Davi Alcolumbre",     partido:"UNIÃO BRASIL", uf:"AP", cargo:"SEN",  overall:85, tier:"ouro",    traits:["FERA_REG","CAMPEAO"],    pac:88, pres:84, inf:91, leg:72, bse:95, mid:70 },
+  { id:7,  nome:"Rodrigo Pacheco",     partido:"PSD",          uf:"MG", cargo:"SEN",  overall:85, tier:"ouro",    traits:["CAMPEAO"],                pac:90, pres:92, inf:88, leg:78, bse:80, mid:74 },
+  { id:8,  nome:"Sergio Moro",         partido:"UNIÃO BRASIL", uf:"PR", cargo:"SEN",  overall:82, tier:"ouro",    traits:["FENOMENO"],               pac:62, pres:82, inf:74, leg:68, bse:78, mid:92 },
+  { id:9,  nome:"Simone Tebet",        partido:"MDB",          uf:"MS", cargo:"SEN",  overall:81, tier:"ouro",    traits:["CAMPEAO"],                pac:82, pres:86, inf:80, leg:74, bse:72, mid:84 },
+  { id:10, nome:"Eduardo Braga",       partido:"MDB",          uf:"AM", cargo:"SEN",  overall:81, tier:"ouro",    traits:["FERA_REG"],               pac:84, pres:80, inf:82, leg:76, bse:88, mid:64 },
+  { id:11, nome:"Otto Alencar",        partido:"PSD",          uf:"BA", cargo:"SEN",  overall:79, tier:"prata",   traits:["FERA_REG"],               pac:82, pres:84, inf:78, leg:74, bse:86, mid:58 },
+  { id:12, nome:"Efraim Filho",        partido:"UNIÃO BRASIL", uf:"PB", cargo:"SEN",  overall:78, tier:"prata",   traits:["CAMPEAO"],                pac:84, pres:80, inf:76, leg:72, bse:82, mid:62 },
+  { id:13, nome:"Alessandro Vieira",   partido:"MDB",          uf:"SE", cargo:"SEN",  overall:76, tier:"prata",   traits:["ESTREANTE"],              pac:70, pres:82, inf:72, leg:70, bse:74, mid:80 },
+  { id:14, nome:"Carlos Viana",        partido:"PODEMOS",      uf:"MG", cargo:"SEN",  overall:74, tier:"prata",   traits:["COMEBACK"],               pac:76, pres:78, inf:70, leg:68, bse:72, mid:74 },
+  { id:15, nome:"Soraya Thronicke",    partido:"PODEMOS",      uf:"MS", cargo:"SEN",  overall:73, tier:"prata",   traits:["ESTREANTE"],              pac:62, pres:74, inf:64, leg:60, bse:68, mid:86 },
+  { id:16, nome:"Humberto Costa",      partido:"PT",           uf:"PE", cargo:"SEN",  overall:72, tier:"prata",   traits:["FERA_REG"],               pac:78, pres:78, inf:74, leg:72, bse:80, mid:58 },
+  { id:17, nome:"Marcos Rogério",      partido:"PL",           uf:"RO", cargo:"SEN",  overall:70, tier:"bronze",  traits:[],                          pac:68, pres:74, inf:66, leg:62, bse:70, mid:72 },
+  { id:18, nome:"Zequinha Marinho",    partido:"PODEMOS",      uf:"PA", cargo:"SEN",  overall:68, tier:"bronze",  traits:[],                          pac:70, pres:72, inf:64, leg:60, bse:72, mid:56 },
+  { id:19, nome:"Irajá",               partido:"PSD",          uf:"TO", cargo:"SEN",  overall:67, tier:"bronze",  traits:["ESTREANTE"],              pac:64, pres:70, inf:60, leg:58, bse:66, mid:62 },
+  { id:20, nome:"Jorge Kajuru",        partido:"PSB",          uf:"GO", cargo:"SEN",  overall:64, tier:"bronze",  traits:[],                          pac:48, pres:68, inf:54, leg:52, bse:60, mid:88 },
+  { id:21, nome:"Omar Aziz",           partido:"PSD",          uf:"AM", cargo:"SEN",  overall:77, tier:"prata",   traits:["CAMPEAO"],                pac:82, pres:80, inf:76, leg:70, bse:78, mid:68 },
+  { id:22, nome:"Angelo Coronel",      partido:"PSD",          uf:"BA", cargo:"SEN",  overall:75, tier:"prata",   traits:[],                          pac:74, pres:78, inf:70, leg:66, bse:82, mid:60 },
+  { id:23, nome:"Astronauta Marcos Pontes", partido:"PL",      uf:"SP", cargo:"SEN",  overall:71, tier:"bronze",  traits:["ESTREANTE"],              pac:58, pres:74, inf:62, leg:56, bse:68, mid:80 },
+  { id:24, nome:"Pablo Marçal",        partido:"PRTB",         uf:"SP", cargo:"—",    overall:38, tier:"bronze",  traits:["ESTREANTE"],              pac:18, pres:12, inf:22, leg:4,  bse:68, mid:96 },
+];
+
+const TRAIT_LABEL = { FENOMENO:"Fenômeno", FERA_REG:"Fera regional", CAMPEAO:"Campeão", LEGEND:"Lenda", COMEBACK:"Comeback", ESTREANTE:"Estreante" };
+
+Object.assign(window, {
+  TENANTS, PARTY_COLORS, partyColor, ROLES, MODULES, UF_LIST, PARTY_STRENGTH,
+  HOME_KPIS, HOME_ALERTS, HOME_TOP_CANDIDATOS, HOME_EMENDAS_UF, HOME_MOV_DIA, HOME_AUDIT,
+  RADAR_CANDIDATOS, TRAIT_LABEL,
+});
+
+
+// ===== src/platform-data2.jsx =====
+/* Datasets para Lotes 2-4 */
+
+/* ====== Módulo Estudo ====== */
+const ESTUDO_TEMAS = [
+  { id:"reforma-trib",  nome:"Reforma Tributária",          mencoes: 18420, sentimento: -12, trend: "+340%", cat:"Economia" },
+  { id:"seguranca",     nome:"Segurança Pública",           mencoes: 14230, sentimento:  -8, trend: "+22%",  cat:"Social"   },
+  { id:"marco-temporal",nome:"Marco Temporal",              mencoes: 12110, sentimento: -34, trend: "+180%", cat:"Judicial" },
+  { id:"saude",         nome:"SUS · filas de cirurgia",     mencoes:  9820, sentimento: -18, trend: "+14%",  cat:"Social"   },
+  { id:"educacao",      nome:"Escola sem partido",          mencoes:  8740, sentimento:   2, trend: "-6%",   cat:"Social"   },
+  { id:"clima",         nome:"Seca Amazônia 2024",          mencoes:  7620, sentimento: -28, trend: "+62%",  cat:"Ambiente" },
+  { id:"arcabouco",     nome:"Arcabouço fiscal",            mencoes:  6930, sentimento:  -6, trend: "+9%",   cat:"Economia" },
+  { id:"eleicoes",      nome:"Eleições municipais 2024",    mencoes:  6430, sentimento:   8, trend: "-12%",  cat:"Política" },
+];
+
+const ESTUDO_CLUSTERS = [
+  { lider:"Lula (PT)",                aliados: 312, alcance: "Nacional",  forca: 88, cor: "#E4142C" },
+  { lider:"Bolsonaro (PL)",           aliados: 276, alcance: "Nacional",  forca: 85, cor: "#004F9F" },
+  { lider:"Tarcísio (REPUBLICANOS)",  aliados: 124, alcance: "SP + SE",   forca: 78, cor: "#005FAF" },
+  { lider:"Ratinho Jr (PSD)",         aliados:  98, alcance: "Sul + MT",  forca: 74, cor: "#FDB913" },
+  { lider:"ACM Neto (UB)",            aliados:  72, alcance: "NE + BA",   forca: 68, cor: "#002A7B" },
+];
+
+const ESTUDO_ESTUDOS = [
+  { titulo:"Perfil do eleitor indeciso · SE 2024",        autor:"Equipe pesquisa Mazzel",  data:"12 nov 2024", tipo:"Pesquisa",   paginas: 64 },
+  { titulo:"Impacto da reforma tributária no Nordeste",   autor:"Eduardo Amaral (econ.)",  data:"03 nov 2024", tipo:"Análise",    paginas: 38 },
+  { titulo:"Mapeamento de redes · Influência em X",       autor:"Social Lab MZ",           data:"28 out 2024", tipo:"Relatório",  paginas: 52 },
+  { titulo:"Desempenho eleitoral UB 2022-2024",           autor:"Consultoria interna",     data:"14 out 2024", tipo:"Estudo",     paginas: 84 },
+  { titulo:"Correlação emendas x votos · meta-análise",   autor:"J.P. Andrade (cientista)", data:"30 set 2024", tipo:"Paper",     paginas: 28 },
+  { titulo:"Evangélicos e poder de voto · 2016-2024",     autor:"Equipe religião Mazzel",   data:"18 set 2024", tipo:"Estudo",    paginas: 46 },
+];
+
+/* ====== Portal do Cliente (candidato) ====== */
+const PORTAL_AGENDA = [
+  { h:"08:00", titulo:"Café com prefeitos · Feira de Santana",   local:"FSA/BA",     tipo:"Base", conf:"confirmado" },
+  { h:"10:30", titulo:"Entrevista TV Bahia · Jornal Nacional",   local:"Salvador",   tipo:"Mídia", conf:"confirmado" },
+  { h:"14:00", titulo:"Sessão CAS · votação MP 1.184",           local:"Brasília",   tipo:"Legislativo", conf:"pendente" },
+  { h:"16:30", titulo:"Reunião bancada do Nordeste",             local:"Congresso",  tipo:"Articulação", conf:"confirmado" },
+  { h:"19:00", titulo:"Jantar com empresários do Oeste",         local:"Barreiras",  tipo:"Base", conf:"confirmado" },
+];
+
+const PORTAL_METAS = [
+  { m:"Emendas aprovadas 2024",     v:61, meta:80, unidade:"R$ M" },
+  { m:"Base municipal ativa",       v:92, meta:95, unidade:"%"   },
+  { m:"Discursos em plenário",      v:34, meta:40, unidade:""    },
+  { m:"Menções positivas (mídia)",  v:68, meta:75, unidade:"%"   },
+];
+
+const PORTAL_EQUIPE = [
+  { nome:"Ana Moura",       papel:"Chefia de gabinete",        local:"Brasília",   ativo:true  },
+  { nome:"Rafael Tavares",  papel:"Assessor imprensa",         local:"Brasília",   ativo:true  },
+  { nome:"Carla Pinheiro",  papel:"Articulação Congresso",     local:"Brasília",   ativo:false },
+  { nome:"Pedro Vilaça",    papel:"Coordenador base BA",       local:"Salvador",   ativo:true  },
+  { nome:"Júlia Neves",     papel:"Redes sociais",             local:"Salvador",   ativo:true  },
+];
+
+/* ====== Admin / White-Label ====== */
+const ADMIN_USUARIOS = [
+  { nome:"Paulo Guedes",        email:"paulo.g@unionbrasil.org.br", papel:"Presidente",   uf:"—",  status:"ativo",    mfa:true, last:"agora" },
+  { nome:"Ana Carolina Silva",  email:"ana.c@unionbrasil.org.br",   papel:"Diretoria",    uf:"—",  status:"ativo",    mfa:true, last:"há 2min" },
+  { nome:"Carlos Lima",         email:"carlos.l@unionbrasil.org.br",papel:"Delegado",     uf:"BA", status:"ativo",    mfa:true, last:"há 8min" },
+  { nome:"Maria Fernanda T.",   email:"maria.t@unionbrasil.org.br", papel:"Diretoria",    uf:"—",  status:"ativo",    mfa:false,last:"há 22min" },
+  { nome:"João Pedro Martins",  email:"joao.m@unionbrasil.org.br",  papel:"Analista",     uf:"—",  status:"ativo",    mfa:true, last:"há 34min" },
+  { nome:"Jaques Wagner",       email:"jw@senado.leg.br",           papel:"Candidato",    uf:"BA", status:"ativo",    mfa:true, last:"há 1h" },
+  { nome:"Flávia Cunha",        email:"flavia.c@unionbrasil.org.br",papel:"Delegado",     uf:"RJ", status:"pendente", mfa:false,last:"nunca" },
+  { nome:"Ricardo Amaral",      email:"ricardo.a@unionbrasil.org.br",papel:"Analista",    uf:"—",  status:"suspenso", mfa:true, last:"há 4d"  },
+];
+
+const ADMIN_PAPEIS = [
+  { papel:"Presidente",  qtd:1,  desc:"Acesso total · admin irrestrito",                   perm:["Tudo"] },
+  { papel:"Diretoria",   qtd:8,  desc:"Leitura/escrita em todos os módulos, sem admin",     perm:["Home","Mapa","Radar","Dossiê","Estudo","Delegados","Filiados","IA","Alertas"] },
+  { papel:"Delegado",    qtd:27, desc:"Gestão da própria UF · visibilidade nacional limitada", perm:["Home","Mapa (própria UF)","Filiados (própria UF)","Alertas"] },
+  { papel:"Analista",    qtd:14, desc:"Leitura ampla, sem exportação em massa",             perm:["Home","Radar","Estudo","Dossiê (leitura)"] },
+  { papel:"Candidato",   qtd:1247,desc:"Portal próprio · dados individuais apenas",         perm:["Portal do Cliente","Dossiê próprio","IA"] },
+];
+
+const ADMIN_AUDIT = [
+  { quando:"14:23", quem:"Ana Carolina Silva", acao:"LOGIN",          obj:"Plataforma",                ip:"177.42.12.8" },
+  { quando:"14:12", quem:"Carlos Lima (BA)",   acao:"EXPORT",         obj:"relatório emendas 2024",    ip:"200.12.4.15" },
+  { quando:"14:04", quem:"Sistema",            acao:"SYNC_TSE",       obj:"48.312 registros",          ip:"—"          },
+  { quando:"13:48", quem:"João Pedro Martins", acao:"VIEW_DOSSIE",    obj:"Jaques Wagner",             ip:"187.33.9.2" },
+  { quando:"13:22", quem:"Paulo Guedes",       acao:"ROLE_CHANGE",    obj:"Ricardo Amaral → suspenso", ip:"191.4.11.7" },
+  { quando:"13:05", quem:"Maria Fernanda T.",  acao:"COMMENT",        obj:"alerta #a2",                ip:"177.42.12.91" },
+  { quando:"12:40", quem:"Ana Carolina Silva", acao:"EXPORT",         obj:"Top 100 overall · CSV",     ip:"177.42.12.8" },
+];
+
+/* ====== Delegados ====== */
+const DELEGADOS_LIST = [
+  { nome:"Carlos Lima",         uf:"BA", cidades: 417, filiados: 28400, perf: 92, status: "top" },
+  { nome:"Flávia Cunha",        uf:"RJ", cidades:  92, filiados: 22100, perf: 88, status: "top" },
+  { nome:"Rodrigo Paiva",       uf:"MG", cidades: 853, filiados: 41200, perf: 86, status: "top" },
+  { nome:"Eduardo Amaral",      uf:"SP", cidades: 645, filiados: 52800, perf: 84, status: "ok"  },
+  { nome:"Lúcia Nascimento",    uf:"PE", cidades: 185, filiados: 18900, perf: 78, status: "ok"  },
+  { nome:"Marcelo Tavares",     uf:"CE", cidades: 184, filiados: 17200, perf: 76, status: "ok"  },
+  { nome:"Fernanda Castro",     uf:"RS", cidades: 497, filiados: 14600, perf: 72, status: "ok"  },
+  { nome:"Ricardo Brandão",     uf:"PR", cidades: 399, filiados: 13800, perf: 70, status: "ok"  },
+  { nome:"Júlia Menezes",       uf:"GO", cidades: 246, filiados:  9200, perf: 64, status: "at"  },
+  { nome:"Paulo Ribeiro",       uf:"ES", cidades:  78, filiados:  6100, perf: 58, status: "at"  },
+  { nome:"Antônio Farias",      uf:"MA", cidades: 217, filiados:  5400, perf: 52, status: "baixo" },
+  { nome:"Beatriz Aguiar",      uf:"PB", cidades: 223, filiados:  4900, perf: 48, status: "baixo" },
+];
+
+/* ====== Filiados ====== */
+const FILIADOS_UF = UF_LIST.map((uf, i) => ({
+  uf,
+  total: 1000 + ((uf.charCodeAt(0) + uf.charCodeAt(1) + i * 13) * 31) % 50000,
+  novos30d: 50 + (uf.charCodeAt(0) * 7) % 2400,
+  baixas30d: 10 + (uf.charCodeAt(1) * 3) % 800,
+})).sort((a,b) => b.total - a.total);
+
+const FILIADOS_TOTAL = FILIADOS_UF.reduce((s, u) => s + u.total, 0);
+const FILIADOS_NOVOS_30 = FILIADOS_UF.reduce((s, u) => s + u.novos30d, 0);
+
+const FILIADOS_FAIXA_IDADE = [
+  { faixa:"16-24", v: 8 },
+  { faixa:"25-34", v: 18 },
+  { faixa:"35-44", v: 24 },
+  { faixa:"45-54", v: 22 },
+  { faixa:"55-64", v: 16 },
+  { faixa:"65+",   v: 12 },
+];
+
+/* ====== IA Chat ====== */
+const IA_SUGESTOES = [
+  { titulo:"Quais senadores UB têm maior risco eleitoral em 2026?",       icon:"Target"   },
+  { titulo:"Resumir posicionamento do partido sobre reforma tributária",  icon:"Sparkles" },
+  { titulo:"Comparar desempenho de emendas entre Bahia e Pernambuco",     icon:"BarChart3"},
+  { titulo:"Identificar municípios com maior potencial de crescimento",   icon:"MapPin"   },
+  { titulo:"Gerar dossiê executivo · Jaques Wagner (1 página)",            icon:"FileSearch"},
+  { titulo:"Analisar cobertura de mídia da última semana",                 icon:"Sparkles" },
+];
+
+const IA_CONVERSA = [
+  {
+    role:"user",
+    msg:"Quais alertas críticos nas últimas 24h exigem ação da diretoria?",
+    t:"14:22",
+  },
+  {
+    role:"assistant",
+    msg:"Identifiquei 3 alertas críticos que recomendam ação imediata:",
+    citations: [
+      { ref:"CEAF",  texto:"Pablo Marçal (PRTB-SP) · nova ação inscrita no CEAF · 12min atrás" },
+      { ref:"STF",   texto:"Ex-Gov. Roberto Rocha (UB-MA) · denúncia recebida pelo STF, relator Gilmar Mendes · 4h atrás" },
+      { ref:"TCU",   texto:"Dep. Marcelo Queiroga (PL-PB) · TCE aberto em R$ 2,8M · 2h atrás" },
+    ],
+    followup: "Recomendo priorizar o caso do STF — envolve ex-governador filiado à UB e a notícia já foi capturada por Folha e CNN. Quer que eu gere rascunho de nota oficial?",
+    t:"14:22",
+  },
+];
+
+/* ====== Alertas (Central) ====== */
+const ALERTAS_DIA = [
+  { id:1, sev:"crit", hora:"14:22", tipo:"Judicial", titulo:"Nova ação CEAF · Pablo Marçal",      fonte:"Conjur",          uf:"SP" },
+  { id:2, sev:"alto", hora:"13:44", tipo:"Mídia",    titulo:"Folha: Flávio Bolsonaro em CPI",     fonte:"Folha de S.Paulo",uf:"RJ" },
+  { id:3, sev:"med",  hora:"13:02", tipo:"Emenda",   titulo:"CGU cancelou emenda Júlia Rocha",     fonte:"CGU",             uf:"MG" },
+  { id:4, sev:"med",  hora:"12:31", tipo:"Processo", titulo:"TCU · TCE aberto · R$ 2,8M",          fonte:"TCU",             uf:"PB" },
+  { id:5, sev:"bx",   hora:"11:48", tipo:"Filiação", titulo:"150 novos filiados BA em 14 cidades", fonte:"Sistema interno", uf:"BA" },
+  { id:6, sev:"crit", hora:"10:17", tipo:"Processo", titulo:"STF: denúncia Roberto Rocha",         fonte:"STF",             uf:"MA" },
+  { id:7, sev:"alto", hora:"09:44", tipo:"Redes",    titulo:"Pico menções negativas H.Costa +340%",fonte:"X Analytics",     uf:"PE" },
+  { id:8, sev:"med",  hora:"09:05", tipo:"Mídia",    titulo:"CNN: entrevista Wanderlei Barbosa",   fonte:"CNN Brasil",      uf:"TO" },
+  { id:9, sev:"bx",   hora:"08:32", tipo:"Legislativo", titulo:"PL 4320/2024 aprovada Senado",    fonte:"Senado",          uf:"—" },
+  { id:10,sev:"crit", hora:"08:01", tipo:"Mídia",    titulo:"Estadão · investigação bancada PP",  fonte:"Estadão",         uf:"—" },
+];
+
+const ALERTAS_CATS = [
+  { cat:"Judicial",     qtd: 14, cor:"#f87171" },
+  { cat:"Mídia",        qtd: 42, cor:"#60a5fa" },
+  { cat:"Emenda",       qtd:  8, cor:"#fbbf24" },
+  { cat:"Processo",     qtd: 11, cor:"#fb923c" },
+  { cat:"Redes",        qtd: 28, cor:"#a78bfa" },
+  { cat:"Filiação",     qtd: 19, cor:"#34d399" },
+  { cat:"Legislativo",  qtd: 16, cor:"#93c5fd" },
+];
+
+Object.assign(window, {
+  ESTUDO_TEMAS, ESTUDO_CLUSTERS, ESTUDO_ESTUDOS,
+  PORTAL_AGENDA, PORTAL_METAS, PORTAL_EQUIPE,
+  ADMIN_USUARIOS, ADMIN_PAPEIS, ADMIN_AUDIT,
+  DELEGADOS_LIST, FILIADOS_UF, FILIADOS_TOTAL, FILIADOS_NOVOS_30, FILIADOS_FAIXA_IDADE,
+  IA_SUGESTOES, IA_CONVERSA,
+  ALERTAS_DIA, ALERTAS_CATS,
+});
+
+
+// ===== src/platform-shell.jsx =====
+/* Sidebar + Topbar + Cmd+K shell */
+
+const { useState, useEffect, useRef, useMemo } = React;
+
+function Icon({ name, size = 16, className = "", stroke = 1.8 }) {
+  const s = size;
+  const common = { width: s, height: s, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: stroke, strokeLinecap: "round", strokeLinejoin: "round", className };
+  switch (name) {
+    case "Home":     return <svg {...common}><path d="M3 11l9-8 9 8v10a2 2 0 0 1-2 2h-4v-7h-6v7H5a2 2 0 0 1-2-2z"/></svg>;
+    case "MapPin":   return <svg {...common}><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>;
+    case "Target":   return <svg {...common}><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg>;
+    case "FileSearch":return <svg {...common}><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7"/><path d="M14 3v5h5"/><circle cx="17" cy="17" r="3"/><path d="m21 21-1.5-1.5"/></svg>;
+    case "BarChart3":return <svg {...common}><path d="M3 3v18h18"/><path d="M7 14v4"/><path d="M12 8v10"/><path d="M17 4v14"/></svg>;
+    case "Users":    return <svg {...common}><path d="M17 20v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="8" r="4"/><path d="M21 20v-2a4 4 0 0 0-3-3.87"/><path d="M15 4.13a4 4 0 0 1 0 7.75"/></svg>;
+    case "UserCheck":return <svg {...common}><path d="M17 20v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="8" r="4"/><path d="m16 11 2 2 4-4"/></svg>;
+    case "Sparkles": return <svg {...common}><path d="M12 3 13.5 9 20 10.5 13.5 12 12 18 10.5 12 4 10.5 10.5 9z"/><path d="M19 3v4M21 5h-4"/></svg>;
+    case "Bell":     return <svg {...common}><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>;
+    case "Briefcase":return <svg {...common}><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>;
+    case "Settings": return <svg {...common}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.9 2.9l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.9-2.9l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.9-2.9l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.9 2.9l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>;
+    case "Search":   return <svg {...common}><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>;
+    case "Crown":    return <svg {...common}><path d="M2 7l4 10h12l4-10-5 4-5-7-5 7-5-4z"/></svg>;
+    case "User":     return <svg {...common}><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>;
+    case "ChevronDown":return <svg {...common}><path d="m6 9 6 6 6-6"/></svg>;
+    case "ChevronRight":return <svg {...common}><path d="m9 18 6-6-6-6"/></svg>;
+    case "Banknote": return <svg {...common}><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>;
+    case "AlertTriangle":return <svg {...common}><path d="M10.3 3.86 1.82 18a2 2 0 0 0 1.7 3h16.97a2 2 0 0 0 1.7-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>;
+    case "Sun":      return <svg {...common}><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>;
+    case "Moon":     return <svg {...common}><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>;
+    case "Filter":   return <svg {...common}><path d="M22 3H2l8 9.46V19l4 2v-8.54z"/></svg>;
+    case "ArrowUp":  return <svg {...common}><path d="M12 19V5M5 12l7-7 7 7"/></svg>;
+    case "ArrowDown":return <svg {...common}><path d="M12 5v14M19 12l-7 7-7-7"/></svg>;
+    case "Check":    return <svg {...common}><path d="M20 6 9 17l-5-5"/></svg>;
+    case "X":        return <svg {...common}><path d="M18 6 6 18M6 6l12 12"/></svg>;
+    case "Plus":     return <svg {...common}><path d="M12 5v14M5 12h14"/></svg>;
+    case "Download": return <svg {...common}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg>;
+    default: return <svg {...common}><circle cx="12" cy="12" r="9"/></svg>;
+  }
+}
+
+function Sidebar({ tenant, role, activeModule, onNavigate }) {
+  const items = MODULES.filter(m => m.roles.includes(role));
+  const t = TENANTS[tenant];
+  return (
+    <aside className="sidebar-col" data-role={role}>
+      <div className="tenant-brand">
+        <div className="tenant-logo">{t.logoText}</div>
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <div className="text-[13px] font-bold t-fg-strong leading-tight truncate">{t.nome}</div>
+          <div className="text-[10.5px] t-fg-dim tracking-wider uppercase mt-[1px]">{t.plano} · {t.versao}</div>
+        </div>
+      </div>
+
+      <nav className="flex-1 overflow-y-auto py-3">
+        <div className="px-4 pb-1 text-[9.5px] font-bold t-fg-ghost tracking-[0.14em] uppercase">Módulos</div>
+        {items.map(m => (
+          <a key={m.id}
+             className={`nav-item ${activeModule === m.id ? "active" : ""}`}
+             onClick={(e) => { e.preventDefault(); onNavigate(m.id); }}>
+            <Icon name={m.icon} size={15} />
+            <span className="flex-1">{m.label}</span>
+            {m.badge ? <span className="chip chip-red" style={{ height: 16, fontSize: 9.5, padding: "0 5px" }}>{m.badge}</span> : null}
+          </a>
+        ))}
+      </nav>
+
+      <div className="px-4 py-3 border-t" style={{ borderColor: "var(--rule)" }}>
+        <div className="text-[10px] t-fg-ghost tracking-[0.14em] uppercase mb-2">Sessão</div>
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-full t-bg-tenant-soft ring-soft flex items-center justify-center text-[11px] font-bold t-fg-strong">
+            {role === "presidente" ? "PG" : role === "diretoria" ? "AC" : "JW"}
+          </div>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div className="text-[12px] font-semibold t-fg leading-tight truncate">
+              {role === "presidente" ? "Paulo Guedes" : role === "diretoria" ? "Ana Carolina" : "Jaques Wagner"}
+            </div>
+            <div className="text-[10px] t-fg-dim leading-tight truncate">{ROLES[role].label}</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+function Topbar({ tenant, role, onOpenCmdk, breadcrumbs }) {
+  const t = TENANTS[tenant];
+  return (
+    <header className="topbar">
+      <div className="breadcrumb flex items-center gap-2 text-[12px]" style={{ flexShrink: 1 }}>
+        {breadcrumbs.map((b, i) => (
+          <React.Fragment key={i}>
+            {i > 0 && <Icon name="ChevronRight" size={12} className="t-fg-ghost" style={{ flexShrink: 0 }} />}
+            <span className={i === breadcrumbs.length - 1 ? "t-fg-strong font-semibold" : "t-fg-muted"} style={{ whiteSpace: "nowrap", flexShrink: 0 }}>{b}</span>
+          </React.Fragment>
+        ))}
+      </div>
+
+      <div className="flex-1" />
+
+      <button className="search-cmdk" onClick={onOpenCmdk}>
+        <Icon name="Search" size={13} className="t-fg-dim" />
+        <span className="text-[12px] t-fg-dim flex-1 text-left">Buscar candidato, UF, partido, processo…</span>
+        <span className="kbd">⌘K</span>
+      </button>
+
+      <button className="btn-ghost" title="Alertas">
+        <Icon name="Bell" size={13} />
+        <span>7</span>
+      </button>
+
+      <div className="h-5 w-px" style={{ background: "var(--rule)" }} />
+
+      <div className="flex items-center gap-2 text-[11.5px]">
+        <div className="chip chip-muted" style={{ height: 22 }}>
+          <span className="chip-dot" style={{ background: "var(--tenant-primary)" }} />
+          {ROLES[role].label}
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function CmdKPalette({ open, onClose, onNavigate }) {
+  const [q, setQ] = useState("");
+  const inputRef = useRef(null);
+  useEffect(() => { if (open) setTimeout(() => inputRef.current?.focus(), 30); }, [open]);
+
+  const items = useMemo(() => {
+    const base = [
+      ...MODULES.map(m => ({ kind: "Módulo", label: m.label, icon: m.icon, action: () => onNavigate(m.id) })),
+      ...RADAR_CANDIDATOS.slice(0, 12).map(c => ({ kind: "Candidato", label: `${c.nome} · ${c.partido}-${c.uf}`, icon: "User", action: () => onNavigate("dossie") })),
+      ...UF_LIST.map(uf => ({ kind: "UF", label: `Unidade Federativa · ${uf}`, icon: "MapPin", action: () => onNavigate("mapa") })),
+    ];
+    if (!q) return base.slice(0, 14);
+    const lc = q.toLowerCase();
+    return base.filter(i => i.label.toLowerCase().includes(lc) || i.kind.toLowerCase().includes(lc)).slice(0, 14);
+  }, [q, onNavigate]);
+
+  if (!open) return null;
+  return (
+    <div className="cmdk-overlay" onClick={onClose}>
+      <div className="cmdk-panel" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center gap-2 px-4 py-3 border-b" style={{ borderColor: "var(--rule)" }}>
+          <Icon name="Search" size={14} className="t-fg-dim" />
+          <input ref={inputRef} value={q} onChange={e => setQ(e.target.value)}
+                 placeholder="O que você procura?"
+                 className="flex-1 bg-transparent outline-none text-[13px] t-fg placeholder:t-fg-dim" />
+          <span className="kbd">ESC</span>
+        </div>
+        <div className="max-h-[380px] overflow-y-auto py-2">
+          {items.length === 0 && <div className="px-4 py-8 text-center text-[12px] t-fg-dim">Nenhum resultado.</div>}
+          {items.map((it, i) => (
+            <button key={i} onClick={() => { it.action(); onClose(); }}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-[var(--chart-hover)]">
+              <Icon name={it.icon} size={14} className="t-fg-muted" />
+              <span className="text-[12.5px] t-fg flex-1">{it.label}</span>
+              <span className="text-[10px] t-fg-dim tracking-wider uppercase">{it.kind}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { Icon, Sidebar, Topbar, CmdKPalette });
+
+
+// ===== src/platform-home.jsx =====
+/* Home Dashboard module */
+
+const { useState: useHState, useMemo: useHMemo } = React;
+
+/* ============ SVG Brazil choropleth (simplified states) ============ */
+/* Simplified polygon path per state - illustrative positions */
+const BRASIL_STATES = [
+  { uf: "AC", cx: 96,  cy: 240, path: "M60,220 L130,215 L135,260 L80,265 Z" },
+  { uf: "AM", cx: 230, cy: 200, path: "M140,150 L330,150 L335,250 L140,255 Z" },
+  { uf: "RR", cx: 280, cy: 110, path: "M230,80 L320,85 L325,145 L235,145 Z" },
+  { uf: "AP", cx: 390, cy: 115, path: "M355,85 L425,90 L430,145 L360,145 Z" },
+  { uf: "PA", cx: 400, cy: 210, path: "M340,150 L465,150 L465,265 L345,260 Z" },
+  { uf: "RO", cx: 165, cy: 290, path: "M140,265 L230,265 L230,320 L140,320 Z" },
+  { uf: "MT", cx: 305, cy: 305, path: "M235,265 L390,265 L395,355 L240,355 Z" },
+  { uf: "MS", cx: 330, cy: 390, path: "M275,360 L395,360 L400,445 L280,445 Z" },
+  { uf: "TO", cx: 430, cy: 290, path: "M400,265 L470,265 L475,340 L405,340 Z" },
+  { uf: "MA", cx: 490, cy: 205, path: "M470,150 L545,155 L550,255 L475,260 Z" },
+  { uf: "PI", cx: 515, cy: 250, path: "M490,200 L555,200 L560,295 L495,295 Z" },
+  { uf: "CE", cx: 560, cy: 195, path: "M540,155 L615,160 L620,225 L545,225 Z" },
+  { uf: "RN", cx: 620, cy: 205, path: "M600,170 L660,175 L665,220 L605,220 Z" },
+  { uf: "PB", cx: 635, cy: 235, path: "M595,220 L670,225 L670,255 L600,255 Z" },
+  { uf: "PE", cx: 605, cy: 260, path: "M555,250 L670,255 L670,285 L560,285 Z" },
+  { uf: "AL", cx: 635, cy: 290, path: "M600,285 L665,288 L665,310 L605,310 Z" },
+  { uf: "SE", cx: 615, cy: 315, path: "M585,308 L645,310 L645,335 L590,335 Z" },
+  { uf: "BA", cx: 525, cy: 310, path: "M460,265 L590,270 L595,365 L465,365 Z" },
+  { uf: "GO", cx: 410, cy: 360, path: "M385,340 L460,340 L465,410 L390,410 Z" },
+  { uf: "DF", cx: 450, cy: 350, path: "M440,340 L470,340 L470,360 L440,360 Z" },
+  { uf: "MG", cx: 475, cy: 400, path: "M395,365 L575,370 L580,445 L400,445 Z" },
+  { uf: "ES", cx: 555, cy: 420, path: "M535,395 L590,395 L590,445 L540,445 Z" },
+  { uf: "RJ", cx: 510, cy: 455, path: "M470,440 L560,440 L560,475 L475,475 Z" },
+  { uf: "SP", cx: 425, cy: 450, path: "M330,430 L470,430 L475,480 L335,480 Z" },
+  { uf: "PR", cx: 380, cy: 490, path: "M310,475 L445,475 L445,510 L315,510 Z" },
+  { uf: "SC", cx: 375, cy: 525, path: "M315,510 L430,510 L430,545 L320,545 Z" },
+  { uf: "RS", cx: 340, cy: 570, path: "M265,545 L410,545 L415,610 L270,610 Z" },
+];
+
+function BrasilChoropleth({ mode, onHover, onClick, highlightUf, data }) {
+  const colorFor = (uf) => {
+    if (mode === "partido") {
+      const p = PARTY_STRENGTH[uf];
+      return partyColor(p);
+    }
+    const score = data?.[uf] ?? 50;
+    if (score >= 85) return "#34d399";
+    if (score >= 70) return "#60a5fa";
+    if (score >= 55) return "#fbbf24";
+    if (score >= 40) return "#fb923c";
+    return "#f87171";
+  };
+  return (
+    <svg viewBox="50 70 620 560" className="w-full h-full" style={{ maxHeight: 420 }}>
+      {BRASIL_STATES.map(s => {
+        const isHi = highlightUf === s.uf;
+        return (
+          <g key={s.uf} onMouseEnter={() => onHover?.(s.uf)} onMouseLeave={() => onHover?.(null)} onClick={() => onClick?.(s.uf)} style={{ cursor: "pointer" }}>
+            <path d={s.path}
+                  fill={colorFor(s.uf)}
+                  fillOpacity={isHi ? 0.95 : 0.72}
+                  stroke={isHi ? "#fff" : "rgba(0,0,0,0.25)"}
+                  strokeWidth={isHi ? 2 : 0.6}
+                  className="region-polygon" />
+            <text x={s.cx} y={s.cy + 3} textAnchor="middle"
+                  className="state-label"
+                  style={{ fontSize: 11, fill: "#0a0a0b" }}
+                  pointerEvents="none">{s.uf}</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+/* ============ Home module ============ */
+function ModuleHome({ tenant, role, onNavigate }) {
+  const kpis = HOME_KPIS[role];
+  const [mapMode, setMapMode] = useHState("partido");
+  const [hoverUf, setHoverUf] = useHState(null);
+  const scoreData = useHMemo(() => {
+    const d = {};
+    UF_LIST.forEach((u, i) => { d[u] = 45 + ((u.charCodeAt(0) + u.charCodeAt(1) + i * 7) % 50); });
+    return d;
+  }, []);
+
+  const hoveredDetail = hoverUf ? {
+    uf: hoverUf,
+    partido: PARTY_STRENGTH[hoverUf] || "—",
+    score: scoreData[hoverUf],
+    eleitos: 10 + ((hoverUf.charCodeAt(0) + hoverUf.charCodeAt(1)) % 40),
+  } : null;
+
+  return (
+    <div className="bg-page-grad min-h-full">
+      <div className="max-w-[1600px] mx-auto px-8 py-7">
+
+        {/* Saudação */}
+        <div className="flex items-end justify-between mb-6">
+          <div>
+            <div className="text-[11px] t-fg-dim tracking-[0.18em] uppercase font-semibold">Dashboard · {new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })}</div>
+            <h1 className="text-[34px] font-display font-bold t-fg-strong mt-1 leading-none">
+              {role === "candidato" ? "Bom dia, Senador." : role === "presidente" ? "Bom dia, Presidente." : "Bom dia, diretoria."}
+            </h1>
+            <div className="text-[13px] t-fg-muted mt-1.5 max-w-xl">
+              {role === "candidato"
+                ? "Resumo do seu mandato, base e emendas em execução."
+                : "Visão executiva agregada da plataforma Mazzel · dados atualizados há 4 minutos."}
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button className="btn-ghost"><Icon name="Download" size={13}/>Exportar visão</button>
+            <button className="btn-primary"><Icon name="Sparkles" size={13}/>Resumo IA</button>
+          </div>
+        </div>
+
+        {/* KPI row */}
+        <div className="grid grid-cols-4 gap-3 mb-6">
+          {kpis.map((k, i) => (
+            <div key={i} className="kpi-card ring-soft">
+              <div className="text-[10.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">{k.k}</div>
+              <div className="flex items-end gap-2 mt-2">
+                <div className="text-[38px] font-display font-bold tnum leading-none"
+                     style={{ backgroundImage: "linear-gradient(180deg, var(--overall-from), var(--overall-to))", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
+                  {k.v}
+                </div>
+              </div>
+              <div className="text-[11px] t-fg-dim mt-2">{k.hint}</div>
+              <div className="kpi-trend">
+                <span className={`chip ${k.ok ? "chip-green" : "chip-red"}`} style={{ height: 20 }}>
+                  <Icon name={k.trend.startsWith("+") ? "ArrowUp" : (k.trend.startsWith("-") ? "ArrowDown" : "Check")} size={10} />
+                  {k.trend}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Map + Alerts row */}
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          {/* Map */}
+          <div className="col-span-2 t-bg-card ring-soft rounded-xl overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-3.5 border-b" style={{ borderColor: "var(--rule)" }}>
+              <div>
+                <div className="text-[10.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">Mapa do Brasil</div>
+                <div className="text-[15px] font-bold t-fg-strong leading-tight">Força política por UF</div>
+              </div>
+              <div className="flex items-center gap-1 p-0.5 rounded-md" style={{ background: "var(--rule)" }}>
+                {[{k:"partido",l:"Partido"},{k:"score",l:"Score regional"}].map(o => (
+                  <button key={o.k} onClick={() => setMapMode(o.k)}
+                          className={`btn-ghost ${mapMode === o.k ? "active" : ""}`} style={{ padding: "5px 10px" }}>{o.l}</button>
+                ))}
+                <button className="btn-ghost" style={{ padding: "5px 10px" }} onClick={() => onNavigate("mapa")}>Abrir mapa completo →</button>
+              </div>
+            </div>
+            <div className="grid grid-cols-[1fr_220px]">
+              <div className="p-4 pt-2">
+                <BrasilChoropleth mode={mapMode} onHover={setHoverUf} onClick={() => onNavigate("mapa")} highlightUf={hoverUf} data={scoreData} />
+              </div>
+              <div className="border-l p-4" style={{ borderColor: "var(--rule)" }}>
+                {hoveredDetail ? (
+                  <>
+                    <div className="text-[10px] t-fg-dim uppercase tracking-wider">UF</div>
+                    <div className="text-[28px] font-display font-bold t-fg-strong">{hoveredDetail.uf}</div>
+                    <div className="text-[11.5px] t-fg-muted mt-0.5 mb-4">Clique para abrir Mapa Eleitoral</div>
+                    <div className="space-y-3">
+                      <div>
+                        <div className="text-[10px] t-fg-dim uppercase tracking-wider mb-1">Partido dominante</div>
+                        <div className="flex items-center gap-2">
+                          <span className="party-dot" style={{ background: partyColor(hoveredDetail.partido) }} />
+                          <span className="text-[13px] font-semibold t-fg-strong">{hoveredDetail.partido}</span>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-[10px] t-fg-dim uppercase tracking-wider mb-1">Score regional</div>
+                        <div className="text-[22px] font-bold tnum t-fg-strong">{hoveredDetail.score}<span className="text-[12px] t-fg-dim"> / 100</span></div>
+                      </div>
+                      <div>
+                        <div className="text-[10px] t-fg-dim uppercase tracking-wider mb-1">Eleitos UB</div>
+                        <div className="text-[22px] font-bold tnum t-fg-strong">{hoveredDetail.eleitos}</div>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="h-full flex flex-col items-center justify-center text-center">
+                    <div className="text-[11px] t-fg-dim uppercase tracking-wider">Passe o mouse sobre</div>
+                    <div className="text-[14px] font-semibold t-fg mt-1">uma unidade federativa</div>
+                    <div className="text-[11px] t-fg-dim mt-2">para ver detalhes</div>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center gap-3 px-5 py-2.5 border-t" style={{ borderColor: "var(--rule)" }}>
+              {mapMode === "partido"
+                ? ["UNIÃO BRASIL","PL","PT","PSD","MDB","PSB"].map(p => (
+                    <div key={p} className="flex items-center gap-1.5 text-[10.5px] t-fg-muted">
+                      <span className="party-dot" style={{ background: partyColor(p) }} />{p}
+                    </div>
+                  ))
+                : [["#f87171","<40"],["#fb923c","40-55"],["#fbbf24","55-70"],["#60a5fa","70-85"],["#34d399","≥85"]].map(([c,l]) => (
+                    <div key={l} className="flex items-center gap-1.5 text-[10.5px] t-fg-muted">
+                      <span className="party-dot" style={{ background: c }} />{l}
+                    </div>
+                  ))
+              }
+            </div>
+          </div>
+
+          {/* Alerts timeline */}
+          <div className="t-bg-card ring-soft rounded-xl overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between px-5 py-3.5 border-b" style={{ borderColor: "var(--rule)" }}>
+              <div>
+                <div className="text-[10.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">Alertas recentes</div>
+                <div className="text-[15px] font-bold t-fg-strong leading-tight">Últimas 24h</div>
+              </div>
+              <button className="btn-ghost" onClick={() => onNavigate("alertas")} style={{ padding: "5px 9px" }}>Ver todos</button>
+            </div>
+            <div className="flex-1 overflow-y-auto" style={{ maxHeight: 520 }}>
+              {HOME_ALERTS.map(a => (
+                <div key={a.id} className={`alert-row alert-sev-${a.sev}`}>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className={`chip ${a.sev === "crit" ? "chip-red" : a.sev === "alto" ? "chip-red" : a.sev === "med" ? "chip-amber" : "chip-muted"}`} style={{ height: 16, fontSize: 9 }}>{a.sev === "crit" ? "Crítico" : a.sev === "alto" ? "Alto" : a.sev === "med" ? "Médio" : "Baixo"}</span>
+                      <span className="text-[10px] t-fg-dim uppercase tracking-wider">{a.tipo}</span>
+                      <span className="text-[10px] t-fg-dim ml-auto">{a.when}</span>
+                    </div>
+                    <div className="text-[12.5px] font-semibold t-fg-strong truncate">{a.who} · {a.uf}</div>
+                    <div className="text-[11.5px] t-fg-muted truncate">{a.what}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Three feature cards */}
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          {/* Top 10 Overall */}
+          <div className="t-bg-card ring-soft rounded-xl overflow-hidden">
+            <div className="px-5 py-3.5 border-b flex items-center justify-between" style={{ borderColor: "var(--rule)" }}>
+              <div>
+                <div className="text-[10.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">Ranking</div>
+                <div className="text-[15px] font-bold t-fg-strong leading-tight">Top 10 · Overall Mazzel</div>
+              </div>
+              <button className="btn-ghost" style={{ padding: "5px 9px" }} onClick={() => onNavigate("radar")}>Ver radar →</button>
+            </div>
+            <div className="row-striped">
+              {HOME_TOP_CANDIDATOS.map((c, i) => (
+                <div key={i} className="grid grid-cols-[28px_1fr_auto] items-center gap-3 px-5 py-2 cursor-pointer card-hover" onClick={() => onNavigate("dossie")}>
+                  <div className="text-[12px] font-bold tnum t-fg-dim">{String(i+1).padStart(2,"0")}</div>
+                  <div className="min-w-0">
+                    <div className="text-[12.5px] font-semibold t-fg-strong truncate">{c.nome}</div>
+                    <div className="flex items-center gap-1.5 text-[10.5px] t-fg-dim">
+                      <span className="party-dot" style={{ background: partyColor(c.partido) }} />
+                      {c.partido} · {c.uf} · {c.cargo}
+                    </div>
+                  </div>
+                  <div className={`tnum font-bold text-[16px] ${c.tier === "dourado" ? "text-amber-300" : "t-fg-strong"}`}>{c.overall}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Emendas por UF */}
+          <div className="t-bg-card ring-soft rounded-xl overflow-hidden">
+            <div className="px-5 py-3.5 border-b" style={{ borderColor: "var(--rule)" }}>
+              <div className="text-[10.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">Execução orçamentária</div>
+              <div className="text-[15px] font-bold t-fg-strong leading-tight">Emendas liberadas · 2024 (top UF)</div>
+            </div>
+            <div className="p-5 space-y-2.5">
+              {HOME_EMENDAS_UF.map((e, i) => {
+                const pct = 100 - i * 8;
+                return (
+                  <div key={e.uf} className="flex items-center gap-3">
+                    <div className="w-7 text-[11px] font-bold tnum t-fg">{e.uf}</div>
+                    <div className="flex-1 h-2.5 rounded-sm overflow-hidden" style={{ background: "var(--rule)" }}>
+                      <div className="h-full" style={{ width: `${pct}%`, background: "linear-gradient(90deg, var(--tenant-primary), rgba(var(--tenant-primary-rgb), 0.4))" }} />
+                    </div>
+                    <div className="tnum font-bold text-[12.5px] t-fg-strong w-[68px] text-right">{e.v}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Movimentações do dia */}
+          <div className="t-bg-card ring-soft rounded-xl overflow-hidden">
+            <div className="px-5 py-3.5 border-b" style={{ borderColor: "var(--rule)" }}>
+              <div className="text-[10.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">Atividade operacional</div>
+              <div className="text-[15px] font-bold t-fg-strong leading-tight">Movimentações do dia</div>
+            </div>
+            <div>
+              {HOME_MOV_DIA.map((m, i) => (
+                <div key={i} className="flex items-start gap-3 px-5 py-2.5 border-b last:border-0" style={{ borderColor: "var(--rule)" }}>
+                  <div className="w-7 h-7 rounded-md t-bg-tenant-soft flex items-center justify-center shrink-0 mt-0.5">
+                    <Icon name={m.icon} size={13} className="t-tenant" stroke={2.2}/>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <div className="text-[12px] font-semibold t-fg-strong truncate">{m.evento}</div>
+                      <div className="text-[10px] t-fg-dim ml-auto tnum">{m.hora}</div>
+                    </div>
+                    <div className="text-[11px] t-fg-muted truncate">{m.detail}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Audit feed */}
+        <div className="t-bg-card ring-soft rounded-xl overflow-hidden mb-8">
+          <div className="px-5 py-3.5 border-b flex items-center justify-between" style={{ borderColor: "var(--rule)" }}>
+            <div>
+              <div className="text-[10.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">Auditoria</div>
+              <div className="text-[15px] font-bold t-fg-strong leading-tight">Atividade recente na plataforma</div>
+            </div>
+            <div className="text-[11px] t-fg-dim">Retenção 90 dias · LGPD-compliant</div>
+          </div>
+          <div>
+            {HOME_AUDIT.map((a, i) => (
+              <div key={i} className="flex items-center gap-3 px-5 py-2.5 border-b last:border-0 text-[12px]" style={{ borderColor: "var(--rule)" }}>
+                <div className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--tenant-primary)" }} />
+                <div className="font-semibold t-fg-strong">{a.who}</div>
+                <div className="t-fg-muted flex-1 truncate">{a.what}</div>
+                <div className="t-fg-dim text-[11px] tnum">{a.when}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { ModuleHome, BrasilChoropleth });
+
+
+// ===== src/platform-mapa.jsx =====
+/* Mapa Eleitoral — interactive SVG with toolbar + sidebar contextual */
+
+const { useState: useMState, useMemo: useMMemo } = React;
+
+const MAP_LAYERS = [
+  { id: "partido",   label: "Partido dominante" },
+  { id: "score",     label: "Score regional" },
+  { id: "eleitos",   label: "Eleitos UB" },
+  { id: "emendas",   label: "Emendas R$" },
+  { id: "alertas",   label: "Densidade alertas" },
+];
+
+const MAP_YEARS = ["2026 (proj.)","2024","2022","2020","2018"];
+
+function ModuleMapa({ tenant, onNavigate }) {
+  const [layer, setLayer] = useMState("partido");
+  const [year, setYear] = useMState("2026 (proj.)");
+  const [selectedUf, setSelectedUf] = useMState("SP");
+  const [hoverUf, setHoverUf] = useMState(null);
+  const [compareMode, setCompareMode] = useMState(false);
+  const [compareUf, setCompareUf] = useMState("MG");
+
+  const scoreData = useMMemo(() => {
+    const d = {};
+    UF_LIST.forEach((u, i) => { d[u] = 45 + ((u.charCodeAt(0) + u.charCodeAt(1) + i * 7) % 50); });
+    return d;
+  }, []);
+
+  const ufDetail = (uf) => ({
+    uf,
+    partido: PARTY_STRENGTH[uf] || "—",
+    score: scoreData[uf],
+    eleitos: 10 + ((uf.charCodeAt(0) + uf.charCodeAt(1)) % 40),
+    senadores: ((uf.charCodeAt(0) + uf.charCodeAt(1)) % 3) + 1,
+    deputados: 5 + ((uf.charCodeAt(0)) % 20),
+    prefeitos: 30 + ((uf.charCodeAt(0) + uf.charCodeAt(1) * 3) % 70),
+    emendas: 40 + ((uf.charCodeAt(0) + uf.charCodeAt(1)) % 160),
+    alertas: (uf.charCodeAt(1) % 5),
+    trend: (uf.charCodeAt(0) % 2) ? "+2,3pp" : "-0,8pp",
+    top3: [
+      { nome: "Jaques Wagner", partido: "PT", overall: 87 },
+      { nome: "Otto Alencar", partido: "PSD", overall: 79 },
+      { nome: "Angelo Coronel", partido: "PSD", overall: 75 },
+    ],
+  });
+
+  const det = ufDetail(selectedUf);
+  const cmp = compareMode ? ufDetail(compareUf) : null;
+
+  return (
+    <div style={{ height: "calc(100vh - 48px)", position: "relative", overflow: "hidden", background: "var(--bg-page)" }}>
+
+      {/* Map canvas */}
+      <div className="absolute inset-0 bg-page-grad flex items-center justify-center p-8" style={{ paddingRight: 392 }}>
+        <div className="w-full h-full flex items-center justify-center">
+          <BrasilChoropleth
+            mode={layer === "score" ? "score" : layer === "partido" ? "partido" : "score"}
+            onHover={setHoverUf}
+            onClick={(uf) => { if (compareMode) setCompareUf(uf); else setSelectedUf(uf); }}
+            highlightUf={hoverUf || selectedUf}
+            data={scoreData}
+          />
+        </div>
+      </div>
+
+      {/* Toolbar */}
+      <div className="map-toolbar">
+        <div className="flex items-center gap-1 pr-2 border-r" style={{ borderColor: "var(--rule)" }}>
+          <span className="text-[10px] t-fg-dim uppercase tracking-wider px-2 font-semibold">Camada</span>
+          {MAP_LAYERS.map(l => (
+            <button key={l.id} onClick={() => setLayer(l.id)}
+                    className={`btn-ghost ${layer === l.id ? "active" : ""}`} style={{ padding: "5px 9px", fontSize: 11 }}>{l.label}</button>
+          ))}
+        </div>
+        <div className="flex items-center gap-1 pr-2 border-r" style={{ borderColor: "var(--rule)" }}>
+          <span className="text-[10px] t-fg-dim uppercase tracking-wider px-2 font-semibold">Ano</span>
+          <select value={year} onChange={e => setYear(e.target.value)}
+                  className="btn-ghost" style={{ padding: "5px 9px", fontSize: 11 }}>
+            {MAP_YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+          </select>
+        </div>
+        <button onClick={() => setCompareMode(!compareMode)} className={`btn-ghost ${compareMode ? "active" : ""}`} style={{ padding: "5px 10px", fontSize: 11 }}>
+          <Icon name="Filter" size={11}/> {compareMode ? "Comparando 2 UFs" : "Comparar UFs"}
+        </button>
+        <button className="btn-ghost" style={{ padding: "5px 10px", fontSize: 11 }}><Icon name="Download" size={11}/> Exportar</button>
+      </div>
+
+      {/* Legend */}
+      <div className="map-legend">
+        <div className="text-[9.5px] t-fg-dim uppercase tracking-wider font-semibold mb-1.5">Legenda · {MAP_LAYERS.find(l => l.id === layer).label}</div>
+        <div className="flex items-center gap-3 flex-wrap" style={{ maxWidth: 340 }}>
+          {layer === "partido" ? ["UNIÃO BRASIL","PL","PT","PSD","MDB","PSB","REPUBLICANOS","PSDB"].map(p => (
+            <div key={p} className="flex items-center gap-1.5 text-[10.5px] t-fg-muted">
+              <span className="party-dot" style={{ background: partyColor(p) }} />{p}
+            </div>
+          )) : [["#f87171","<40"],["#fb923c","40-55"],["#fbbf24","55-70"],["#60a5fa","70-85"],["#34d399","≥85"]].map(([c,l]) => (
+            <div key={l} className="flex items-center gap-1.5 text-[10.5px] t-fg-muted">
+              <span className="party-dot" style={{ background: c }} />{l}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Context panel */}
+      <div className="map-context-panel">
+        <div className="p-5 border-b" style={{ borderColor: "var(--rule)" }}>
+          <div className="flex items-center gap-2 mb-1">
+            <Icon name="MapPin" size={13} className="t-tenant" />
+            <span className="text-[10.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">Unidade federativa</span>
+          </div>
+          <div className="flex items-baseline gap-3">
+            <div className="text-[48px] font-display font-bold t-fg-strong leading-none tnum">{selectedUf}</div>
+            <div className="flex-1">
+              <div className="text-[13px] font-semibold t-fg">{ufName(selectedUf)}</div>
+              <div className="text-[11px] t-fg-muted">{year}</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 mt-3">
+            <span className="chip chip-blue">
+              <span className="party-dot" style={{ background: partyColor(det.partido) }} />
+              {det.partido} dominante
+            </span>
+            <span className={`chip ${det.trend.startsWith("+") ? "chip-green" : "chip-red"}`}>
+              <Icon name={det.trend.startsWith("+") ? "ArrowUp" : "ArrowDown"} size={9}/>
+              {det.trend} YoY
+            </span>
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto">
+          {/* big metric */}
+          <div className="p-5 border-b" style={{ borderColor: "var(--rule)" }}>
+            <div className="text-[10.5px] t-fg-dim uppercase tracking-wider font-semibold mb-1.5">Score regional</div>
+            <div className="flex items-baseline gap-2">
+              <div className="text-[44px] font-display font-bold tnum t-fg-strong leading-none">{det.score}</div>
+              <div className="text-[14px] t-fg-dim tnum">/ 100</div>
+              {cmp && <div className="ml-auto text-right">
+                <div className="text-[10.5px] t-fg-dim uppercase tracking-wider">vs {compareUf}</div>
+                <div className="text-[22px] font-display font-bold tnum t-fg-muted">{cmp.score}</div>
+              </div>}
+            </div>
+            <div className="mt-3 h-1.5 rounded-sm overflow-hidden" style={{ background: "var(--rule)" }}>
+              <div style={{ width: `${det.score}%`, height: "100%", background: "linear-gradient(90deg, var(--tenant-primary), #60a5fa)" }} />
+            </div>
+          </div>
+
+          {/* breakdown */}
+          <div className="p-5 border-b" style={{ borderColor: "var(--rule)" }}>
+            <div className="text-[10.5px] t-fg-dim uppercase tracking-wider font-semibold mb-3">Força eleitoral UB</div>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { l: "Senadores", v: det.senadores },
+                { l: "Dep. fed.",  v: det.deputados },
+                { l: "Prefeitos",  v: det.prefeitos },
+              ].map(m => (
+                <div key={m.l} className="ring-soft rounded-md p-3" style={{ background: "var(--bg-card-2)" }}>
+                  <div className="text-[10px] t-fg-dim uppercase tracking-wider">{m.l}</div>
+                  <div className="text-[22px] font-bold tnum t-fg-strong mt-0.5 leading-none">{m.v}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="p-5 border-b" style={{ borderColor: "var(--rule)" }}>
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-[10.5px] t-fg-dim uppercase tracking-wider font-semibold">Emendas 2024</div>
+              <div className="tnum text-[13px] font-bold t-fg-strong">R$ {det.emendas}M</div>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="text-[10.5px] t-fg-dim uppercase tracking-wider font-semibold">Alertas abertos</div>
+              <div className="tnum text-[13px] font-bold t-fg-strong flex items-center gap-1.5">
+                <span className={`chip-dot`} style={{ background: det.alertas > 2 ? "var(--danger)" : "var(--warn)", width: 8, height: 8 }}/>
+                {det.alertas}
+              </div>
+            </div>
+          </div>
+
+          <div className="p-5">
+            <div className="text-[10.5px] t-fg-dim uppercase tracking-wider font-semibold mb-3">Top 3 · políticos da UF</div>
+            <div className="space-y-2">
+              {det.top3.map((c, i) => (
+                <div key={i} className="flex items-center gap-3 p-2 rounded-md card-hover cursor-pointer" style={{ background: "var(--bg-card-2)" }} onClick={() => onNavigate("dossie")}>
+                  <div className="text-[11px] tnum font-bold t-fg-dim w-4">#{i+1}</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[12px] font-semibold t-fg-strong truncate">{c.nome}</div>
+                    <div className="flex items-center gap-1.5 text-[10.5px] t-fg-dim">
+                      <span className="party-dot" style={{ background: partyColor(c.partido) }} />
+                      {c.partido}
+                    </div>
+                  </div>
+                  <div className="tnum text-[15px] font-bold text-amber-300">{c.overall}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="p-4 border-t flex gap-2" style={{ borderColor: "var(--rule)" }}>
+          <button className="btn-primary flex-1 justify-center" onClick={() => onNavigate("dossie")}>Abrir dossiê da UF</button>
+          <button className="btn-ghost">Exportar</button>
+        </div>
+      </div>
+
+    </div>
+  );
+}
+
+function ufName(uf) {
+  const map = { AC:"Acre", AL:"Alagoas", AM:"Amazonas", AP:"Amapá", BA:"Bahia", CE:"Ceará", DF:"Distrito Federal", ES:"Espírito Santo", GO:"Goiás", MA:"Maranhão", MG:"Minas Gerais", MS:"Mato Grosso do Sul", MT:"Mato Grosso", PA:"Pará", PB:"Paraíba", PE:"Pernambuco", PI:"Piauí", PR:"Paraná", RJ:"Rio de Janeiro", RN:"Rio Grande do Norte", RO:"Rondônia", RR:"Roraima", RS:"Rio Grande do Sul", SC:"Santa Catarina", SE:"Sergipe", SP:"São Paulo", TO:"Tocantins" };
+  return map[uf] || uf;
+}
+
+Object.assign(window, { ModuleMapa });
+
+
+// ===== src/platform-radar.jsx =====
+/* Radar Político - grid de cards FIFA + filtros */
+
+const { useState: useRState, useMemo: useRMemo } = React;
+
+function FifaMiniCard({ c, onClick }) {
+  const tierClass = c.tier === "dourado" || c.tier === "ouro" ? "" : c.tier === "prata" ? "tier-silver" : "tier-bronze";
+  const goldNum = "#fcd34d";
+  const numColor = c.tier === "prata" ? "#e5e7eb" : c.tier === "bronze" ? "#fdba74" : goldNum;
+  return (
+    <div className={`fifa-mini ${tierClass}`} onClick={onClick}>
+      <div className="flex items-start justify-between">
+        <div className="text-center">
+          <div className="font-display font-black leading-none tnum" style={{ fontSize: 34, color: numColor, textShadow: "0 2px 4px rgba(0,0,0,0.4)" }}>{c.overall}</div>
+          <div className="text-[10px] font-bold tracking-widest mt-0.5" style={{ color: numColor, opacity: 0.85 }}>{c.cargo}</div>
+        </div>
+        <div className="flex flex-col items-end gap-1">
+          <div className="text-[10px] font-bold tracking-wider px-1.5 py-0.5 rounded"
+               style={{ background: partyColor(c.partido), color: "#fff" }}>{c.partido}</div>
+          <div className="text-[10px] font-bold t-fg tnum" style={{ color: numColor }}>{c.uf}</div>
+        </div>
+      </div>
+
+      <div className="flex-1 flex items-center justify-center">
+        <div className="w-full h-[78px] rounded-md flex items-center justify-center"
+             style={{ background: `radial-gradient(circle at 50% 40%, ${numColor}22, transparent 70%)` }}>
+          <svg width="62" height="62" viewBox="0 0 24 24" fill="none" stroke={numColor} strokeWidth="1.2">
+            <circle cx="12" cy="8" r="3.5"/>
+            <path d="M5 20a7 7 0 0 1 14 0"/>
+          </svg>
+        </div>
+      </div>
+
+      <div className="text-center mb-1.5">
+        <div className="text-[12px] font-bold t-fg-strong leading-tight truncate" style={{ color: c.tier === "prata" ? "#f1f5f9" : c.tier === "bronze" ? "#fed7aa" : "#fef3c7" }}>{c.nome}</div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-x-1 gap-y-0.5 text-[9px] font-bold tracking-wider" style={{ color: numColor, opacity: 0.92 }}>
+        <div className="tnum">{c.pac} <span style={{ opacity: 0.7 }}>PAC</span></div>
+        <div className="tnum">{c.pres} <span style={{ opacity: 0.7 }}>PRS</span></div>
+        <div className="tnum">{c.inf} <span style={{ opacity: 0.7 }}>INF</span></div>
+        <div className="tnum">{c.leg} <span style={{ opacity: 0.7 }}>LEG</span></div>
+        <div className="tnum">{c.bse} <span style={{ opacity: 0.7 }}>BSE</span></div>
+        <div className="tnum">{c.mid} <span style={{ opacity: 0.7 }}>MID</span></div>
+      </div>
+
+      {c.traits && c.traits.length > 0 && (
+        <div className="mt-1.5 flex items-center gap-1 flex-wrap">
+          {c.traits.slice(0, 2).map(t => (
+            <span key={t} className="text-[8.5px] font-bold tracking-wider uppercase px-1.5 py-[1px] rounded"
+                  style={{ background: "rgba(0,0,0,0.35)", color: numColor, border: `1px solid ${numColor}33` }}>{TRAIT_LABEL[t]}</span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ModuleRadar({ onNavigate }) {
+  const [cargo, setCargo] = useRState("TODOS");
+  const [uf, setUf] = useRState("TODAS");
+  const [partido, setPartido] = useRState("TODOS");
+  const [tier, setTier] = useRState("TODOS");
+  const [sort, setSort] = useRState("overall");
+  const [q, setQ] = useRState("");
+
+  const partidos = useRMemo(() => ["TODOS", ...Array.from(new Set(RADAR_CANDIDATOS.map(c => c.partido)))], []);
+  const cargos = ["TODOS","PRES","GOV","SEN","DEP"];
+  const tiers = ["TODOS","dourado","ouro","prata","bronze"];
+
+  const results = useRMemo(() => {
+    let r = RADAR_CANDIDATOS.slice();
+    if (cargo !== "TODOS") r = r.filter(c => c.cargo === cargo);
+    if (uf !== "TODAS")   r = r.filter(c => c.uf === uf);
+    if (partido !== "TODOS") r = r.filter(c => c.partido === partido);
+    if (tier !== "TODOS") r = r.filter(c => c.tier === tier);
+    if (q) r = r.filter(c => c.nome.toLowerCase().includes(q.toLowerCase()));
+    if (sort === "overall") r.sort((a,b)=>b.overall-a.overall);
+    else if (sort === "nome") r.sort((a,b)=>a.nome.localeCompare(b.nome));
+    else if (sort === "uf") r.sort((a,b)=>a.uf.localeCompare(b.uf));
+    return r;
+  }, [cargo, uf, partido, tier, sort, q]);
+
+  return (
+    <div className="bg-page-grad min-h-full">
+      <div className="max-w-[1600px] mx-auto px-8 py-7">
+
+        <div className="flex items-end justify-between mb-5">
+          <div>
+            <div className="text-[11px] t-fg-dim tracking-[0.18em] uppercase font-semibold">Radar Político</div>
+            <h1 className="text-[32px] font-display font-bold t-fg-strong mt-1 leading-none">Ranking nacional · 51.384 políticos monitorados</h1>
+            <div className="text-[13px] t-fg-muted mt-1.5">Cards Mazzel FIFA-style · metodologia proprietária com 6 dimensões ponderadas.</div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button className="btn-ghost"><Icon name="Download" size={13}/>Exportar CSV</button>
+            <button className="btn-primary"><Icon name="Sparkles" size={13}/>Análise IA</button>
+          </div>
+        </div>
+
+        {/* Filtros */}
+        <div className="t-bg-card ring-soft rounded-xl p-4 mb-5">
+          <div className="grid grid-cols-[260px_repeat(5,1fr)_auto] gap-2 items-center">
+            <div className="flex items-center gap-2 h-8 px-2.5 rounded-md" style={{ background: "var(--rule)" }}>
+              <Icon name="Search" size={12} className="t-fg-dim" />
+              <input value={q} onChange={e => setQ(e.target.value)} placeholder="Buscar nome…"
+                     className="flex-1 bg-transparent outline-none text-[12px] t-fg placeholder:t-fg-dim" />
+            </div>
+            {[
+              { v: cargo, s: setCargo, opts: cargos, label: "Cargo" },
+              { v: uf, s: setUf, opts: ["TODAS", ...UF_LIST], label: "UF" },
+              { v: partido, s: setPartido, opts: partidos, label: "Partido" },
+              { v: tier, s: setTier, opts: tiers, label: "Tier" },
+              { v: sort, s: setSort, opts: ["overall","nome","uf"], label: "Ordenar" },
+            ].map((f, i) => (
+              <div key={i}>
+                <div className="text-[9.5px] t-fg-dim uppercase tracking-wider font-semibold mb-1">{f.label}</div>
+                <select value={f.v} onChange={e => f.s(e.target.value)}
+                        className="btn-ghost w-full" style={{ padding: "6px 9px", fontSize: 12 }}>
+                  {f.opts.map(o => <option key={o} value={o}>{typeof o === "string" ? o : o}</option>)}
+                </select>
+              </div>
+            ))}
+            <div className="text-right pl-2 border-l" style={{ borderColor: "var(--rule)" }}>
+              <div className="text-[9.5px] t-fg-dim uppercase tracking-wider font-semibold">Resultados</div>
+              <div className="text-[18px] font-bold t-fg-strong tnum">{results.length}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Grid de cards */}
+        <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(186px, 1fr))" }}>
+          {results.map(c => <FifaMiniCard key={c.id} c={c} onClick={() => onNavigate("dossie")} />)}
+          {results.length === 0 && (
+            <div className="col-span-full t-bg-card ring-soft rounded-xl p-12 text-center">
+              <div className="text-[15px] font-semibold t-fg">Nenhum resultado.</div>
+              <div className="text-[12px] t-fg-muted mt-1">Ajuste os filtros.</div>
+            </div>
+          )}
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { ModuleRadar, FifaMiniCard });
+
+
+// ===== src/platform-stubs.jsx =====
+/* Stub modules + Dossie integration */
+
+function ModuleStub({ title, subtitle, onNavigate }) {
+  return (
+    <div className="bg-page-grad min-h-full">
+      <div className="max-w-[1200px] mx-auto px-8 py-10">
+        <div className="mb-6">
+          <div className="text-[11px] t-fg-dim tracking-[0.18em] uppercase font-semibold">{title}</div>
+          <h1 className="text-[32px] font-display font-bold t-fg-strong mt-1 leading-none">{subtitle}</h1>
+        </div>
+        <div className="t-bg-card ring-soft rounded-xl p-10 text-center">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl t-bg-tenant-soft mb-4">
+            <Icon name="Sparkles" size={22} className="t-tenant" />
+          </div>
+          <div className="text-[18px] font-semibold t-fg-strong">Módulo em desenvolvimento</div>
+          <div className="text-[13px] t-fg-muted mt-1 max-w-md mx-auto">Esta seção já está prototipada no backlog. Use os módulos abaixo enquanto isso.</div>
+          <div className="flex items-center justify-center gap-2 mt-5">
+            <button className="btn-ghost" onClick={() => onNavigate("home")}>← Dashboard</button>
+            <button className="btn-ghost" onClick={() => onNavigate("radar")}>Radar</button>
+            <button className="btn-ghost" onClick={() => onNavigate("mapa")}>Mapa</button>
+            <button className="btn-ghost" onClick={() => onNavigate("dossie")}>Dossiês</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ModuleDossie({ onNavigate }) {
+  const [openFull, setOpenFull] = React.useState(false);
+  return (
+    <div className="bg-page-grad min-h-full">
+      <div className="max-w-[1600px] mx-auto px-8 py-7">
+        <div className="flex items-end justify-between mb-5">
+          <div>
+            <div className="text-[11px] t-fg-dim tracking-[0.18em] uppercase font-semibold">Dossiês políticos</div>
+            <h1 className="text-[32px] font-display font-bold t-fg-strong mt-1 leading-none">Biblioteca de dossiês</h1>
+            <div className="text-[13px] t-fg-muted mt-1.5">Selecione um político para abrir o dossiê completo — Overall FIFA, radar de dimensões, histórico, emendas, processos e mídia.</div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button className="btn-primary" onClick={() => window.open("Header Hero.html", "_blank")}>
+              <Icon name="FileSearch" size={13}/> Abrir dossiê completo · Jaques Wagner
+            </button>
+          </div>
+        </div>
+
+        <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(186px, 1fr))" }}>
+          {RADAR_CANDIDATOS.map(c => (
+            <FifaMiniCard key={c.id} c={c} onClick={() => {
+              if (c.nome === "Jaques Wagner") window.open("Header Hero.html", "_blank");
+              else alert(`Dossiê completo: ${c.nome} — mockado neste protótipo. O dossiê de Jaques Wagner está completo (botão acima).`);
+            }} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { ModuleStub, ModuleDossie });
+
+
+// ===== src/platform-estudo-portal.jsx =====
+/* Módulo Estudo - 3 abas: Pulso | Clusters | Biblioteca */
+
+const { useState: useEstState } = React;
+
+function ModuleEstudo({ onNavigate }) {
+  const [tab, setTab] = useEstState("pulso");
+  const [temaSel, setTemaSel] = useEstState(ESTUDO_TEMAS[0]);
+
+  return (
+    <div className="bg-page-grad min-h-full">
+      <div className="max-w-[1600px] mx-auto px-8 py-7">
+        <div className="flex items-end justify-between mb-5">
+          <div>
+            <div className="text-[11px] t-fg-dim tracking-[0.18em] uppercase font-semibold">Módulo Estudo</div>
+            <h1 className="text-[32px] font-display font-bold t-fg-strong mt-1 leading-none">Inteligência política aprofundada</h1>
+            <div className="text-[13px] t-fg-muted mt-1.5">Temas em alta, clusters de influência e biblioteca de pesquisas exclusivas.</div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button className="btn-ghost"><Icon name="Download" size={13}/>Exportar</button>
+            <button className="btn-primary"><Icon name="Sparkles" size={13}/>Gerar briefing IA</button>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-1 mb-5 p-1 rounded-lg inline-flex" style={{ background: "var(--rule)" }}>
+          {[{k:"pulso",l:"Pulso · Temas em alta"},{k:"clusters",l:"Clusters de influência"},{k:"biblioteca",l:"Biblioteca"}].map(t => (
+            <button key={t.k} onClick={() => setTab(t.k)} className={`btn-ghost ${tab === t.k ? "active" : ""}`} style={{ padding: "7px 14px", fontSize: 12 }}>{t.l}</button>
+          ))}
+        </div>
+
+        {tab === "pulso" && (
+          <div className="grid grid-cols-[1.25fr_1fr] gap-3">
+            <div className="t-bg-card ring-soft rounded-xl overflow-hidden">
+              <div className="px-5 py-3.5 border-b" style={{ borderColor: "var(--rule)" }}>
+                <div className="text-[10.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">Temas · últimos 30 dias</div>
+                <div className="text-[15px] font-bold t-fg-strong leading-tight">Monitoramento semântico (187 fontes · IA)</div>
+              </div>
+              <div>
+                {ESTUDO_TEMAS.map(t => {
+                  const sel = temaSel.id === t.id;
+                  return (
+                    <div key={t.id} onClick={() => setTemaSel(t)}
+                         className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-4 px-5 py-3 border-b last:border-0 cursor-pointer card-hover"
+                         style={{ borderColor: "var(--rule)", background: sel ? "var(--chart-hover)" : "transparent" }}>
+                      <div>
+                        <div className="text-[13px] font-semibold t-fg-strong">{t.nome}</div>
+                        <div className="text-[10.5px] t-fg-dim uppercase tracking-wider">{t.cat}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-[11px] t-fg-dim uppercase tracking-wider">Menções</div>
+                        <div className="tnum font-bold t-fg-strong">{t.mencoes.toLocaleString("pt-BR")}</div>
+                      </div>
+                      <div className="text-right w-[70px]">
+                        <div className="text-[11px] t-fg-dim uppercase tracking-wider">Sent.</div>
+                        <div className={`tnum font-bold ${t.sentimento < 0 ? "t-danger" : "t-ok"}`}>{t.sentimento > 0 ? "+" : ""}{t.sentimento}</div>
+                      </div>
+                      <div className={`chip ${t.trend.startsWith("+") ? "chip-red" : "chip-green"}`} style={{ height: 22 }}>
+                        <Icon name={t.trend.startsWith("+") ? "ArrowUp" : "ArrowDown"} size={9}/>{t.trend}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="t-bg-card ring-soft rounded-xl overflow-hidden flex flex-col">
+              <div className="px-5 py-3.5 border-b" style={{ borderColor: "var(--rule)" }}>
+                <div className="text-[10.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">Tema selecionado</div>
+                <div className="text-[15px] font-bold t-fg-strong leading-tight">{temaSel.nome}</div>
+              </div>
+              <div className="p-5 border-b" style={{ borderColor: "var(--rule)" }}>
+                <div className="grid grid-cols-3 gap-3">
+                  <div><div className="text-[10px] t-fg-dim uppercase tracking-wider">Menções</div>
+                    <div className="text-[22px] font-bold tnum t-fg-strong">{temaSel.mencoes.toLocaleString("pt-BR")}</div></div>
+                  <div><div className="text-[10px] t-fg-dim uppercase tracking-wider">Sentimento</div>
+                    <div className={`text-[22px] font-bold tnum ${temaSel.sentimento < 0 ? "t-danger" : "t-ok"}`}>{temaSel.sentimento > 0 ? "+" : ""}{temaSel.sentimento}</div></div>
+                  <div><div className="text-[10px] t-fg-dim uppercase tracking-wider">Trend</div>
+                    <div className="text-[22px] font-bold tnum t-fg-strong">{temaSel.trend}</div></div>
+                </div>
+              </div>
+              <div className="p-5 border-b" style={{ borderColor: "var(--rule)" }}>
+                <div className="text-[10.5px] t-fg-dim uppercase tracking-wider font-semibold mb-2">Distribuição por fonte</div>
+                <div className="space-y-2">
+                  {[["Imprensa tradicional", 42],["Twitter/X", 28],["Instagram", 14],["Podcasts", 9],["YouTube", 7]].map(([k,v]) => (
+                    <div key={k} className="flex items-center gap-3">
+                      <div className="text-[11px] t-fg w-[130px] truncate">{k}</div>
+                      <div className="flex-1 h-2 rounded-sm overflow-hidden" style={{ background: "var(--rule)" }}>
+                        <div style={{ width: `${v*2.2}%`, height: "100%", background: "linear-gradient(90deg, var(--tenant-primary), #60a5fa)" }} />
+                      </div>
+                      <div className="tnum text-[11px] font-bold t-fg-strong w-8 text-right">{v}%</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="p-5 flex-1">
+                <div className="text-[10.5px] t-fg-dim uppercase tracking-wider font-semibold mb-2">Insight IA</div>
+                <div className="text-[12.5px] t-fg-muted leading-relaxed">
+                  Tema em aceleração rápida — atenção crítica. Base conservadora com sentimento predominantemente negativo. Recomenda-se posicionamento cauteloso e alinhamento com a bancada do Nordeste antes de declarações públicas.
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {tab === "clusters" && (
+          <div className="grid grid-cols-[1fr_320px] gap-3">
+            <div className="t-bg-card ring-soft rounded-xl overflow-hidden">
+              <div className="px-5 py-3.5 border-b" style={{ borderColor: "var(--rule)" }}>
+                <div className="text-[10.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">Mapa de clusters</div>
+                <div className="text-[15px] font-bold t-fg-strong leading-tight">Principais agrupamentos políticos · força de coesão</div>
+              </div>
+              <div className="p-6">
+                <svg viewBox="0 0 600 340" className="w-full">
+                  {ESTUDO_CLUSTERS.map((c, i) => {
+                    const cx = 120 + i * 90;
+                    const cy = 170 + (i % 2 === 0 ? -40 : 40);
+                    const r = 18 + c.forca / 4;
+                    return (
+                      <g key={c.lider}>
+                        <circle cx={cx} cy={cy} r={r} fill={c.cor} fillOpacity="0.22" stroke={c.cor} strokeWidth="1.5"/>
+                        {[...Array(Math.min(12, Math.floor(c.aliados / 26)))].map((_, j) => {
+                          const ang = (j / 12) * Math.PI * 2;
+                          return <circle key={j} cx={cx + Math.cos(ang) * (r + 16)} cy={cy + Math.sin(ang) * (r + 16)} r="3.5" fill={c.cor} fillOpacity="0.6" />;
+                        })}
+                        <text x={cx} y={cy + 3} textAnchor="middle" style={{ fontSize: 11, fill: c.cor, fontWeight: 700 }}>{c.forca}</text>
+                        <text x={cx} y={cy + r + 32} textAnchor="middle" style={{ fontSize: 10, fill: "var(--fg)", fontWeight: 600 }}>{c.lider.split(" (")[0]}</text>
+                      </g>
+                    );
+                  })}
+                </svg>
+              </div>
+            </div>
+            <div className="space-y-3">
+              {ESTUDO_CLUSTERS.map((c, i) => (
+                <div key={i} className="t-bg-card ring-soft rounded-lg p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-3 h-3 rounded-full" style={{ background: c.cor }}/>
+                    <div className="text-[13px] font-bold t-fg-strong flex-1">{c.lider}</div>
+                    <div className="tnum text-[16px] font-bold t-fg-strong">{c.forca}</div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-[11px]">
+                    <div><span className="t-fg-dim">Aliados </span><span className="tnum font-semibold t-fg">{c.aliados}</span></div>
+                    <div><span className="t-fg-dim">Alcance </span><span className="font-semibold t-fg">{c.alcance}</span></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {tab === "biblioteca" && (
+          <div className="t-bg-card ring-soft rounded-xl overflow-hidden">
+            <div className="px-5 py-3.5 border-b flex items-center gap-3" style={{ borderColor: "var(--rule)" }}>
+              <div className="flex-1">
+                <div className="text-[10.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">Biblioteca Mazzel</div>
+                <div className="text-[15px] font-bold t-fg-strong leading-tight">Pesquisas, papers e relatórios exclusivos</div>
+              </div>
+              <div className="flex items-center gap-2 h-8 px-3 rounded-md" style={{ background: "var(--rule)" }}>
+                <Icon name="Search" size={12} className="t-fg-dim"/>
+                <input placeholder="Buscar por título, autor, tipo…" className="bg-transparent outline-none text-[12px] t-fg placeholder:t-fg-dim w-64" />
+              </div>
+            </div>
+            <div className="row-striped">
+              <div className="grid grid-cols-[2.5fr_1.5fr_1fr_100px_80px_80px] gap-3 px-5 py-2.5 text-[10px] t-fg-dim uppercase tracking-wider font-semibold border-b" style={{ borderColor: "var(--rule)", background: "var(--bg-card-2)" }}>
+                <div>Título</div><div>Autor</div><div>Data</div><div>Tipo</div><div className="text-right">Páginas</div><div></div>
+              </div>
+              {ESTUDO_ESTUDOS.map((e, i) => (
+                <div key={i} className="grid grid-cols-[2.5fr_1.5fr_1fr_100px_80px_80px] gap-3 px-5 py-3 items-center text-[12px]">
+                  <div className="font-semibold t-fg-strong flex items-center gap-2">
+                    <Icon name="FileSearch" size={13} className="t-tenant"/>{e.titulo}
+                  </div>
+                  <div className="t-fg-muted">{e.autor}</div>
+                  <div className="t-fg-muted tnum">{e.data}</div>
+                  <div><span className="chip chip-blue" style={{ height: 20 }}>{e.tipo}</span></div>
+                  <div className="text-right tnum t-fg">{e.paginas}</div>
+                  <div className="text-right"><button className="btn-ghost" style={{ padding: "4px 10px", fontSize: 11 }}>Abrir</button></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+}
+
+/* Portal do Cliente */
+function ModulePortal({ onNavigate }) {
+  return (
+    <div className="bg-page-grad min-h-full">
+      <div className="max-w-[1600px] mx-auto px-8 py-7">
+        <div className="flex items-end justify-between mb-5">
+          <div>
+            <div className="text-[11px] t-fg-dim tracking-[0.18em] uppercase font-semibold">Portal do Cliente · Sen. Jaques Wagner</div>
+            <h1 className="text-[32px] font-display font-bold t-fg-strong mt-1 leading-none">Comando do mandato</h1>
+            <div className="text-[13px] t-fg-muted mt-1.5">Visão proprietária do candidato · dados confidenciais · não visível a terceiros.</div>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="chip chip-green"><span className="chip-dot" style={{ background: "var(--ok)" }}/>Portal ativo · renovação em 147 dias</span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-4 gap-3 mb-5">
+          {[
+            { l:"Overall Mazzel",       v:"87", h:"Top 12% entre senadores",     ok:true  },
+            { l:"Emendas em execução",  v:"R$ 42M", h:"de R$ 61M aprovado (69%)",ok:true  },
+            { l:"Eventos agenda semana",v:"18",    h:"5 Brasília · 13 BA",       ok:true  },
+            { l:"Metas 2024 batidas",   v:"3/4",  h:"1 em risco: imprensa",      ok:false },
+          ].map(k => (
+            <div key={k.l} className="kpi-card ring-soft">
+              <div className="text-[10.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">{k.l}</div>
+              <div className="text-[32px] font-display font-bold tnum mt-1.5 leading-none" style={{ backgroundImage: "linear-gradient(180deg, var(--overall-from), var(--overall-to))", WebkitBackgroundClip: "text", color: "transparent" }}>{k.v}</div>
+              <div className="text-[11px] t-fg-dim mt-1.5">{k.h}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-[1.3fr_1fr] gap-3 mb-5">
+          <div className="t-bg-card ring-soft rounded-xl overflow-hidden">
+            <div className="px-5 py-3.5 border-b flex items-center justify-between" style={{ borderColor: "var(--rule)" }}>
+              <div>
+                <div className="text-[10.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">Agenda · hoje</div>
+                <div className="text-[15px] font-bold t-fg-strong">Quinta, 28 novembro · 5 compromissos</div>
+              </div>
+              <button className="btn-ghost" style={{ padding: "5px 9px" }}>Ver semana →</button>
+            </div>
+            <div>
+              {PORTAL_AGENDA.map((a, i) => (
+                <div key={i} className="grid grid-cols-[60px_1fr_auto_auto] gap-3 items-center px-5 py-3 border-b last:border-0" style={{ borderColor: "var(--rule)" }}>
+                  <div className="text-[14px] font-bold tnum t-fg-strong">{a.h}</div>
+                  <div>
+                    <div className="text-[12.5px] font-semibold t-fg-strong">{a.titulo}</div>
+                    <div className="text-[11px] t-fg-dim">{a.local}</div>
+                  </div>
+                  <span className="chip chip-muted" style={{ height: 20 }}>{a.tipo}</span>
+                  <span className={`chip ${a.conf === "confirmado" ? "chip-green" : "chip-amber"}`} style={{ height: 20 }}>
+                    {a.conf === "confirmado" ? "✓" : "?"}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="t-bg-card ring-soft rounded-xl overflow-hidden">
+            <div className="px-5 py-3.5 border-b" style={{ borderColor: "var(--rule)" }}>
+              <div className="text-[10.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">Metas 2024</div>
+              <div className="text-[15px] font-bold t-fg-strong">Progresso do mandato</div>
+            </div>
+            <div className="p-5 space-y-4">
+              {PORTAL_METAS.map(m => {
+                const pct = Math.round((m.v / m.meta) * 100);
+                const cor = pct >= 90 ? "var(--ok)" : pct >= 75 ? "var(--warn)" : "var(--danger)";
+                return (
+                  <div key={m.m}>
+                    <div className="flex items-baseline justify-between mb-1.5">
+                      <div className="text-[12px] font-semibold t-fg">{m.m}</div>
+                      <div className="tnum text-[12px] t-fg-muted">{m.v}{m.unidade} / {m.meta}{m.unidade}</div>
+                    </div>
+                    <div className="h-2 rounded-sm overflow-hidden" style={{ background: "var(--rule)" }}>
+                      <div style={{ width: `${Math.min(100,pct)}%`, height: "100%", background: cor }}/>
+                    </div>
+                    <div className="text-[10px] t-fg-dim mt-1">{pct}% atingido</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="t-bg-card ring-soft rounded-xl overflow-hidden">
+            <div className="px-5 py-3.5 border-b" style={{ borderColor: "var(--rule)" }}>
+              <div className="text-[10.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">Minha equipe</div>
+              <div className="text-[15px] font-bold t-fg-strong">Gabinete + campo · 5 ativos</div>
+            </div>
+            <div>
+              {PORTAL_EQUIPE.map((p, i) => (
+                <div key={i} className="flex items-center gap-3 px-5 py-3 border-b last:border-0" style={{ borderColor: "var(--rule)" }}>
+                  <div className="w-8 h-8 rounded-full t-bg-tenant-soft flex items-center justify-center text-[11px] font-bold t-fg-strong">{p.nome.split(" ").map(x=>x[0]).join("").slice(0,2)}</div>
+                  <div className="flex-1">
+                    <div className="text-[12.5px] font-semibold t-fg-strong">{p.nome}</div>
+                    <div className="text-[11px] t-fg-muted">{p.papel} · {p.local}</div>
+                  </div>
+                  <span className={`chip ${p.ativo ? "chip-green" : "chip-muted"}`} style={{ height: 20 }}>{p.ativo ? "online" : "offline"}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="t-bg-card ring-soft rounded-xl overflow-hidden">
+            <div className="px-5 py-3.5 border-b" style={{ borderColor: "var(--rule)" }}>
+              <div className="text-[10.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">Ações rápidas</div>
+              <div className="text-[15px] font-bold t-fg-strong">Comandos do mandato</div>
+            </div>
+            <div className="grid grid-cols-2 gap-2 p-4">
+              {[
+                { l:"Abrir meu dossiê", icon:"FileSearch", onClick:() => window.open("Header Hero.html","_blank") },
+                { l:"Solicitar relatório", icon:"Download" },
+                { l:"Agendar reunião", icon:"Users" },
+                { l:"Falar com diretoria", icon:"Bell" },
+                { l:"Análise IA do mandato", icon:"Sparkles" },
+                { l:"Configurar alertas", icon:"Settings" },
+              ].map((a,i) => (
+                <button key={i} onClick={a.onClick} className="flex items-center gap-2 p-3 rounded-md t-border card-hover text-left" style={{ border: "1px solid var(--rule)", background: "var(--bg-card-2)" }}>
+                  <Icon name={a.icon} size={14} className="t-tenant"/>
+                  <span className="text-[12px] font-semibold t-fg">{a.l}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { ModuleEstudo, ModulePortal });
+
+
+// ===== src/platform-admin-dossie.jsx =====
+/* Admin / White-Label + Dossiê Shell */
+
+const { useState: useAdmState } = React;
+
+function ModuleAdmin({ tenant, onNavigate }) {
+  const [tab, setTab] = useAdmState("tenant");
+  const t = TENANTS[tenant];
+
+  return (
+    <div className="bg-page-grad min-h-full">
+      <div className="max-w-[1600px] mx-auto px-8 py-7">
+        <div className="flex items-end justify-between mb-5">
+          <div>
+            <div className="text-[11px] t-fg-dim tracking-[0.18em] uppercase font-semibold">Admin · Apenas Presidente</div>
+            <h1 className="text-[32px] font-display font-bold t-fg-strong mt-1 leading-none">Configurações da plataforma</h1>
+            <div className="text-[13px] t-fg-muted mt-1.5">Tenant · usuários · papéis · auditoria · integrações.</div>
+          </div>
+          <span className="chip chip-red"><Icon name="AlertTriangle" size={10}/>Ações aqui afetam todos os usuários</span>
+        </div>
+
+        <div className="flex items-center gap-1 mb-5 p-1 rounded-lg inline-flex" style={{ background: "var(--rule)" }}>
+          {[{k:"tenant",l:"White-label"},{k:"usuarios",l:"Usuários"},{k:"papeis",l:"Papéis & permissões"},{k:"audit",l:"Auditoria"},{k:"integ",l:"Integrações"}].map(x => (
+            <button key={x.k} onClick={() => setTab(x.k)} className={`btn-ghost ${tab === x.k ? "active" : ""}`} style={{ padding: "7px 14px", fontSize: 12 }}>{x.l}</button>
+          ))}
+        </div>
+
+        {tab === "tenant" && (
+          <div className="grid grid-cols-[1fr_380px] gap-3">
+            <div className="t-bg-card ring-soft rounded-xl p-6">
+              <div className="text-[11px] t-fg-dim uppercase tracking-[0.14em] font-semibold mb-3">Identidade visual</div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[10.5px] t-fg-dim uppercase tracking-wider font-semibold">Nome do cliente</label>
+                  <input defaultValue={t.nome} className="w-full mt-1.5 px-3 py-2 rounded-md text-[13px] t-fg bg-transparent" style={{ border: "1px solid var(--rule-strong)" }}/>
+                </div>
+                <div>
+                  <label className="text-[10.5px] t-fg-dim uppercase tracking-wider font-semibold">Sigla (2-3 letras)</label>
+                  <input defaultValue={t.sigla} className="w-full mt-1.5 px-3 py-2 rounded-md text-[13px] t-fg bg-transparent" style={{ border: "1px solid var(--rule-strong)" }}/>
+                </div>
+                <div>
+                  <label className="text-[10.5px] t-fg-dim uppercase tracking-wider font-semibold">Cor primária</label>
+                  <div className="flex items-center gap-2 mt-1.5">
+                    <div className="w-9 h-9 rounded-md shrink-0 ring-soft" style={{ background: t.primary }}/>
+                    <input defaultValue={t.primary} className="flex-1 px-3 py-2 rounded-md text-[13px] tnum t-fg bg-transparent" style={{ border: "1px solid var(--rule-strong)" }}/>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[10.5px] t-fg-dim uppercase tracking-wider font-semibold">Cor de destaque</label>
+                  <div className="flex items-center gap-2 mt-1.5">
+                    <div className="w-9 h-9 rounded-md shrink-0 ring-soft" style={{ background: t.accent }}/>
+                    <input defaultValue={t.accent} className="flex-1 px-3 py-2 rounded-md text-[13px] tnum t-fg bg-transparent" style={{ border: "1px solid var(--rule-strong)" }}/>
+                  </div>
+                </div>
+                <div className="col-span-2">
+                  <label className="text-[10.5px] t-fg-dim uppercase tracking-wider font-semibold">Domínio customizado</label>
+                  <input defaultValue="plataforma.unionbrasil.org.br" className="w-full mt-1.5 px-3 py-2 rounded-md text-[13px] tnum t-fg bg-transparent" style={{ border: "1px solid var(--rule-strong)" }}/>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 mt-5 pt-5 border-t" style={{ borderColor: "var(--rule)" }}>
+                <button className="btn-primary">Salvar alterações</button>
+                <button className="btn-ghost">Descartar</button>
+                <div className="flex-1"/>
+                <div className="text-[11px] t-fg-dim">Última edição: 23 nov · Paulo Guedes</div>
+              </div>
+            </div>
+
+            <div className="t-bg-card ring-soft rounded-xl overflow-hidden">
+              <div className="px-5 py-3.5 border-b" style={{ borderColor: "var(--rule)" }}>
+                <div className="text-[10.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">Pré-visualização</div>
+                <div className="text-[15px] font-bold t-fg-strong">Como os usuários vão ver</div>
+              </div>
+              <div className="p-4">
+                <div className="rounded-lg overflow-hidden ring-soft">
+                  <div className="flex items-center gap-2.5 px-4 py-3" style={{ background: "linear-gradient(180deg, rgba(var(--tenant-primary-rgb),0.15), transparent)" }}>
+                    <div className="w-8 h-8 rounded-md flex items-center justify-center text-white font-bold text-[11px] flex-shrink-0" style={{ background: t.primary }}>{t.logoText}</div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[12px] font-bold t-fg-strong truncate leading-tight">{t.nome}</div>
+                      <div className="text-[10px] t-fg-dim uppercase tracking-wider leading-tight mt-0.5">{t.plano}</div>
+                    </div>
+                  </div>
+                  <div className="px-4 py-3 border-t" style={{ borderColor: "var(--rule)" }}>
+                    <div className="text-[10px] t-fg-dim uppercase tracking-wider">Dashboard</div>
+                    <div className="text-[13px] font-bold t-fg-strong">Bom dia, equipe.</div>
+                    <button className="btn-primary mt-3" style={{ padding: "6px 10px", fontSize: 11 }}>Botão primário</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {tab === "usuarios" && (
+          <div className="t-bg-card ring-soft rounded-xl overflow-hidden">
+            <div className="px-5 py-3.5 border-b flex items-center gap-3" style={{ borderColor: "var(--rule)" }}>
+              <div className="flex-1">
+                <div className="text-[10.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">Gestão de usuários</div>
+                <div className="text-[15px] font-bold t-fg-strong">{ADMIN_USUARIOS.length} usuários ativos</div>
+              </div>
+              <div className="flex items-center gap-2 h-8 px-3 rounded-md" style={{ background: "var(--rule)" }}>
+                <Icon name="Search" size={12} className="t-fg-dim"/>
+                <input placeholder="Buscar…" className="bg-transparent outline-none text-[12px] w-52 t-fg"/>
+              </div>
+              <button className="btn-primary" style={{ padding: "6px 12px", fontSize: 11 }}><Icon name="Plus" size={11}/>Novo usuário</button>
+            </div>
+            <div className="row-striped">
+              <div className="grid grid-cols-[2fr_2fr_1fr_70px_90px_60px_90px_80px] gap-3 px-5 py-2.5 text-[10px] t-fg-dim uppercase tracking-wider font-semibold border-b" style={{ borderColor: "var(--rule)", background: "var(--bg-card-2)" }}>
+                <div>Nome</div><div>E-mail</div><div>Papel</div><div>UF</div><div>Status</div><div>MFA</div><div>Último acesso</div><div></div>
+              </div>
+              {ADMIN_USUARIOS.map((u, i) => (
+                <div key={i} className="grid grid-cols-[2fr_2fr_1fr_70px_90px_60px_90px_80px] gap-3 px-5 py-2.5 items-center text-[12px]">
+                  <div className="font-semibold t-fg-strong">{u.nome}</div>
+                  <div className="t-fg-muted truncate">{u.email}</div>
+                  <div className="t-fg">{u.papel}</div>
+                  <div className="tnum t-fg">{u.uf}</div>
+                  <div><span className={`chip ${u.status === "ativo" ? "chip-green" : u.status === "pendente" ? "chip-amber" : "chip-red"}`} style={{ height: 20 }}>{u.status}</span></div>
+                  <div>{u.mfa ? <Icon name="Check" size={13} className="t-ok"/> : <Icon name="X" size={13} className="t-danger"/>}</div>
+                  <div className="t-fg-dim text-[11px] tnum">{u.last}</div>
+                  <div className="text-right"><button className="btn-ghost" style={{ padding: "3px 9px", fontSize: 10 }}>Editar</button></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {tab === "papeis" && (
+          <div className="space-y-3">
+            {ADMIN_PAPEIS.map((p, i) => (
+              <div key={i} className="t-bg-card ring-soft rounded-xl p-5">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-lg t-bg-tenant-soft flex items-center justify-center shrink-0">
+                    <Icon name="Users" size={20} className="t-tenant"/>
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-baseline gap-3 mb-1">
+                      <div className="text-[15px] font-bold t-fg-strong">{p.papel}</div>
+                      <div className="chip chip-muted" style={{ height: 20 }}>{p.qtd} {p.qtd === 1 ? "usuário" : "usuários"}</div>
+                    </div>
+                    <div className="text-[12px] t-fg-muted mb-3">{p.desc}</div>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {p.perm.map(pm => <span key={pm} className="chip chip-blue" style={{ height: 22 }}>{pm}</span>)}
+                    </div>
+                  </div>
+                  <button className="btn-ghost" style={{ padding: "5px 10px" }}>Editar permissões</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {tab === "audit" && (
+          <div className="t-bg-card ring-soft rounded-xl overflow-hidden">
+            <div className="px-5 py-3.5 border-b flex items-center justify-between" style={{ borderColor: "var(--rule)" }}>
+              <div>
+                <div className="text-[10.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">Auditoria · LGPD-compliant</div>
+                <div className="text-[15px] font-bold t-fg-strong">Log de ações · retenção 90 dias</div>
+              </div>
+              <button className="btn-ghost"><Icon name="Download" size={12}/>Exportar</button>
+            </div>
+            <div>
+              <div className="grid grid-cols-[80px_2fr_1.5fr_2fr_120px] gap-3 px-5 py-2.5 text-[10px] t-fg-dim uppercase tracking-wider font-semibold border-b" style={{ borderColor: "var(--rule)", background: "var(--bg-card-2)" }}>
+                <div>Quando</div><div>Quem</div><div>Ação</div><div>Objeto</div><div>IP</div>
+              </div>
+              {ADMIN_AUDIT.map((a, i) => (
+                <div key={i} className="grid grid-cols-[80px_2fr_1.5fr_2fr_120px] gap-3 px-5 py-2.5 items-center text-[12px] border-b last:border-0" style={{ borderColor: "var(--rule)" }}>
+                  <div className="tnum font-bold t-fg">{a.quando}</div>
+                  <div className="t-fg-strong font-semibold">{a.quem}</div>
+                  <div><span className="chip chip-purple" style={{ height: 20 }}>{a.acao}</span></div>
+                  <div className="t-fg-muted">{a.obj}</div>
+                  <div className="tnum t-fg-dim">{a.ip}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {tab === "integ" && (
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { n:"TSE", d:"Sincronização candidatos & eleitos", s:"conectado" },
+              { n:"CEAF", d:"Cadastro de expulsões e ações",     s:"conectado" },
+              { n:"TCU",  d:"Processos e TCEs",                   s:"conectado" },
+              { n:"STF",  d:"Ações e denúncias",                  s:"conectado" },
+              { n:"CGU",  d:"Controle de emendas",                s:"conectado" },
+              { n:"Câmara", d:"Votações e presenças",             s:"conectado" },
+              { n:"Senado", d:"Atividade parlamentar",            s:"conectado" },
+              { n:"X (Twitter)", d:"Monitoramento social",        s:"conectado" },
+              { n:"Meltwater", d:"Clipping de mídia",             s:"pendente" },
+            ].map((it, i) => (
+              <div key={i} className="t-bg-card ring-soft rounded-xl p-4">
+                <div className="flex items-start justify-between mb-2">
+                  <div className="text-[14px] font-bold t-fg-strong">{it.n}</div>
+                  <span className={`chip ${it.s === "conectado" ? "chip-green" : "chip-amber"}`} style={{ height: 20 }}>{it.s}</span>
+                </div>
+                <div className="text-[11.5px] t-fg-muted">{it.d}</div>
+                <button className="btn-ghost mt-3" style={{ padding: "5px 10px", fontSize: 11 }}>Configurar</button>
+              </div>
+            ))}
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+}
+
+/* Dossiê refatorado no shell - abre Header Hero.html embedado */
+function ModuleDossieFull({ onNavigate }) {
+  return (
+    <div style={{ height: "100%", background: "var(--bg-page)", position: "relative" }}>
+      <div className="px-8 pt-5 pb-3 flex items-end justify-between border-b" style={{ borderColor: "var(--rule)" }}>
+        <div>
+          <div className="text-[11px] t-fg-dim tracking-[0.18em] uppercase font-semibold">Biblioteca de dossiês</div>
+          <h1 className="text-[24px] font-display font-bold t-fg-strong mt-0.5 leading-none">Selecione um político</h1>
+        </div>
+        <div className="flex items-center gap-2">
+          <button className="btn-primary" onClick={() => window.open("Header Hero.html","_blank")}>
+            <Icon name="FileSearch" size={13}/>Abrir dossiê completo · Jaques Wagner
+          </button>
+        </div>
+      </div>
+      <div className="px-8 py-5 overflow-auto" style={{ maxHeight: "calc(100vh - 48px - 80px)" }}>
+        <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(186px, 1fr))" }}>
+          {RADAR_CANDIDATOS.map(c => (
+            <FifaMiniCard key={c.id} c={c} onClick={() => {
+              if (c.nome === "Jaques Wagner") window.open("Header Hero.html","_blank");
+              else alert(`Dossiê completo: ${c.nome} — em produção. O dossiê de Jaques Wagner está 100% pronto.`);
+            }} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { ModuleAdmin, ModuleDossieFull });
+
+
+// ===== src/platform-lote4.jsx =====
+/* Delegados + Filiados + IA + Alertas */
+
+const { useState: useLotState } = React;
+
+function ModuleDelegados({ onNavigate }) {
+  const [sort, setSort] = useLotState("perf");
+  const sorted = [...DELEGADOS_LIST].sort((a,b) => sort === "perf" ? b.perf - a.perf : sort === "filiados" ? b.filiados - a.filiados : a.uf.localeCompare(b.uf));
+  return (
+    <div className="bg-page-grad min-h-full">
+      <div className="max-w-[1600px] mx-auto px-8 py-7">
+        <div className="flex items-end justify-between mb-5">
+          <div>
+            <div className="text-[11px] t-fg-dim tracking-[0.18em] uppercase font-semibold">Delegados</div>
+            <h1 className="text-[32px] font-display font-bold t-fg-strong mt-1 leading-none">Gestão de delegações estaduais</h1>
+            <div className="text-[13px] t-fg-muted mt-1.5">27 delegados · hierarquia UF · performance operacional</div>
+          </div>
+          <div className="flex items-center gap-2">
+            <select value={sort} onChange={e => setSort(e.target.value)} className="btn-ghost" style={{ padding: "6px 10px", fontSize: 12 }}>
+              <option value="perf">Ordenar · Performance</option>
+              <option value="filiados">Ordenar · Filiados</option>
+              <option value="uf">Ordenar · UF</option>
+            </select>
+            <button className="btn-primary"><Icon name="Plus" size={13}/>Novo delegado</button>
+          </div>
+        </div>
+        <div className="grid grid-cols-4 gap-3 mb-5">
+          {[
+            { l:"Delegados ativos", v:"27" },
+            { l:"Cidades cobertas", v:"4.238" },
+            { l:"Filiados base",    v:"234k" },
+            { l:"Performance média", v:"72" },
+          ].map(k => (
+            <div key={k.l} className="kpi-card ring-soft">
+              <div className="text-[10.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">{k.l}</div>
+              <div className="text-[32px] font-bold tnum mt-1 t-fg-strong">{k.v}</div>
+            </div>
+          ))}
+        </div>
+        <div className="t-bg-card ring-soft rounded-xl overflow-hidden">
+          <div className="grid grid-cols-[50px_2fr_80px_1fr_1fr_120px_100px] gap-3 px-5 py-2.5 text-[10px] t-fg-dim uppercase tracking-wider font-semibold border-b" style={{ borderColor: "var(--rule)", background: "var(--bg-card-2)" }}>
+            <div>UF</div><div>Delegado</div><div>Cidades</div><div>Filiados</div><div>Performance</div><div>Status</div><div></div>
+          </div>
+          {sorted.map((d, i) => (
+            <div key={i} className="grid grid-cols-[50px_2fr_80px_1fr_1fr_120px_100px] gap-3 px-5 py-3 items-center text-[12px] border-b last:border-0" style={{ borderColor: "var(--rule)" }}>
+              <div className="tnum font-bold t-fg-strong">{d.uf}</div>
+              <div>
+                <div className="font-semibold t-fg-strong">{d.nome}</div>
+                <div className="text-[10.5px] t-fg-dim">Delegado · Federação {d.uf}</div>
+              </div>
+              <div className="tnum t-fg">{d.cidades}</div>
+              <div className="tnum t-fg">{d.filiados.toLocaleString("pt-BR")}</div>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 h-1.5 rounded-sm overflow-hidden" style={{ background: "var(--rule)" }}>
+                  <div style={{ width: `${d.perf}%`, height: "100%", background: d.perf >= 80 ? "var(--ok)" : d.perf >= 60 ? "var(--warn)" : "var(--danger)" }}/>
+                </div>
+                <div className="tnum font-bold t-fg-strong w-8 text-right">{d.perf}</div>
+              </div>
+              <div><span className={`chip ${d.status === "top" ? "chip-green" : d.status === "ok" ? "chip-blue" : d.status === "at" ? "chip-amber" : "chip-red"}`} style={{ height: 20 }}>{d.status === "top" ? "Top performer" : d.status === "ok" ? "Em linha" : d.status === "at" ? "Atenção" : "Abaixo"}</span></div>
+              <div className="text-right"><button className="btn-ghost" style={{ padding: "4px 10px", fontSize: 11 }}>Ver →</button></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ModuleFiliados({ onNavigate }) {
+  const maxUf = FILIADOS_UF[0].total;
+  return (
+    <div className="bg-page-grad min-h-full">
+      <div className="max-w-[1600px] mx-auto px-8 py-7">
+        <div className="flex items-end justify-between mb-5">
+          <div>
+            <div className="text-[11px] t-fg-dim tracking-[0.18em] uppercase font-semibold">Filiados União Brasil</div>
+            <h1 className="text-[32px] font-display font-bold t-fg-strong mt-1 leading-none">Base nacional de filiados</h1>
+            <div className="text-[13px] t-fg-muted mt-1.5">Sincronizada com TSE · atualizada diariamente</div>
+          </div>
+          <button className="btn-primary"><Icon name="Download" size={13}/>Exportar base completa</button>
+        </div>
+
+        <div className="grid grid-cols-4 gap-3 mb-5">
+          {[
+            { l:"Total nacional",     v: FILIADOS_TOTAL.toLocaleString("pt-BR") },
+            { l:"Novos (30d)",        v: FILIADOS_NOVOS_30.toLocaleString("pt-BR"), t:"+14%" },
+            { l:"Taxa retenção",      v:"94,2%", t:"+0,8pp" },
+            { l:"Ranking nacional",   v:"4º", h:"entre 33 partidos" },
+          ].map(k => (
+            <div key={k.l} className="kpi-card ring-soft">
+              <div className="text-[10.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">{k.l}</div>
+              <div className="text-[32px] font-bold tnum mt-1 t-fg-strong">{k.v}</div>
+              {k.t && <div className="kpi-trend"><span className="chip chip-green" style={{ height: 20 }}><Icon name="ArrowUp" size={10}/>{k.t}</span></div>}
+              {k.h && <div className="text-[11px] t-fg-dim mt-1">{k.h}</div>}
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-[1.5fr_1fr] gap-3">
+          <div className="t-bg-card ring-soft rounded-xl overflow-hidden">
+            <div className="px-5 py-3.5 border-b" style={{ borderColor: "var(--rule)" }}>
+              <div className="text-[10.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">Distribuição por UF</div>
+              <div className="text-[15px] font-bold t-fg-strong">Top 15 unidades federativas</div>
+            </div>
+            <div className="p-5 space-y-1.5">
+              {FILIADOS_UF.slice(0, 15).map(u => (
+                <div key={u.uf} className="grid grid-cols-[36px_1fr_90px_70px] gap-3 items-center text-[11.5px]">
+                  <div className="tnum font-bold t-fg-strong">{u.uf}</div>
+                  <div className="h-2 rounded-sm overflow-hidden" style={{ background: "var(--rule)" }}>
+                    <div style={{ width: `${(u.total/maxUf)*100}%`, height: "100%", background: "linear-gradient(90deg, var(--tenant-primary), #60a5fa)" }}/>
+                  </div>
+                  <div className="tnum font-semibold t-fg text-right">{u.total.toLocaleString("pt-BR")}</div>
+                  <div className="tnum text-[10px] t-ok text-right">+{u.novos30d}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="t-bg-card ring-soft rounded-xl overflow-hidden">
+            <div className="px-5 py-3.5 border-b" style={{ borderColor: "var(--rule)" }}>
+              <div className="text-[10.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">Perfil demográfico</div>
+              <div className="text-[15px] font-bold t-fg-strong">Faixa etária dos filiados</div>
+            </div>
+            <div className="p-5 space-y-2">
+              {FILIADOS_FAIXA_IDADE.map(f => (
+                <div key={f.faixa} className="grid grid-cols-[80px_1fr_50px] gap-3 items-center text-[11.5px]">
+                  <div className="t-fg">{f.faixa} anos</div>
+                  <div className="h-2 rounded-sm overflow-hidden" style={{ background: "var(--rule)" }}>
+                    <div style={{ width: `${f.v*4}%`, height: "100%", background: "linear-gradient(90deg, var(--tenant-primary), var(--accent-blue))" }}/>
+                  </div>
+                  <div className="tnum font-bold t-fg-strong text-right">{f.v}%</div>
+                </div>
+              ))}
+              <div className="pt-4 mt-4 border-t grid grid-cols-2 gap-2" style={{ borderColor: "var(--rule)" }}>
+                <div><div className="text-[10px] t-fg-dim uppercase tracking-wider">Gênero M/F</div><div className="tnum font-bold t-fg-strong">54% / 46%</div></div>
+                <div><div className="text-[10px] t-fg-dim uppercase tracking-wider">Escolaridade</div><div className="tnum font-bold t-fg-strong">62% superior</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ModuleIA({ onNavigate }) {
+  const [msgs, setMsgs] = useLotState(IA_CONVERSA);
+  const [input, setInput] = useLotState("");
+  const send = () => {
+    if (!input.trim()) return;
+    setMsgs(prev => [...prev, { role:"user", msg: input, t: new Date().toLocaleTimeString("pt-BR", { hour:"2-digit", minute:"2-digit" }) },
+      { role:"assistant", msg:"Analisando… Este é um protótipo — a integração Claude está pronta para ativação em produção.", t: "agora" }]);
+    setInput("");
+  };
+  return (
+    <div className="bg-page-grad" style={{ height: "100%" }}>
+      <div className="max-w-[1200px] mx-auto h-full flex flex-col px-8 py-7">
+        <div className="mb-4">
+          <div className="text-[11px] t-fg-dim tracking-[0.18em] uppercase font-semibold">IA Assistente</div>
+          <h1 className="text-[28px] font-display font-bold t-fg-strong mt-1 leading-none">
+            <span style={{ background: "linear-gradient(90deg, var(--tenant-primary), var(--accent-blue-strong))", WebkitBackgroundClip: "text", color: "transparent" }}>Mazzel AI</span> · Sua copiloto política
+          </h1>
+        </div>
+
+        <div className="flex-1 t-bg-card ring-soft rounded-xl overflow-hidden flex flex-col min-h-0">
+          <div className="flex-1 overflow-y-auto p-6 space-y-5">
+            {msgs.map((m, i) => (
+              <div key={i} className={`flex gap-3 ${m.role === "user" ? "justify-end" : ""}`}>
+                {m.role === "assistant" && (
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: "linear-gradient(135deg, var(--tenant-primary), var(--accent-blue-strong))" }}>
+                    <Icon name="Sparkles" size={14} className="text-white" stroke={2.2}/>
+                  </div>
+                )}
+                <div className={`max-w-[76%] ${m.role === "user" ? "order-1" : ""}`}>
+                  <div className={`rounded-2xl px-4 py-3 text-[13px] leading-relaxed ${m.role === "user" ? "ring-tenant" : "ring-soft"}`} style={{ background: m.role === "user" ? "rgba(var(--tenant-primary-rgb), 0.12)" : "var(--bg-card-2)", color: "var(--fg)" }}>
+                    {m.msg}
+                    {m.citations && (
+                      <div className="mt-3 space-y-1.5 text-[12px]">
+                        {m.citations.map((c, j) => (
+                          <div key={j} className="flex items-start gap-2">
+                            <span className="chip chip-blue" style={{ height: 18, fontSize: 9 }}>{c.ref}</span>
+                            <span className="t-fg-muted flex-1">{c.texto}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {m.followup && <div className="mt-3 text-[12px] t-fg italic">{m.followup}</div>}
+                  </div>
+                  <div className={`text-[10px] t-fg-dim mt-1 ${m.role === "user" ? "text-right" : ""}`}>{m.t}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="px-6 py-4 border-t" style={{ borderColor: "var(--rule)" }}>
+            <div className="text-[10px] t-fg-dim uppercase tracking-wider font-semibold mb-2">Sugestões</div>
+            <div className="flex items-center gap-2 flex-wrap mb-3">
+              {IA_SUGESTOES.slice(0, 4).map((s, i) => (
+                <button key={i} onClick={() => setInput(s.titulo)} className="btn-ghost text-left" style={{ padding: "6px 10px", fontSize: 11.5 }}>
+                  <Icon name={s.icon} size={11}/>{s.titulo}
+                </button>
+              ))}
+            </div>
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg ring-soft" style={{ background: "var(--bg-card-2)" }}>
+              <Icon name="Sparkles" size={14} className="t-tenant"/>
+              <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send()}
+                     placeholder="Pergunte qualquer coisa sobre a base política nacional…" className="flex-1 bg-transparent outline-none text-[13px] t-fg placeholder:t-fg-dim"/>
+              <button onClick={send} className="btn-primary" style={{ padding: "6px 14px", fontSize: 11 }}>Enviar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ModuleAlertas({ onNavigate }) {
+  const [filtro, setFiltro] = useLotState("todos");
+  const visible = filtro === "todos" ? ALERTAS_DIA : ALERTAS_DIA.filter(a => a.sev === filtro);
+  const total = ALERTAS_CATS.reduce((s, c) => s + c.qtd, 0);
+  return (
+    <div className="bg-page-grad min-h-full">
+      <div className="max-w-[1600px] mx-auto px-8 py-7">
+        <div className="flex items-end justify-between mb-5">
+          <div>
+            <div className="text-[11px] t-fg-dim tracking-[0.18em] uppercase font-semibold">Central de Alertas</div>
+            <h1 className="text-[32px] font-display font-bold t-fg-strong mt-1 leading-none">Monitoramento 24/7</h1>
+            <div className="text-[13px] t-fg-muted mt-1.5">Jurídico · Mídia · Redes · Emendas · Processos · Legislativo</div>
+          </div>
+          <button className="btn-primary"><Icon name="Settings" size={13}/>Configurar</button>
+        </div>
+
+        <div className="grid grid-cols-4 gap-3 mb-5">
+          {[
+            { l:"Críticos abertos", v:"12", t:"+3 · 24h", ok:false },
+            { l:"Alto",             v:"34", t:"+7",       ok:false },
+            { l:"Médio",            v:"58", t:"-4",       ok:true  },
+            { l:"Total 7d",         v:"138", t:"+18%",    ok:false },
+          ].map(k => (
+            <div key={k.l} className="kpi-card ring-soft">
+              <div className="text-[10.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">{k.l}</div>
+              <div className="text-[32px] font-bold tnum mt-1 t-fg-strong">{k.v}</div>
+              <div className="kpi-trend"><span className={`chip ${k.ok ? "chip-green" : "chip-red"}`} style={{ height: 20 }}>{k.t}</span></div>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-[1fr_320px] gap-3">
+          <div className="t-bg-card ring-soft rounded-xl overflow-hidden">
+            <div className="px-5 py-3.5 border-b flex items-center gap-2" style={{ borderColor: "var(--rule)" }}>
+              <div className="flex-1">
+                <div className="text-[10.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">Feed em tempo real</div>
+                <div className="text-[15px] font-bold t-fg-strong">{visible.length} alertas filtrados</div>
+              </div>
+              <div className="flex items-center gap-1 p-0.5 rounded-md" style={{ background: "var(--rule)" }}>
+                {["todos","crit","alto","med","bx"].map(f => (
+                  <button key={f} onClick={() => setFiltro(f)} className={`btn-ghost ${filtro === f ? "active" : ""}`} style={{ padding: "5px 10px", fontSize: 11 }}>
+                    {f === "todos" ? "Todos" : f === "crit" ? "Crítico" : f === "alto" ? "Alto" : f === "med" ? "Médio" : "Baixo"}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              {visible.map(a => (
+                <div key={a.id} className={`alert-row alert-sev-${a.sev}`}>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className={`chip ${a.sev === "crit" ? "chip-red" : a.sev === "alto" ? "chip-red" : a.sev === "med" ? "chip-amber" : "chip-muted"}`} style={{ height: 18, fontSize: 9 }}>{a.sev === "crit" ? "Crítico" : a.sev === "alto" ? "Alto" : a.sev === "med" ? "Médio" : "Baixo"}</span>
+                      <span className="text-[10px] t-fg-dim uppercase tracking-wider">{a.tipo}</span>
+                      <span className="tnum text-[11px] t-fg-muted">{a.uf}</span>
+                      <span className="text-[10px] t-fg-dim ml-auto tnum">{a.hora}</span>
+                    </div>
+                    <div className="text-[13px] font-semibold t-fg-strong">{a.titulo}</div>
+                    <div className="text-[11px] t-fg-muted">Fonte: {a.fonte}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="t-bg-card ring-soft rounded-xl overflow-hidden">
+            <div className="px-5 py-3.5 border-b" style={{ borderColor: "var(--rule)" }}>
+              <div className="text-[10.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">Por categoria · 7 dias</div>
+              <div className="text-[15px] font-bold t-fg-strong">{total} alertas totais</div>
+            </div>
+            <div className="p-5 space-y-2.5">
+              {ALERTAS_CATS.map(c => (
+                <div key={c.cat} className="grid grid-cols-[1fr_auto] gap-3 items-center">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full" style={{ background: c.cor }}/>
+                    <div className="text-[12px] t-fg flex-1">{c.cat}</div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-24 h-1.5 rounded-sm overflow-hidden" style={{ background: "var(--rule)" }}>
+                      <div style={{ width: `${(c.qtd/total)*250}%`, height: "100%", background: c.cor }}/>
+                    </div>
+                    <div className="tnum font-bold text-[12px] t-fg-strong w-7 text-right">{c.qtd}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { ModuleDelegados, ModuleFiliados, ModuleIA, ModuleAlertas });
+
+
+// ===== src/platform-app.jsx =====
+/* Root App - routing + tweak panel + tenant/theme */
+
+const { useState: useAState, useEffect: useAEffect, useCallback: useACb } = React;
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "tenant": "mazzel",
+  "role": "presidente",
+  "theme": "light"
+}/*EDITMODE-END*/;
+
+function applyTenant(tenantId) {
+  const t = TENANTS[tenantId] || TENANTS.uniao;
+  const r = document.documentElement.style;
+  r.setProperty("--tenant-primary", t.primary);
+  r.setProperty("--tenant-primary-rgb", t.primaryRgb);
+  r.setProperty("--tenant-accent", t.accent);
+  r.setProperty("--tenant-nome", `"${t.nome}"`);
+  r.setProperty("--tenant-sigla", `"${t.sigla}"`);
+}
+
+function TweakPanel({ visible, state, onChange }) {
+  if (!visible) return null;
+  return (
+    <div className="tweak-panel">
+      <div className="flex items-center justify-between mb-3">
+        <div className="text-[13px] font-bold t-fg-strong">Tweaks</div>
+        <div className="text-[10px] t-fg-dim tracking-wider uppercase">Protótipo</div>
+      </div>
+
+      <div className="space-y-3.5">
+        <div>
+          <div className="text-[10px] t-fg-dim uppercase tracking-wider font-semibold mb-1.5">Cliente (white-label)</div>
+          <div className="flex gap-1 p-0.5 rounded-md" style={{ background: "var(--rule)" }}>
+            {Object.values(TENANTS).map(t => (
+              <button key={t.id} onClick={() => onChange({ tenant: t.id })}
+                      className={`btn-ghost flex-1 justify-center ${state.tenant === t.id ? "active" : ""}`} style={{ padding: "6px 8px", fontSize: 11 }}>
+                <span className="party-dot" style={{ background: t.primary }}/>{t.sigla}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <div className="text-[10px] t-fg-dim uppercase tracking-wider font-semibold mb-1.5">Perfil de acesso</div>
+          <div className="flex gap-1 p-0.5 rounded-md" style={{ background: "var(--rule)" }}>
+            {Object.entries(ROLES).map(([k, v]) => (
+              <button key={k} onClick={() => onChange({ role: k })}
+                      className={`btn-ghost flex-1 justify-center ${state.role === k ? "active" : ""}`} style={{ padding: "6px 8px", fontSize: 11 }}>{v.label}</button>
+            ))}
+          </div>
+          <div className="text-[10.5px] t-fg-dim mt-1.5">{ROLES[state.role].scope}</div>
+        </div>
+
+        <div>
+          <div className="text-[10px] t-fg-dim uppercase tracking-wider font-semibold mb-1.5">Tema</div>
+          <div className="flex gap-1 p-0.5 rounded-md" style={{ background: "var(--rule)" }}>
+            <button onClick={() => onChange({ theme: "dark" })}
+                    className={`btn-ghost flex-1 justify-center ${state.theme === "dark" ? "active" : ""}`} style={{ padding: "6px 8px", fontSize: 11 }}>
+              <Icon name="Moon" size={11}/> Dark
+            </button>
+            <button onClick={() => onChange({ theme: "light" })}
+                    className={`btn-ghost flex-1 justify-center ${state.theme === "light" ? "active" : ""}`} style={{ padding: "6px 8px", fontSize: 11 }}>
+              <Icon name="Sun" size={11}/> Light
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [tweaks, setTweaks] = useAState(TWEAK_DEFAULTS);
+  const [tweakVisible, setTweakVisible] = useAState(false);
+  const [module, setModule] = useAState(() => (localStorage.getItem("mazzel-module") || "home"));
+  const [cmdk, setCmdk] = useAState(false);
+
+  /* apply tenant/theme */
+  useAEffect(() => { applyTenant(tweaks.tenant); }, [tweaks.tenant]);
+  useAEffect(() => { document.body.dataset.theme = tweaks.theme; }, [tweaks.theme]);
+  useAEffect(() => { localStorage.setItem("mazzel-module", module); }, [module]);
+
+  /* if role changes and current module not allowed, go home */
+  useAEffect(() => {
+    const m = MODULES.find(x => x.id === module);
+    if (m && !m.roles.includes(tweaks.role)) setModule("home");
+  }, [tweaks.role, module]);
+
+  /* cmd+K */
+  useAEffect(() => {
+    const onKey = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); setCmdk(c => !c); }
+      if (e.key === "Escape") setCmdk(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  /* edit mode bridge */
+  useAEffect(() => {
+    const handler = (e) => {
+      if (e?.data?.type === "__activate_edit_mode") setTweakVisible(true);
+      if (e?.data?.type === "__deactivate_edit_mode") setTweakVisible(false);
+    };
+    window.addEventListener("message", handler);
+    try { window.parent.postMessage({ type: "__edit_mode_available" }, "*"); } catch {}
+    return () => window.removeEventListener("message", handler);
+  }, []);
+
+  const applyTweaks = useACb((partial) => {
+    setTweaks(prev => {
+      const next = { ...prev, ...partial };
+      try { window.parent.postMessage({ type: "__edit_mode_set_keys", edits: partial }, "*"); } catch {}
+      return next;
+    });
+  }, []);
+
+  const breadcrumbs = React.useMemo(() => {
+    const t = TENANTS[tweaks.tenant];
+    const m = MODULES.find(x => x.id === module);
+    return [t.nome, m ? m.label : "Dashboard"];
+  }, [tweaks.tenant, module]);
+
+  const renderModule = () => {
+    const props = { tenant: tweaks.tenant, role: tweaks.role, onNavigate: setModule };
+    switch (module) {
+      case "home":      return <ModuleHome {...props} />;
+      case "mapa":      return <ModuleMapa {...props} />;
+      case "radar":     return <ModuleRadar {...props} />;
+      case "dossie":    return <ModuleDossieFull {...props} />;
+      case "estudo":    return <ModuleEstudo {...props} />;
+      case "delegados": return <ModuleDelegados {...props} />;
+      case "filiados":  return <ModuleFiliados {...props} />;
+      case "ia":        return <ModuleIA {...props} />;
+      case "alertas":   return <ModuleAlertas {...props} />;
+      case "portal":    return <ModulePortal {...props} />;
+      case "admin":     return <ModuleAdmin {...props} />;
+      default:          return <ModuleHome {...props} />;
+    }
+  };
+
+  return (
+    <div className="shell" data-role={tweaks.role}>
+      <div className="shell-body">
+        <Sidebar tenant={tweaks.tenant} role={tweaks.role} activeModule={module} onNavigate={setModule} />
+        <div className="shell-main">
+          <Topbar tenant={tweaks.tenant} role={tweaks.role} onOpenCmdk={() => setCmdk(true)} breadcrumbs={breadcrumbs} />
+          <div className="main-scroll">{renderModule()}</div>
+        </div>
+      </div>
+      <CmdKPalette open={cmdk} onClose={() => setCmdk(false)} onNavigate={setModule} />
+      <TweakPanel visible={tweakVisible} state={tweaks} onChange={applyTweaks} />
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
+
+
+</script>
+</body>
+</html>

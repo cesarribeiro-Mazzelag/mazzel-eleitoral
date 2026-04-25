@@ -1,0 +1,61 @@
+/* =========================================================================
+ * Campanha · tweaks de estilo em CSS puro
+ * ========================================================================= */
+
+/* densidade confortável → padding padrão
+   densidade compacta    → reduz espaços em cards e listas */
+[data-density="compacto"] .kpi-card { padding: 14px 16px 10px; }
+[data-density="compacto"] .chip { height: 18px; font-size: 10px; }
+
+/* buttons hover smoothing */
+.btn-ghost, .btn-primary { transition: all .15s ease; }
+
+/* Tela-específicas */
+.camp-hero {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--tenant-primary) 0%, color-mix(in oklab, var(--tenant-primary) 75%, black) 100%);
+  color: #fff;
+}
+.camp-hero::before {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(600px 300px at 90% -10%, rgba(255,255,255,0.12), transparent 60%),
+    radial-gradient(400px 200px at 10% 110%, rgba(255,255,255,0.08), transparent 60%);
+  pointer-events: none;
+}
+
+/* Segment control */
+.seg { display: inline-flex; padding: 2px; border-radius: 7px; background: var(--rule); gap: 2px; }
+.seg-item { padding: 5px 10px; border-radius: 5px; font: 600 11px/1 Inter,sans-serif; color: var(--fg-muted); cursor: pointer; border: none; background: transparent; white-space: nowrap; }
+.seg-item:hover { color: var(--fg); }
+.seg-item.active { background: var(--bg-card); color: var(--fg-strong); box-shadow: 0 1px 2px rgba(0,0,0,0.08); }
+
+/* list-row */
+.list-row { display: grid; align-items: center; gap: 12px; padding: 9px 14px; border-bottom: 1px solid var(--rule); transition: background .1s; }
+.list-row:hover { background: var(--chart-hover); }
+.list-row:last-child { border-bottom: 0; }
+
+/* cards */
+.card { background: var(--bg-card); border: 1px solid var(--rule); border-radius: 12px; }
+.card-header { padding: 14px 18px 10px; border-bottom: 1px solid var(--rule); display: flex; align-items: center; gap: 12px; }
+.card-title { font: 700 13px/1.2 Inter,sans-serif; color: var(--fg-strong); letter-spacing: -0.005em; }
+.card-sub   { font: 500 10.5px/1.2 Inter,sans-serif; color: var(--fg-dim); letter-spacing: 0.05em; text-transform: uppercase; }
+
+/* sparkline colors */
+.spark-up   { stroke: var(--ok); }
+.spark-down { stroke: var(--danger); }
+.spark-flat { stroke: var(--fg-dim); }
+
+/* pills for tier */
+.tier-ouro   { background: linear-gradient(135deg, #fde68a, #f59e0b); color: #78350f; }
+.tier-prata  { background: linear-gradient(135deg, #e5e7eb, #9ca3af); color: #374151; }
+.tier-bronze { background: linear-gradient(135deg, #fed7aa, #c2410c); color: #7c2d12; }
+
+/* Chat-specific */
+.msg-bubble { max-width: 75%; padding: 9px 12px; border-radius: 12px; font-size: 12.5px; line-height: 1.45; }
+.msg-me     { background: var(--tenant-primary); color: #fff; border-top-right-radius: 4px; }
+.msg-them   { background: var(--rule); color: var(--fg); border-top-left-radius: 4px; }
+[data-theme="dark"] .msg-them { background: #1a1a1d; }

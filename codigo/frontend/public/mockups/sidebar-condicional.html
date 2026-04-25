@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<title>Sidebar Condicional · 9 Perfis · Mazzel Eleitoral</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root, [data-theme="dark"] {
+  --mz-bg-page:    #0a0a0b;
+  --mz-bg-page-2:  #0c0c0e;
+  --mz-bg-card:    #0e0e11;
+  --mz-bg-card-2:  rgba(255,255,255,0.015);
+  --mz-bg-sidebar: #0b0b0d;
+  --mz-bg-topbar:  #09090b;
+  --mz-bg-elevated:#131316;
+  --mz-fg:         #e4e4e7;
+  --mz-fg-strong:  #ffffff;
+  --mz-fg-muted:   #a1a1aa;
+  --mz-fg-dim:     #71717a;
+  --mz-fg-faint:   #52525b;
+  --mz-fg-ghost:   #3f3f46;
+  --mz-rule:         rgba(255,255,255,0.06);
+  --mz-rule-strong:  rgba(255,255,255,0.10);
+  --mz-hairline:     rgba(255,255,255,0.06);
+  --mz-accent:       #93c5fd;
+  --mz-accent-strong:#60a5fa;
+  --mz-ok:      #34d399;
+  --mz-warn:    #fbbf24;
+  --mz-danger:  #f87171;
+  --mz-kbd-bg:  rgba(255,255,255,0.08);
+  --mz-kbd-fg:  #d4d4d8;
+  --mz-tenant-primary:     #002A7B;
+  --mz-tenant-primary-rgb: 0, 42, 123;
+  --mz-tenant-accent:      #FFCC00;
+}
+
+[data-theme="light"] {
+  --mz-bg-page:    #f4f4f5;
+  --mz-bg-page-2:  #fafafa;
+  --mz-bg-card:    #ffffff;
+  --mz-bg-card-2:  rgba(0,0,0,0.02);
+  --mz-bg-sidebar: #fafafa;
+  --mz-bg-topbar:  #ffffff;
+  --mz-bg-elevated:#ffffff;
+  --mz-fg:         #18181b;
+  --mz-fg-strong:  #09090b;
+  --mz-fg-muted:   #52525b;
+  --mz-fg-dim:     #71717a;
+  --mz-fg-faint:   #a1a1aa;
+  --mz-fg-ghost:   #d4d4d8;
+  --mz-rule:         rgba(0,0,0,0.06);
+  --mz-rule-strong:  rgba(0,0,0,0.10);
+  --mz-hairline:     rgba(0,0,0,0.08);
+  --mz-accent:       #1d4ed8;
+  --mz-ok:      #059669;
+  --mz-warn:    #d97706;
+  --mz-danger:  #dc2626;
+  --mz-kbd-bg:  rgba(0,0,0,0.06);
+  --mz-kbd-fg:  #18181b;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--mz-bg-page);
+  color: var(--mz-fg);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "cv11","ss01";
+  overflow: hidden;
+}
+
+.tnum { font-variant-numeric: tabular-nums; font-feature-settings: "tnum","cv11"; }
+
+/* ============ SHELL ============ */
+.shell {
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 260px 1fr 380px;
+  min-height: 0;
+}
+.shell-sidebar {
+  background: var(--mz-bg-sidebar);
+  border-right: 1px solid var(--mz-rule);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+.shell-main {
+  background: var(--mz-bg-page);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.shell-insp {
+  background: var(--mz-bg-sidebar);
+  border-left: 1px solid var(--mz-rule);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* ============ TOPBAR ============ */
+.topbar {
+  height: 48px;
+  background: var(--mz-bg-topbar);
+  border-bottom: 1px solid var(--mz-rule);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.crumbs { display: flex; align-items: center; gap: 6px; font-size: 12px; white-space: nowrap; }
+.crumb-dim { color: var(--mz-fg-muted); }
+.crumb-sep { color: var(--mz-fg-ghost); }
+.crumb-strong { color: var(--mz-fg-strong); font-weight: 600; }
+
+.search-cmdk {
+  width: 420px;
+  max-width: 50%;
+  height: 30px;
+  border-radius: 6px;
+  background: var(--mz-rule);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  cursor: pointer;
+  border: none;
+  color: var(--mz-fg-dim);
+  font-size: 12px;
+  font-family: inherit;
+}
+.search-cmdk:hover { background: var(--mz-rule-strong); }
+
+.kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 5px;
+  min-width: 16px;
+  height: 18px;
+  background: var(--mz-kbd-bg);
+  color: var(--mz-kbd-fg);
+  border-radius: 3px;
+  font: 600 10px/1 'JetBrains Mono', monospace;
+}
+
+.btn-ghost {
+  padding: 6px 10px;
+  border-radius: 6px;
+  font: 600 11px/1 Inter, sans-serif;
+  background: var(--mz-rule);
+  color: var(--mz-fg);
+  cursor: pointer;
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  font-family: inherit;
+}
+.btn-ghost:hover { background: var(--mz-rule-strong); color: var(--mz-fg-strong); }
+.btn-icon {
+  width: 32px;
+  height: 30px;
+  padding: 0;
+  justify-content: center;
+}
+
+.chip {
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 4px;
+  font: 600 10.5px/22px 'Inter', sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.chip-dot { width: 6px; height: 6px; border-radius: 999px; }
+.chip-muted { background: rgba(161,161,170,0.08); color: #a1a1aa; box-shadow: inset 0 0 0 1px rgba(161,161,170,0.15); }
+[data-theme="light"] .chip-muted { background: rgba(82,82,91,0.06); color: #52525b; box-shadow: inset 0 0 0 1px rgba(82,82,91,0.18); }
+.chip-blue { background: rgba(59,130,246,0.12); color: #93c5fd; box-shadow: inset 0 0 0 1px rgba(59,130,246,0.25); }
+.chip-red { background: rgba(239,68,68,0.12); color: #fca5a5; box-shadow: inset 0 0 0 1px rgba(239,68,68,0.35); }
+.chip-green { background: rgba(34,197,94,0.10); color: #86efac; box-shadow: inset 0 0 0 1px rgba(34,197,94,0.22); }
+.chip-amber { background: rgba(251,191,36,0.12); color: #fcd34d; box-shadow: inset 0 0 0 1px rgba(251,191,36,0.30); }
+[data-theme="light"] .chip-blue { background: rgba(37,99,235,0.10); color: #1d4ed8; box-shadow: inset 0 0 0 1px rgba(37,99,235,0.30); }
+[data-theme="light"] .chip-red { background: rgba(220,38,38,0.10); color: #b91c1c; box-shadow: inset 0 0 0 1px rgba(220,38,38,0.40); }
+[data-theme="light"] .chip-green { background: rgba(22,163,74,0.10); color: #15803d; box-shadow: inset 0 0 0 1px rgba(22,163,74,0.28); }
+[data-theme="light"] .chip-amber { background: rgba(217,119,6,0.10); color: #a16207; box-shadow: inset 0 0 0 1px rgba(217,119,6,0.35); }
+
+/* ============ SIDEBAR (brand + nav + session) ============ */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--mz-rule);
+  background: linear-gradient(180deg, rgba(var(--mz-tenant-primary-rgb), 0.10) 0%, transparent 100%);
+  flex-shrink: 0;
+}
+.brand-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: var(--mz-tenant-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 900;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  box-shadow: 0 4px 12px -4px rgba(var(--mz-tenant-primary-rgb), 0.5);
+  flex-shrink: 0;
+}
+.brand-text { min-width: 0; flex: 1; }
+.brand-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--mz-fg-strong);
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.brand-meta {
+  font-size: 10px;
+  color: var(--mz-fg-dim);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 0 16px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--mz-rule-strong) transparent;
+}
+
+.nav-divider {
+  height: 1px;
+  margin: 10px 16px 10px;
+  background: var(--mz-rule);
+}
+.nav-divider:first-child { display: none; }
+/* legacy label kept hidden in case of stale cache */
+.nav-section-label { display: none; }
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 14px 7px 14px;
+  border-left: 2px solid transparent;
+  font: 500 13px/1.2 Inter, sans-serif;
+  color: var(--mz-fg-muted);
+  cursor: pointer;
+  transition: color .15s, border-color .15s, background .15s;
+  text-decoration: none;
+  position: relative;
+}
+.nav-item:hover { color: var(--mz-fg); }
+.nav-item.active {
+  color: var(--mz-fg-strong);
+  border-left-color: var(--mz-tenant-primary);
+  background: linear-gradient(90deg, rgba(var(--mz-tenant-primary-rgb), 0.14) 0%, transparent 100%);
+}
+.nav-item-ico {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.nav-item-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nav-item-badge {
+  height: 16px;
+  font-size: 9.5px;
+  padding: 0 5px;
+  border-radius: 999px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+}
+.nav-item-badge-new { background: rgba(var(--mz-tenant-primary-rgb),0.18); color: var(--mz-fg-strong); }
+.nav-item-badge-red { background: rgba(239,68,68,0.15); color: #fca5a5; box-shadow: inset 0 0 0 1px rgba(239,68,68,0.3); }
+[data-theme="light"] .nav-item-badge-red { color: #b91c1c; }
+.nav-item-consult {
+  font-size: 9px;
+  color: var(--mz-fg-ghost);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.nav-item.consultivo {
+  opacity: 0.75;
+}
+
+.session {
+  padding: 12px 16px 14px;
+  border-top: 1px solid var(--mz-rule);
+  flex-shrink: 0;
+}
+.session-label {
+  font-size: 10px;
+  color: var(--mz-fg-ghost);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.session-row { display: flex; align-items: center; gap: 10px; }
+.session-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: rgba(var(--mz-tenant-primary-rgb), 0.12);
+  box-shadow: 0 0 0 1px var(--mz-hairline);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--mz-fg-strong);
+  flex-shrink: 0;
+}
+.session-text { min-width: 0; flex: 1; }
+.session-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mz-fg);
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.session-role {
+  font-size: 10px;
+  color: var(--mz-fg-dim);
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ============ MAIN (preview do que o perfil vê) ============ */
+.main-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 32px 32px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--mz-rule-strong) transparent;
+}
+
+.main-head {
+  margin-bottom: 20px;
+}
+.main-eyebrow {
+  font-size: 10px;
+  color: var(--mz-fg-ghost);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+.main-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--mz-fg-strong);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.main-sub {
+  font-size: 13px;
+  color: var(--mz-fg-muted);
+  margin-top: 6px;
+  max-width: 640px;
+  line-height: 1.5;
+}
+
+.main-alert {
+  margin-top: 14px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(251,191,36,0.08);
+  border: 1px solid rgba(251,191,36,0.25);
+  color: var(--mz-fg);
+  font-size: 12px;
+  display: flex;
+  align-items: start;
+  gap: 10px;
+  line-height: 1.45;
+}
+[data-theme="light"] .main-alert { background: rgba(217,119,6,0.08); border-color: rgba(217,119,6,0.35); }
+
+/* ========== CARDS NO MAIN ========== */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 18px;
+}
+.kpi {
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  border-radius: 12px;
+  padding: 14px 16px;
+  position: relative;
+}
+.kpi-label {
+  font-size: 10px;
+  color: var(--mz-fg-ghost);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.kpi-value {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--mz-fg-strong);
+  letter-spacing: -0.02em;
+  margin-top: 4px;
+  line-height: 1.1;
+}
+.kpi-delta {
+  font-size: 10.5px;
+  color: var(--mz-fg-muted);
+  margin-top: 2px;
+}
+.kpi-delta.pos { color: var(--mz-ok); }
+.kpi-delta.neg { color: var(--mz-danger); }
+
+.panel-section {
+  margin-top: 24px;
+}
+.panel-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.panel-section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--mz-fg-strong);
+}
+.panel-section-caption {
+  font-size: 11px;
+  color: var(--mz-fg-dim);
+}
+
+.panel-card {
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+
+.mini-list { display: flex; flex-direction: column; }
+.mini-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--mz-rule);
+  font-size: 12px;
+}
+.mini-row:last-child { border-bottom: none; }
+.mini-row-left {
+  min-width: 0;
+  flex: 1;
+}
+.mini-row-title {
+  color: var(--mz-fg-strong);
+  font-weight: 600;
+  font-size: 12.5px;
+  line-height: 1.3;
+}
+.mini-row-meta {
+  color: var(--mz-fg-dim);
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.mini-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.main-empty {
+  padding: 40px;
+  text-align: center;
+  color: var(--mz-fg-dim);
+  background: var(--mz-bg-card);
+  border: 1px dashed var(--mz-rule-strong);
+  border-radius: 12px;
+  font-size: 13px;
+  margin-top: 18px;
+}
+
+/* ============ INSPECTOR (direita) ============ */
+.insp-head {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--mz-rule);
+  flex-shrink: 0;
+  background: linear-gradient(180deg, rgba(var(--mz-tenant-primary-rgb), 0.06) 0%, transparent 100%);
+}
+.insp-head-label {
+  font-size: 10px;
+  color: var(--mz-fg-ghost);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.insp-head-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--mz-fg-strong);
+  letter-spacing: -0.01em;
+}
+
+.insp-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--mz-rule-strong) transparent;
+}
+
+.insp-section { margin-bottom: 22px; }
+.insp-section-title {
+  font-size: 10px;
+  color: var(--mz-fg-muted);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+/* personas grid */
+.personas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.persona-btn {
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  color: var(--mz-fg-muted);
+  transition: all .15s;
+  display: flex;
+  flex-direction: column;
+  min-height: 50px;
+}
+.persona-btn:hover { border-color: var(--mz-rule-strong); color: var(--mz-fg); }
+.persona-btn.active {
+  border-color: var(--mz-tenant-primary);
+  background: rgba(var(--mz-tenant-primary-rgb), 0.12);
+  color: var(--mz-fg-strong);
+  box-shadow: 0 0 0 1px rgba(var(--mz-tenant-primary-rgb), 0.35) inset;
+}
+.persona-btn-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.005em;
+}
+.persona-btn-sub {
+  font-size: 9.5px;
+  color: var(--mz-fg-ghost);
+  margin-top: 3px;
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.persona-btn.active .persona-btn-sub { color: var(--mz-fg-muted); }
+
+.persona-group-label {
+  font-size: 9px;
+  color: var(--mz-fg-ghost);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin: 10px 0 5px;
+}
+.persona-group-label:first-of-type { margin-top: 0; }
+
+/* tenant picker */
+.tenant-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.tenant-btn {
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 11px;
+  color: var(--mz-fg-muted);
+  font-weight: 600;
+  transition: all .15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tenant-btn:hover { color: var(--mz-fg); border-color: var(--mz-rule-strong); }
+.tenant-btn.active {
+  border-color: var(--mz-tenant-primary);
+  color: var(--mz-fg-strong);
+  background: rgba(var(--mz-tenant-primary-rgb), 0.08);
+}
+.tenant-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+/* rbac matrix */
+.rbac-wrap {
+  overflow-x: auto;
+  margin: -4px -4px 0;
+  padding: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--mz-rule-strong) transparent;
+}
+.rbac {
+  font-size: 10px;
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  min-width: 320px;
+}
+.rbac th, .rbac td {
+  text-align: center;
+  padding: 4px 2px;
+  border-bottom: 1px solid var(--mz-rule);
+  vertical-align: middle;
+  height: 22px;
+}
+.rbac th {
+  font-size: 9px;
+  color: var(--mz-fg-dim);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding-bottom: 6px;
+  white-space: nowrap;
+}
+.rbac td.rbac-label {
+  text-align: left;
+  color: var(--mz-fg);
+  font-weight: 500;
+  padding-left: 4px;
+  font-size: 11px;
+  letter-spacing: -0.005em;
+}
+.rbac td.rbac-label-active {
+  color: var(--mz-fg-strong);
+  font-weight: 600;
+}
+.rbac-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.rbac-mark-full { background: rgba(52,211,153,0.18); color: var(--mz-ok); }
+.rbac-mark-part { background: rgba(251,191,36,0.18); color: var(--mz-warn); }
+.rbac-mark-none { background: transparent; color: var(--mz-fg-ghost); }
+[data-theme="light"] .rbac-mark-full { background: rgba(5,150,105,0.15); }
+[data-theme="light"] .rbac-mark-part { background: rgba(217,119,6,0.15); }
+
+.rbac-legend {
+  display: flex;
+  gap: 14px;
+  margin-top: 10px;
+  font-size: 10px;
+  color: var(--mz-fg-dim);
+}
+.rbac-legend-row { display: flex; align-items: center; gap: 5px; }
+
+/* footer do insp */
+.insp-foot {
+  padding: 12px 16px;
+  border-top: 1px solid var(--mz-rule);
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--mz-fg-dim);
+  line-height: 1.5;
+}
+.insp-foot-strong { color: var(--mz-fg); font-weight: 600; }
+
+/* ícones inline svg helper */
+.ico { width: 15px; height: 15px; }
+
+/* responsive (mínimo) */
+@media (max-width: 1200px) {
+  .shell { grid-template-columns: 240px 1fr 340px; }
+}
+@media (max-width: 980px) {
+  .shell { grid-template-columns: 220px 1fr; }
+  .shell-insp { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <!-- SIDEBAR -->
+  <aside class="shell-sidebar">
+    <div class="brand">
+      <div class="brand-logo" id="brandLogo">UB</div>
+      <div class="brand-text">
+        <div class="brand-name" id="brandName">União Brasil</div>
+        <div class="brand-meta" id="brandMeta">Enterprise · v2.4.1</div>
+      </div>
+    </div>
+    <nav class="nav" id="sidebarNav"></nav>
+    <div class="session">
+      <div class="session-label">Sessão</div>
+      <div class="session-row">
+        <div class="session-avatar" id="sessionAvatar">PG</div>
+        <div class="session-text">
+          <div class="session-name" id="sessionName">Paulo Guedes</div>
+          <div class="session-role" id="sessionRole">Presidente · Nacional irrestrito</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="shell-main">
+    <header class="topbar">
+      <div class="crumbs">
+        <span class="crumb-dim" id="crumb1">União Brasil</span>
+        <span class="crumb-sep">›</span>
+        <span class="crumb-strong" id="crumb2">Dashboard</span>
+      </div>
+      <div style="flex:1"></div>
+      <button class="search-cmdk" type="button">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+        <span style="flex:1;text-align:left">Buscar candidato, UF, partido...</span>
+        <span class="kbd">⌘K</span>
+      </button>
+      <button class="btn-ghost" type="button" title="Alertas">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>
+        <span class="tnum" id="alertCount">7</span>
+      </button>
+      <button class="btn-ghost btn-icon" id="themeToggle" title="Alternar tema">
+        <svg class="ico" id="themeIco" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>
+      </button>
+      <div style="height:20px;width:1px;background:var(--mz-rule)"></div>
+      <span class="chip chip-muted" id="roleChip">
+        <span class="chip-dot" style="background:var(--mz-tenant-primary)"></span>
+        <span id="roleChipLabel">Presidente</span>
+      </span>
+    </header>
+    <div class="main-scroll" id="mainContent"></div>
+  </div>
+
+  <!-- INSPECTOR -->
+  <aside class="shell-insp">
+    <div class="insp-head">
+      <div class="insp-head-label">Protótipo · Sprint 1</div>
+      <div class="insp-head-title">Sidebar condicional · 9 perfis</div>
+    </div>
+    <div class="insp-scroll">
+      <div class="insp-section">
+        <div class="insp-section-title">Perfil ativo</div>
+        <div id="personasHost"></div>
+      </div>
+
+      <div class="insp-section">
+        <div class="insp-section-title">Tenant (white-label)</div>
+        <div class="tenant-row" id="tenantHost"></div>
+      </div>
+
+      <div class="insp-section">
+        <div class="insp-section-title">Permissões do perfil selecionado</div>
+        <div class="rbac-wrap">
+          <table class="rbac" id="rbacTable"></table>
+        </div>
+        <div class="rbac-legend">
+          <span class="rbac-legend-row"><span class="rbac-mark rbac-mark-full">✓</span> vê</span>
+          <span class="rbac-legend-row"><span class="rbac-mark rbac-mark-part">⦿</span> filtrado</span>
+          <span class="rbac-legend-row"><span class="rbac-mark rbac-mark-none">—</span> oculto</span>
+        </div>
+      </div>
+    </div>
+    <div class="insp-foot">
+      <span class="insp-foot-strong">Clique num perfil</span> pra alternar a sidebar, o avatar, o painel do meio e ver a matriz RBAC ajustar.
+    </div>
+  </aside>
+</div>
+
+<script>
+/* ============================================================
+   DADOS: perfis, módulos, matriz RBAC, tenants
+   ============================================================ */
+
+const PERSONAS = [
+  // grupo A
+  { group:'Cadeia de comando',  id:'presidente',         label:'Presidente',        sub:'Nacional irrestrito',      name:'Paulo Guedes',       initials:'PG' },
+  { group:'Cadeia de comando',  id:'lideranca_estadual', label:'Liderança UF',      sub:'Bahia',                    name:'Rui Costa',          initials:'RC' },
+  { group:'Cadeia de comando',  id:'coord_regional',     label:'Coord Regional',    sub:'Recôncavo',                name:'Otávio Campos',      initials:'OC' },
+  { group:'Cadeia de comando',  id:'coord_territorial',  label:'Coord Territorial', sub:'Itapagipe · Salvador',     name:'Márcia Oliveira',    initials:'MO' },
+  { group:'Cadeia de comando',  id:'cabo_eleitoral',     label:'Cabo Eleitoral',    sub:'Quadra R-14 · Itapagipe',  name:'João Pereira',       initials:'JP' },
+  // grupo B
+  { group:'Autoridades independentes', id:'politico_eleito',    label:'Político Eleito',      sub:'Senador · BA',            name:'Jaques Wagner',  initials:'JW' },
+  { group:'Autoridades independentes', id:'candidato',          label:'Candidato',            sub:'Campanha 2026',           name:'Ana Martins',    initials:'AM' },
+  { group:'Autoridades independentes', id:'equipe_gabinete',    label:'Equipe Gabinete',      sub:'Chefe de gabinete',       name:'Cristina Leite', initials:'CL' },
+  // grupo C e D
+  { group:'Operação',    id:'admin_partido', label:'Admin Partido',  sub:'Time administrativo',  name:'Rodrigo Sampaio', initials:'RS' },
+  { group:'Super admin', id:'admin_mazzel',  label:'Admin Mazzel',   sub:'Plataforma · tenants', name:'César Ribeiro',   initials:'CR' }
+];
+
+const TENANTS = [
+  { id:'uniao',  nome:'União Brasil', sigla:'UB', primary:'#002A7B', primaryRgb:'0,42,123',    plano:'Enterprise', versao:'v2.4.1' },
+  { id:'pt',     nome:'PT',           sigla:'PT', primary:'#E11D48', primaryRgb:'225,29,72',   plano:'Enterprise', versao:'v2.4.1' },
+  { id:'psdb',   nome:'PSDB',         sigla:'SD', primary:'#1E40AF', primaryRgb:'30,64,175',   plano:'Standard',   versao:'v2.4.1' },
+  { id:'pl',     nome:'PL',           sigla:'PL', primary:'#15803D', primaryRgb:'21,128,61',   plano:'Enterprise', versao:'v2.4.1' },
+  { id:'mazzel', nome:'Mazzel Demo',  sigla:'MZ', primary:'#6D28D9', primaryRgb:'109,40,217',  plano:'Demo',       versao:'v2.4.1' }
+];
+
+/*
+  Cada módulo tem icon (svg path d), label, href, seção visual ("Inteligência" etc),
+  e `visibility` por perfil: "full" | "filtered" | "hidden".
+  Alguns módulos têm lógica especial (ex: político eleito vê certas coisas como "consultivo").
+*/
+const MODULES = [
+  // Inteligência
+  { id:'home',      label:'Dashboard',        section:'Inteligência', href:'/mazzel-preview/home',
+    icon:'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z M9 22V12h6v10',
+    vis:{ presidente:'full', lideranca_estadual:'filtered', coord_regional:'filtered', coord_territorial:'filtered', cabo_eleitoral:'filtered', politico_eleito:'full', candidato:'filtered', equipe_gabinete:'filtered', admin_partido:'full', admin_mazzel:'full' } },
+  { id:'mapa',      label:'Mapa Eleitoral',   section:'Inteligência', href:'/mazzel-preview/mapa',
+    icon:'M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4 M8 2v16 M16 6v16',
+    vis:{ presidente:'full', lideranca_estadual:'filtered', coord_regional:'filtered', coord_territorial:'filtered', cabo_eleitoral:'hidden', politico_eleito:'full', candidato:'filtered', equipe_gabinete:'full', admin_partido:'full', admin_mazzel:'full' } },
+  { id:'radar',     label:'Radar Político',   section:'Inteligência', href:'/mazzel-preview/radar',
+    icon:'M12 12a4 4 0 1 1-3-6.92 M12 2a10 10 0 0 1 10 10h-4a6 6 0 0 0-6-6 M12 12h10',
+    vis:{ presidente:'full', lideranca_estadual:'filtered', coord_regional:'hidden', coord_territorial:'hidden', cabo_eleitoral:'hidden', politico_eleito:'full', candidato:'filtered', equipe_gabinete:'full', admin_partido:'full', admin_mazzel:'full' } },
+  { id:'dossies',   label:'Dossiês',          section:'Inteligência', href:'/mazzel-preview/dossies',
+    icon:'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4 M7 10l5 5 5-5 M12 15V3',
+    vis:{ presidente:'full', lideranca_estadual:'full', coord_regional:'full', coord_territorial:'full', cabo_eleitoral:'hidden', politico_eleito:'full', candidato:'full', equipe_gabinete:'full', admin_partido:'full', admin_mazzel:'full' } },
+  { id:'aliancas',  label:'Alianças',         section:'Inteligência', href:'/mazzel-preview/aliancas', badgeLabel:'NEW',
+    icon:'M17 11v-1a5 5 0 0 0-10 0v1 M7 11h10 M5 11h14v8a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z',
+    vis:{ presidente:'full', lideranca_estadual:'filtered', coord_regional:'filtered', coord_territorial:'hidden', cabo_eleitoral:'hidden', politico_eleito:'full', candidato:'filtered', equipe_gabinete:'full', admin_partido:'full', admin_mazzel:'full' } },
+  { id:'estudo',    label:'Módulo Estudo',    section:'Inteligência', href:'/mazzel-preview/estudo',
+    icon:'M3 3v18h18 M9 17V9 M13 17v-5 M17 17v-3',
+    vis:{ presidente:'full', lideranca_estadual:'filtered', coord_regional:'hidden', coord_territorial:'hidden', cabo_eleitoral:'hidden', politico_eleito:'full', candidato:'full', equipe_gabinete:'full', admin_partido:'full', admin_mazzel:'full' } },
+
+  // Ação política
+  { id:'campanha',  label:'Campanha 2026',    section:'Ação política', href:'/mazzel-preview/campanha',
+    icon:'M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z M4 22V15',
+    vis:{ presidente:'full', lideranca_estadual:'filtered', coord_regional:'filtered', coord_territorial:'filtered', cabo_eleitoral:'filtered', politico_eleito:'hidden', candidato:'filtered', equipe_gabinete:'hidden', admin_partido:'full', admin_mazzel:'full' } },
+  { id:'chat',      label:'Chat',    section:'Ação política', href:'/mazzel-preview/chat',
+    icon:'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z',
+    vis:{ presidente:'full', lideranca_estadual:'full', coord_regional:'full', coord_territorial:'full', cabo_eleitoral:'full', politico_eleito:'full', candidato:'full', equipe_gabinete:'full', admin_partido:'full', admin_mazzel:'full' } },
+  { id:'ia',        label:'Mazzel IA',    section:'Ação política', href:'/mazzel-preview/ia',
+    icon:'M12 2l2.4 7.4H22l-6 4.4 2.3 7.2L12 16.6l-6.3 4.4L8 14.8 2 10.4h7.6z',
+    vis:{ presidente:'full', lideranca_estadual:'full', coord_regional:'full', coord_territorial:'hidden', cabo_eleitoral:'hidden', politico_eleito:'full', candidato:'full', equipe_gabinete:'full', admin_partido:'full', admin_mazzel:'full' } },
+
+  // Estrutura (cadeia de comando) — colapsada sob "Lideranças"
+  // Nomenclatura interna: Presidente Nacional → Diretório Nacional → Diretórios Estaduais → Diretórios Municipais → Coordenadores Territoriais
+  { id:'liderancas',    label:'Lideranças',      section:'Estrutura', href:'/mazzel-preview/liderancas',
+    icon:'M6 3l1.5 4 4.5 1-4.5 1-1.5 4-1.5-4-4.5-1 4.5-1z M17 15l1 3 3 1-3 1-1 3-1-3-3-1 3-1z',
+    vis:{ presidente:'full', lideranca_estadual:'filtered', coord_regional:'filtered', coord_territorial:'hidden', cabo_eleitoral:'hidden', politico_eleito:'hidden', candidato:'hidden', equipe_gabinete:'hidden', admin_partido:'full', admin_mazzel:'full' } },
+  // Cabos Eleitorais → submódulo de Campanha 2026
+  // Suplentes → submódulo de Radar Político
+  { id:'filiados',      label:'Filiados',        section:'Estrutura', href:'/mazzel-preview/afiliados', badgeLabel:'NEW',
+    icon:'M17 11l2 2 4-4 M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8',
+    vis:{ presidente:'full', lideranca_estadual:'filtered', coord_regional:'filtered', coord_territorial:'filtered', cabo_eleitoral:'hidden', politico_eleito:'hidden', candidato:'hidden', equipe_gabinete:'hidden', admin_partido:'full', admin_mazzel:'full' } },
+
+  // Campo (visão do Cabo)
+  { id:'agenda_dia', label:'Agenda do dia',     section:'Campo', href:'/mazzel-preview/cabo/agenda',
+    icon:'M8 2v4 M16 2v4 M3 9h18 M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z',
+    vis:{ presidente:'hidden', lideranca_estadual:'hidden', coord_regional:'hidden', coord_territorial:'hidden', cabo_eleitoral:'full', politico_eleito:'hidden', candidato:'hidden', equipe_gabinete:'hidden', admin_partido:'full', admin_mazzel:'hidden' } },
+  { id:'minha_area', label:'Minha área',        section:'Campo', href:'/mazzel-preview/cabo/area',
+    icon:'M12 2a8 8 0 0 0-8 8c0 6 8 12 8 12s8-6 8-12a8 8 0 0 0-8-8z M12 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4z',
+    vis:{ presidente:'hidden', lideranca_estadual:'hidden', coord_regional:'hidden', coord_territorial:'hidden', cabo_eleitoral:'full', politico_eleito:'hidden', candidato:'hidden', equipe_gabinete:'hidden', admin_partido:'full', admin_mazzel:'hidden' } },
+  { id:'metas_sem',  label:'Metas da semana',   section:'Campo', href:'/mazzel-preview/cabo/metas',
+    icon:'M22 12h-4l-3 9L9 3 6 12H2',
+    vis:{ presidente:'hidden', lideranca_estadual:'hidden', coord_regional:'hidden', coord_territorial:'hidden', cabo_eleitoral:'full', politico_eleito:'hidden', candidato:'hidden', equipe_gabinete:'hidden', admin_partido:'full', admin_mazzel:'hidden' } },
+  { id:'registro',   label:'Registro rápido',   section:'Campo', href:'/mazzel-preview/cabo/registro',
+    icon:'M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z M12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z',
+    vis:{ presidente:'hidden', lideranca_estadual:'hidden', coord_regional:'hidden', coord_territorial:'hidden', cabo_eleitoral:'full', politico_eleito:'hidden', candidato:'hidden', equipe_gabinete:'hidden', admin_partido:'full', admin_mazzel:'hidden' } },
+
+  // Mandato (político eleito + equipe)
+  { id:'compromissos', label:'Compromissos', section:'Mandato', href:'/mazzel-preview/mandato/compromissos',
+    icon:'M9 11l3 3 8-8 M20 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9',
+    vis:{ presidente:'hidden', lideranca_estadual:'hidden', coord_regional:'hidden', coord_territorial:'hidden', cabo_eleitoral:'hidden', politico_eleito:'full', candidato:'hidden', equipe_gabinete:'full', admin_partido:'full', admin_mazzel:'hidden' } },
+  { id:'estrutura_partido', label:'Estrutura do partido', section:'Mandato', href:'/mazzel-preview/mandato/estrutura', consultivo:true,
+    icon:'M3 21h18 M5 21V7l8-4v18 M19 21V11l-6-4',
+    vis:{ presidente:'hidden', lideranca_estadual:'hidden', coord_regional:'hidden', coord_territorial:'hidden', cabo_eleitoral:'hidden', politico_eleito:'full', candidato:'hidden', equipe_gabinete:'full', admin_partido:'full', admin_mazzel:'hidden' } },
+
+  // Operação
+  { id:'agenda', label:'Agenda', section:'Operação', href:'/mazzel-preview/agenda', badgeLabel:'NEW',
+    icon:'M8 2v4 M16 2v4 M3 9h18 M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z M8 14h.01 M12 14h.01 M16 14h.01',
+    vis:{ presidente:'full', lideranca_estadual:'full', coord_regional:'full', coord_territorial:'full', cabo_eleitoral:'hidden', politico_eleito:'full', candidato:'full', equipe_gabinete:'full', admin_partido:'full', admin_mazzel:'full' } },
+  { id:'alertas',   label:'Alertas',         section:'Operação', href:'/mazzel-preview/alertas', badge:7,
+    icon:'M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9 M10.3 21a1.94 1.94 0 0 0 3.4 0',
+    vis:{ presidente:'full', lideranca_estadual:'filtered', coord_regional:'filtered', coord_territorial:'filtered', cabo_eleitoral:'filtered', politico_eleito:'full', candidato:'filtered', equipe_gabinete:'full', admin_partido:'full', admin_mazzel:'full' } },
+  { id:'relatorios', label:'Relatórios',     section:'Operação', href:'/mazzel-preview/relatorios',
+    icon:'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6 M16 13H8 M16 17H8 M10 9H8',
+    vis:{ presidente:'full', lideranca_estadual:'filtered', coord_regional:'filtered', coord_territorial:'hidden', cabo_eleitoral:'hidden', politico_eleito:'full', candidato:'filtered', equipe_gabinete:'full', admin_partido:'full', admin_mazzel:'full' } },
+
+  // Conta
+  { id:'portal',    label:'Meu painel',      section:'Conta', href:'/mazzel-preview/portal',
+    icon:'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z',
+    vis:{ presidente:'full', lideranca_estadual:'full', coord_regional:'full', coord_territorial:'full', cabo_eleitoral:'full', politico_eleito:'full', candidato:'full', equipe_gabinete:'full', admin_partido:'full', admin_mazzel:'full' } },
+  { id:'glossario', label:'Glossário',       section:'Conta', href:'/mazzel-preview/glossario',
+    icon:'M4 19.5A2.5 2.5 0 0 1 6.5 17H20 M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z',
+    vis:{ presidente:'full', lideranca_estadual:'full', coord_regional:'full', coord_territorial:'full', cabo_eleitoral:'full', politico_eleito:'full', candidato:'full', equipe_gabinete:'full', admin_partido:'full', admin_mazzel:'full' } },
+  { id:'admin',     label:'Admin',           section:'Conta', href:'/mazzel-preview/admin',
+    icon:'M12.2 2h-.4a2 2 0 0 0-2 2v.2c0 .7-.3 1.4-.9 1.8l-.2.1c-.6.3-1.3.3-1.9 0l-.2-.1a2 2 0 0 0-2.7.7l-.2.4a2 2 0 0 0 .7 2.7l.2.1c.6.3.9 1 .9 1.7v.2c0 .7-.3 1.3-.9 1.7l-.2.1a2 2 0 0 0-.7 2.7l.2.4a2 2 0 0 0 2.7.7l.2-.1c.6-.3 1.3-.3 1.9 0l.2.1c.6.4.9 1 .9 1.8v.2a2 2 0 0 0 2 2h.4a2 2 0 0 0 2-2v-.2c0-.7.3-1.4.9-1.8l.2-.1c.6-.3 1.3-.3 1.9 0l.2.1a2 2 0 0 0 2.7-.7l.2-.3a2 2 0 0 0-.7-2.8l-.2-.1a2 2 0 0 1-.9-1.7v-.2c0-.7.3-1.4.9-1.7l.2-.1a2 2 0 0 0 .7-2.7l-.2-.4a2 2 0 0 0-2.7-.7l-.2.1c-.6.3-1.3.3-1.9 0l-.2-.1a2 2 0 0 1-.9-1.8v-.2A2 2 0 0 0 12.2 2z M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z',
+    vis:{ presidente:'hidden', lideranca_estadual:'hidden', coord_regional:'hidden', coord_territorial:'hidden', cabo_eleitoral:'hidden', politico_eleito:'hidden', candidato:'hidden', equipe_gabinete:'hidden', admin_partido:'full', admin_mazzel:'full' } },
+  { id:'super',     label:'Super Admin',     section:'Conta', href:'/mazzel-preview/super',
+    icon:'M12 2l10 5v6c0 5-4 9-10 9S2 18 2 13V7z M9 12l2 2 4-4',
+    vis:{ presidente:'hidden', lideranca_estadual:'hidden', coord_regional:'hidden', coord_territorial:'hidden', cabo_eleitoral:'hidden', politico_eleito:'hidden', candidato:'hidden', equipe_gabinete:'hidden', admin_partido:'hidden', admin_mazzel:'full' } }
+];
+
+// ordem canônica de seções na sidebar
+const SECTION_ORDER = ['Inteligência','Ação política','Estrutura','Campo','Mandato','Operação','Conta'];
+
+/* ============================================================
+   ESTADO + RENDER
+   ============================================================ */
+
+const STATE = {
+  persona: 'presidente',
+  tenantId: 'uniao',
+  theme: (localStorage.getItem('mz-theme') === 'light' ? 'light' : 'dark')
+};
+
+// ---------- ícone SVG ----------
+function icoSvg(d) {
+  return `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`;
+}
+
+// ---------- render personas ----------
+function renderPersonas() {
+  const host = document.getElementById('personasHost');
+  const groups = [];
+  PERSONAS.forEach(p => {
+    let g = groups.find(x => x.name === p.group);
+    if (!g) { g = { name: p.group, items: [] }; groups.push(g); }
+    g.items.push(p);
+  });
+  let html = '';
+  groups.forEach(g => {
+    html += `<div class="persona-group-label">${g.name}</div>`;
+    html += `<div class="personas">`;
+    g.items.forEach(p => {
+      const active = STATE.persona === p.id ? 'active' : '';
+      html += `<button class="persona-btn ${active}" data-persona="${p.id}">
+        <span class="persona-btn-label">${p.label}</span>
+        <span class="persona-btn-sub">${p.sub}</span>
+      </button>`;
+    });
+    html += `</div>`;
+  });
+  host.innerHTML = html;
+  host.querySelectorAll('[data-persona]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      STATE.persona = btn.dataset.persona;
+      renderAll();
+    });
+  });
+}
+
+// ---------- render tenants ----------
+function renderTenants() {
+  const host = document.getElementById('tenantHost');
+  host.innerHTML = TENANTS.map(t => {
+    const active = STATE.tenantId === t.id ? 'active' : '';
+    return `<button class="tenant-btn ${active}" data-tenant="${t.id}">
+      <span class="tenant-swatch" style="background:${t.primary}"></span>
+      ${t.nome}
+    </button>`;
+  }).join('');
+  host.querySelectorAll('[data-tenant]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      STATE.tenantId = btn.dataset.tenant;
+      renderAll();
+    });
+  });
+}
+
+// ---------- aplicar tokens de tenant ----------
+function applyTenant() {
+  const t = TENANTS.find(x => x.id === STATE.tenantId) || TENANTS[0];
+  const rs = document.documentElement.style;
+  rs.setProperty('--mz-tenant-primary', t.primary);
+  rs.setProperty('--mz-tenant-primary-rgb', t.primaryRgb);
+  document.getElementById('brandLogo').textContent = t.sigla;
+  document.getElementById('brandName').textContent = t.nome;
+  document.getElementById('brandMeta').textContent = `${t.plano} · ${t.versao}`;
+  document.getElementById('crumb1').textContent = t.nome;
+}
+
+// ---------- render sidebar ----------
+function renderSidebar() {
+  const persona = PERSONAS.find(p => p.id === STATE.persona);
+  const visible = MODULES.filter(m => m.vis[STATE.persona] !== 'hidden');
+  // agrupa por seção
+  const bySection = {};
+  visible.forEach(m => {
+    if (!bySection[m.section]) bySection[m.section] = [];
+    bySection[m.section].push(m);
+  });
+
+  // só exibe label de seção se tiver >1 item OU houver mais de 1 seção total
+  const sections = SECTION_ORDER.filter(s => bySection[s] && bySection[s].length);
+  const showSectionLabels = sections.length > 1;
+
+  let html = '';
+  let firstActiveId = null;
+  sections.forEach(section => {
+    if (showSectionLabels) html += `<div class="nav-divider" aria-hidden="true"></div>`;
+    bySection[section].forEach(m => {
+      if (!firstActiveId) firstActiveId = m.id;
+      const isActive = m.id === 'home' || (m.id === firstActiveId && !bySection['Inteligência']?.find(x => x.id === 'home'));
+      const isHome = m.id === 'home' || (m.id === firstActiveId);
+      const activeClass = isHome && m.id === firstActiveId ? 'active' : '';
+      const consult = m.consultivo ? 'consultivo' : '';
+      const badgeHtml = m.badgeLabel
+        ? `<span class="nav-item-badge nav-item-badge-new">${m.badgeLabel}</span>`
+        : (m.badge ? `<span class="nav-item-badge nav-item-badge-red">${m.badge}</span>` : '');
+      const consultLabel = m.consultivo ? `<span class="nav-item-consult">consulta</span>` : '';
+      html += `<a href="#" class="nav-item ${activeClass} ${consult}" data-mod="${m.id}">
+        <span class="nav-item-ico">${icoSvg(m.icon)}</span>
+        <span class="nav-item-label">${m.label}</span>
+        ${consultLabel || badgeHtml}
+      </a>`;
+    });
+  });
+  document.getElementById('sidebarNav').innerHTML = html;
+
+  // Click handlers (ilustrativo — só atualiza breadcrumb + main preview)
+  document.querySelectorAll('#sidebarNav .nav-item').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.querySelectorAll('#sidebarNav .nav-item').forEach(x => x.classList.remove('active'));
+      el.classList.add('active');
+      const m = MODULES.find(x => x.id === el.dataset.mod);
+      document.getElementById('crumb2').textContent = m.label;
+    });
+  });
+
+  // Session
+  document.getElementById('sessionAvatar').textContent = persona.initials;
+  document.getElementById('sessionName').textContent = persona.name;
+  document.getElementById('sessionRole').textContent = `${persona.label} · ${persona.sub}`;
+
+  // Role chip
+  document.getElementById('roleChipLabel').textContent = persona.label;
+}
+
+// ---------- render main (preview do dashboard do perfil) ----------
+function renderMain() {
+  const persona = PERSONAS.find(p => p.id === STATE.persona);
+  const host = document.getElementById('mainContent');
+  const firstModule = MODULES.find(m => m.vis[STATE.persona] !== 'hidden');
+  document.getElementById('crumb2').textContent = firstModule ? firstModule.label : 'Dashboard';
+
+  const title = getMainTitle(persona);
+  const sub = getMainSub(persona);
+  const kpis = getMainKpis(persona);
+  const body = getMainBody(persona);
+
+  host.innerHTML = `
+    <div class="main-head">
+      <div class="main-eyebrow">Aterrissagem padrão · ${persona.label}</div>
+      <div class="main-title">${title}</div>
+      <div class="main-sub">${sub}</div>
+      ${getMainAlert(persona)}
+    </div>
+    ${kpis ? `<div class="kpi-grid">${kpis}</div>` : ''}
+    ${body}
+  `;
+
+  // alertCount badge
+  const counts = { presidente:7, lideranca_estadual:4, coord_regional:3, coord_territorial:5, cabo_eleitoral:2, politico_eleito:3, candidato:2, equipe_gabinete:6, admin_partido:1, admin_mazzel:0 };
+  const c = counts[STATE.persona] ?? 0;
+  document.getElementById('alertCount').textContent = c;
+  document.querySelector('#alertCount').parentElement.style.display = c > 0 ? '' : 'none';
+}
+
+function kpiCard(label, value, delta, variant) {
+  const cls = variant === 'pos' ? 'pos' : (variant === 'neg' ? 'neg' : '');
+  return `<div class="kpi">
+    <div class="kpi-label">${label}</div>
+    <div class="kpi-value tnum">${value}</div>
+    ${delta ? `<div class="kpi-delta ${cls}">${delta}</div>` : ''}
+  </div>`;
+}
+
+function miniList(rows) {
+  return `<div class="mini-list">${rows.map(r => `
+    <div class="mini-row">
+      <span class="mini-dot" style="background:${r.color || '#3b82f6'}"></span>
+      <div class="mini-row-left">
+        <div class="mini-row-title">${r.title}</div>
+        <div class="mini-row-meta">${r.meta}</div>
+      </div>
+      ${r.chip ? `<span class="chip ${r.chip.cls}">${r.chip.label}</span>` : ''}
+    </div>
+  `).join('')}</div>`;
+}
+
+function getMainTitle(p) {
+  switch (p.id) {
+    case 'presidente':         return 'Visão nacional · União Brasil';
+    case 'lideranca_estadual': return 'Bahia · liderança estadual';
+    case 'coord_regional':     return 'Recôncavo · coordenação regional';
+    case 'coord_territorial':  return 'Itapagipe · mapa do cabo';
+    case 'cabo_eleitoral':     return 'Bom dia, João. Hoje você tem 4 paradas.';
+    case 'politico_eleito':    return 'Senador Jaques Wagner · mandato';
+    case 'candidato':          return 'Ana Martins · minha campanha';
+    case 'equipe_gabinete':    return 'Gabinete do Senador Wagner';
+    case 'admin_partido':      return 'Operação administrativa · União Brasil';
+    case 'admin_mazzel':       return 'Plataforma Mazzel · todos os tenants';
+  }
+}
+function getMainSub(p) {
+  switch (p.id) {
+    case 'presidente':         return 'Agregado de 827 campanhas ativas em todas as 27 UFs. Decisões estratégicas, alocação orçamentária, convenções, crises jurídicas.';
+    case 'lideranca_estadual': return 'Você gerencia 41 campanhas na Bahia. Designe coordenadores regionais, acompanhe metas por município e valide prestações de conta.';
+    case 'coord_regional':     return 'Você coordena 12 campanhas em 6 municípios do Recôncavo. Designe coordenadores territoriais e acompanhe progresso no mapa.';
+    case 'coord_territorial':  return 'Você coordena 14 bairros em Salvador. Designe cabos, valide rondas e monitore cobertura rua a rua.';
+    case 'cabo_eleitoral':     return 'Quadra R-14 · Rua do Carmo, 8 quarteirões. Check-in das 08:00. Coordenação por Márcia Oliveira.';
+    case 'politico_eleito':    return 'Senador da República · Bahia. Agenda, Radar, Alianças e visão consultiva da estrutura do partido.';
+    case 'candidato':          return 'Sua candidatura a deputada estadual pela Bahia. Visualize seu dossiê, aliados, agenda e indicadores de campanha.';
+    case 'equipe_gabinete':    return 'Você atende ao Senador Jaques Wagner. Agenda sincronizada via Google, compromissos, alertas e Radar Político.';
+    case 'admin_partido':      return 'Filiados, lideranças, prestação de contas, relatórios institucionais. Sem acesso a campanhas individuais.';
+    case 'admin_mazzel':       return 'Gestão de tenants, white-label, usuários, billing, telemetria. Acesso irrestrito.';
+  }
+}
+function getMainAlert(p) {
+  if (p.id === 'cabo_eleitoral') return `<div class="main-alert">
+    <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+    <span><b style="color:var(--mz-fg-strong)">Modo validado ativo.</b> Sua coordenadora fará o check-in por você hoje. Leve RG e o crachá.</span>
+  </div>`;
+  if (p.id === 'politico_eleito') return `<div class="main-alert">
+    <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+    <span><b style="color:var(--mz-fg-strong)">Você é autoridade independente.</b> Vê a estrutura do partido apenas consultivamente. Designações ficam com a Presidência.</span>
+  </div>`;
+  return '';
+}
+
+function getMainKpis(p) {
+  switch (p.id) {
+    case 'presidente': return kpiCard('Campanhas ativas','827','+34 nos últimos 7d','pos')
+                            + kpiCard('UFs cobertas','27/27','100%','pos')
+                            + kpiCard('Alertas críticos','3','-2 vs ontem','pos')
+                            + kpiCard('Filiados','1.42M','+12.4K mês','pos');
+    case 'lideranca_estadual': return kpiCard('Campanhas BA','41','6 em risco','neg')
+                            + kpiCard('Cabos ativos','1.204','+89 mês','pos')
+                            + kpiCard('Cobertura Salvador','72%','+4%','pos')
+                            + kpiCard('Alertas abertos','4','2 críticos','neg');
+    case 'coord_regional': return kpiCard('Municípios','6','2 sem coord. terr.','neg')
+                            + kpiCard('Cabos ativos','187','+12 semana','pos')
+                            + kpiCard('Metas atingidas','64%','+3%','pos')
+                            + kpiCard('Chat furtivo','12','últimas 24h','');
+    case 'coord_territorial': return kpiCard('Bairros','14','2 sub-cobertos','neg')
+                            + kpiCard('Cabos','46','8 sem smartphone','')
+                            + kpiCard('Rondas validadas','23','hoje','pos')
+                            + kpiCard('Conflitos','2','revisar','neg');
+    case 'cabo_eleitoral': return kpiCard('Paradas hoje','4','2 feitas','pos')
+                            + kpiCard('Meta semanal','3/5','ruas cobertas','')
+                            + kpiCard('Próxima visita','09:40','Rua do Carmo','')
+                            + kpiCard('Check-ins validados','11','mês','pos');
+    case 'politico_eleito': return kpiCard('Compromissos hoje','6','2 críticos','')
+                            + kpiCard('Votações esta sem.','14','3 cruciais','')
+                            + kpiCard('Alertas Radar','3','1 Alianças','')
+                            + kpiCard('Aprovação BA','58%','+2p mês','pos');
+    case 'candidato': return kpiCard('Dias pra eleição','187','','')
+                            + kpiCard('Verba mobilizada','R$ 1.2M','35% meta','')
+                            + kpiCard('Eventos agendados','12','próximos 30d','')
+                            + kpiCard('Intenção de voto','8%','+1p semana','pos');
+    case 'equipe_gabinete': return kpiCard('Compromissos','6','hoje','')
+                            + kpiCard('Confirmados','4','2 pendentes','neg')
+                            + kpiCard('E-mails na fila','24','priorizar 3','')
+                            + kpiCard('Alertas','6','2 do Radar','');
+    case 'admin_partido': return kpiCard('Filiados válidos','1.42M','+12.4K mês','pos')
+                            + kpiCard('Lideranças','418','+6 semana','pos')
+                            + kpiCard('Pendências TSE','3','próx. prazo 12d','neg')
+                            + kpiCard('Prest. contas','94%','conformes','pos');
+    case 'admin_mazzel': return kpiCard('Tenants ativos','5','PT entrou ontem','pos')
+                            + kpiCard('Usuários','3.847','MAU','')
+                            + kpiCard('Uptime 30d','99.97%','','pos')
+                            + kpiCard('Billing MRR','R$ 184K','+12%','pos');
+  }
+}
+
+function getMainBody(p) {
+  const two = (a,b) => `<div style="display:grid;grid-template-columns:1.4fr 1fr;gap:14px;margin-top:16px">${a}${b}</div>`;
+
+  switch (p.id) {
+    case 'presidente':
+    case 'admin_mazzel':
+      return two(
+        `<div class="panel-card"><div class="panel-section-head"><span class="panel-section-title">Campanhas em risco · top 5</span><span class="panel-section-caption">5 de 62 listadas</span></div>${miniList([
+          {title:'Carlos Brito · Dep. Federal · PE', meta:'Queda de 8p · verba travada há 11 dias', color:'#ef4444', chip:{cls:'chip-red',label:'CRÍTICO'}},
+          {title:'Lídia Rocha · Senado · MT', meta:'Coordenador regional inativo há 6d', color:'#fbbf24', chip:{cls:'chip-amber',label:'ALTO'}},
+          {title:'Vanessa Melo · Dep. Est. · BA', meta:'Pesquisa interna caiu 3p', color:'#fbbf24', chip:{cls:'chip-amber',label:'ALTO'}},
+          {title:'Paulo Matos · Prefeito · AL', meta:'CEIS pendente há 14 dias', color:'#ef4444', chip:{cls:'chip-red',label:'CRÍTICO'}},
+          {title:'Clóvis Sena · Vereador · SP', meta:'Aliança PSDB quebrada ontem', color:'#fbbf24'}
+        ])}</div>`,
+        `<div class="panel-card"><div class="panel-section-head"><span class="panel-section-title">Radar · próximos 48h</span></div>${miniList([
+          {title:'Votação PL 2634 · LC impostos', meta:'Câmara · quinta 14h', color:'#3b82f6'},
+          {title:'CPI Redes Sociais', meta:'Senado · quinta 10h', color:'#a855f7'},
+          {title:'Convenção MDB-AL', meta:'Sábado · aliança em jogo', color:'#f97316'}
+        ])}</div>`
+      );
+
+    case 'lideranca_estadual':
+      return two(
+        `<div class="panel-card"><div class="panel-section-head"><span class="panel-section-title">Municípios · Bahia</span><span class="panel-section-caption">6 em risco</span></div>${miniList([
+          {title:'Salvador', meta:'14 campanhas · cobertura 72%', color:'#22c55e', chip:{cls:'chip-green',label:'OK'}},
+          {title:'Feira de Santana', meta:'6 campanhas · cobertura 58%', color:'#fbbf24', chip:{cls:'chip-amber',label:'MÉDIA'}},
+          {title:'Camaçari', meta:'3 campanhas · coord. vacante', color:'#ef4444', chip:{cls:'chip-red',label:'SEM COORD'}},
+          {title:'Ilhéus', meta:'2 campanhas · orçamento crítico', color:'#ef4444', chip:{cls:'chip-red',label:'CRÍTICO'}},
+          {title:'Vitória da Conquista', meta:'4 campanhas · cobertura 65%', color:'#22c55e'}
+        ])}</div>`,
+        `<div class="panel-card"><div class="panel-section-head"><span class="panel-section-title">Designações pendentes</span></div>${miniList([
+          {title:'Coord. regional · Recôncavo', meta:'2 candidatos sugeridos pela IA', color:'#3b82f6'},
+          {title:'Coord. regional · Sertão', meta:'Vacante há 8 dias', color:'#ef4444'},
+          {title:'Lideranças municipais', meta:'3 pendentes', color:'#fbbf24'}
+        ])}</div>`
+      );
+
+    case 'coord_regional':
+      return two(
+        `<div class="panel-card"><div class="panel-section-head"><span class="panel-section-title">Municípios · Recôncavo</span></div>${miniList([
+          {title:'Santo Amaro', meta:'3 campanhas · 42 cabos · 68% cobertura', color:'#22c55e'},
+          {title:'Cachoeira', meta:'2 campanhas · 28 cabos · 74%', color:'#22c55e'},
+          {title:'Maragogipe', meta:'1 campanha · sem coord. territorial', color:'#ef4444', chip:{cls:'chip-red',label:'VACANTE'}},
+          {title:'Muritiba', meta:'2 campanhas · 18 cabos · 51%', color:'#fbbf24'},
+          {title:'Nazaré', meta:'2 campanhas · 24 cabos · 66%', color:'#22c55e'},
+          {title:'São Félix', meta:'2 campanhas · sem coord. territorial', color:'#ef4444'}
+        ])}</div>`,
+        `<div class="panel-card"><div class="panel-section-head"><span class="panel-section-title">Cabos sem smartphone</span></div>${miniList([
+          {title:'José Ferreira · 72 anos', meta:'Santo Amaro · modo validado', color:'#a855f7'},
+          {title:'Maria das Dores · 68 anos', meta:'Cachoeira · modo validado', color:'#a855f7'},
+          {title:'Antônio Braga · 64 anos', meta:'Muritiba · modo validado', color:'#a855f7'},
+          {title:'+5 outros', meta:'Ronda de validação hoje 14h', color:'#71717a'}
+        ])}</div>`
+      );
+
+    case 'coord_territorial':
+      return two(
+        `<div class="panel-card"><div class="panel-section-head"><span class="panel-section-title">Bairros · Itapagipe</span></div>${miniList([
+          {title:'Bonfim', meta:'8 quadras · 12 cabos · cobertura 82%', color:'#22c55e'},
+          {title:'Ribeira', meta:'6 quadras · 9 cabos · 71%', color:'#22c55e'},
+          {title:'Calçada', meta:'5 quadras · 7 cabos · 54%', color:'#fbbf24'},
+          {title:'Mares', meta:'4 quadras · 2 cabos · 31%', color:'#ef4444', chip:{cls:'chip-red',label:'BAIXA'}},
+          {title:'Uruguai', meta:'7 quadras · 10 cabos · 68%', color:'#22c55e'}
+        ])}</div>`,
+        `<div class="panel-card"><div class="panel-section-head"><span class="panel-section-title">Ronda de validação · hoje</span></div>${miniList([
+          {title:'08:00 · José Ferreira · Bonfim', meta:'Presença OK', color:'#22c55e'},
+          {title:'09:30 · Maria das Dores · Ribeira', meta:'Aguardando', color:'#fbbf24'},
+          {title:'11:00 · Antônio Braga · Calçada', meta:'Próximo', color:'#71717a'},
+          {title:'14:00 · Clara Souza · Mares', meta:'Próximo', color:'#71717a'}
+        ])}</div>`
+      );
+
+    case 'cabo_eleitoral':
+      return `<div class="panel-section">
+        <div class="panel-section-head"><span class="panel-section-title">Agenda de hoje · segunda 23/04</span><span class="panel-section-caption">Modo validado</span></div>
+        <div class="panel-card">${miniList([
+          {title:'08:00 · Check-in na Rua do Carmo', meta:'Feito via coordenadora Márcia', color:'#22c55e', chip:{cls:'chip-green',label:'OK'}},
+          {title:'09:40 · Visita Sra. Clotilde · nº 48', meta:'Idosa · levar panfleto em fonte grande', color:'#3b82f6'},
+          {title:'11:00 · Panfletagem · Rua São Pedro', meta:'Meta 80 panfletos', color:'#3b82f6'},
+          {title:'14:30 · Reunião de quadra · Bar da Nena', meta:'Levar assinaturas da Sra. Clotilde', color:'#3b82f6'}
+        ])}</div>
+      </div>`;
+
+    case 'politico_eleito':
+      return two(
+        `<div class="panel-card"><div class="panel-section-head"><span class="panel-section-title">Agenda · próximos 2 dias</span><span class="panel-section-caption">Google · sincronizada</span></div>${miniList([
+          {title:'10:00 · Sessão Plenária · Sen. Federal', meta:'PL 2634 em pauta', color:'#3b82f6', chip:{cls:'chip-blue',label:'VOTAÇÃO'}},
+          {title:'14:30 · Reunião bancada BA', meta:'Estratégia de aliança', color:'#a855f7'},
+          {title:'16:00 · Entrevista Globo News', meta:'Economia · 15min ao vivo', color:'#f97316', chip:{cls:'chip-amber',label:'MÍDIA'}},
+          {title:'Ter 09:00 · CPI Redes Sociais', meta:'Senado · sabatina', color:'#ef4444'},
+          {title:'Ter 19:00 · Convenção MDB · AL', meta:'Aliança estratégica', color:'#3b82f6'}
+        ])}</div>`,
+        `<div class="panel-card"><div class="panel-section-head"><span class="panel-section-title">Radar do dia</span></div>${miniList([
+          {title:'PL 2634 aprovado na Câmara', meta:'Novo em pauta no Senado', color:'#3b82f6'},
+          {title:'Aliança PSDB-PT fragilizada', meta:'+1p no índice de volatilidade', color:'#fbbf24'},
+          {title:'TCU · sanção Dep. Rocha', meta:'Adversário direto', color:'#ef4444'}
+        ])}</div>`
+      );
+
+    case 'candidato':
+      return two(
+        `<div class="panel-card"><div class="panel-section-head"><span class="panel-section-title">Próximos eventos</span></div>${miniList([
+          {title:'Sáb 10:00 · Reunião ABAV Ilhéus', meta:'200 confirmados', color:'#3b82f6'},
+          {title:'Dom 15:00 · Panfletagem Centro', meta:'30 voluntários', color:'#3b82f6'},
+          {title:'Ter 19:00 · Debate Rádio Candeias', meta:'Preparação com consultor 17h', color:'#f97316'}
+        ])}</div>`,
+        `<div class="panel-card"><div class="panel-section-head"><span class="panel-section-title">Meu dossiê</span></div>${miniList([
+          {title:'Ranking interno', meta:'OVR 74 · tier Ouro · 12º na BA', color:'#fbbf24'},
+          {title:'Atualizar perfil público', meta:'3 seções incompletas', color:'#ef4444'},
+          {title:'Histórico eleitoral', meta:'Vereadora 2022 · 4.2K votos', color:'#71717a'}
+        ])}</div>`
+      );
+
+    case 'equipe_gabinete':
+      return two(
+        `<div class="panel-card"><div class="panel-section-head"><span class="panel-section-title">Agenda do Senador · hoje</span></div>${miniList([
+          {title:'10:00 · Sessão Plenária', meta:'Confirmado', color:'#22c55e'},
+          {title:'14:30 · Reunião bancada BA', meta:'A confirmar', color:'#fbbf24'},
+          {title:'16:00 · Entrevista Globo News', meta:'Confirmado · briefing entregue', color:'#22c55e'},
+          {title:'18:00 · Jantar com aliados', meta:'Confirmação pendente', color:'#fbbf24'}
+        ])}</div>`,
+        `<div class="panel-card"><div class="panel-section-head"><span class="panel-section-title">Comunicados internos</span></div>${miniList([
+          {title:'Novo rito de tramitação', meta:'Mesa Diretora · ler', color:'#3b82f6'},
+          {title:'Resposta à mídia sobre PL', meta:'Aguardando aprovação', color:'#fbbf24'},
+          {title:'Relatório da CPI', meta:'Disponível amanhã', color:'#71717a'}
+        ])}</div>`
+      );
+
+    case 'admin_partido':
+      return two(
+        `<div class="panel-card"><div class="panel-section-head"><span class="panel-section-title">Prestação de contas · estados</span></div>${miniList([
+          {title:'Bahia', meta:'Completo · validado', color:'#22c55e'},
+          {title:'Pernambuco', meta:'Pendente · 3 NFs', color:'#fbbf24'},
+          {title:'São Paulo', meta:'Completo · validado', color:'#22c55e'},
+          {title:'Minas Gerais', meta:'Incompleto · prazo 12d', color:'#ef4444'}
+        ])}</div>`,
+        `<div class="panel-card"><div class="panel-section-head"><span class="panel-section-title">Pendências TSE</span></div>${miniList([
+          {title:'DRAP BA · Dep. Est.', meta:'Prazo 12d', color:'#ef4444'},
+          {title:'Convenção PE', meta:'Certidão faltante', color:'#fbbf24'},
+          {title:'Filiação SP', meta:'Revisão em 200 casos', color:'#71717a'}
+        ])}</div>`
+      );
+  }
+  return '';
+}
+
+/* ============================================================
+   MATRIZ RBAC VISUAL
+   ============================================================ */
+
+const PERSONA_SHORT = [
+  { id:'presidente', short:'Pres' },
+  { id:'lideranca_estadual', short:'LidUF' },
+  { id:'coord_regional', short:'CReg' },
+  { id:'coord_territorial', short:'CTer' },
+  { id:'cabo_eleitoral', short:'Cabo' },
+  { id:'politico_eleito', short:'PolEl' },
+  { id:'candidato', short:'Cand' },
+  { id:'equipe_gabinete', short:'Gab' },
+  { id:'admin_partido', short:'AdmP' },
+  { id:'admin_mazzel', short:'AdmM' }
+];
+
+function renderRbac() {
+  const rows = [...MODULES];
+  let html = '<thead><tr><th style="text-align:left;padding-left:4px">Módulo</th>';
+  PERSONA_SHORT.forEach(p => {
+    const active = STATE.persona === p.id ? 'style="color:var(--mz-tenant-primary)"' : '';
+    html += `<th ${active}>${p.short}</th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  rows.forEach(m => {
+    const labelActiveCls = m.vis[STATE.persona] !== 'hidden' ? 'rbac-label-active' : '';
+    html += `<tr><td class="rbac-label ${labelActiveCls}">${m.label}</td>`;
+    PERSONA_SHORT.forEach(p => {
+      const v = m.vis[p.id];
+      let cls='rbac-mark-none', mark='—';
+      if (v === 'full')     { cls='rbac-mark-full'; mark='✓'; }
+      if (v === 'filtered') { cls='rbac-mark-part'; mark='⦿'; }
+      html += `<td><span class="rbac-mark ${cls}">${mark}</span></td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody>';
+  document.getElementById('rbacTable').innerHTML = html;
+}
+
+/* ============================================================
+   THEME
+   ============================================================ */
+
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', STATE.theme);
+  localStorage.setItem('mz-theme', STATE.theme);
+  const ico = document.getElementById('themeIco');
+  if (STATE.theme === 'dark') {
+    // sol (troca pra light)
+    ico.innerHTML = '<circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>';
+  } else {
+    // lua (troca pra dark)
+    ico.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+  }
+}
+
+document.getElementById('themeToggle').addEventListener('click', () => {
+  STATE.theme = STATE.theme === 'dark' ? 'light' : 'dark';
+  applyTheme();
+});
+
+/* ============================================================
+   RENDER ALL
+   ============================================================ */
+
+function renderAll() {
+  applyTenant();
+  renderPersonas();
+  renderSidebar();
+  renderMain();
+  renderRbac();
+}
+
+applyTheme();
+renderTenants();
+renderAll();
+</script>
+</body>
+</html>

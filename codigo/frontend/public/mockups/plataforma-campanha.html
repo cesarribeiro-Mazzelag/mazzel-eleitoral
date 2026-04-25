@@ -1,0 +1,2170 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light" data-role="diretoria">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mazzel · Campanha 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+/* Theme tokens (subset, sufficient for this module) */
+:root, [data-theme="dark"] {
+  --bg-page: #0a0a0b; --bg-page-2: #0c0c0e;
+  --bg-card: #0e0e11; --bg-card-2: rgba(255,255,255,0.015);
+  --bg-sidebar: #0b0b0d; --bg-topbar: #09090b;
+  --bg-elevated: #131316;
+  --fg: #e4e4e7; --fg-strong: #ffffff; --fg-muted: #a1a1aa;
+  --fg-dim: #71717a; --fg-faint: #52525b; --fg-ghost: #3f3f46;
+  --rule: rgba(255,255,255,0.06); --rule-strong: rgba(255,255,255,0.10);
+  --accent-blue: #93c5fd; --accent-blue-strong: #60a5fa;
+  --overall-from: #ffffff; --overall-to: #d4d4d8;
+  --ok: #34d399; --warn: #fbbf24; --danger: #f87171;
+  --chart-hover: rgba(255,255,255,0.06);
+  --kbd-bg: rgba(255,255,255,0.08); --kbd-fg: #d4d4d8;
+  --page-grad-1: rgba(59,130,246,0.06); --page-grad-2: rgba(168,85,247,0.04);
+}
+[data-theme="light"] {
+  --bg-page: #f4f4f5; --bg-page-2: #fafafa;
+  --bg-card: #ffffff; --bg-card-2: rgba(0,0,0,0.02);
+  --bg-sidebar: #fafafa; --bg-topbar: #ffffff;
+  --bg-elevated: #ffffff;
+  --fg: #18181b; --fg-strong: #09090b; --fg-muted: #52525b;
+  --fg-dim: #71717a; --fg-faint: #a1a1aa; --fg-ghost: #d4d4d8;
+  --rule: rgba(0,0,0,0.06); --rule-strong: rgba(0,0,0,0.10);
+  --accent-blue: #1d4ed8; --accent-blue-strong: #1e40af;
+  --overall-from: #09090b; --overall-to: #3f3f46;
+  --ok: #059669; --warn: #d97706; --danger: #dc2626;
+  --chart-hover: rgba(0,0,0,0.04);
+  --kbd-bg: rgba(0,0,0,0.06); --kbd-fg: #18181b;
+  --page-grad-1: rgba(59,130,246,0.05); --page-grad-2: rgba(168,85,247,0.04);
+}
+:root {
+  --tenant-primary: #002A7B; --tenant-primary-rgb: 0, 42, 123; --tenant-accent: #FFCC00;
+}
+
+html, body { background: var(--bg-page); color: var(--fg); }
+body { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
+.tnum { font-variant-numeric: tabular-nums; font-feature-settings: "tnum","cv11"; }
+.font-display { letter-spacing: -0.02em; }
+.font-mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+.t-fg{color:var(--fg)} .t-fg-strong{color:var(--fg-strong)} .t-fg-muted{color:var(--fg-muted)}
+.t-fg-dim{color:var(--fg-dim)} .t-fg-faint{color:var(--fg-faint)} .t-fg-ghost{color:var(--fg-ghost)}
+.t-accent{color:var(--accent-blue)} .t-ok{color:var(--ok)} .t-warn{color:var(--warn)} .t-danger{color:var(--danger)}
+.t-bg-card{background:var(--bg-card)}
+.ring-soft { box-shadow: inset 0 0 0 1px var(--rule); }
+.bg-page-grad {
+  background:
+    radial-gradient(1200px 600px at 85% -10%, var(--page-grad-1), transparent 60%),
+    radial-gradient(800px 400px at 10% 0%, var(--page-grad-2), transparent 60%),
+    var(--bg-page);
+}
+
+/* chips */
+.chip { display: inline-flex; align-items: center; gap: 4px; padding: 0 8px; height: 20px; border-radius: 999px; font-size: 10.5px; font-weight: 700; white-space: nowrap; letter-spacing: 0.02em; }
+.chip-blue   { background: rgba(37,99,235,0.10);  color: #1d4ed8; box-shadow: inset 0 0 0 1px rgba(37,99,235,0.30); }
+.chip-green  { background: rgba(22,163,74,0.10);  color: #15803d; box-shadow: inset 0 0 0 1px rgba(22,163,74,0.28); }
+.chip-amber  { background: rgba(217,119,6,0.10);  color: #a16207; box-shadow: inset 0 0 0 1px rgba(217,119,6,0.35); }
+.chip-red    { background: rgba(220,38,38,0.10);  color: #b91c1c; box-shadow: inset 0 0 0 1px rgba(220,38,38,0.40); }
+.chip-gray, .chip-neutral   { background: rgba(82,82,91,0.06);  color: #52525b; box-shadow: inset 0 0 0 1px rgba(82,82,91,0.18); }
+.chip-violet { background: rgba(147,51,234,0.10); color: #7e22ce; box-shadow: inset 0 0 0 1px rgba(147,51,234,0.30); }
+[data-theme="dark"] .chip-blue   { background: rgba(59,130,246,0.12); color: #93c5fd; box-shadow: inset 0 0 0 1px rgba(59,130,246,0.25); }
+[data-theme="dark"] .chip-green  { background: rgba(34,197,94,0.10); color: #86efac; box-shadow: inset 0 0 0 1px rgba(34,197,94,0.22); }
+[data-theme="dark"] .chip-amber  { background: rgba(251,191,36,0.12); color: #fcd34d; box-shadow: inset 0 0 0 1px rgba(251,191,36,0.30); }
+[data-theme="dark"] .chip-red    { background: rgba(239,68,68,0.12); color: #fca5a5; box-shadow: inset 0 0 0 1px rgba(239,68,68,0.35); }
+[data-theme="dark"] .chip-gray,[data-theme="dark"] .chip-neutral { background: rgba(161,161,170,0.08); color: #a1a1aa; box-shadow: inset 0 0 0 1px rgba(161,161,170,0.15); }
+[data-theme="dark"] .chip-violet { background: rgba(168,85,247,0.12); color: #d8b4fe; box-shadow: inset 0 0 0 1px rgba(168,85,247,0.25); }
+
+/* kbd */
+.kbd { display: inline-flex; align-items: center; justify-content: center; padding: 1px 5px; min-width: 16px; height: 18px; border-radius: 3px; font: 600 10px/1 'JetBrains Mono', monospace; }
+
+/* nav */
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 7px 12px 7px 14px; border-left: 2px solid transparent; font: 500 13px/1.2 Inter, sans-serif; color: var(--fg-muted); cursor: pointer; transition: color .15s, border-color .15s, background .15s; text-decoration: none; }
+.nav-item:hover { color: var(--fg); }
+.nav-item.active { color: var(--fg-strong); border-left-color: var(--tenant-primary); background: linear-gradient(90deg, rgba(var(--tenant-primary-rgb), 0.14) 0%, transparent 100%); }
+
+/* buttons */
+.btn-ghost { padding: 6px 10px; border-radius: 6px; font: 600 11px/1 Inter, sans-serif; background: var(--rule); color: var(--fg); cursor: pointer; transition: background .12s, color .12s; border: 1px solid transparent; display: inline-flex; align-items: center; gap: 6px; }
+.btn-ghost:hover { background: var(--rule-strong); color: var(--fg-strong); }
+.btn-ghost.active { background: var(--fg-strong); color: var(--bg-card); }
+.btn-primary { padding: 7px 12px; border-radius: 6px; font: 700 12px/1 Inter, sans-serif; background: var(--tenant-primary); color: #fff; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 1px 0 rgba(255,255,255,0.15) inset, 0 4px 12px -4px rgba(var(--tenant-primary-rgb), 0.4); }
+.btn-primary:hover { filter: brightness(1.1); }
+
+/* shell */
+.shell { height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+.shell-body { display: grid; grid-template-columns: 224px 1fr; min-height: 0; flex: 1; }
+.shell-main { overflow: hidden; background: var(--bg-page); min-width: 0; display: flex; flex-direction: column; }
+.shell-main > .main-scroll { flex: 1; overflow: auto; min-height: 0; }
+
+/* sidebar */
+.sidebar-col { background: var(--bg-sidebar); border-right: 1px solid var(--rule); display: flex; flex-direction: column; overflow: hidden; }
+
+/* topbar */
+.topbar { height: 48px; background: var(--bg-topbar); border-bottom: 1px solid var(--rule); display: flex; align-items: center; padding: 0 16px; gap: 16px; flex-shrink: 0; }
+.topbar > * { flex-shrink: 0; }
+.topbar .breadcrumb { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.search-cmdk { width: 440px; max-width: 50%; height: 30px; border-radius: 6px; background: var(--rule); display: flex; align-items: center; gap: 8px; padding: 0 10px; cursor: pointer; transition: background .12s; }
+.search-cmdk:hover { background: var(--rule-strong); }
+
+/* KPI */
+.kpi-card { background: var(--bg-card); border: 1px solid var(--rule); border-radius: 12px; padding: 18px 20px 14px; position: relative; overflow: hidden; min-width: 0; }
+.kpi-card .tnum { white-space: nowrap; }
+
+/* Tweaks panel */
+.tweak-panel { position: fixed; bottom: 18px; right: 18px; width: 320px; z-index: 80; background: var(--bg-elevated); border: 1px solid var(--rule-strong); border-radius: 12px; padding: 14px 16px; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.6); }
+
+/* thin-scroll */
+.thin-scroll { scrollbar-width: thin; scrollbar-color: var(--rule-strong) transparent; }
+.thin-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+.thin-scroll::-webkit-scrollbar-thumb { background: var(--rule-strong); border-radius: 999px; }
+</style>
+<style>
+/* =========================================================================
+ * Campanha · tweaks de estilo em CSS puro
+ * ========================================================================= */
+
+/* densidade confortável → padding padrão
+   densidade compacta    → reduz espaços em cards e listas */
+[data-density="compacto"] .kpi-card { padding: 14px 16px 10px; }
+[data-density="compacto"] .chip { height: 18px; font-size: 10px; }
+
+/* buttons hover smoothing */
+.btn-ghost, .btn-primary { transition: all .15s ease; }
+
+/* Tela-específicas */
+.camp-hero {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--tenant-primary) 0%, color-mix(in oklab, var(--tenant-primary) 75%, black) 100%);
+  color: #fff;
+}
+.camp-hero::before {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(600px 300px at 90% -10%, rgba(255,255,255,0.12), transparent 60%),
+    radial-gradient(400px 200px at 10% 110%, rgba(255,255,255,0.08), transparent 60%);
+  pointer-events: none;
+}
+
+/* Segment control */
+.seg { display: inline-flex; padding: 2px; border-radius: 7px; background: var(--rule); gap: 2px; }
+.seg-item { padding: 5px 10px; border-radius: 5px; font: 600 11px/1 Inter,sans-serif; color: var(--fg-muted); cursor: pointer; border: none; background: transparent; white-space: nowrap; }
+.seg-item:hover { color: var(--fg); }
+.seg-item.active { background: var(--bg-card); color: var(--fg-strong); box-shadow: 0 1px 2px rgba(0,0,0,0.08); }
+
+/* list-row */
+.list-row { display: grid; align-items: center; gap: 12px; padding: 9px 14px; border-bottom: 1px solid var(--rule); transition: background .1s; }
+.list-row:hover { background: var(--chart-hover); }
+.list-row:last-child { border-bottom: 0; }
+
+/* cards */
+.card { background: var(--bg-card); border: 1px solid var(--rule); border-radius: 12px; }
+.card-header { padding: 14px 18px 10px; border-bottom: 1px solid var(--rule); display: flex; align-items: center; gap: 12px; }
+.card-title { font: 700 13px/1.2 Inter,sans-serif; color: var(--fg-strong); letter-spacing: -0.005em; }
+.card-sub   { font: 500 10.5px/1.2 Inter,sans-serif; color: var(--fg-dim); letter-spacing: 0.05em; text-transform: uppercase; }
+
+/* sparkline colors */
+.spark-up   { stroke: var(--ok); }
+.spark-down { stroke: var(--danger); }
+.spark-flat { stroke: var(--fg-dim); }
+
+/* pills for tier */
+.tier-ouro   { background: linear-gradient(135deg, #fde68a, #f59e0b); color: #78350f; }
+.tier-prata  { background: linear-gradient(135deg, #e5e7eb, #9ca3af); color: #374151; }
+.tier-bronze { background: linear-gradient(135deg, #fed7aa, #c2410c); color: #7c2d12; }
+
+/* Chat-specific */
+.msg-bubble { max-width: 75%; padding: 9px 12px; border-radius: 12px; font-size: 12.5px; line-height: 1.45; }
+.msg-me     { background: var(--tenant-primary); color: #fff; border-top-right-radius: 4px; }
+.msg-them   { background: var(--rule); color: var(--fg); border-top-left-radius: 4px; }
+[data-theme="dark"] .msg-them { background: #1a1a1d; }
+
+</style>
+</head>
+<body>
+
+<div id="root" class="shell"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<!-- Tweakable defaults -->
+<script>
+window.TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "tenant": "uniao",
+  "persona": "delegado",
+  "theme": "light",
+  "densidade": "confortavel",
+  "modoDemo": true,
+  "corCerca": "responsavel",
+  "furtivoDefault": "aberto"
+}/*EDITMODE-END*/;
+</script>
+
+<!-- Inlined bundle -->
+<script type="text/babel">
+
+/* ====== src/campanha-primitives.jsx ====== */
+/* =========================================================================
+ * Campanha · Primitives, Icons, Shell chrome
+ * ========================================================================= */
+
+const CAMP_TENANTS = {
+  uniao:  { label: "UB",       name: "União Brasil",   primary: "#002A7B", primaryRgb: "0, 42, 123",   accent: "#FFCC00" },
+  mazzel: { label: "MZ",       name: "Mazzel",         primary: "#111111", primaryRgb: "17, 17, 17",   accent: "#FFD700" },
+};
+const TENANTS_CAMP = CAMP_TENANTS;
+
+const CAMPANHA_PERSONAS = {
+  delegado:    { id: "delegado",    label: "Delegado",      scope: "UF · BA",          descricao: "Visão estadual, coordena regionais" },
+  regional:    { id: "regional",    label: "Coord. Regional", scope: "Recôncavo",      descricao: "Coordena território com múltiplas cidades" },
+  territorial: { id: "territorial", label: "Coord. Territorial", scope: "Feira de Santana",  descricao: "Coordena uma cidade ou grande bairro" },
+  cabo:        { id: "cabo",        label: "Cabo Eleitoral", scope: "Bairro Tomba",     descricao: "Operador de rua, micro-cerca" },
+};
+
+const CAMP_SCREENS = [
+  { id: "hub",      label: "Hub",              icon: "LayoutDashboard" },
+  { id: "mapa",     label: "Mapa de Cercas",   icon: "Map" },
+  { id: "arvore",   label: "Hierarquia",       icon: "GitBranch" },
+  { id: "cadastro", label: "Lideranças",       icon: "UserPlus" },
+  { id: "crm",      label: "CRM",              icon: "CalendarHeart" },
+  { id: "chat",     label: "Chat sigiloso",    icon: "MessagesSquare" },
+  { id: "ranking",  label: "Ranking",          icon: "Trophy" },
+];
+
+/* ========================================================================
+ * CIcon — SVG icon set (stroke-based, lucide-flavored)
+ * ======================================================================== */
+function CIcon({ name, size = 14, className = "", style = {}, stroke = 1.6 }) {
+  const common = { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: stroke, strokeLinecap: "round", strokeLinejoin: "round", className, style };
+  const P = {
+    LayoutDashboard: <><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></>,
+    Map:             <><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14"/><path d="M15 6v14"/></>,
+    GitBranch:       <><circle cx="6" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="12" r="2"/><path d="M6 7v10"/><path d="M18 10a4 4 0 0 0-4-4H8"/></>,
+    UserPlus:        <><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></>,
+    CalendarHeart:   <><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/><path d="M12 18s-3-2-3-4.5A1.5 1.5 0 0 1 12 12a1.5 1.5 0 0 1 3 1.5C15 16 12 18 12 18Z"/></>,
+    MessagesSquare:  <><path d="M14 9a2 2 0 0 1-2 2H7l-3 3V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v4Z"/><path d="M18 9h2a2 2 0 0 1 2 2v10l-3-3h-5a2 2 0 0 1-2-2"/></>,
+    Trophy:          <><path d="M6 9H4a2 2 0 0 1-2-2V5h4"/><path d="M18 9h2a2 2 0 0 0 2-2V5h-4"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></>,
+    Search:          <><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></>,
+    X:               <><path d="M18 6 6 18M6 6l12 12"/></>,
+    ChevronDown:     <><polyline points="6 9 12 15 18 9"/></>,
+    ChevronRight:    <><polyline points="9 18 15 12 9 6"/></>,
+    ArrowRight:      <><path d="M5 12h14M13 5l7 7-7 7"/></>,
+    ArrowUp:         <><path d="M12 19V5M5 12l7-7 7 7"/></>,
+    ArrowDown:       <><path d="M12 5v14M19 12l-7 7-7-7"/></>,
+    Plus:            <><path d="M12 5v14M5 12h14"/></>,
+    Filter:          <><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></>,
+    Settings:        <><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></>,
+    MoreHorizontal:  <><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></>,
+    Bell:            <><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></>,
+    User:            <><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></>,
+    Users:           <><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></>,
+    Phone:           <><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.8a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.35 1.84.59 2.8.72A2 2 0 0 1 22 16.92Z"/></>,
+    MessageCircle:   <><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></>,
+    Lock:            <><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></>,
+    Eye:             <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></>,
+    EyeOff:          <><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><path d="m1 1 22 22"/></>,
+    Heart:           <><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></>,
+    Gift:            <><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7Z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7Z"/></>,
+    MapPin:          <><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></>,
+    Home:            <><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><polyline points="9 22 9 12 15 12 15 22"/></>,
+    Target:          <><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></>,
+    TrendingUp:      <><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></>,
+    Flag:            <><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1Z"/><line x1="4" y1="22" x2="4" y2="15"/></>,
+    CheckCircle:     <><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></>,
+    AlertTriangle:   <><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></>,
+    Send:            <><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></>,
+    Paperclip:       <><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></>,
+    Shield:          <><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></>,
+    Clock:           <><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></>,
+    Calendar:        <><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></>,
+    Sparkles:        <><path d="M12 3l1.9 4.8L19 9.7l-4.8 1.9L12 16.4l-2.2-4.8L5 9.7l4.8-1.9Z"/><path d="M19 17v4M17 19h4M4 4v2M3 5h2"/></>,
+    CircleDot:       <><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="currentColor"/></>,
+    Star:            <><polygon points="12 2 15 9 22 9.5 17 14.5 18.5 22 12 18 5.5 22 7 14.5 2 9.5 9 9"/></>,
+    Copy:            <><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></>,
+    Download:        <><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></>,
+    Layers:          <><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></>,
+    Minus:           <><line x1="5" y1="12" x2="19" y2="12"/></>,
+    Command:         <><path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3Z"/></>,
+    Zap:             <><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></>,
+    Cake:            <><path d="M20 21V11a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v10"/><path d="M4 16s1.5-2 4-2 3.5 2 4 2 1.5-2 4-2 4 2 4 2"/><path d="M2 21h20"/><path d="M7 8V6c0-1 1-2 1-2s-.5-1 0-2"/><path d="M12 8V6c0-1 1-2 1-2s-.5-1 0-2"/><path d="M17 8V6c0-1 1-2 1-2s-.5-1 0-2"/></>,
+    FileText:        <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></>,
+  };
+  return <svg {...common}>{P[name] || P.CircleDot}</svg>;
+}
+
+/* ========================================================================
+ * CSidebar — left nav (just this Campanha module in focus)
+ * ======================================================================== */
+function CSidebar({ tenant }) {
+  const t = CAMP_TENANTS[tenant];
+  const modules = [
+    { id: "dash",    label: "Dashboard",       icon: "LayoutDashboard" },
+    { id: "mapa",    label: "Mapa eleitoral",  icon: "Map" },
+    { id: "radar",   label: "Radar político",  icon: "Target" },
+    { id: "dossies", label: "Dossiês",         icon: "FileText" },
+    { id: "campanha",label: "Campanha 2026",   icon: "Flag", active: true, badge: "LIVE" },
+    { id: "estudo",  label: "Estudo de caso",  icon: "Sparkles" },
+    { id: "ia",      label: "Copiloto IA",     icon: "MessageCircle" },
+    { id: "alertas", label: "Alertas",         icon: "Bell" },
+  ];
+  return (
+    <aside className="sidebar-col">
+      <div className="px-4 pt-4 pb-3 flex items-center gap-3" style={{ borderBottom: "1px solid var(--rule)" }}>
+        <div className="w-9 h-9 rounded-[10px] flex items-center justify-center font-black text-[13px]"
+             style={{ background: `linear-gradient(135deg, ${t.primary}, ${t.primary}cc)`, color: "#fff", boxShadow: "0 4px 12px -2px rgba(0,0,0,0.25)" }}>
+          {t.label}
+        </div>
+        <div className="min-w-0">
+          <div className="text-[12.5px] font-bold t-fg-strong truncate">{t.name}</div>
+          <div className="text-[9.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">Plataforma Mazzel</div>
+        </div>
+      </div>
+
+      <nav className="flex-1 overflow-y-auto thin-scroll pt-3 pb-2">
+        <div className="px-4 text-[9.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold mb-2">Módulos</div>
+        {modules.map(m => (
+          <a key={m.id} href="#" className={`nav-item ${m.active ? "active" : ""}`} onClick={e => e.preventDefault()}>
+            <CIcon name={m.icon} size={14}/>
+            <span className="flex-1 truncate">{m.label}</span>
+            {m.badge && <span className="chip chip-green" style={{ height: 16, fontSize: 9, padding: "0 5px" }}>{m.badge}</span>}
+          </a>
+        ))}
+      </nav>
+
+      <div className="p-3 border-t flex items-center gap-2" style={{ borderColor: "var(--rule)" }}>
+        <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold" style={{ background: "var(--rule-strong)", color: "var(--fg-strong)" }}>AM</div>
+        <div className="flex-1 min-w-0">
+          <div className="text-[11px] font-semibold t-fg-strong truncate">Antonio Mazzel</div>
+          <div className="text-[9.5px] t-fg-dim truncate">CEO · Mazzel</div>
+        </div>
+        <CIcon name="Settings" size={12} className="t-fg-dim"/>
+      </div>
+    </aside>
+  );
+}
+
+/* ========================================================================
+ * CTopbar
+ * ======================================================================== */
+function CTopbar({ tenant, personaLabel, breadcrumbs, onOpenCmdk }) {
+  return (
+    <header className="topbar">
+      <div className="breadcrumb flex items-center gap-1.5 text-[12px]">
+        {breadcrumbs.map((b, i) => (
+          <React.Fragment key={i}>
+            {i > 0 && <CIcon name="ChevronRight" size={11} className="t-fg-faint"/>}
+            <span className={i === breadcrumbs.length - 1 ? "t-fg-strong font-semibold" : "t-fg-muted"}>{b}</span>
+          </React.Fragment>
+        ))}
+      </div>
+
+      <div className="flex-1"/>
+
+      <div onClick={onOpenCmdk} className="search-cmdk">
+        <CIcon name="Search" size={13} className="t-fg-dim"/>
+        <span className="text-[12px] t-fg-dim flex-1">Buscar cercas, lideranças, campanhas…</span>
+        <span className="kbd" style={{ background: "var(--kbd-bg)", color: "var(--kbd-fg)" }}>⌘K</span>
+      </div>
+
+      <button className="btn-ghost" title="Alertas">
+        <CIcon name="Bell" size={12}/>
+        <span className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--danger)" }}/>
+      </button>
+
+      <div className="flex items-center gap-2 pl-3" style={{ borderLeft: "1px solid var(--rule)" }}>
+        <span className="chip chip-violet">{personaLabel}</span>
+        <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold" style={{ background: "var(--tenant-primary)", color: "#fff" }}>AM</div>
+      </div>
+    </header>
+  );
+}
+
+/* ========================================================================
+ * Campaign sub-nav (horizontal tab strip under topbar)
+ * ======================================================================== */
+function CampSubNav({ screen, onChange, persona }) {
+  return (
+    <div className="flex items-center gap-1 px-4 h-11 flex-shrink-0" style={{ background: "var(--bg-topbar)", borderBottom: "1px solid var(--rule)" }}>
+      <div className="flex items-center gap-2 mr-3">
+        <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: "var(--tenant-primary)", color: "#fff" }}>
+          <CIcon name="Flag" size={12}/>
+        </div>
+        <div>
+          <div className="text-[12px] font-bold t-fg-strong leading-none">Campanha 2026</div>
+          <div className="text-[9.5px] t-fg-dim uppercase tracking-[0.1em] font-semibold mt-0.5">{persona.scope}</div>
+        </div>
+      </div>
+      <div className="w-px h-5" style={{ background: "var(--rule)" }}/>
+      <nav className="flex items-center gap-0.5 ml-2 overflow-x-auto thin-scroll">
+        {CAMP_SCREENS.map(s => {
+          const active = screen === s.id;
+          return (
+            <button key={s.id} onClick={() => onChange(s.id)}
+              className="flex items-center gap-1.5 px-3 h-7 rounded-md text-[12px] font-semibold transition-colors whitespace-nowrap"
+              style={{
+                color: active ? "var(--fg-strong)" : "var(--fg-muted)",
+                background: active ? "var(--rule-strong)" : "transparent",
+              }}
+              onMouseEnter={e => { if (!active) e.currentTarget.style.color = "var(--fg)"; }}
+              onMouseLeave={e => { if (!active) e.currentTarget.style.color = "var(--fg-muted)"; }}
+            >
+              <CIcon name={s.icon} size={12}/>
+              {s.label}
+            </button>
+          );
+        })}
+      </nav>
+      <div className="flex-1"/>
+      <button className="btn-ghost" style={{ padding: "5px 9px" }}>
+        <CIcon name="Download" size={11}/>
+        Export
+      </button>
+    </div>
+  );
+}
+
+/* export to window scope */
+Object.assign(window, {
+  CAMP_TENANTS, TENANTS_CAMP, CAMPANHA_PERSONAS, CAMP_SCREENS,
+  CIcon, CSidebar, CTopbar, CampSubNav,
+});
+
+
+/* ====== src/campanha-data.jsx ====== */
+/* =========================================================================
+ * Campanha · Data Layer — cercas, lideranças, campanhas, chat
+ * ========================================================================= */
+
+/* ----- Campanhas ativas ----- */
+const CAMPANHAS = [
+  {
+    id: "jaques-26",
+    candidato: "Jaques Wagner",
+    cargo: "Senador · BA",
+    partido: "PT",
+    coligacao: "Brasil da Esperança",
+    status: "Planejamento",
+    fase: "T-12m",
+    score: 73,
+    intencaoVoto: 28.4,
+    margem: "+4.2pp",
+    meta: 6200000,
+    captado: 4821000,
+    ativos: 142,
+    cercas: 38,
+    delta7d: +1.8,
+  },
+  {
+    id: "jm-26",
+    candidato: "João Leão",
+    cargo: "Governador · BA",
+    partido: "PP",
+    coligacao: "Bahia para Todos",
+    status: "Pré-campanha",
+    fase: "T-10m",
+    score: 61,
+    intencaoVoto: 18.2,
+    margem: "-2.1pp",
+    meta: 9400000,
+    captado: 3120000,
+    ativos: 87,
+    cercas: 22,
+    delta7d: -0.4,
+  },
+  {
+    id: "am-federal",
+    candidato: "Adolfo Menezes",
+    cargo: "Dep. Federal · BA",
+    partido: "PSD",
+    coligacao: "Aliança pela Bahia",
+    status: "Monitoramento",
+    fase: "T-11m",
+    score: 68,
+    intencaoVoto: 3.8,
+    margem: "+0.6pp",
+    meta: 1800000,
+    captado: 940000,
+    ativos: 64,
+    cercas: 14,
+    delta7d: +2.3,
+  },
+];
+
+/* ----- Estrutura geográfica · cercas ----- */
+/* Bahia foco: Regional Recôncavo → Municípios → Bairros/micro-cercas */
+const CERCAS = [
+  {
+    id: "reg-reconcavo",
+    nivel: "regional",
+    nome: "Regional Recôncavo",
+    responsavel: "Clarissa Souza",
+    responsavelId: "lid-02",
+    eleitores: 486000,
+    meta: 62000,
+    cadastrados: 38412,
+    engajamento: 78,
+    score: 82,
+    status: "ativo",
+    filhas: [
+      {
+        id: "mun-feira",
+        nivel: "municipio",
+        nome: "Feira de Santana",
+        responsavel: "Diego Almeida",
+        responsavelId: "lid-06",
+        eleitores: 448000,
+        meta: 48000,
+        cadastrados: 29804,
+        engajamento: 74,
+        score: 76,
+        status: "ativo",
+        filhas: [
+          { id: "b-tomba",    nivel: "bairro", nome: "Tomba",           responsavel: "Rita Lima",       responsavelId: "lid-11", eleitores: 28000, meta: 3200, cadastrados: 2640, engajamento: 84, score: 88, status: "ativo" },
+          { id: "b-brasilia", nivel: "bairro", nome: "Brasília",        responsavel: "Marcos Oliveira", responsavelId: "lid-12", eleitores: 31200, meta: 3400, cadastrados: 2128, engajamento: 71, score: 73, status: "ativo" },
+          { id: "b-caseb",    nivel: "bairro", nome: "Caseb",           responsavel: "Ana Paula",       responsavelId: "lid-13", eleitores: 18400, meta: 2100, cadastrados: 1890, engajamento: 81, score: 79, status: "ativo" },
+          { id: "b-cidade-n", nivel: "bairro", nome: "Cidade Nova",     responsavel: "—",               responsavelId: null,      eleitores: 14600, meta: 1600, cadastrados: 410, engajamento: 38, score: 42, status: "vaga" },
+          { id: "b-parque",   nivel: "bairro", nome: "Parque Ipê",      responsavel: "José Roberto",    responsavelId: "lid-14", eleitores: 22100, meta: 2500, cadastrados: 1012, engajamento: 51, score: 54, status: "atencao" },
+        ],
+      },
+      {
+        id: "mun-ssalvador",
+        nivel: "municipio",
+        nome: "Salvador (subúrbio)",
+        responsavel: "Beatriz Fernandes",
+        responsavelId: "lid-07",
+        eleitores: 380000,
+        meta: 42000,
+        cadastrados: 21100,
+        engajamento: 66,
+        score: 68,
+        status: "ativo",
+        filhas: [
+          { id: "b-periperi", nivel: "bairro", nome: "Periperi",        responsavel: "Tiago Mendes",    responsavelId: "lid-15", eleitores: 42000, meta: 4800, cadastrados: 3200, engajamento: 72, score: 71, status: "ativo" },
+          { id: "b-paripe",   nivel: "bairro", nome: "Paripe",          responsavel: "Sandra Rocha",    responsavelId: "lid-16", eleitores: 38500, meta: 4200, cadastrados: 2480, engajamento: 65, score: 66, status: "ativo" },
+          { id: "b-coutos",   nivel: "bairro", nome: "Coutos",          responsavel: "—",               responsavelId: null,      eleitores: 28800, meta: 3100, cadastrados: 680, engajamento: 42, score: 44, status: "vaga" },
+        ],
+      },
+      {
+        id: "mun-sfelix",
+        nivel: "municipio",
+        nome: "São Félix",
+        responsavel: "Otávio Campos",
+        responsavelId: "lid-08",
+        eleitores: 12400,
+        meta: 1400,
+        cadastrados: 1180,
+        engajamento: 89,
+        score: 91,
+        status: "destaque",
+      },
+      {
+        id: "mun-cachoeira",
+        nivel: "municipio",
+        nome: "Cachoeira",
+        responsavel: "Paula Nascimento",
+        responsavelId: "lid-09",
+        eleitores: 22800,
+        meta: 2600,
+        cadastrados: 1740,
+        engajamento: 72,
+        score: 74,
+        status: "ativo",
+      },
+      {
+        id: "mun-maragogipe",
+        nivel: "municipio",
+        nome: "Maragogipe",
+        responsavel: "—",
+        responsavelId: null,
+        eleitores: 32100,
+        meta: 3600,
+        cadastrados: 340,
+        engajamento: 22,
+        score: 28,
+        status: "critico",
+      },
+    ],
+  },
+  {
+    id: "reg-oeste",
+    nivel: "regional",
+    nome: "Regional Oeste Baiano",
+    responsavel: "Renato Bastos",
+    responsavelId: "lid-03",
+    eleitores: 284000,
+    meta: 32000,
+    cadastrados: 18200,
+    engajamento: 64,
+    score: 66,
+    status: "ativo",
+    filhas: [],
+  },
+  {
+    id: "reg-sul",
+    nivel: "regional",
+    nome: "Regional Sul",
+    responsavel: "—",
+    responsavelId: null,
+    eleitores: 412000,
+    meta: 46000,
+    cadastrados: 8400,
+    engajamento: 38,
+    score: 41,
+    status: "vaga",
+    filhas: [],
+  },
+];
+
+/* ----- Lideranças (pessoas na hierarquia) ----- */
+const LIDERANCAS = [
+  { id: "lid-01", nome: "Antonio Mazzel",      papel: "Delegado",            cidade: "Salvador",          cerca: null,               tier: "ouro",    score: 98, eleitoresInfluenciados: 0, aniversario: "1978-04-12", telefone: "(71) 9 9101-0001", whats: true, tags: ["Delegado"], ultimoContato: "hoje" },
+  { id: "lid-02", nome: "Clarissa Souza",      papel: "Coord. Regional",     cidade: "Feira de Santana",  cerca: "Regional Recôncavo", tier: "ouro",    score: 92, eleitoresInfluenciados: 486000, aniversario: "1982-11-03", telefone: "(75) 9 8182-3311", whats: true, tags: ["Regional","Mulher"], ultimoContato: "2d" },
+  { id: "lid-03", nome: "Renato Bastos",       papel: "Coord. Regional",     cidade: "Barreiras",         cerca: "Regional Oeste Baiano", tier: "prata", score: 78, eleitoresInfluenciados: 284000, aniversario: "1975-09-20", telefone: "(77) 9 8420-1100", whats: true, tags: ["Regional"], ultimoContato: "5d" },
+  { id: "lid-06", nome: "Diego Almeida",       papel: "Coord. Territorial",  cidade: "Feira de Santana",  cerca: "Feira de Santana",  tier: "ouro",    score: 86, eleitoresInfluenciados: 448000, aniversario: "1984-03-15", telefone: "(75) 9 9812-4422", whats: true, tags: ["Territorial"], ultimoContato: "1d" },
+  { id: "lid-07", nome: "Beatriz Fernandes",   papel: "Coord. Territorial",  cidade: "Salvador",          cerca: "Salvador (subúrbio)", tier: "prata", score: 74, eleitoresInfluenciados: 380000, aniversario: "1980-07-28", telefone: "(71) 9 9641-7722", whats: true, tags: ["Territorial","Mulher"], ultimoContato: "3d" },
+  { id: "lid-08", nome: "Otávio Campos",       papel: "Coord. Territorial",  cidade: "São Félix",         cerca: "São Félix",         tier: "ouro",    score: 91, eleitoresInfluenciados: 12400, aniversario: "1971-12-05", telefone: "(75) 9 8733-9911", whats: true, tags: ["Territorial","Destaque"], ultimoContato: "hoje" },
+  { id: "lid-09", nome: "Paula Nascimento",    papel: "Coord. Territorial",  cidade: "Cachoeira",         cerca: "Cachoeira",         tier: "prata", score: 72, eleitoresInfluenciados: 22800, aniversario: "1988-06-11", telefone: "(75) 9 9211-3040", whats: true, tags: ["Territorial","Mulher"], ultimoContato: "2d" },
+  { id: "lid-11", nome: "Rita Lima",           papel: "Cabo Eleitoral",      cidade: "Feira de Santana",  cerca: "Tomba",             tier: "ouro",    score: 89, eleitoresInfluenciados: 28000, aniversario: "1990-04-23", telefone: "(75) 9 9522-8810", whats: true, tags: ["Cabo","Mulher","Destaque"], ultimoContato: "hoje" },
+  { id: "lid-12", nome: "Marcos Oliveira",     papel: "Cabo Eleitoral",      cidade: "Feira de Santana",  cerca: "Brasília",          tier: "prata", score: 72, eleitoresInfluenciados: 31200, aniversario: "1985-02-18", telefone: "(75) 9 9611-4401", whats: true, tags: ["Cabo"], ultimoContato: "4d" },
+  { id: "lid-13", nome: "Ana Paula Ribeiro",   papel: "Cabo Eleitoral",      cidade: "Feira de Santana",  cerca: "Caseb",             tier: "prata", score: 76, eleitoresInfluenciados: 18400, aniversario: "1992-10-30", telefone: "(75) 9 9420-7711", whats: true, tags: ["Cabo","Mulher"], ultimoContato: "2d" },
+  { id: "lid-14", nome: "José Roberto",        papel: "Cabo Eleitoral",      cidade: "Feira de Santana",  cerca: "Parque Ipê",        tier: "bronze",score: 54, eleitoresInfluenciados: 22100, aniversario: "1968-01-09", telefone: "(75) 9 8110-2233", whats: false, tags: ["Cabo","Atenção"], ultimoContato: "12d" },
+  { id: "lid-15", nome: "Tiago Mendes",        papel: "Cabo Eleitoral",      cidade: "Salvador",          cerca: "Periperi",          tier: "prata", score: 70, eleitoresInfluenciados: 42000, aniversario: "1987-05-02", telefone: "(71) 9 9702-4455", whats: true, tags: ["Cabo"], ultimoContato: "3d" },
+  { id: "lid-16", nome: "Sandra Rocha",        papel: "Cabo Eleitoral",      cidade: "Salvador",          cerca: "Paripe",            tier: "prata", score: 68, eleitoresInfluenciados: 38500, aniversario: "1979-08-14", telefone: "(71) 9 9811-7200", whats: true, tags: ["Cabo","Mulher"], ultimoContato: "6d" },
+  { id: "lid-21", nome: "Helena Barreto",      papel: "Liderança comunitária",cidade: "Feira de Santana", cerca: "Tomba",             tier: "ouro",    score: 82, eleitoresInfluenciados: 6200, aniversario: "1983-11-27", telefone: "(75) 9 9311-6040", whats: true, tags: ["Comunidade","Mulher"], ultimoContato: "hoje" },
+  { id: "lid-22", nome: "Pastor Elias",        papel: "Liderança religiosa", cidade: "Feira de Santana",  cerca: "Brasília",          tier: "ouro",    score: 85, eleitoresInfluenciados: 3400, aniversario: "1965-06-19", telefone: "(75) 9 8820-1122", whats: true, tags: ["Religioso"], ultimoContato: "1d" },
+  { id: "lid-23", nome: "Dona Marieta",        papel: "Líder de bairro",     cidade: "Cachoeira",         cerca: "Cachoeira",         tier: "prata", score: 76, eleitoresInfluenciados: 1800, aniversario: "1952-03-08", telefone: "(75) 9 8540-7733", whats: false, tags: ["Comunidade","Mulher","Idoso"], ultimoContato: "5d" },
+];
+
+/* aniversariantes da semana ordenados para CRM */
+function proximoAniversario(isoDate, refDate = new Date()) {
+  const [y, m, d] = isoDate.split("-").map(Number);
+  const thisYear = new Date(refDate.getFullYear(), m - 1, d);
+  if (thisYear < new Date(refDate.getFullYear(), refDate.getMonth(), refDate.getDate())) {
+    thisYear.setFullYear(refDate.getFullYear() + 1);
+  }
+  const diffDays = Math.floor((thisYear - new Date(refDate.getFullYear(), refDate.getMonth(), refDate.getDate())) / 86400000);
+  return { date: thisYear, diffDays };
+}
+
+Object.assign(window, { CAMPANHAS, CERCAS, LIDERANCAS, proximoAniversario });
+
+
+/* ====== src/campanha-data2.jsx ====== */
+/* =========================================================================
+ * Campanha · Data Layer parte 2 — chat sigiloso, logística, KPIs, sparklines
+ * ========================================================================= */
+
+/* ----- KPIs do hub (por campanha ativa principal) ----- */
+const HUB_KPIS = {
+  "jaques-26": [
+    { id: "intencao",   label: "Intenção de voto",      valor: "28,4%",       delta: "+1,8pp",  sentiment: "up",   sub: "7 dias · pesquisa interna n=1.200" },
+    { id: "cadastro",   label: "Lideranças cadastradas", valor: "1.482",      delta: "+124",    sentiment: "up",   sub: "semana · meta 1.600" },
+    { id: "cercas",     label: "Cercas ativas",          valor: "38 / 46",    delta: "82%",     sentiment: "neutral", sub: "8 cercas sem responsável" },
+    { id: "captacao",   label: "Captação",               valor: "R$ 4,82 mi",  delta: "78%",     sentiment: "up",   sub: "da meta · R$ 6,2 mi" },
+  ],
+};
+
+/* sparkline pontos (30d) */
+const SPARKS = {
+  intencao: [24.2, 24.6, 25.1, 25.3, 25.8, 26.0, 25.9, 26.4, 26.7, 27.1, 27.0, 27.2, 27.4, 27.6, 27.5, 27.8, 28.0, 27.9, 28.1, 28.0, 27.7, 27.9, 28.1, 28.2, 28.0, 28.3, 28.2, 28.3, 28.4, 28.4],
+  cadastro: [780, 810, 845, 870, 902, 938, 964, 1010, 1040, 1075, 1102, 1128, 1150, 1180, 1208, 1232, 1260, 1290, 1312, 1340, 1368, 1388, 1402, 1420, 1435, 1446, 1458, 1466, 1474, 1482],
+  captacao: [420, 480, 540, 610, 720, 820, 1100, 1400, 1820, 2100, 2320, 2500, 2680, 2820, 2980, 3140, 3300, 3440, 3600, 3770, 3920, 4050, 4180, 4310, 4430, 4540, 4630, 4720, 4780, 4820],
+};
+
+/* ----- Atividade do dia (hub) ----- */
+const ATIVIDADES = [
+  { hora: "14:32", icon: "UserPlus", tipo: "Cadastro",      texto: "Rita Lima cadastrou 12 lideranças em Tomba",       meta: "+1.200 eleitores estimados", cerca: "Tomba" },
+  { hora: "13:18", icon: "Flag",     tipo: "Cerca",         texto: "Cidade Nova sem responsável há 7 dias",             meta: "atenção · escalado para Delegado", cerca: "Cidade Nova", alert: true },
+  { hora: "12:04", icon: "Gift",     tipo: "Aniversário",   texto: "Pastor Elias · 60 anos amanhã",                     meta: "CRM gerou pauta de contato", cerca: "Brasília" },
+  { hora: "11:45", icon: "MessageCircle", tipo: "Chat sigiloso", texto: "Delegado enviou briefing para 14 Regionais",    meta: "modo furtivo · expira em 24h", cerca: "Nacional" },
+  { hora: "10:30", icon: "Sparkles", tipo: "IA",            texto: "Copiloto sugeriu 3 ações para cerca Maragogipe",    meta: "score crítico · 28", cerca: "Maragogipe" },
+  { hora: "09:12", icon: "CheckCircle", tipo: "Meta",       texto: "Regional Recôncavo bateu 62% da meta de cadastro",  meta: "ritmo: meta projetada em 18d", cerca: "Recôncavo" },
+  { hora: "08:40", icon: "Heart",    tipo: "Engajamento",   texto: "Dona Marieta visitou 34 casas em Cachoeira",        meta: "top 5 da semana", cerca: "Cachoeira" },
+  { hora: "08:02", icon: "AlertTriangle", tipo: "Alerta",   texto: "Queda de engajamento em Parque Ipê (-14%)",         meta: "responsável: José Roberto", cerca: "Parque Ipê", alert: true },
+];
+
+/* ----- Alvos de meta (top cercas e bottom cercas) ----- */
+const TOP_CERCAS = [
+  { nome: "São Félix",            meta: 1400,  feito: 1180, pct: 84, responsavel: "Otávio Campos" },
+  { nome: "Tomba",                meta: 3200,  feito: 2640, pct: 83, responsavel: "Rita Lima" },
+  { nome: "Caseb",                meta: 2100,  feito: 1890, pct: 90, responsavel: "Ana Paula" },
+  { nome: "Cachoeira",            meta: 2600,  feito: 1740, pct: 67, responsavel: "Paula Nascimento" },
+  { nome: "Brasília",             meta: 3400,  feito: 2128, pct: 63, responsavel: "Marcos Oliveira" },
+];
+const BOTTOM_CERCAS = [
+  { nome: "Maragogipe",           meta: 3600,  feito: 340,  pct: 9,  responsavel: "—" },
+  { nome: "Cidade Nova",          meta: 1600,  feito: 410,  pct: 26, responsavel: "—" },
+  { nome: "Coutos",               meta: 3100,  feito: 680,  pct: 22, responsavel: "—" },
+  { nome: "Parque Ipê",           meta: 2500,  feito: 1012, pct: 40, responsavel: "José Roberto" },
+];
+
+/* ----- Chat sigiloso ----- */
+const CHAT_CANAIS = [
+  { id: "delegado-regionais", nome: "Delegado → Regionais",     tipo: "broadcast",  membros: 14, ultima: "12 min", preview: "Briefing: cronograma de caravana atualizado. Favor confirmar presença.", unread: 3, furtivo: true,  classificacao: "reservado" },
+  { id: "reconcavo",          nome: "Regional Recôncavo",       tipo: "grupo",      membros: 8,  ultima: "1 h",  preview: "Diego: material gráfico do Tomba está pronto. Vou enviar amanhã.", unread: 0, furtivo: false, classificacao: "interno" },
+  { id: "coord-tomba",        nome: "Coordenação Tomba",        tipo: "grupo",      membros: 4,  ultima: "2 h",  preview: "Rita: terminamos as 12 lideranças. Foto do cadastro anexada.", unread: 0, furtivo: false, classificacao: "interno" },
+  { id: "confidencial-01",    nome: "Gabinete · Estratégia",    tipo: "grupo",      membros: 3,  ultima: "4 h",  preview: "Mensagem criptografada", unread: 1, furtivo: true,  classificacao: "confidencial" },
+  { id: "rita-lima",          nome: "Rita Lima",                tipo: "direto",     membros: 2,  ultima: "1 d",  preview: "Pode me ligar quando puder?", unread: 0, furtivo: false, classificacao: "interno" },
+  { id: "pastor-elias",       nome: "Pastor Elias",             tipo: "direto",     membros: 2,  ultima: "2 d",  preview: "Estaremos lá no domingo, com fé em Deus.", unread: 0, furtivo: false, classificacao: "interno" },
+  { id: "maragogipe-sos",     nome: "SOS Maragogipe",           tipo: "grupo",      membros: 5,  ultima: "3 d",  preview: "Score em 28. Precisamos de plano B.", unread: 0, furtivo: true,  classificacao: "reservado" },
+];
+
+const CHAT_MENSAGENS = {
+  "delegado-regionais": [
+    { id: 1, autor: "Antonio Mazzel",   papel: "Delegado",    texto: "Bom dia a todos. Subindo briefing da semana.",                  hora: "08:12", me: true,  status: "lido" },
+    { id: 2, autor: "Antonio Mazzel",   papel: "Delegado",    texto: "Prioridade 1: cobrir as 8 cercas sem responsável até sexta.",    hora: "08:12", me: true,  status: "lido" },
+    { id: 3, autor: "Clarissa Souza",   papel: "Regional",    texto: "Ok. Recôncavo cobre Cidade Nova e Coutos até quarta.",          hora: "08:24", me: false, status: "lido" },
+    { id: 4, autor: "Renato Bastos",    papel: "Regional",    texto: "Oeste assume 2 cercas do Sul temporariamente. Aguardo confirm.", hora: "08:31", me: false, status: "lido" },
+    { id: 5, autor: "Antonio Mazzel",   papel: "Delegado",    texto: "Confirmado. Reforço do jurídico será enviado para os novos.",    hora: "08:36", me: true,  status: "lido" },
+    { id: 6, autor: "Antonio Mazzel",   papel: "Delegado",    texto: "Anexando o cronograma de caravana de março.",                   hora: "11:40", me: true,  status: "lido", anexo: "caravana-mar.pdf · 2,1 MB" },
+    { id: 7, autor: "Beatriz Fernandes",papel: "Territorial", texto: "Recebido. Vou alinhar com o time de Salvador hoje à noite.",    hora: "11:45", me: false, status: "lido" },
+    { id: 8, autor: "Antonio Mazzel",   papel: "Delegado",    texto: "Favor confirmar presença até amanhã 18h.",                      hora: "11:46", me: true,  status: "entregue" },
+  ],
+};
+
+/* ----- Ranking individual (lideranças ordenadas por score no mês) ----- */
+const RANKING = [...LIDERANCAS]
+  .filter(l => l.papel !== "Delegado")
+  .sort((a, b) => b.score - a.score)
+  .map((l, i) => ({
+    ...l,
+    posicao: i + 1,
+    variacao: i < 3 ? [+2, -1, +3][i] : (i % 3 === 0 ? +1 : (i % 3 === 1 ? 0 : -1)),
+    cadastrosMes: Math.max(4, Math.round((l.score / 10) + ((i % 5) * 3))),
+  }));
+
+/* ----- Heatmap engajamento por cerca/dia (últimas 12 semanas) ----- */
+const HEATMAP_CERCAS = [
+  "Tomba","Brasília","Caseb","Cidade Nova","Parque Ipê","Periperi","Paripe","Coutos","São Félix","Cachoeira","Maragogipe",
+].map((nome, i) => ({
+  nome,
+  dias: Array.from({ length: 12 * 7 }, (_, d) => {
+    const base = [88, 73, 85, 28, 52, 71, 66, 30, 92, 74, 22][i];
+    const wave = Math.sin((d + i) * 0.7) * 12;
+    const noise = ((d * 37 + i * 13) % 15) - 7;
+    return Math.max(0, Math.min(100, Math.round(base + wave + noise)));
+  }),
+}));
+
+Object.assign(window, { HUB_KPIS, SPARKS, ATIVIDADES, TOP_CERCAS, BOTTOM_CERCAS, CHAT_CANAIS, CHAT_MENSAGENS, RANKING, HEATMAP_CERCAS });
+
+
+/* ====== src/campanha-adapter.jsx ====== */
+/* =========================================================================
+ * Campanha · Adapter — small utility shims + reusable mini-components
+ * ========================================================================= */
+
+/* Sparkline SVG */
+function Sparkline({ points, width = 120, height = 32, color = "currentColor", fill = true }) {
+  if (!points || !points.length) return null;
+  const min = Math.min(...points), max = Math.max(...points);
+  const span = max - min || 1;
+  const step = width / (points.length - 1);
+  const path = points.map((p, i) => `${i === 0 ? "M" : "L"} ${i * step} ${height - ((p - min) / span) * height}`).join(" ");
+  const area = `${path} L ${width} ${height} L 0 ${height} Z`;
+  return (
+    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} style={{ overflow: "visible" }}>
+      {fill && <path d={area} fill={color} opacity={0.12}/>}
+      <path d={path} fill="none" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+
+/* KPI tile */
+function KpiTile({ label, valor, delta, sentiment, sub, sparkPoints, sparkColor, onClick }) {
+  const sentimentColor = sentiment === "up" ? "var(--ok)" : sentiment === "down" ? "var(--danger)" : "var(--fg-dim)";
+  return (
+    <div className="kpi-card" onClick={onClick} style={{ cursor: onClick ? "pointer" : "default" }}>
+      <div className="flex items-start justify-between gap-3 mb-3">
+        <div className="text-[10.5px] t-fg-dim uppercase tracking-[0.12em] font-semibold">{label}</div>
+        {delta && (
+          <span className="text-[11px] font-bold tnum flex items-center gap-0.5" style={{ color: sentimentColor }}>
+            {sentiment === "up" && <CIcon name="ArrowUp" size={10}/>}
+            {sentiment === "down" && <CIcon name="ArrowDown" size={10}/>}
+            {delta}
+          </span>
+        )}
+      </div>
+      <div className="flex items-end justify-between gap-3">
+        <div>
+          <div className="text-[28px] font-black tnum font-display leading-none" style={{ background: "linear-gradient(180deg, var(--overall-from), var(--overall-to))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>{valor}</div>
+          {sub && <div className="text-[10.5px] t-fg-muted mt-1.5">{sub}</div>}
+        </div>
+        {sparkPoints && <Sparkline points={sparkPoints} color={sparkColor || sentimentColor} width={96} height={36}/>}
+      </div>
+    </div>
+  );
+}
+
+/* Progress bar */
+function ProgressBar({ value, max = 100, color = "var(--tenant-primary)", height = 6 }) {
+  const pct = Math.min(100, (value / max) * 100);
+  return (
+    <div style={{ width: "100%", height, background: "var(--rule)", borderRadius: 999, overflow: "hidden" }}>
+      <div style={{ width: `${pct}%`, height: "100%", background: color, borderRadius: 999, transition: "width 0.4s" }}/>
+    </div>
+  );
+}
+
+/* Status dot */
+function StatusDot({ status }) {
+  const map = {
+    ativo:    "var(--ok)",
+    destaque: "var(--ok)",
+    atencao:  "var(--warn)",
+    vaga:     "var(--fg-dim)",
+    critico:  "var(--danger)",
+  };
+  return <span style={{ width: 7, height: 7, borderRadius: "50%", background: map[status] || "var(--fg-dim)", display: "inline-block", flexShrink: 0 }}/>;
+}
+
+/* Tier pill */
+function TierPill({ tier }) {
+  return (
+    <span className={`chip tier-${tier}`} style={{ border: "none" }}>{tier.toUpperCase()}</span>
+  );
+}
+
+/* Avatar */
+function Avatar({ nome, size = 28, bg = null }) {
+  const ini = nome.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase();
+  const colors = ["#1d4ed8","#059669","#9333ea","#c2410c","#db2777","#0891b2","#ca8a04"];
+  const seed = nome.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+  const color = bg || colors[seed % colors.length];
+  return (
+    <div style={{ width: size, height: size, borderRadius: "50%", background: color, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: size * 0.4, fontWeight: 700, flexShrink: 0 }}>{ini}</div>
+  );
+}
+
+/* Card wrapper */
+function Card({ title, sub, right, children, noPadding, className = "" }) {
+  return (
+    <section className={`card ${className}`}>
+      {(title || right) && (
+        <header className="card-header">
+          <div className="min-w-0 flex-1">
+            {sub && <div className="card-sub mb-0.5">{sub}</div>}
+            {title && <div className="card-title">{title}</div>}
+          </div>
+          {right}
+        </header>
+      )}
+      <div style={{ padding: noPadding ? 0 : 14 }}>{children}</div>
+    </section>
+  );
+}
+
+/* Segment control */
+function Segment({ value, options, onChange }) {
+  return (
+    <div className="seg">
+      {options.map(o => (
+        <button key={o.value} className={`seg-item ${value === o.value ? "active" : ""}`} onClick={() => onChange(o.value)}>{o.label}</button>
+      ))}
+    </div>
+  );
+}
+
+Object.assign(window, { Sparkline, KpiTile, ProgressBar, StatusDot, TierPill, Avatar, Card, Segment });
+
+
+/* ====== src/campanha-shell.jsx ====== */
+/* =========================================================================
+ * Campanha · Shell wrapper stub — campanha-shell.jsx
+ * (most shell logic now lives inline in the App of Plataforma-Campanha.html;
+ *  this file is kept so the <script src> reference resolves and can host
+ *  any future shell helpers)
+ * ========================================================================= */
+/* no-op for now */
+
+
+/* ====== src/campanha-tela1.jsx ====== */
+/* =========================================================================
+ * Tela 1 · Hub da Campanha
+ * KPIs hero, campanhas ativas, atividade recente, top/bottom cercas, alerta IA
+ * ========================================================================= */
+
+function Tela1Hub({ persona, tenant, demoMode, densidade }) {
+  const [camp, setCamp] = React.useState(CAMPANHAS[0]);
+  const kpis = HUB_KPIS[camp.id] || HUB_KPIS["jaques-26"];
+
+  return (
+    <div className="p-6 space-y-6" style={{ maxWidth: 1680, margin: "0 auto" }}>
+      {/* Hero */}
+      <div className="camp-hero p-6 flex items-center gap-6">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="chip" style={{ background: "rgba(255,255,255,0.16)", color: "#fff", border: "1px solid rgba(255,255,255,0.15)", boxShadow: "none" }}>
+              <span className="w-1.5 h-1.5 rounded-full" style={{ background: "#34d399" }}/>
+              {camp.status.toUpperCase()} · {camp.fase}
+            </span>
+            <span className="text-[11px] font-semibold" style={{ color: "rgba(255,255,255,0.75)" }}>{persona.label} · {persona.scope}</span>
+          </div>
+          <h1 className="text-[32px] font-black font-display leading-tight mb-1">{camp.candidato}</h1>
+          <div className="text-[14px]" style={{ color: "rgba(255,255,255,0.82)" }}>
+            {camp.cargo} · <strong>{camp.partido}</strong> · {camp.coligacao}
+          </div>
+          <div className="flex items-center gap-5 mt-4">
+            <Hero_Stat label="Score overall"    value={camp.score}/>
+            <div className="w-px h-10" style={{ background: "rgba(255,255,255,0.2)" }}/>
+            <Hero_Stat label="Intenção de voto" value={`${camp.intencaoVoto}%`}    delta={camp.margem}/>
+            <div className="w-px h-10" style={{ background: "rgba(255,255,255,0.2)" }}/>
+            <Hero_Stat label="Lideranças"       value={camp.ativos}          sub="ativas"/>
+            <div className="w-px h-10" style={{ background: "rgba(255,255,255,0.2)" }}/>
+            <Hero_Stat label="Cercas"           value={camp.cercas}          sub="/ 46 · 82%"/>
+          </div>
+        </div>
+        <div className="flex flex-col gap-2">
+          <button className="btn-primary" style={{ background: "#fff", color: "var(--tenant-primary)", padding: "10px 16px" }}>
+            <CIcon name="Sparkles" size={13}/>
+            Briefing da manhã
+          </button>
+          <button className="btn-ghost" style={{ background: "rgba(255,255,255,0.14)", color: "#fff", padding: "9px 16px" }}>
+            <CIcon name="FileText" size={12}/>
+            Relatório PDF
+          </button>
+        </div>
+      </div>
+
+      {/* Campanhas switcher */}
+      <div className="flex items-center gap-2 overflow-x-auto thin-scroll -mx-1 px-1">
+        <span className="text-[10.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold mr-2">Campanhas ativas:</span>
+        {CAMPANHAS.map(c => {
+          const active = camp.id === c.id;
+          return (
+            <button key={c.id} onClick={() => setCamp(c)}
+              className="flex items-center gap-2.5 px-3 py-2 rounded-lg whitespace-nowrap"
+              style={{
+                background: active ? "var(--bg-card)" : "transparent",
+                border: `1px solid ${active ? "var(--rule-strong)" : "var(--rule)"}`,
+                color: active ? "var(--fg-strong)" : "var(--fg-muted)",
+                cursor: "pointer", minWidth: 220,
+              }}>
+              <Avatar nome={c.candidato} size={28}/>
+              <div className="text-left">
+                <div className="text-[12px] font-bold">{c.candidato}</div>
+                <div className="text-[10px] t-fg-dim">{c.cargo} · score {c.score}</div>
+              </div>
+              <span className={`chip ${c.delta7d > 0 ? "chip-green" : c.delta7d < 0 ? "chip-red" : "chip-gray"}`}>
+                {c.delta7d > 0 ? "+" : ""}{c.delta7d}
+              </span>
+            </button>
+          );
+        })}
+        <button className="btn-ghost ml-1" style={{ padding: "8px 10px" }}>
+          <CIcon name="Plus" size={12}/>
+          Nova
+        </button>
+      </div>
+
+      {/* KPI grid */}
+      <div className="grid grid-cols-4 gap-4">
+        {kpis.map(k => (
+          <KpiTile key={k.id} label={k.label} valor={k.valor} delta={k.delta} sentiment={k.sentiment} sub={k.sub}
+                   sparkPoints={SPARKS[k.id]} />
+        ))}
+      </div>
+
+      {/* 2-col: timeline + sidebar */}
+      <div className="grid grid-cols-[1fr_380px] gap-4">
+        <Card title="Atividade em tempo real" sub="Hoje · Bahia"
+              right={<Segment value="hoje" onChange={() => {}} options={[{value:"hoje",label:"Hoje"},{value:"7d",label:"7 dias"},{value:"30d",label:"30 dias"}]}/>}
+              noPadding>
+          <div className="relative">
+            {ATIVIDADES.map((a, i) => (
+              <div key={i} className="list-row" style={{ gridTemplateColumns: "56px 28px 1fr auto", paddingTop: 11, paddingBottom: 11 }}>
+                <div className="text-[11px] tnum font-mono t-fg-dim">{a.hora}</div>
+                <div className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: a.alert ? "rgba(220,38,38,0.08)" : "var(--rule)", color: a.alert ? "var(--danger)" : "var(--fg-muted)" }}>
+                  <CIcon name={a.icon} size={13}/>
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="chip chip-gray" style={{ height: 17, fontSize: 9.5 }}>{a.tipo}</span>
+                    {a.alert && <span className="chip chip-red" style={{ height: 17, fontSize: 9.5 }}>ATENÇÃO</span>}
+                    <span className="text-[10px] t-fg-faint">· {a.cerca}</span>
+                  </div>
+                  <div className="text-[12.5px] t-fg">{a.texto}</div>
+                  <div className="text-[10.5px] t-fg-dim mt-0.5">{a.meta}</div>
+                </div>
+                <button className="btn-ghost" style={{ padding: "4px 8px", fontSize: 10.5 }}>Abrir →</button>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <div className="space-y-4">
+          {/* Copiloto */}
+          <Card title="Copiloto sugere" sub="IA · Diário" right={<span className="chip chip-violet">BETA</span>}>
+            <div className="space-y-2">
+              {[
+                { icon: "AlertTriangle", color: "danger",  title: "Maragogipe em risco", body: "Score 28. Sem responsável há 9d. Redirecione Renato Bastos (Oeste)?", cta: "Ver plano" },
+                { icon: "Gift",          color: "warn",    title: "Pastor Elias faz 60 anos amanhã", body: "Gere mensagem personalizada e encomende buquê (R$ 220).", cta: "Preparar" },
+                { icon: "Sparkles",      color: "accent",  title: "Oportunidade em Cachoeira", body: "Paula cresceu +18% em cadastros. Promover a Territorial?", cta: "Analisar" },
+              ].map((s, i) => (
+                <div key={i} className="p-3 rounded-lg" style={{ background: "var(--bg-card-2)", border: "1px solid var(--rule)" }}>
+                  <div className="flex items-start gap-2.5 mb-1.5">
+                    <div className="w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0"
+                         style={{ background: s.color === "danger" ? "rgba(220,38,38,0.08)" : s.color === "warn" ? "rgba(217,119,6,0.08)" : "rgba(147,51,234,0.08)",
+                                  color: s.color === "danger" ? "var(--danger)" : s.color === "warn" ? "var(--warn)" : "var(--accent-blue)" }}>
+                      <CIcon name={s.icon} size={13}/>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[12px] font-bold t-fg-strong">{s.title}</div>
+                      <div className="text-[11px] t-fg-muted mt-0.5" style={{ lineHeight: 1.45 }}>{s.body}</div>
+                    </div>
+                  </div>
+                  <button className="btn-ghost w-full" style={{ justifyContent: "center", padding: "6px 8px", fontSize: 11 }}>{s.cta} →</button>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Captação */}
+          <Card title="Captação da meta" sub="R$ 4,82 mi / 6,20 mi">
+            <div className="space-y-3">
+              <Sparkline points={SPARKS.captacao} width={332} height={60} color="var(--ok)" fill/>
+              <ProgressBar value={captarPct(camp)} color="var(--ok)" height={8}/>
+              <div className="flex items-center justify-between text-[11px]">
+                <span className="t-fg-dim">Projeção · agosto</span>
+                <span className="font-bold t-fg-strong">R$ 6,4 mi</span>
+              </div>
+            </div>
+          </Card>
+        </div>
+      </div>
+
+      {/* Top + Bottom cercas */}
+      <div className="grid grid-cols-2 gap-4">
+        <Card title="Cercas de destaque" sub="Top 5 · ritmo de cadastro"
+              right={<button className="btn-ghost" style={{ padding: "4px 8px", fontSize: 10.5 }}>Ver todas</button>}
+              noPadding>
+          {TOP_CERCAS.map((c, i) => (
+            <div key={i} className="list-row" style={{ gridTemplateColumns: "20px 1fr auto 120px" }}>
+              <div className="text-[12px] font-bold tnum t-fg-strong">{i + 1}</div>
+              <div className="min-w-0">
+                <div className="text-[12.5px] font-semibold t-fg-strong">{c.nome}</div>
+                <div className="text-[10.5px] t-fg-dim">{c.responsavel}</div>
+              </div>
+              <div className="text-right">
+                <div className="text-[12px] font-bold tnum t-fg-strong">{c.feito.toLocaleString("pt-BR")}</div>
+                <div className="text-[10px] t-fg-dim">/ {c.meta.toLocaleString("pt-BR")}</div>
+              </div>
+              <div>
+                <ProgressBar value={c.pct} color="var(--ok)"/>
+                <div className="text-[10px] tnum t-fg-muted mt-1 text-right">{c.pct}%</div>
+              </div>
+            </div>
+          ))}
+        </Card>
+
+        <Card title="Cercas em atenção" sub="Baixo desempenho · intervir" noPadding
+              right={<span className="chip chip-red">4 críticas</span>}>
+          {BOTTOM_CERCAS.map((c, i) => (
+            <div key={i} className="list-row" style={{ gridTemplateColumns: "20px 1fr auto 120px" }}>
+              <div className="text-[12px] font-bold tnum" style={{ color: "var(--danger)" }}>!</div>
+              <div className="min-w-0">
+                <div className="text-[12.5px] font-semibold t-fg-strong">{c.nome}</div>
+                <div className="text-[10.5px]" style={{ color: c.responsavel === "—" ? "var(--danger)" : "var(--fg-dim)" }}>
+                  {c.responsavel === "—" ? "⚠ sem responsável" : c.responsavel}
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-[12px] font-bold tnum t-fg-strong">{c.feito.toLocaleString("pt-BR")}</div>
+                <div className="text-[10px] t-fg-dim">/ {c.meta.toLocaleString("pt-BR")}</div>
+              </div>
+              <div>
+                <ProgressBar value={c.pct} color={c.pct < 20 ? "var(--danger)" : "var(--warn)"}/>
+                <div className="text-[10px] tnum mt-1 text-right" style={{ color: c.pct < 20 ? "var(--danger)" : "var(--warn)" }}>{c.pct}%</div>
+              </div>
+            </div>
+          ))}
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function Hero_Stat({ label, value, sub, delta }) {
+  return (
+    <div>
+      <div className="text-[10px] uppercase tracking-[0.14em] font-semibold mb-1" style={{ color: "rgba(255,255,255,0.68)" }}>{label}</div>
+      <div className="flex items-baseline gap-2">
+        <span className="text-[22px] font-black tnum font-display" style={{ color: "#fff" }}>{value}</span>
+        {sub && <span className="text-[11px] font-semibold" style={{ color: "rgba(255,255,255,0.72)" }}>{sub}</span>}
+        {delta && <span className="text-[11px] font-bold tnum" style={{ color: delta.startsWith("+") ? "#6ee7b7" : "#fca5a5" }}>{delta}</span>}
+      </div>
+    </div>
+  );
+}
+
+function captarPct(c) { return Math.round((c.captado / c.meta) * 100); }
+
+Object.assign(window, { Tela1Hub });
+
+
+/* ====== src/campanha-tela2.jsx ====== */
+/* =========================================================================
+ * Tela 2 · Mapa de Cercas — canvas dedicado
+ * Mapa esquemático da Bahia com cercas, sidebar contextual, legenda
+ * ========================================================================= */
+
+function Tela2Mapa({ demoMode, corCerca }) {
+  const [selected, setSelected] = React.useState(null);
+  const [hovered, setHovered] = React.useState(null);
+  const [layer, setLayer] = React.useState("responsavel"); // responsavel | score | engajamento | vaga
+
+  // cores por estado
+  const colorFor = (cerca) => {
+    if (layer === "score" || corCerca === "score") {
+      const s = cerca.score;
+      if (s >= 80) return "#059669";
+      if (s >= 65) return "#fbbf24";
+      if (s >= 45) return "#f97316";
+      return "#dc2626";
+    }
+    if (layer === "engajamento") {
+      const e = cerca.engajamento;
+      if (e >= 75) return "#1d4ed8";
+      if (e >= 55) return "#60a5fa";
+      if (e >= 35) return "#fbbf24";
+      return "#dc2626";
+    }
+    if (layer === "vaga") {
+      return cerca.responsavelId ? "rgba(82,82,91,0.4)" : "#dc2626";
+    }
+    // responsavel: por tier do responsável (ou vermelho se vago)
+    if (!cerca.responsavelId) return "#dc2626";
+    const lid = LIDERANCAS.find(l => l.id === cerca.responsavelId);
+    if (!lid) return "#71717a";
+    return lid.tier === "ouro" ? "#1d4ed8" : lid.tier === "prata" ? "#9ca3af" : "#c2410c";
+  };
+
+  const allMuns = CERCAS[0].filhas || [];
+  const allBairros = allMuns.flatMap(m => m.filhas || []);
+
+  return (
+    <div className="h-full w-full flex" style={{ background: "var(--bg-page-2)" }}>
+      {/* Left toolbar */}
+      <aside className="w-[260px] flex-shrink-0 border-r overflow-y-auto thin-scroll" style={{ borderColor: "var(--rule)", background: "var(--bg-card)" }}>
+        <div className="p-4 border-b" style={{ borderColor: "var(--rule)" }}>
+          <div className="card-sub mb-2">Camada ativa</div>
+          <div className="grid grid-cols-2 gap-1">
+            {[
+              { k: "responsavel", l: "Responsável" },
+              { k: "score",       l: "Score" },
+              { k: "engajamento", l: "Engajamento" },
+              { k: "vaga",        l: "Vagas" },
+            ].map(o => (
+              <button key={o.k} onClick={() => setLayer(o.k)} className={`btn-ghost ${layer === o.k ? "active" : ""}`} style={{ padding: "6px 8px", fontSize: 10.5, justifyContent: "center" }}>{o.l}</button>
+            ))}
+          </div>
+        </div>
+
+        <div className="p-4 border-b" style={{ borderColor: "var(--rule)" }}>
+          <div className="card-sub mb-2">Legenda</div>
+          <MapLegend layer={layer}/>
+        </div>
+
+        <div className="p-4">
+          <div className="card-sub mb-2">Regionais · Recôncavo</div>
+          <div className="space-y-1">
+            {allMuns.map(m => (
+              <button key={m.id} onClick={() => setSelected(m)}
+                      className="w-full flex items-center gap-2 px-2 py-2 rounded-md text-left"
+                      style={{ background: selected?.id === m.id ? "var(--rule-strong)" : "transparent", border: "1px solid transparent" }}
+                      onMouseEnter={e => { if (selected?.id !== m.id) e.currentTarget.style.background = "var(--chart-hover)"; }}
+                      onMouseLeave={e => { if (selected?.id !== m.id) e.currentTarget.style.background = "transparent"; }}>
+                <StatusDot status={m.status}/>
+                <div className="flex-1 min-w-0">
+                  <div className="text-[12px] font-semibold t-fg-strong">{m.nome}</div>
+                  <div className="text-[10px] t-fg-dim">{m.responsavel}</div>
+                </div>
+                <span className="text-[10px] tnum font-bold" style={{ color: m.score >= 70 ? "var(--ok)" : m.score >= 50 ? "var(--warn)" : "var(--danger)" }}>{m.score}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </aside>
+
+      {/* Map canvas */}
+      <div className="flex-1 relative min-w-0" onClick={() => setSelected(null)}>
+        <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10 pointer-events-none">
+          <div className="px-3 py-2 rounded-lg pointer-events-auto" style={{ background: "var(--bg-card)", border: "1px solid var(--rule-strong)", boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }}>
+            <div className="text-[9.5px] t-fg-dim uppercase tracking-[0.14em] font-semibold">Região</div>
+            <div className="text-[13px] font-bold t-fg-strong">Recôncavo Baiano</div>
+          </div>
+          <div className="flex gap-2 pointer-events-auto">
+            <button className="btn-ghost"><CIcon name="Filter" size={11}/>Filtros</button>
+            <button className="btn-ghost"><CIcon name="Layers" size={11}/>Camadas</button>
+            <button className="btn-ghost"><CIcon name="Plus" size={11}/>Zoom</button>
+            <button className="btn-ghost"><CIcon name="Minus" size={11}/></button>
+            <button className="btn-primary" style={{ padding: "6px 10px", fontSize: 11 }}>
+              <CIcon name="Plus" size={11}/>
+              Nova cerca
+            </button>
+          </div>
+        </div>
+
+        <svg viewBox="0 0 800 600" style={{ width: "100%", height: "100%", cursor: "grab" }} onClick={e => e.stopPropagation()}>
+          <defs>
+            <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
+              <path d="M 24 0 L 0 0 0 24" fill="none" stroke="var(--rule)" strokeWidth="0.5"/>
+            </pattern>
+          </defs>
+          <rect width="800" height="600" fill="url(#grid)"/>
+
+          {/* Regional outline (esquemático) */}
+          <path d="M 120 120 Q 180 80, 280 100 T 520 120 Q 620 140, 680 220 T 700 400 Q 680 480, 580 500 T 340 490 Q 200 480, 140 400 T 120 240 Z"
+                fill="rgba(0, 42, 123, 0.05)" stroke="var(--tenant-primary)" strokeWidth="1.5" strokeDasharray="4 3" opacity="0.6"/>
+
+          {/* Municípios (grandes) */}
+          {[
+            { id: "mun-feira",       cx: 300, cy: 240, r: 58,  nome: "Feira de Santana" },
+            { id: "mun-ssalvador",   cx: 520, cy: 400, r: 52,  nome: "Salvador (subúrbio)" },
+            { id: "mun-sfelix",      cx: 210, cy: 370, r: 28,  nome: "São Félix" },
+            { id: "mun-cachoeira",   cx: 260, cy: 410, r: 36,  nome: "Cachoeira" },
+            { id: "mun-maragogipe",  cx: 380, cy: 460, r: 40,  nome: "Maragogipe" },
+          ].map(m => {
+            const mun = allMuns.find(x => x.id === m.id);
+            const c = colorFor(mun);
+            const active = selected?.id === m.id;
+            return (
+              <g key={m.id} style={{ cursor: "pointer" }}
+                 onClick={e => { e.stopPropagation(); setSelected(mun); }}
+                 onMouseEnter={() => setHovered(mun)} onMouseLeave={() => setHovered(null)}>
+                <circle cx={m.cx} cy={m.cy} r={m.r} fill={c} fillOpacity={active ? 0.30 : 0.15} stroke={c} strokeWidth={active ? 2.2 : 1.4}/>
+                {/* Bairros dentro */}
+                {(mun.filhas || []).map((b, i) => {
+                  const bc = colorFor(b);
+                  const ang = (i / (mun.filhas.length)) * Math.PI * 2;
+                  const x = m.cx + Math.cos(ang) * (m.r * 0.55);
+                  const y = m.cy + Math.sin(ang) * (m.r * 0.55);
+                  return (
+                    <g key={b.id}>
+                      <circle cx={x} cy={y} r={7} fill={bc} fillOpacity={0.85} stroke="#fff" strokeWidth={1.2}/>
+                      {!b.responsavelId && (
+                        <circle cx={x} cy={y} r={10} fill="none" stroke="#dc2626" strokeWidth={1} strokeDasharray="2 2">
+                          {demoMode && <animate attributeName="r" values="10;13;10" dur="2s" repeatCount="indefinite"/>}
+                        </circle>
+                      )}
+                    </g>
+                  );
+                })}
+                <text x={m.cx} y={m.cy + m.r + 14} textAnchor="middle" fontSize="11" fontWeight="700" fill="var(--fg-strong)">{m.nome}</text>
+                <text x={m.cx} y={m.cy + m.r + 26} textAnchor="middle" fontSize="9.5" fill="var(--fg-dim)">score {mun.score} · {Math.round(mun.cadastrados/1000)}k cadastros</text>
+              </g>
+            );
+          })}
+
+          {/* Crosshair label */}
+          <text x="40" y="40" fontSize="10.5" fontWeight="600" fill="var(--fg-dim)" letterSpacing="0.1em">MAPA ESQUEMÁTICO · BA · recôncavo</text>
+          <text x="40" y="560" fontSize="9" fill="var(--fg-faint)" fontFamily="JetBrains Mono">zoom 1:80k  ·  {allBairros.length} micro-cercas  ·  {allMuns.filter(m => !m.responsavelId).length + allBairros.filter(b => !b.responsavelId).length} sem responsável</text>
+        </svg>
+
+        {/* hover tooltip */}
+        {hovered && !selected && (
+          <div className="absolute top-24 right-6 p-3 rounded-lg pointer-events-none" style={{ background: "var(--bg-card)", border: "1px solid var(--rule-strong)", boxShadow: "0 8px 20px rgba(0,0,0,0.12)", width: 220 }}>
+            <div className="text-[10px] t-fg-dim uppercase tracking-wider font-semibold">{hovered.nivel}</div>
+            <div className="text-[14px] font-bold t-fg-strong">{hovered.nome}</div>
+            <div className="text-[11px] t-fg-muted mb-2">{hovered.responsavel}</div>
+            <div className="grid grid-cols-2 gap-1 text-[10.5px]">
+              <div><span className="t-fg-dim">Score</span> <b className="tnum">{hovered.score}</b></div>
+              <div><span className="t-fg-dim">Eng.</span> <b className="tnum">{hovered.engajamento}%</b></div>
+              <div><span className="t-fg-dim">Meta</span> <b className="tnum">{hovered.meta.toLocaleString("pt-BR")}</b></div>
+              <div><span className="t-fg-dim">Feito</span> <b className="tnum">{hovered.cadastrados.toLocaleString("pt-BR")}</b></div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Right drawer */}
+      {selected && (
+        <aside className="w-[360px] flex-shrink-0 border-l overflow-y-auto thin-scroll" style={{ borderColor: "var(--rule)", background: "var(--bg-card)" }}>
+          <div className="p-5 border-b" style={{ borderColor: "var(--rule)" }}>
+            <div className="flex items-start justify-between gap-2 mb-3">
+              <div>
+                <div className="card-sub mb-1">{selected.nivel}</div>
+                <div className="text-[20px] font-black font-display t-fg-strong">{selected.nome}</div>
+              </div>
+              <button className="btn-ghost" onClick={() => setSelected(null)} style={{ padding: "5px 7px" }}><CIcon name="X" size={11}/></button>
+            </div>
+            <div className="flex items-center gap-2">
+              <StatusDot status={selected.status}/>
+              <span className="text-[11px] t-fg-muted capitalize">{selected.status}</span>
+              <span className="text-[11px] t-fg-faint">·</span>
+              <span className="text-[11px] t-fg-muted">Resp. {selected.responsavel}</span>
+            </div>
+          </div>
+
+          <div className="p-5 grid grid-cols-2 gap-3 border-b" style={{ borderColor: "var(--rule)" }}>
+            <MiniStat label="Score overall"   value={selected.score}                color={selected.score >= 70 ? "var(--ok)" : selected.score >= 50 ? "var(--warn)" : "var(--danger)"}/>
+            <MiniStat label="Engajamento"     value={`${selected.engajamento}%`}/>
+            <MiniStat label="Cadastros"       value={selected.cadastrados.toLocaleString("pt-BR")}/>
+            <MiniStat label="Meta"            value={selected.meta.toLocaleString("pt-BR")}/>
+          </div>
+
+          <div className="p-5 border-b" style={{ borderColor: "var(--rule)" }}>
+            <div className="card-sub mb-2">Progresso de cadastro</div>
+            <ProgressBar value={(selected.cadastrados / selected.meta) * 100}
+                         color={(selected.cadastrados / selected.meta) > 0.7 ? "var(--ok)" : (selected.cadastrados / selected.meta) > 0.4 ? "var(--warn)" : "var(--danger)"}
+                         height={8}/>
+            <div className="flex justify-between mt-1 text-[10.5px] t-fg-dim">
+              <span className="tnum">{Math.round((selected.cadastrados / selected.meta) * 100)}%</span>
+              <span>{(selected.meta - selected.cadastrados).toLocaleString("pt-BR")} faltando</span>
+            </div>
+          </div>
+
+          {selected.filhas && selected.filhas.length > 0 && (
+            <div className="p-5 border-b" style={{ borderColor: "var(--rule)" }}>
+              <div className="card-sub mb-2">Bairros · {selected.filhas.length}</div>
+              <div className="space-y-1.5">
+                {selected.filhas.map(b => (
+                  <div key={b.id} className="flex items-center gap-2 py-1.5">
+                    <StatusDot status={b.status}/>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[11.5px] font-semibold t-fg-strong">{b.nome}</div>
+                      <div className="text-[10px] t-fg-dim">{b.responsavel}</div>
+                    </div>
+                    <div className="text-[10px] font-bold tnum t-fg-strong">{b.score}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="p-5 space-y-2">
+            <button className="btn-primary w-full" style={{ justifyContent: "center" }}>
+              <CIcon name="UserPlus" size={12}/>
+              Adicionar liderança
+            </button>
+            <button className="btn-ghost w-full" style={{ justifyContent: "center" }}>
+              <CIcon name="MessagesSquare" size={12}/>
+              Abrir canal da cerca
+            </button>
+            <button className="btn-ghost w-full" style={{ justifyContent: "center" }}>
+              <CIcon name="FileText" size={12}/>
+              Relatório desta cerca
+            </button>
+          </div>
+        </aside>
+      )}
+    </div>
+  );
+}
+
+function MapLegend({ layer }) {
+  const items = {
+    responsavel: [
+      { color: "#1d4ed8", label: "Tier ouro" },
+      { color: "#9ca3af", label: "Tier prata" },
+      { color: "#c2410c", label: "Tier bronze" },
+      { color: "#dc2626", label: "Sem responsável" },
+    ],
+    score: [
+      { color: "#059669", label: "80+" },
+      { color: "#fbbf24", label: "65–79" },
+      { color: "#f97316", label: "45–64" },
+      { color: "#dc2626", label: "<45" },
+    ],
+    engajamento: [
+      { color: "#1d4ed8", label: "75+%" },
+      { color: "#60a5fa", label: "55–75%" },
+      { color: "#fbbf24", label: "35–54%" },
+      { color: "#dc2626", label: "<35%" },
+    ],
+    vaga: [
+      { color: "#dc2626", label: "Cerca sem responsável" },
+      { color: "rgba(82,82,91,0.4)", label: "Com responsável" },
+    ],
+  };
+  return (
+    <div className="space-y-1">
+      {items[layer].map((it, i) => (
+        <div key={i} className="flex items-center gap-2 text-[11px]">
+          <span style={{ width: 12, height: 12, borderRadius: 3, background: it.color, flexShrink: 0 }}/>
+          <span className="t-fg-muted">{it.label}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function MiniStat({ label, value, color }) {
+  return (
+    <div>
+      <div className="text-[9.5px] t-fg-dim uppercase tracking-wider font-semibold mb-0.5">{label}</div>
+      <div className="text-[18px] font-black tnum font-display" style={{ color: color || "var(--fg-strong)" }}>{value}</div>
+    </div>
+  );
+}
+
+Object.assign(window, { Tela2Mapa });
+
+
+/* ====== src/campanha-telas-4-8.jsx ====== */
+/* =========================================================================
+ * Telas 4 · Árvore · 5 · Cadastro · 6 · CRM · 7 · Chat · 8 · Ranking
+ * ========================================================================= */
+
+/* ---------- Tela 4 · Árvore Hierárquica ---------- */
+function Tela4Arvore() {
+  const [expanded, setExpanded] = React.useState({ "reg-reconcavo": true, "mun-feira": true });
+  const toggle = (id) => setExpanded(e => ({ ...e, [id]: !e[id] }));
+
+  const row = (node, depth) => {
+    const hasChildren = node.filhas && node.filhas.length > 0;
+    const isOpen = expanded[node.id];
+    return (
+      <React.Fragment key={node.id}>
+        <div className="list-row" style={{ gridTemplateColumns: `${depth * 20 + 28}px 24px 1fr 140px 120px 80px 140px 80px`, paddingLeft: 14 + depth * 20 }}>
+          <div onClick={() => hasChildren && toggle(node.id)} style={{ cursor: hasChildren ? "pointer" : "default" }}>
+            {hasChildren && <CIcon name={isOpen ? "ChevronDown" : "ChevronRight"} size={12} className="t-fg-muted"/>}
+          </div>
+          <StatusDot status={node.status}/>
+          <div className="min-w-0 flex items-center gap-2">
+            <CIcon name={node.nivel === "regional" ? "Flag" : node.nivel === "municipio" ? "MapPin" : "Home"} size={12} className="t-fg-dim"/>
+            <div className="min-w-0">
+              <div className="text-[12.5px] font-semibold t-fg-strong truncate">{node.nome}</div>
+              <div className="text-[10px] t-fg-dim uppercase tracking-wider">{node.nivel}</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 min-w-0">
+            {node.responsavelId ? <Avatar nome={node.responsavel} size={22}/> : <span className="w-[22px] h-[22px] rounded-full flex items-center justify-center" style={{ background: "rgba(220,38,38,0.1)", color: "var(--danger)" }}><CIcon name="AlertTriangle" size={10}/></span>}
+            <div className="text-[11.5px] t-fg truncate">{node.responsavel}</div>
+          </div>
+          <div>
+            <ProgressBar value={(node.cadastrados/node.meta)*100} color={(node.cadastrados/node.meta) > 0.7 ? "var(--ok)" : (node.cadastrados/node.meta) > 0.4 ? "var(--warn)" : "var(--danger)"}/>
+            <div className="text-[10px] tnum t-fg-dim mt-0.5">{node.cadastrados.toLocaleString("pt-BR")} / {node.meta.toLocaleString("pt-BR")}</div>
+          </div>
+          <div className="text-[13px] font-bold tnum" style={{ color: node.score >= 70 ? "var(--ok)" : node.score >= 50 ? "var(--warn)" : "var(--danger)" }}>{node.score}</div>
+          <div className="text-[11px] tnum t-fg-muted">{node.engajamento}%</div>
+          <div className="flex gap-1 justify-end">
+            <button className="btn-ghost" style={{ padding: "4px 7px" }}><CIcon name="MessageCircle" size={10}/></button>
+            <button className="btn-ghost" style={{ padding: "4px 7px" }}><CIcon name="MoreHorizontal" size={10}/></button>
+          </div>
+        </div>
+        {hasChildren && isOpen && node.filhas.map(c => row(c, depth + 1))}
+      </React.Fragment>
+    );
+  };
+
+  return (
+    <div className="p-6 space-y-4" style={{ maxWidth: 1680, margin: "0 auto" }}>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-[22px] font-black font-display t-fg-strong">Hierarquia da campanha</h1>
+          <div className="text-[12px] t-fg-muted mt-0.5">Delegado → Regionais → Territoriais → Bairros · cobertura em tempo real</div>
+        </div>
+        <div className="flex gap-2">
+          <Segment value="operacional" onChange={() => {}} options={[{value:"operacional",label:"Operacional"},{value:"geografica",label:"Geográfica"}]}/>
+          <button className="btn-ghost"><CIcon name="Download" size={11}/>Export</button>
+          <button className="btn-primary"><CIcon name="Plus" size={11}/>Nova cerca</button>
+        </div>
+      </div>
+
+      <Card noPadding>
+        <div className="list-row" style={{ gridTemplateColumns: "48px 24px 1fr 140px 120px 80px 140px 80px", paddingTop: 8, paddingBottom: 8, background: "var(--bg-card-2)", fontWeight: 600, color: "var(--fg-dim)", fontSize: 10.5, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+          <div/><div/><div>Cerca</div><div>Responsável</div><div>Cadastro</div><div>Score</div><div>Engaj.</div><div className="text-right">Ações</div>
+        </div>
+        {CERCAS.map(n => row(n, 0))}
+      </Card>
+
+      <div className="grid grid-cols-4 gap-4">
+        <StatCard label="Regionais" value="3" sub="1 vaga" tone="warn"/>
+        <StatCard label="Territoriais" value="8" sub="1 vaga" tone="warn"/>
+        <StatCard label="Bairros" value="11" sub="2 vagos" tone="danger"/>
+        <StatCard label="Cobertura total" value="74%" sub="meta 90%" tone="ok"/>
+      </div>
+    </div>
+  );
+}
+
+function StatCard({ label, value, sub, tone }) {
+  const color = tone === "ok" ? "var(--ok)" : tone === "warn" ? "var(--warn)" : tone === "danger" ? "var(--danger)" : "var(--fg-strong)";
+  return (
+    <div className="card p-4">
+      <div className="text-[10px] t-fg-dim uppercase tracking-wider font-semibold mb-1.5">{label}</div>
+      <div className="text-[26px] font-black tnum font-display" style={{ color }}>{value}</div>
+      <div className="text-[10.5px] t-fg-muted mt-0.5">{sub}</div>
+    </div>
+  );
+}
+
+/* ---------- Tela 5 · Cadastro de Lideranças ---------- */
+function Tela5Cadastro() {
+  const [q, setQ] = React.useState("");
+  const [filtro, setFiltro] = React.useState("todos");
+  const [editing, setEditing] = React.useState(null);
+
+  const filtered = LIDERANCAS.filter(l => {
+    if (filtro === "vagas") return false;
+    if (filtro === "ouro" && l.tier !== "ouro") return false;
+    if (filtro === "mulher" && !l.tags.includes("Mulher")) return false;
+    if (q && !(l.nome.toLowerCase().includes(q.toLowerCase()) || l.cidade.toLowerCase().includes(q.toLowerCase()))) return false;
+    return true;
+  });
+
+  return (
+    <div className="p-6" style={{ maxWidth: 1680, margin: "0 auto" }}>
+      <div className="grid grid-cols-[1fr_400px] gap-4">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h1 className="text-[22px] font-black font-display t-fg-strong">Lideranças</h1>
+              <div className="text-[12px] t-fg-muted mt-0.5">{filtered.length} de {LIDERANCAS.length} · cadastros, tiers, cercas</div>
+            </div>
+            <div className="flex gap-2">
+              <div className="flex items-center gap-2 px-3 h-[34px] rounded-md" style={{ background: "var(--rule)", width: 260 }}>
+                <CIcon name="Search" size={12} className="t-fg-dim"/>
+                <input value={q} onChange={e => setQ(e.target.value)} placeholder="Buscar por nome ou cidade…" className="flex-1 bg-transparent outline-none text-[12px]" style={{ color: "var(--fg)" }}/>
+              </div>
+              <Segment value={filtro} onChange={setFiltro} options={[{value:"todos",label:"Todos"},{value:"ouro",label:"Ouro"},{value:"mulher",label:"Mulheres"}]}/>
+              <button className="btn-primary"><CIcon name="UserPlus" size={11}/>Cadastrar</button>
+            </div>
+          </div>
+
+          <Card noPadding>
+            <div className="list-row" style={{ gridTemplateColumns: "1fr 140px 140px 80px 100px 80px", paddingTop: 8, paddingBottom: 8, background: "var(--bg-card-2)", fontWeight: 600, color: "var(--fg-dim)", fontSize: 10.5, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+              <div>Nome</div><div>Papel</div><div>Cerca</div><div>Tier</div><div className="text-right">Influência</div><div className="text-right">Score</div>
+            </div>
+            {filtered.map(l => (
+              <div key={l.id} className="list-row" style={{ gridTemplateColumns: "1fr 140px 140px 80px 100px 80px", cursor: "pointer" }} onClick={() => setEditing(l)}>
+                <div className="flex items-center gap-3 min-w-0">
+                  <Avatar nome={l.nome} size={30}/>
+                  <div className="min-w-0">
+                    <div className="text-[12.5px] font-semibold t-fg-strong truncate">{l.nome}</div>
+                    <div className="text-[10.5px] t-fg-dim truncate">{l.cidade} · {l.tags.join(" · ")}</div>
+                  </div>
+                </div>
+                <div className="text-[11.5px] t-fg-muted truncate">{l.papel}</div>
+                <div className="text-[11.5px] t-fg-muted truncate">{l.cerca || "—"}</div>
+                <div><TierPill tier={l.tier}/></div>
+                <div className="text-[11.5px] tnum t-fg text-right">{l.eleitoresInfluenciados.toLocaleString("pt-BR")}</div>
+                <div className="text-[13px] font-bold tnum text-right" style={{ color: l.score >= 80 ? "var(--ok)" : l.score >= 60 ? "var(--warn)" : "var(--danger)" }}>{l.score}</div>
+              </div>
+            ))}
+          </Card>
+        </div>
+
+        {/* Formulário lateral (ou Edit pane) */}
+        <Card title={editing ? "Editar liderança" : "Cadastrar liderança"} sub={editing ? editing.nome : "Formulário rápido"}
+              right={editing && <button className="btn-ghost" onClick={() => setEditing(null)} style={{ padding: "5px 7px" }}><CIcon name="X" size={11}/></button>}>
+          <div className="space-y-3">
+            {[
+              { label: "Nome completo",     val: editing?.nome || "",       ph: "Ex: Rita Lima" },
+              { label: "Papel",             val: editing?.papel || "",      ph: "Cabo Eleitoral" },
+              { label: "Telefone · WhatsApp",val: editing?.telefone || "",   ph: "(75) 9 ..." },
+              { label: "Cidade",            val: editing?.cidade || "",     ph: "Feira de Santana" },
+              { label: "Cerca",             val: editing?.cerca || "",      ph: "Tomba" },
+            ].map((f, i) => (
+              <Field key={i} label={f.label}>
+                <input defaultValue={f.val} placeholder={f.ph}
+                       className="w-full h-[34px] px-3 rounded-md outline-none text-[12.5px]"
+                       style={{ background: "var(--rule)", color: "var(--fg)" }}/>
+              </Field>
+            ))}
+
+            <Field label="Tier">
+              <div className="flex gap-1.5">
+                {["ouro","prata","bronze"].map(t => (
+                  <button key={t} className={`btn-ghost ${editing?.tier === t ? "active" : ""}`} style={{ flex: 1, justifyContent: "center", padding: "7px 8px" }}>{t.toUpperCase()}</button>
+                ))}
+              </div>
+            </Field>
+
+            <Field label="Tags">
+              <div className="flex flex-wrap gap-1.5">
+                {["Mulher","Jovem","Idoso","Religioso","Comunidade","Destaque","Atenção"].map(t => {
+                  const on = editing?.tags?.includes(t);
+                  return <span key={t} className={`chip ${on ? "chip-blue" : "chip-gray"}`} style={{ cursor: "pointer" }}>{t}</span>;
+                })}
+              </div>
+            </Field>
+
+            <div className="flex gap-2 pt-2">
+              <button className="btn-primary flex-1" style={{ justifyContent: "center" }}>
+                <CIcon name="CheckCircle" size={12}/>
+                Salvar
+              </button>
+              <button className="btn-ghost" style={{ padding: "8px 12px" }}>Cancelar</button>
+            </div>
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function Field({ label, children }) {
+  return (
+    <div>
+      <div className="text-[10px] t-fg-dim uppercase tracking-wider font-semibold mb-1.5">{label}</div>
+      {children}
+    </div>
+  );
+}
+
+/* ---------- Tela 6 · CRM Aniversariantes + Follow-ups ---------- */
+function Tela6CRM() {
+  const hoje = new Date(2026, 2, 14); // 14 mar 2026 (ref demo)
+  const comAniv = LIDERANCAS.map(l => ({ ...l, aniv: proximoAniversario(l.aniversario, hoje) })).sort((a,b) => a.aniv.diffDays - b.aniv.diffDays);
+  const proximos7 = comAniv.filter(l => l.aniv.diffDays <= 7);
+  const proximos30 = comAniv.filter(l => l.aniv.diffDays > 7 && l.aniv.diffDays <= 30);
+
+  return (
+    <div className="p-6 space-y-5" style={{ maxWidth: 1680, margin: "0 auto" }}>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-[22px] font-black font-display t-fg-strong">CRM · relacionamento</h1>
+          <div className="text-[12px] t-fg-muted mt-0.5">Aniversários, follow-ups, contatos agendados</div>
+        </div>
+        <div className="flex gap-2">
+          <button className="btn-ghost"><CIcon name="Calendar" size={11}/>Mês de março</button>
+          <button className="btn-primary"><CIcon name="Plus" size={11}/>Nova lembrança</button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-4 gap-4">
+        <KpiTile label="Aniversariantes hoje"    valor={comAniv.filter(l => l.aniv.diffDays === 0).length.toString()} sub="plano de contato pronto" sentiment="up"/>
+        <KpiTile label="Próximos 7 dias"          valor={proximos7.length.toString()}                    sub="ligações programadas"/>
+        <KpiTile label="Follow-ups pendentes"     valor="23"                                             delta="-4" sentiment="up" sub="vs semana anterior"/>
+        <KpiTile label="Taxa de resposta"         valor="78%"                                            delta="+6pp" sentiment="up" sub="WhatsApp · 30d"/>
+      </div>
+
+      <div className="grid grid-cols-[1fr_380px] gap-4">
+        <Card title="Próximos aniversariantes" sub="7 dias" noPadding>
+          {proximos7.length === 0 && <div className="p-8 text-center text-[12px] t-fg-dim">Nenhum aniversariante nos próximos 7 dias.</div>}
+          {proximos7.map((l, i) => (
+            <div key={l.id} className="list-row" style={{ gridTemplateColumns: "60px 30px 1fr 120px 90px auto" }}>
+              <div className="text-center">
+                <div className="text-[11px] font-bold tnum t-fg-strong">{l.aniv.date.toLocaleDateString("pt-BR",{day:"2-digit",month:"short"})}</div>
+                <div className="text-[9.5px] t-fg-dim uppercase">{l.aniv.diffDays === 0 ? "hoje" : l.aniv.diffDays === 1 ? "amanhã" : `em ${l.aniv.diffDays}d`}</div>
+              </div>
+              <Avatar nome={l.nome} size={28}/>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <div className="text-[12.5px] font-semibold t-fg-strong truncate">{l.nome}</div>
+                  <TierPill tier={l.tier}/>
+                </div>
+                <div className="text-[10.5px] t-fg-dim truncate">{l.papel} · {l.cidade}</div>
+              </div>
+              <div className="text-[11px] t-fg-muted">
+                <div>{new Date().getFullYear() - new Date(l.aniversario).getFullYear()} anos</div>
+                <div className="t-fg-faint">{l.telefone}</div>
+              </div>
+              <div className="flex gap-1">
+                {l.whats && <span className="chip chip-green" style={{ height: 18 }}>WA</span>}
+                <span className="chip chip-gray" style={{ height: 18 }}>CALL</span>
+              </div>
+              <div className="flex gap-1">
+                <button className="btn-ghost" style={{ padding: "5px 8px" }}><CIcon name="MessageCircle" size={11}/></button>
+                <button className="btn-primary" style={{ padding: "5px 10px", fontSize: 10.5 }}>Preparar</button>
+              </div>
+            </div>
+          ))}
+        </Card>
+
+        <div className="space-y-4">
+          <Card title="Plano do dia" sub="Copiloto · auto-gerado">
+            <div className="space-y-2.5">
+              {[
+                { h: "10:30", t: "Ligar para Helena Barreto", ctx: "Tomba · pauta: apoio domingo" },
+                { h: "14:00", t: "Mensagem para Pastor Elias", ctx: "aniversário amanhã · sugestão de buquê" },
+                { h: "16:30", t: "Visita Cachoeira · Paula", ctx: "reforço de cadastros" },
+                { h: "18:00", t: "Retornar Marcos Oliveira",  ctx: "queda de engajamento Brasília" },
+              ].map((it, i) => (
+                <div key={i} className="flex items-start gap-3 pb-2.5" style={{ borderBottom: i < 3 ? "1px solid var(--rule)" : "none" }}>
+                  <div className="text-[11px] tnum font-mono t-fg-dim w-10 flex-shrink-0 mt-0.5">{it.h}</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[12px] font-semibold t-fg-strong">{it.t}</div>
+                    <div className="text-[10.5px] t-fg-muted">{it.ctx}</div>
+                  </div>
+                  <input type="checkbox" className="mt-1"/>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card title="Mais em 30 dias" sub={`${proximos30.length} pessoas`} noPadding>
+            {proximos30.slice(0, 5).map(l => (
+              <div key={l.id} className="list-row" style={{ gridTemplateColumns: "50px 1fr 40px" }}>
+                <div className="text-[10.5px] tnum t-fg-dim">{l.aniv.date.toLocaleDateString("pt-BR",{day:"2-digit",month:"short"})}</div>
+                <div className="text-[11.5px] t-fg-strong truncate">{l.nome}</div>
+                <TierPill tier={l.tier}/>
+              </div>
+            ))}
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Tela 7 · Chat Sigiloso ---------- */
+function Tela7Chat({ modoFurtivoDefault }) {
+  const [canal, setCanal] = React.useState(CHAT_CANAIS[0]);
+  const [furtivo, setFurtivo] = React.useState(modoFurtivoDefault === "furtivo");
+  const msgs = CHAT_MENSAGENS[canal.id] || [];
+
+  return (
+    <div className="h-full w-full flex" style={{ background: "var(--bg-page-2)" }}>
+      {/* channel list */}
+      <aside className="w-[300px] flex-shrink-0 border-r overflow-y-auto thin-scroll flex flex-col" style={{ borderColor: "var(--rule)", background: "var(--bg-card)" }}>
+        <div className="p-4 border-b" style={{ borderColor: "var(--rule)" }}>
+          <div className="flex items-center gap-2 mb-3">
+            <CIcon name="Shield" size={14} style={{ color: "var(--tenant-primary)" }}/>
+            <div className="flex-1 min-w-0">
+              <div className="text-[12.5px] font-bold t-fg-strong">Canais seguros</div>
+              <div className="text-[10px] t-fg-dim">E2E · registros auditáveis</div>
+            </div>
+            <button className="btn-ghost" style={{ padding: "5px 7px" }}><CIcon name="Plus" size={11}/></button>
+          </div>
+          <div className="flex items-center gap-2 px-3 h-[30px] rounded-md" style={{ background: "var(--rule)" }}>
+            <CIcon name="Search" size={11} className="t-fg-dim"/>
+            <input placeholder="Buscar canal…" className="flex-1 bg-transparent outline-none text-[11.5px]" style={{ color: "var(--fg)" }}/>
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto">
+          {CHAT_CANAIS.map(c => {
+            const active = canal.id === c.id;
+            return (
+              <div key={c.id} onClick={() => setCanal(c)}
+                   className="px-4 py-3 cursor-pointer"
+                   style={{ background: active ? "var(--rule-strong)" : "transparent", borderBottom: "1px solid var(--rule)" }}
+                   onMouseEnter={e => { if (!active) e.currentTarget.style.background = "var(--chart-hover)"; }}
+                   onMouseLeave={e => { if (!active) e.currentTarget.style.background = "transparent"; }}>
+                <div className="flex items-center gap-2 mb-1">
+                  {c.furtivo && <CIcon name="Lock" size={10} style={{ color: "var(--warn)" }}/>}
+                  <div className="text-[12px] font-semibold t-fg-strong flex-1 truncate">{c.nome}</div>
+                  <div className="text-[9.5px] t-fg-dim">{c.ultima}</div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="text-[11px] t-fg-muted flex-1 truncate">{c.furtivo ? <span className="italic t-fg-faint">Mensagem protegida</span> : c.preview}</div>
+                  {c.unread > 0 && <span className="chip chip-red" style={{ height: 16, minWidth: 16, justifyContent: "center", fontSize: 9.5 }}>{c.unread}</span>}
+                </div>
+                <div className="flex items-center gap-1.5 mt-1">
+                  <span className="chip chip-gray" style={{ height: 15, fontSize: 9 }}>{c.tipo.toUpperCase()}</span>
+                  <span className="text-[9.5px] t-fg-faint">· {c.membros} membros · {c.classificacao}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </aside>
+
+      {/* chat body */}
+      <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex items-center gap-3 px-5 h-[56px] flex-shrink-0 border-b" style={{ borderColor: "var(--rule)", background: "var(--bg-card)" }}>
+          <div className="w-9 h-9 rounded-md flex items-center justify-center" style={{ background: "var(--tenant-primary)", color: "#fff" }}>
+            <CIcon name={canal.tipo === "direto" ? "User" : "Users"} size={14}/>
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <div className="text-[13px] font-bold t-fg-strong">{canal.nome}</div>
+              {canal.furtivo && <span className="chip chip-amber"><CIcon name="Lock" size={9}/>FURTIVO</span>}
+              <span className="chip chip-gray">{canal.classificacao.toUpperCase()}</span>
+            </div>
+            <div className="text-[10.5px] t-fg-dim">{canal.membros} membros · última atividade {canal.ultima} atrás</div>
+          </div>
+          <button className="btn-ghost" onClick={() => setFurtivo(!furtivo)} title="Modo furtivo (burn-after-read)">
+            <CIcon name={furtivo ? "EyeOff" : "Eye"} size={11}/>
+            {furtivo ? "Furtivo ON" : "Furtivo OFF"}
+          </button>
+          <button className="btn-ghost" style={{ padding: "6px 8px" }}><CIcon name="Phone" size={11}/></button>
+          <button className="btn-ghost" style={{ padding: "6px 8px" }}><CIcon name="MoreHorizontal" size={11}/></button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto thin-scroll px-6 py-5 space-y-3" style={{ background: "var(--bg-page-2)" }}>
+          <div className="flex justify-center mb-4">
+            <div className="px-3 py-1.5 rounded-full text-[10.5px] flex items-center gap-1.5" style={{ background: "rgba(217,119,6,0.1)", color: "var(--warn)", border: "1px solid rgba(217,119,6,0.25)" }}>
+              <CIcon name="Shield" size={10}/>
+              Conversa cifrada ponta-a-ponta · log de auditoria apenas em acesso judicial
+            </div>
+          </div>
+
+          {msgs.map(m => (
+            <div key={m.id} className={`flex gap-2 ${m.me ? "justify-end" : "justify-start"}`}>
+              {!m.me && <Avatar nome={m.autor} size={26}/>}
+              <div className={m.me ? "text-right" : ""} style={{ maxWidth: "75%" }}>
+                {!m.me && <div className="text-[10px] t-fg-dim font-semibold mb-0.5">{m.autor} · <span className="t-fg-faint">{m.papel}</span></div>}
+                <div className={`msg-bubble ${m.me ? "msg-me" : "msg-them"}`}>
+                  {m.texto}
+                  {m.anexo && (
+                    <div className={`mt-2 px-2.5 py-2 rounded-md flex items-center gap-2 text-[10.5px]`} style={{ background: m.me ? "rgba(255,255,255,0.14)" : "var(--bg-card)" }}>
+                      <CIcon name="FileText" size={11}/>
+                      {m.anexo}
+                    </div>
+                  )}
+                </div>
+                <div className="text-[9.5px] t-fg-faint mt-0.5 flex items-center gap-1 justify-end">
+                  <span>{m.hora}</span>
+                  {m.me && <CIcon name="CheckCircle" size={9} style={{ color: m.status === "lido" ? "var(--ok)" : "var(--fg-faint)" }}/>}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex-shrink-0 px-5 py-3 border-t" style={{ borderColor: "var(--rule)", background: "var(--bg-card)" }}>
+          {furtivo && (
+            <div className="mb-2 px-3 py-1.5 rounded-md text-[10.5px] flex items-center gap-2" style={{ background: "rgba(217,119,6,0.08)", color: "var(--warn)", border: "1px solid rgba(217,119,6,0.2)" }}>
+              <CIcon name="Clock" size={10}/>
+              Modo furtivo: mensagem expira em 24h e não é armazenada após leitura.
+            </div>
+          )}
+          <div className="flex items-end gap-2">
+            <button className="btn-ghost" style={{ padding: "8px" }}><CIcon name="Paperclip" size={12}/></button>
+            <textarea rows={1} placeholder="Escrever mensagem segura…" className="flex-1 resize-none rounded-md px-3 py-2 text-[12.5px] outline-none"
+                      style={{ background: "var(--rule)", color: "var(--fg)", minHeight: 36, maxHeight: 120 }}/>
+            <button className="btn-primary" style={{ padding: "8px 14px" }}>
+              <CIcon name="Send" size={12}/>
+              Enviar
+            </button>
+          </div>
+          <div className="flex items-center justify-between mt-2 text-[10px] t-fg-dim">
+            <div>Delegado → {canal.nome} · membros vinculados à cerca</div>
+            <div className="flex items-center gap-3">
+              <span className="flex items-center gap-1"><CIcon name="Lock" size={9}/>E2E</span>
+              <span className="flex items-center gap-1"><CIcon name="Shield" size={9}/>Compliance LGPD</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Tela 8 · Ranking + Heatmap ---------- */
+function Tela8Ranking() {
+  const [view, setView] = React.useState("lista");
+
+  return (
+    <div className="p-6 space-y-5" style={{ maxWidth: 1680, margin: "0 auto" }}>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-[22px] font-black font-display t-fg-strong">Ranking & heatmap</h1>
+          <div className="text-[12px] t-fg-muted mt-0.5">Produtividade individual · engajamento por cerca/dia</div>
+        </div>
+        <div className="flex gap-2">
+          <Segment value={view} onChange={setView} options={[{value:"lista",label:"Ranking"},{value:"heatmap",label:"Heatmap"}]}/>
+          <button className="btn-ghost"><CIcon name="Download" size={11}/>Exportar</button>
+        </div>
+      </div>
+
+      {view === "lista" && (
+        <div className="grid grid-cols-[1fr_380px] gap-4">
+          <Card title="Ranking do mês" sub={`${RANKING.length} lideranças · ordenado por score`} noPadding>
+            <div className="list-row" style={{ gridTemplateColumns: "40px 32px 1fr 90px 90px 80px 70px", paddingTop: 8, paddingBottom: 8, background: "var(--bg-card-2)", fontWeight: 600, color: "var(--fg-dim)", fontSize: 10.5, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+              <div className="text-center">#</div><div/><div>Liderança</div><div>Papel</div><div className="text-right">Cadastros</div><div className="text-right">Δ</div><div className="text-right">Score</div>
+            </div>
+            {RANKING.slice(0, 12).map((l) => (
+              <div key={l.id} className="list-row" style={{ gridTemplateColumns: "40px 32px 1fr 90px 90px 80px 70px" }}>
+                <div className="text-center">
+                  {l.posicao <= 3 ? (
+                    <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full font-black text-[11px] tier-${l.posicao === 1 ? "ouro" : l.posicao === 2 ? "prata" : "bronze"}`}>{l.posicao}</span>
+                  ) : (
+                    <span className="text-[12px] font-bold tnum t-fg-muted">{l.posicao}</span>
+                  )}
+                </div>
+                <Avatar nome={l.nome} size={28}/>
+                <div className="min-w-0">
+                  <div className="text-[12.5px] font-semibold t-fg-strong truncate">{l.nome}</div>
+                  <div className="text-[10.5px] t-fg-dim truncate">{l.cidade} · {l.cerca}</div>
+                </div>
+                <div className="text-[11px] t-fg-muted truncate">{l.papel}</div>
+                <div className="text-right text-[12px] font-bold tnum t-fg">{l.cadastrosMes}</div>
+                <div className="text-right text-[11px] font-bold tnum" style={{ color: l.variacao > 0 ? "var(--ok)" : l.variacao < 0 ? "var(--danger)" : "var(--fg-dim)" }}>
+                  {l.variacao > 0 ? `↑${l.variacao}` : l.variacao < 0 ? `↓${Math.abs(l.variacao)}` : "—"}
+                </div>
+                <div className="text-right text-[13px] font-bold tnum" style={{ color: l.score >= 80 ? "var(--ok)" : l.score >= 60 ? "var(--warn)" : "var(--danger)" }}>{l.score}</div>
+              </div>
+            ))}
+          </Card>
+
+          <div className="space-y-4">
+            <Card title="Pódio · ouro" sub="Top 3 do mês">
+              <div className="space-y-3">
+                {RANKING.slice(0, 3).map((l, i) => (
+                  <div key={l.id} className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-[15px] tier-${i === 0 ? "ouro" : i === 1 ? "prata" : "bronze"}`}>{i + 1}</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[12.5px] font-bold t-fg-strong">{l.nome}</div>
+                      <div className="text-[10.5px] t-fg-dim">{l.cerca} · {l.cadastrosMes} cadastros</div>
+                    </div>
+                    <div className="text-[16px] font-black tnum font-display" style={{ color: "var(--ok)" }}>{l.score}</div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            <Card title="Gamificação" sub="Regras ativas">
+              <div className="space-y-2 text-[11.5px]">
+                {[
+                  { icon: "Zap",    t: "+1 pt",  d: "por liderança cadastrada" },
+                  { icon: "Star",   t: "+5 pt",  d: "por liderança com tag Destaque" },
+                  { icon: "Heart",  t: "+2 pt",  d: "por contato ativo (WhatsApp ≤ 7d)" },
+                  { icon: "Target", t: "+20 pt", d: "por cerca 100% da meta" },
+                ].map((r, i) => (
+                  <div key={i} className="flex items-center gap-2.5 py-1">
+                    <CIcon name={r.icon} size={13} className="t-fg-dim"/>
+                    <span className="font-bold tnum t-fg-strong w-10">{r.t}</span>
+                    <span className="t-fg-muted flex-1">{r.d}</span>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+        </div>
+      )}
+
+      {view === "heatmap" && (
+        <Card title="Engajamento diário por cerca" sub="12 semanas · darker = mais engajamento">
+          <div style={{ display: "grid", gridTemplateColumns: "140px repeat(84, 1fr)", gap: 2, fontSize: 9.5 }}>
+            <div/>
+            {Array.from({ length: 84 }, (_, i) => (
+              <div key={i} className="text-center t-fg-faint" style={{ fontSize: 8, visibility: i % 7 === 0 ? "visible" : "hidden" }}>W{Math.floor(i/7) + 1}</div>
+            ))}
+            {HEATMAP_CERCAS.map(c => (
+              <React.Fragment key={c.nome}>
+                <div className="text-[10.5px] t-fg-strong font-semibold py-0.5 truncate">{c.nome}</div>
+                {c.dias.map((v, d) => (
+                  <div key={d} title={`${c.nome} · ${v}%`}
+                       style={{ height: 14, borderRadius: 2,
+                                background: `rgba(29, 78, 216, ${Math.max(0.05, v/100)})`,
+                                border: v < 20 ? "1px solid rgba(220,38,38,0.4)" : "none" }}/>
+                ))}
+              </React.Fragment>
+            ))}
+          </div>
+          <div className="flex items-center gap-3 mt-4 text-[10.5px] t-fg-dim">
+            <span>Baixo</span>
+            {[0.1, 0.3, 0.5, 0.7, 0.9].map(op => <span key={op} style={{ width: 18, height: 12, background: `rgba(29, 78, 216, ${op})`, borderRadius: 2 }}/>)}
+            <span>Alto</span>
+            <div className="flex-1"/>
+            <span className="flex items-center gap-1"><span style={{ width: 10, height: 10, border: "1.5px solid var(--danger)", borderRadius: 2 }}/> &lt; 20% · alerta</span>
+          </div>
+        </Card>
+      )}
+    </div>
+  );
+}
+
+Object.assign(window, { Tela4Arvore, Tela5Cadastro, Tela6CRM, Tela7Chat, Tela8Ranking });
+
+
+</script>
+
+<!-- App + boot -->
+<script type="text/babel">
+const { useState, useEffect, useMemo } = React;
+
+function TweaksPanel({ state, setState, visible, onClose }) {
+  if (!visible) return null;
+  const set = (k, v) => {
+    const next = { ...state, [k]: v };
+    setState(next);
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { [k]: v } }, '*');
+  };
+  return (
+    <div className="tweak-panel">
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <div className="text-[10px] t-fg-dim uppercase tracking-[0.14em] font-semibold">Tweaks</div>
+          <div className="text-[14px] font-bold t-fg-strong">Configuração</div>
+        </div>
+        <button onClick={onClose} className="btn-ghost" style={{ padding: "5px 7px" }}>
+          <window.CIcon name="X" size={11}/>
+        </button>
+      </div>
+
+      <div className="space-y-3 text-[11.5px]">
+        <Tweak label="Tenant (white-label)">
+          {[["uniao","UB"],["mazzel","MZ"]].map(([k,l]) => (
+            <button key={k} onClick={() => set("tenant", k)} className={`btn-ghost ${state.tenant === k ? "active" : ""}`} style={{ flex: 1, justifyContent: "center", padding: "6px 8px" }}>{l}</button>
+          ))}
+        </Tweak>
+        <Tweak label="Persona">
+          {[["delegado","Delegado"],["regional","Regional"],["territorial","Territorial"],["cabo","Cabo"]].map(([k,l]) => (
+            <button key={k} onClick={() => set("persona", k)} className={`btn-ghost ${state.persona === k ? "active" : ""}`} style={{ flex: 1, justifyContent: "center", padding: "5px 4px", fontSize: 10 }}>{l}</button>
+          ))}
+        </Tweak>
+        <Tweak label="Tema">
+          {[["light","☀"],["dark","☾"]].map(([k,l]) => (
+            <button key={k} onClick={() => set("theme", k)} className={`btn-ghost ${state.theme === k ? "active" : ""}`} style={{ flex: 1, justifyContent: "center", padding: "6px 8px" }}>{l}</button>
+          ))}
+        </Tweak>
+        <Tweak label="Cor das cercas">
+          {[["responsavel","Responsável"],["score","Score"]].map(([k,l]) => (
+            <button key={k} onClick={() => set("corCerca", k)} className={`btn-ghost ${state.corCerca === k ? "active" : ""}`} style={{ flex: 1, justifyContent: "center", padding: "6px 8px", fontSize: 10.5 }}>{l}</button>
+          ))}
+        </Tweak>
+        <Tweak label="Chat padrão">
+          {[["aberto","Aberto"],["furtivo","Furtivo"]].map(([k,l]) => (
+            <button key={k} onClick={() => set("furtivoDefault", k)} className={`btn-ghost ${state.furtivoDefault === k ? "active" : ""}`} style={{ flex: 1, justifyContent: "center", padding: "6px 8px", fontSize: 10.5 }}>{l}</button>
+          ))}
+        </Tweak>
+        <Tweak label="Modo demo">
+          <button onClick={() => set("modoDemo", !state.modoDemo)} className={`btn-ghost ${state.modoDemo ? "active" : ""}`} style={{ flex: 1, justifyContent: "center", padding: "6px 10px" }}>
+            {state.modoDemo ? "ON · animações" : "OFF"}
+          </button>
+        </Tweak>
+      </div>
+    </div>
+  );
+}
+function Tweak({ label, children }) {
+  return (
+    <div>
+      <div className="text-[10px] t-fg-dim uppercase tracking-wider font-semibold mb-1.5">{label}</div>
+      <div className="flex gap-1.5">{children}</div>
+    </div>
+  );
+}
+
+/* Cmd+K palette stub */
+function CmdK({ visible, onClose, onNavigate }) {
+  if (!visible) return null;
+  const items = [
+    ...(window.CAMP_SCREENS || []).map(s => ({ type: "Tela", label: s.label, id: s.id })),
+    ...(window.CAMPANHAS || []).slice(0, 3).map(c => ({ type: "Campanha", label: c.candidato, id: "hub" })),
+    ...(window.CERCAS || []).flatMap(c => c.filhas || []).slice(0, 5).map(c => ({ type: "Cerca", label: c.nome, id: "mapa" })),
+    ...(window.LIDERANCAS || []).slice(0, 5).map(l => ({ type: "Liderança", label: l.nome, id: "cadastro" })),
+  ];
+  return (
+    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)", zIndex: 100, display: "flex", alignItems: "flex-start", justifyContent: "center", paddingTop: "14vh" }}>
+      <div onClick={e => e.stopPropagation()} style={{ width: 600, maxWidth: "92vw", background: "var(--bg-elevated)", border: "1px solid var(--rule-strong)", borderRadius: 12, overflow: "hidden", boxShadow: "0 40px 80px -20px rgba(0,0,0,0.6)" }}>
+        <div className="flex items-center gap-2 px-4 py-3 border-b" style={{ borderColor: "var(--rule)" }}>
+          <window.CIcon name="Search" size={14} className="t-fg-dim"/>
+          <input autoFocus placeholder="Buscar cercas, lideranças, campanhas, telas…" className="flex-1 bg-transparent outline-none text-[13px]" style={{ color: "var(--fg)" }}/>
+          <span className="kbd" style={{ background: "var(--kbd-bg)", color: "var(--kbd-fg)" }}>ESC</span>
+        </div>
+        <div className="max-h-[50vh] overflow-y-auto thin-scroll">
+          {items.map((it, i) => (
+            <div key={i} onClick={() => { onNavigate(it.id); onClose(); }} className="flex items-center gap-3 px-4 py-2.5 cursor-pointer" style={{ borderBottom: "1px solid var(--rule)" }}
+                 onMouseEnter={e => e.currentTarget.style.background = "var(--chart-hover)"}
+                 onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+              <span className="chip chip-gray" style={{ height: 18, fontSize: 9.5, minWidth: 70, justifyContent: "center" }}>{it.type}</span>
+              <span className="text-[12.5px] t-fg-strong flex-1">{it.label}</span>
+              <window.CIcon name="ArrowRight" size={11} className="t-fg-dim"/>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [state, setState] = useState(() => ({
+    ...window.TWEAK_DEFAULTS,
+    ...(JSON.parse(localStorage.getItem("mazzel-campanha-v1") || "{}"))
+  }));
+  const [screen, setScreen] = useState(() => localStorage.getItem("mazzel-camp-screen") || "hub");
+  const [tweaksVisible, setTweaksVisible] = useState(false);
+  const [cmdkVisible, setCmdkVisible] = useState(false);
+
+  /* persist */
+  useEffect(() => { localStorage.setItem("mazzel-campanha-v1", JSON.stringify(state)); }, [state]);
+  useEffect(() => { localStorage.setItem("mazzel-camp-screen", screen); }, [screen]);
+
+  /* theme + tenant */
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", state.theme);
+    const t = window.TENANTS_CAMP[state.tenant];
+    document.documentElement.style.setProperty("--tenant-primary", t.primary);
+    document.documentElement.style.setProperty("--tenant-primary-rgb", t.primaryRgb);
+    document.documentElement.style.setProperty("--tenant-accent", t.accent);
+  }, [state.theme, state.tenant]);
+
+  /* Tweaks bridge */
+  useEffect(() => {
+    const onMsg = (e) => {
+      if (!e.data) return;
+      if (e.data.type === '__activate_edit_mode') setTweaksVisible(true);
+      if (e.data.type === '__deactivate_edit_mode') setTweaksVisible(false);
+    };
+    window.addEventListener('message', onMsg);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', onMsg);
+  }, []);
+
+  /* Cmd+K */
+  useEffect(() => {
+    const onKey = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") { e.preventDefault(); setCmdkVisible(true); }
+      if (e.key === "Escape") { setCmdkVisible(false); }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
+  const persona = window.CAMPANHA_PERSONAS[state.persona];
+
+  const screenTitle = window.CAMP_SCREENS.find(s => s.id === screen)?.label || "Campanha";
+  const breadcrumbs = ["Mazzel", "Campanha 2026", screenTitle];
+
+  const renderScreen = () => {
+    switch (screen) {
+      case "hub":      return <window.Tela1Hub persona={persona} tenant={state.tenant} demoMode={state.modoDemo} densidade={state.densidade}/>;
+      case "mapa":     return <window.Tela2Mapa demoMode={state.modoDemo} corCerca={state.corCerca}/>;
+      case "arvore":   return <window.Tela4Arvore/>;
+      case "cadastro": return <window.Tela5Cadastro/>;
+      case "crm":      return <window.Tela6CRM/>;
+      case "chat":     return <window.Tela7Chat modoFurtivoDefault={state.furtivoDefault}/>;
+      case "ranking":  return <window.Tela8Ranking/>;
+      default:         return <window.Tela1Hub persona={persona} tenant={state.tenant}/>;
+    }
+  };
+
+  const fillMap = screen === "mapa" || screen === "chat";
+
+  return (
+    <>
+      <div className="shell-body">
+        <window.CSidebar tenant={state.tenant} activeModule="campanha" onNavigate={() => {}}/>
+        <main className="shell-main">
+          <window.CTopbar tenant={state.tenant} personaLabel={persona.label} breadcrumbs={breadcrumbs} onOpenCmdk={() => setCmdkVisible(true)}/>
+          <window.CampSubNav screen={screen} onChange={setScreen} persona={persona}/>
+          <div className={fillMap ? "main-scroll" : "main-scroll bg-page-grad"} style={fillMap ? { padding: 0, overflow: "hidden" } : undefined}>
+            {renderScreen()}
+          </div>
+        </main>
+      </div>
+
+      <TweaksPanel state={state} setState={setState} visible={tweaksVisible} onClose={() => setTweaksVisible(false)}/>
+      <CmdK visible={cmdkVisible} onClose={() => setCmdkVisible(false)} onNavigate={setScreen}/>
+    </>
+  );
+}
+
+/* boot: poll until all babel-transpiled modules have exposed their exports on window */
+(function boot(tries) {
+  const ready = window.CAMPANHA_PERSONAS && window.TENANTS_CAMP && window.CAMP_SCREENS
+             && window.CSidebar && window.CTopbar && window.CampSubNav && window.CIcon
+             && window.Tela1Hub && window.Tela2Mapa && window.Tela4Arvore
+             && window.Tela5Cadastro && window.Tela6CRM && window.Tela7Chat && window.Tela8Ranking
+             && window.CAMPANHAS && window.LIDERANCAS && window.CERCAS;
+  if (!ready) {
+    if (tries > 200) {
+      document.getElementById("root").innerHTML = '<div style="padding:40px;font-family:monospace;color:#f87171">Timeout: módulos não carregaram.</div>';
+      return;
+    }
+    return setTimeout(() => boot(tries + 1), 30);
+  }
+  try {
+    ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+  } catch (e) {
+    document.getElementById("root").innerHTML = '<div style="padding:40px;font-family:monospace;color:#f87171;background:#0a0a0b;height:100vh;white-space:pre-wrap">' + (e.stack || e.message) + '</div>';
+    console.error(e);
+  }
+})(0);
+</script>
+</body>
+</html>

@@ -41,6 +41,25 @@ const PARTY_COLORS = {
   AVANTE:         { a: "#005BAC", b: "#00984C", accent: "#F5C518" },
   SOLIDARIEDADE:  { a: "#E30613", b: "#F5C518", accent: "#005BAC" },
   CIDADANIA:      { a: "#E30613", b: "#FFFFFF", accent: "#005BAC" },
+  // Adicionados (15 partidos sem cor que Agente F apontou):
+  PTB:            { a: "#005BAC", b: "#F5C518", accent: "#E30613" },
+  PV:             { a: "#006633", b: "#FFFFFF", accent: "#FFCC00" },
+  AGIR:           { a: "#0066B3", b: "#F5C518", accent: "#0066B3" },
+  PCDOB:          { a: "#DA251C", b: "#FFFFFF", accent: "#FFDD00" },
+  "PC DO B":      { a: "#DA251C", b: "#FFFFFF", accent: "#FFDD00" },
+  PRTB:           { a: "#005BAC", b: "#F5C518", accent: "#E30613" },
+  PROS:           { a: "#F68E21", b: "#005BAC", accent: "#F68E21" },
+  PODEMOS:        { a: "#5A8ECB", b: "#005BAC", accent: "#FFFFFF" },
+  PODE:           { a: "#5A8ECB", b: "#005BAC", accent: "#FFFFFF" },
+  REDE:           { a: "#2EB5C2", b: "#005BAC", accent: "#FFFFFF" },
+  PMB:            { a: "#005BAC", b: "#F5C518", accent: "#FFFFFF" },
+  PHS:            { a: "#FF6600", b: "#005BAC", accent: "#FFFFFF" },
+  PSTU:           { a: "#E30613", b: "#1A1A1A", accent: "#FFFFFF" },
+  PCB:            { a: "#E30613", b: "#1A1A1A", accent: "#FFDD00" },
+  PPL:            { a: "#005BAC", b: "#FFFFFF", accent: "#E30613" },
+  PCO:            { a: "#E30613", b: "#1A1A1A", accent: "#FFFFFF" },
+  SD:             { a: "#E30613", b: "#F5C518", accent: "#005BAC" },
+  PRD:            { a: "#005BAC", b: "#FFFFFF", accent: "#FFDD00" },
 };
 
 const DEFAULT_COLORS = { a: "#334155", b: "#64748B", accent: "#94A3B8" };
@@ -147,19 +166,29 @@ function adaptiveFontSize(nome) {
   return 14;
 }
 
-// Stats vem do backend como atributos_6 (VOT/FID/EFI/INT/ART/TER).
-// O card aceita tambem politico.stats { vot, fid, efi, int, art, ter } por compatibilidade.
+// Stats vem do backend como overall_v9 (ATV/LEG/BSE/INF/MID/PAC).
+// O card aceita tambem politico.stats { atv, leg, bse, inf, mid, pac } por compatibilidade.
+// Mantemos retrocompat com atributos_6 antigo (mapeia VOT->BSE_proxy etc) durante migracao.
 function getStats(p) {
-  const fonte = p.atributos_6 || p.stats || {};
+  const fonte = p.overall_v9 || p.atributos_6 || p.stats || {};
   return {
-    VOT: fonte.VOT ?? fonte.vot,
-    FID: fonte.FID ?? fonte.fid,
-    EFI: fonte.EFI ?? fonte.efi,
-    INT: fonte.INT ?? fonte.int,
-    ART: fonte.ART ?? fonte.art,
-    TER: fonte.TER ?? fonte.ter,
+    ATV: fonte.ATV ?? fonte.atv,
+    LEG: fonte.LEG ?? fonte.leg,
+    BSE: fonte.BSE ?? fonte.bse,
+    INF: fonte.INF ?? fonte.inf,
+    MID: fonte.MID ?? fonte.mid,
+    PAC: fonte.PAC ?? fonte.pac,
   };
 }
+
+const SIGLA_TOOLTIPS = {
+  ATV: "Atividade - Discursos, comissoes e CPIs (parlamentar) / Agenda + audiencias + DOU (executivo)",
+  LEG: "Legislativo - PLs de autoria, aprovados e relatorias",
+  BSE: "Base - Votacao absoluta, capilaridade UF e fidelidade do eleitor",
+  INF: "Influencia - Lideranca partidaria, cargos em comissoes e rede de apoios",
+  MID: "Midia - Mencoes, engajamento em redes e entrevistas",
+  PAC: "Pactuacao - Acordos interpartidarios, base governista e taxa de execucao de emendas",
+};
 
 export const CardPolitico = forwardRef(function CardPolitico(
   { politico, onAbrirDossie, width = 204, height = 360 },
@@ -348,8 +377,8 @@ export const CardPolitico = forwardRef(function CardPolitico(
           display: "flex", justifyContent: "space-between",
           marginBottom: 8,
         }}>
-          {["VOT", "FID", "EFI", "INT", "ART", "TER"].map((k) => (
-            <div key={k} style={{
+          {["ATV", "LEG", "BSE", "INF", "MID", "PAC"].map((k) => (
+            <div key={k} title={SIGLA_TOOLTIPS[k]} style={{
               display: "flex", flexDirection: "column", alignItems: "center", flex: 1,
             }}>
               <div style={{

@@ -42,7 +42,7 @@ const DossieMapaCandidato = dynamic(
 const tkn = () => (typeof window === "undefined" ? "" : localStorage.getItem("ub_token") ?? "");
 const fmt = (n) => (n == null ? "—" : Number(n).toLocaleString("pt-BR"));
 const fmtPct = (n) => (n == null ? "—" : `${Math.round(n)}%`);
-const fmtMoeda = (n) => n == null ? "—" : `R$ ${Number(n).toLocaleString("pt-BR", { maximumFractionDigits: 0 })}`;
+const fmtMoeda = (n) => n == null ? "—" : `R$ ${Number(n).toLocaleString("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 const fetcher = async (url) => {
   const r = await fetch(url, { headers: { Authorization: `Bearer ${tkn()}` } });
   if (!r.ok) throw new Error(`HTTP ${r.status}`);

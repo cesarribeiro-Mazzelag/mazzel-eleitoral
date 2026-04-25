@@ -1,0 +1,123 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]: UB
+        - generic [ref=e7]:
+          - generic [ref=e8]: União Brasil
+          - generic [ref=e9]: Enterprise · v2.4.1
+      - navigation [ref=e10]:
+        - generic [ref=e11]:
+          - link "Dashboard" [ref=e12] [cursor=pointer]:
+            - /url: /mazzel-preview
+            - img [ref=e13]
+            - generic [ref=e15]: Dashboard
+          - link "Mapa Eleitoral" [ref=e16] [cursor=pointer]:
+            - /url: /mazzel-preview/mapa
+            - img [ref=e17]
+            - generic [ref=e20]: Mapa Eleitoral
+          - link "Radar Político" [ref=e21] [cursor=pointer]:
+            - /url: /mazzel-preview/radar
+            - img [ref=e22]
+            - generic [ref=e26]: Radar Político
+          - link "Dossiês" [ref=e27] [cursor=pointer]:
+            - /url: /mazzel-preview/dossies
+            - img [ref=e28]
+            - generic [ref=e33]: Dossiês
+          - link "Alianças NEW" [ref=e34] [cursor=pointer]:
+            - /url: /mazzel-preview/aliancas
+            - img [ref=e35]
+            - generic [ref=e40]: Alianças
+            - generic [ref=e41]: NEW
+          - link "Módulo Estudo" [ref=e42] [cursor=pointer]:
+            - /url: /mazzel-preview/estudo
+            - img [ref=e43]
+            - generic [ref=e45]: Módulo Estudo
+        - generic [ref=e46]:
+          - link "Campanha 2026" [ref=e47] [cursor=pointer]:
+            - /url: /mazzel-preview/campanha
+            - img [ref=e48]
+            - generic [ref=e51]: Campanha 2026
+          - link "Chat" [ref=e52] [cursor=pointer]:
+            - /url: /mazzel-preview/chat
+            - img [ref=e53]
+            - generic [ref=e56]: Chat
+          - link "Mazzel IA" [ref=e57] [cursor=pointer]:
+            - /url: /mazzel-preview/ia
+            - img [ref=e58]
+            - generic [ref=e61]: Mazzel IA
+        - generic [ref=e62]:
+          - link "Lideranças" [ref=e63] [cursor=pointer]:
+            - /url: /mazzel-preview/liderancas
+            - img [ref=e64]
+            - generic [ref=e66]: Lideranças
+          - link "Filiados NEW" [ref=e67] [cursor=pointer]:
+            - /url: /mazzel-preview/afiliados
+            - img [ref=e68]
+            - generic [ref=e72]: Filiados
+            - generic [ref=e73]: NEW
+          - link "Delegados" [ref=e74] [cursor=pointer]:
+            - /url: /mazzel-preview/delegados
+            - img [ref=e75]
+            - generic [ref=e80]: Delegados
+        - generic [ref=e81]:
+          - link "Agenda NEW" [ref=e82] [cursor=pointer]:
+            - /url: /mazzel-preview/agenda
+            - img [ref=e83]
+            - generic [ref=e85]: Agenda
+            - generic [ref=e86]: NEW
+          - link "Alertas 7" [ref=e87] [cursor=pointer]:
+            - /url: /mazzel-preview/alertas
+            - img [ref=e88]
+            - generic [ref=e91]: Alertas
+            - generic [ref=e92]: "7"
+          - link "Relatórios" [ref=e93] [cursor=pointer]:
+            - /url: /mazzel-preview/relatorios
+            - img [ref=e94]
+            - generic [ref=e97]: Relatórios
+        - generic [ref=e98]:
+          - link "Meu painel" [ref=e99] [cursor=pointer]:
+            - /url: /mazzel-preview/portal
+            - img [ref=e100]
+            - generic [ref=e103]: Meu painel
+          - link "Glossário" [ref=e104] [cursor=pointer]:
+            - /url: /mazzel-preview/glossario
+            - img [ref=e105]
+            - generic [ref=e108]: Glossário
+      - generic [ref=e109]:
+        - generic [ref=e110]: Sessão
+        - generic [ref=e111]:
+          - generic [ref=e112]: CR
+          - generic [ref=e113]:
+            - generic [ref=e114]: Cesar Ribeiro
+            - generic [ref=e115]: Presidente
+    - generic [ref=e116]:
+      - banner [ref=e117]:
+        - generic [ref=e118]:
+          - generic [ref=e120]: União Brasil
+          - generic [ref=e121]:
+            - img [ref=e122]
+            - generic [ref=e124]: Dossiês
+        - button "Buscar candidato, UF, partido, processo... ⌘K" [ref=e125] [cursor=pointer]:
+          - img [ref=e126]
+          - generic [ref=e129]: Buscar candidato, UF, partido, processo...
+          - generic [ref=e130]: ⌘K
+        - button "7" [ref=e131] [cursor=pointer]:
+          - img [ref=e132]
+          - generic [ref=e135]: "7"
+        - button "Mudar para claro" [ref=e136] [cursor=pointer]:
+          - img [ref=e137]
+        - button "UB" [ref=e142] [cursor=pointer]:
+          - generic [ref=e144]: UB
+          - img [ref=e145]
+        - button "Presidente" [ref=e148] [cursor=pointer]:
+          - img [ref=e149]
+          - generic [ref=e152]: Presidente
+          - img [ref=e153]
+      - generic [ref=e157]:
+        - link "Voltar para biblioteca" [ref=e158] [cursor=pointer]:
+          - /url: /mazzel-preview/dossies
+          - img [ref=e159]
+          - text: Voltar para biblioteca
+        - generic [ref=e163]: Carregando dossiê…
+  - alert [ref=e164]

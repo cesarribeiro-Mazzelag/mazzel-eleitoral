@@ -1,0 +1,1906 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<title>Dossiê Político</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = { theme: { extend: {
+    fontFamily: { sans: ['Inter','ui-sans-serif','system-ui'], mono: ['JetBrains Mono','ui-monospace','monospace'] },
+  }}}
+</script>
+<style>
+/* theme tokens + shared component styles */
+:root, [data-theme="dark"] {
+  --bg-page: #0a0a0b; --bg-page-2: #0c0c0e;
+  --bg-card: #0e0e11; --bg-card-2: rgba(255,255,255,0.015);
+  --bg-sidebar: #0b0b0d;
+  --fg: #e4e4e7; --fg-strong: #ffffff; --fg-muted: #a1a1aa;
+  --fg-dim: #71717a; --fg-faint: #52525b; --fg-ghost: #3f3f46;
+  --rule: rgba(255,255,255,0.05); --rule-strong: rgba(255,255,255,0.08);
+  --hairline: rgba(255,255,255,0.06);
+  --accent-blue: #93c5fd; --accent-blue-strong: #60a5fa;
+  --overall-from: #ffffff; --overall-to: #d4d4d8;
+  --overall-muted-from: #71717a; --overall-muted-to: #52525b;
+  --page-grad-1: rgba(59,130,246,0.08); --page-grad-2: rgba(168,85,247,0.05);
+  --ok: #34d399; --verified: #34d399;
+  --warn: #fbbf24; --danger: #f87171;
+  --chart-hover: rgba(255,255,255,0.08);
+}
+[data-theme="light"] {
+  --bg-page: #f4f4f5; --bg-page-2: #fafafa;
+  --bg-card: #ffffff; --bg-card-2: rgba(0,0,0,0.02);
+  --bg-sidebar: #fafafa;
+  --fg: #18181b; --fg-strong: #09090b; --fg-muted: #52525b;
+  --fg-dim: #71717a; --fg-faint: #a1a1aa; --fg-ghost: #d4d4d8;
+  --rule: rgba(0,0,0,0.06); --rule-strong: rgba(0,0,0,0.10);
+  --hairline: rgba(0,0,0,0.08);
+  --accent-blue: #1d4ed8; --accent-blue-strong: #1e40af;
+  --overall-from: #09090b; --overall-to: #3f3f46;
+  --overall-muted-from: #a1a1aa; --overall-muted-to: #71717a;
+  --page-grad-1: rgba(59,130,246,0.07); --page-grad-2: rgba(168,85,247,0.05);
+  --ok: #059669; --verified: #059669;
+  --warn: #d97706; --danger: #dc2626;
+  --chart-hover: rgba(0,0,0,0.04);
+}
+html,body { background: var(--bg-page); color: var(--fg); }
+.tnum { font-variant-numeric: tabular-nums; font-feature-settings: "tnum","cv11"; }
+.font-display { font-family: 'Inter', sans-serif; font-feature-settings: "cv11","ss01"; letter-spacing: -0.02em; }
+
+.t-fg{color:var(--fg);} .t-fg-strong{color:var(--fg-strong);} .t-fg-muted{color:var(--fg-muted);}
+.t-fg-dim{color:var(--fg-dim);} .t-fg-faint{color:var(--fg-faint);} .t-fg-ghost{color:var(--fg-ghost);}
+.t-accent{color:var(--accent-blue);} .t-ok{color:var(--ok);}
+.t-border{border-color:var(--rule);} .t-border-strong{border-color:var(--rule-strong);}
+.t-bg-card{background:var(--bg-card);} .t-bg-card-2{background:var(--bg-card-2);}
+.t-bg-sidebar{background:var(--bg-sidebar);}
+
+.bg-dossier {
+  background:
+    radial-gradient(1200px 600px at 85% -10%, var(--page-grad-1), transparent 60%),
+    radial-gradient(800px 400px at 10% 0%, var(--page-grad-2), transparent 60%),
+    linear-gradient(180deg, var(--bg-page-2) 0%, var(--bg-page) 100%);
+  min-height: 100vh;
+}
+.ring-soft { box-shadow: 0 0 0 1px var(--hairline), 0 1px 0 var(--hairline) inset; }
+[data-theme="light"] .ring-soft { box-shadow: 0 0 0 1px var(--hairline), 0 1px 2px rgba(0,0,0,0.03); }
+.ring-danger { box-shadow: 0 0 0 2px rgba(239,68,68,0.40), 0 0 60px -10px rgba(239,68,68,0.25) inset; }
+[data-theme="light"] .ring-danger { box-shadow: 0 0 0 2px rgba(220,38,38,0.50), 0 8px 24px -12px rgba(220,38,38,0.25); }
+
+.trait-gold {
+  background: linear-gradient(180deg, #facc15 0%, #b8860b 100%); color: #1a1205;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.45) inset, 0 -1px 0 rgba(0,0,0,0.25) inset, 0 4px 12px -4px rgba(234,179,8,0.4);
+}
+.trait-silver {
+  background: linear-gradient(180deg, #f3f4f6 0%, #9ca3af 100%); color: #18181b;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.6) inset, 0 -1px 0 rgba(0,0,0,0.2) inset, 0 4px 12px -4px rgba(156,163,175,0.35);
+}
+
+.fifa-card {
+  background:
+    linear-gradient(135deg, rgba(251,191,36,0.12) 0%, rgba(251,191,36,0.02) 40%, rgba(255,255,255,0.04) 100%),
+    linear-gradient(180deg, #1a1510 0%, #0f0d0a 100%);
+  border: 1px solid rgba(251,191,36,0.25);
+  box-shadow: 0 20px 40px -20px rgba(0,0,0,0.6), 0 0 0 1px rgba(251,191,36,0.08) inset;
+}
+.fifa-stripe { background: linear-gradient(90deg, transparent 0%, rgba(251,191,36,0.4) 50%, transparent 100%); }
+
+.overall-num {
+  background: linear-gradient(180deg, var(--overall-from) 0%, var(--overall-to) 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.overall-muted {
+  background: linear-gradient(180deg, var(--overall-muted-from) 0%, var(--overall-muted-to) 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+.chip {
+  height: 24px; padding: 0 8px; border-radius: 4px;
+  font: 600 11px/24px 'Inter', sans-serif; letter-spacing: 0.06em; text-transform: uppercase;
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+}
+.chip-dot { width: 6px; height: 6px; border-radius: 999px; }
+
+:root .chip-blue,   [data-theme="dark"] .chip-blue   { background: rgba(59,130,246,0.12); color: #93c5fd; box-shadow: inset 0 0 0 1px rgba(59,130,246,0.25); }
+:root .chip-green,  [data-theme="dark"] .chip-green  { background: rgba(34,197,94,0.10); color: #86efac; box-shadow: inset 0 0 0 1px rgba(34,197,94,0.22); }
+:root .chip-purple, [data-theme="dark"] .chip-purple { background: rgba(168,85,247,0.12); color: #d8b4fe; box-shadow: inset 0 0 0 1px rgba(168,85,247,0.25); }
+:root .chip-orange, [data-theme="dark"] .chip-orange { background: rgba(249,115,22,0.12); color: #fdba74; box-shadow: inset 0 0 0 1px rgba(249,115,22,0.25); }
+:root .chip-red,    [data-theme="dark"] .chip-red    { background: rgba(239,68,68,0.12);  color: #fca5a5; box-shadow: inset 0 0 0 1px rgba(239,68,68,0.35); }
+:root .chip-amber,  [data-theme="dark"] .chip-amber  { background: rgba(251,191,36,0.12); color: #fcd34d; box-shadow: inset 0 0 0 1px rgba(251,191,36,0.30); }
+:root .chip-muted,  [data-theme="dark"] .chip-muted  { background: rgba(161,161,170,0.08); color: #a1a1aa; box-shadow: inset 0 0 0 1px rgba(161,161,170,0.15); }
+
+[data-theme="light"] .chip-blue   { background: rgba(37,99,235,0.10);  color: #1d4ed8; box-shadow: inset 0 0 0 1px rgba(37,99,235,0.30); }
+[data-theme="light"] .chip-green  { background: rgba(22,163,74,0.10);  color: #15803d; box-shadow: inset 0 0 0 1px rgba(22,163,74,0.28); }
+[data-theme="light"] .chip-purple { background: rgba(147,51,234,0.10); color: #7e22ce; box-shadow: inset 0 0 0 1px rgba(147,51,234,0.30); }
+[data-theme="light"] .chip-orange { background: rgba(234,88,12,0.10);  color: #c2410c; box-shadow: inset 0 0 0 1px rgba(234,88,12,0.30); }
+[data-theme="light"] .chip-red    { background: rgba(220,38,38,0.10);  color: #b91c1c; box-shadow: inset 0 0 0 1px rgba(220,38,38,0.40); }
+[data-theme="light"] .chip-amber  { background: rgba(217,119,6,0.10);  color: #a16207; box-shadow: inset 0 0 0 1px rgba(217,119,6,0.35); }
+[data-theme="light"] .chip-muted  { background: rgba(82,82,91,0.06);   color: #52525b; box-shadow: inset 0 0 0 1px rgba(82,82,91,0.18); }
+
+.dot-blue   { background: #3b82f6; } .dot-green  { background: #22c55e; }
+.dot-purple { background: #a855f7; } .dot-orange { background: #f97316; }
+.dot-red    { background: #ef4444; animation: pulse-red 1.8s ease-in-out infinite; }
+.dot-amber  { background: #fbbf24; }
+[data-theme="light"] .dot-blue{background:#1d4ed8}[data-theme="light"] .dot-green{background:#15803d}
+[data-theme="light"] .dot-purple{background:#7e22ce}[data-theme="light"] .dot-orange{background:#c2410c}
+[data-theme="light"] .dot-red{background:#dc2626}[data-theme="light"] .dot-amber{background:#a16207}
+
+@keyframes pulse-red { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(1.2)} }
+
+.alert-bar {
+  background: linear-gradient(90deg, rgba(239,68,68,0.12) 0%, rgba(239,68,68,0.04) 100%);
+  border-top: 1px solid rgba(239,68,68,0.25);
+}
+[data-theme="light"] .alert-bar {
+  background: linear-gradient(90deg, rgba(220,38,38,0.08) 0%, rgba(220,38,38,0.02) 100%);
+  border-top: 1px solid rgba(220,38,38,0.25);
+}
+
+.rank-track { background: var(--rule); }
+.rank-fill  { background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 50%, #7dd3fc 100%); }
+[data-theme="light"] .rank-fill { background: linear-gradient(90deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%); }
+
+/* severity rings for alerts */
+.sev-critico { box-shadow: 0 0 0 2px rgba(239,68,68,0.55), 0 8px 32px -8px rgba(239,68,68,0.35); }
+.sev-alto    { box-shadow: 0 0 0 1px rgba(239,68,68,0.35); }
+.sev-medio   { box-shadow: 0 0 0 1px rgba(251,191,36,0.35); }
+.sev-baixo   { box-shadow: 0 0 0 1px var(--rule-strong); }
+[data-theme="light"] .sev-critico { box-shadow: 0 0 0 2px rgba(220,38,38,0.55), 0 8px 32px -8px rgba(220,38,38,0.25); }
+[data-theme="light"] .sev-alto    { box-shadow: 0 0 0 1px rgba(220,38,38,0.45); }
+[data-theme="light"] .sev-medio   { box-shadow: 0 0 0 1px rgba(217,119,6,0.45); }
+
+/* sidebar nav item */
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 12px 7px 14px; border-left: 2px solid transparent;
+  font: 500 13px/1.2 Inter, sans-serif;
+  color: var(--fg-muted); cursor: pointer; transition: color .15s, border-color .15s, background .15s;
+  border-radius: 0;
+}
+.nav-item:hover { color: var(--fg); }
+.nav-item.active { color: var(--accent-blue); border-left-color: var(--accent-blue-strong); background: var(--chart-hover); }
+.nav-item .nav-num { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--fg-dim); width: 14px; }
+.nav-item.active .nav-num { color: var(--accent-blue); }
+
+/* scroll reveal hook: section */
+section[data-screen-label] { scroll-margin-top: 80px; }
+
+/* timeline */
+.timeline-scroll { scrollbar-width: thin; scrollbar-color: var(--rule-strong) transparent; }
+.timeline-scroll::-webkit-scrollbar { height: 8px; }
+.timeline-scroll::-webkit-scrollbar-track { background: transparent; }
+.timeline-scroll::-webkit-scrollbar-thumb { background: var(--rule-strong); border-radius: 4px; }
+
+/* node styles */
+.node-eleito    { background:#22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,0.25), 0 0 18px rgba(34,197,94,0.55); }
+.node-naoeleito { background: var(--fg-ghost); }
+.node-2turno    { background:#fbbf24; box-shadow: 0 0 0 3px rgba(251,191,36,0.25); }
+.node-nomeado   { background:#a855f7; box-shadow: 0 0 0 3px rgba(168,85,247,0.2); }
+[data-theme="light"] .node-eleito{background:#15803d;box-shadow:0 0 0 3px rgba(21,128,61,0.18)}
+[data-theme="light"] .node-2turno{background:#a16207}
+[data-theme="light"] .node-nomeado{background:#7e22ce}
+
+/* tweaks button */
+.btn-ghost {
+  padding: 6px 10px; border-radius: 6px; font: 600 11px/1 Inter, sans-serif;
+  background: var(--rule); color: var(--fg); cursor: pointer; transition: background .12s;
+  border: 1px solid transparent;
+}
+.btn-ghost:hover { background: var(--rule-strong); }
+.btn-ghost.active { background: var(--fg-strong); color: var(--bg-card); }
+
+/* map mock polygon hover */
+.map-region { transition: opacity .18s, transform .18s; transform-origin: center; }
+.map-region:hover { opacity: 0.9; transform: scale(1.01); }
+
+.shell-grid { display: grid; grid-template-columns: 224px 1fr; min-height: 100vh; }
+@media (max-width: 1100px) {
+  .shell-grid { grid-template-columns: 1fr; }
+  .sidebar-col { display: none !important; }
+}
+
+</style>
+</head>
+<body data-theme="dark" class="bg-dossier min-h-screen font-sans antialiased">
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+
+<script type="text/babel" data-presets="react">
+/* === src/icons.jsx === */
+/* global-scope icon set (lucide-style), mounted on window */
+const _Icon = ({ d, size = 14, stroke = 2, fill = "none", className = "" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke="currentColor"
+    strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" className={className}>
+    {d}
+  </svg>
+);
+
+const UserIcon      = (p) => <_Icon {...p} d={<><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></>}/>;
+const TargetIcon    = (p) => <_Icon {...p} d={<><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></>}/>;
+const MapPinIcon    = (p) => <_Icon {...p} d={<><path d="M20 10c0 7-8 13-8 13s-8-6-8-13a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></>}/>;
+const GitBranchIcon = (p) => <_Icon {...p} d={<><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></>}/>;
+const FileTextIcon  = (p) => <_Icon {...p} d={<><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></>}/>;
+const AlertTriIcon  = (p) => <_Icon {...p} d={<><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></>}/>;
+const WalletIcon    = (p) => <_Icon {...p} d={<><path d="M20 12V8H6a2 2 0 0 1 0-4h12v4"/><path d="M4 6v12a2 2 0 0 0 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4h-4z"/></>}/>;
+const BanknoteIcon  = (p) => <_Icon {...p} d={<><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></>}/>;
+const UserCircleIcon= (p) => <_Icon {...p} d={<><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></>}/>;
+const ZapIcon       = (p) => <_Icon {...p} d={<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="currentColor" stroke="none" />} />;
+const StarIcon      = (p) => <_Icon {...p} d={<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="currentColor" stroke="none" />} />;
+const AlertIcon     = AlertTriIcon;
+const TrendIcon     = (p) => <_Icon {...p} d={<><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></>}/>;
+const HashIcon      = (p) => <_Icon {...p} d={<><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></>}/>;
+const BuildIcon     = (p) => <_Icon {...p} d={<><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></>}/>;
+const CheckIcon     = (p) => <_Icon {...p} d={<polyline points="20 6 9 17 4 12"/>}/>;
+const XIcon         = (p) => <_Icon {...p} d={<><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>}/>;
+const ArrowRIcon    = (p) => <_Icon {...p} d={<><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></>}/>;
+const ArrowLIcon    = (p) => <_Icon {...p} d={<><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></>}/>;
+const DownloadIcon  = (p) => <_Icon {...p} d={<><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></>}/>;
+const EditIcon      = (p) => <_Icon {...p} d={<><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></>}/>;
+const InstaIcon     = (p) => <_Icon {...p} d={<><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></>}/>;
+const TwitterIcon   = (p) => <_Icon {...p} d={<path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>}/>;
+const FacebookIcon  = (p) => <_Icon {...p} d={<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>}/>;
+const YoutubeIcon   = (p) => <_Icon {...p} d={<><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" fill="currentColor" stroke="none"/></>}/>;
+const TiktokIcon    = (p) => <_Icon {...p} d={<path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/>}/>;
+const BriefcaseIcon = (p) => <_Icon {...p} d={<><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></>}/>;
+const ExternalIcon  = (p) => <_Icon {...p} d={<><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></>}/>;
+const CalendarIcon  = (p) => <_Icon {...p} d={<><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></>}/>;
+const CircleIcon    = (p) => <_Icon {...p} d={<circle cx="12" cy="12" r="10"/>}/>;
+const DotsIcon      = (p) => <_Icon {...p} d={<><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></>}/>;
+const SunIcon       = (p) => <_Icon {...p} d={<><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></>}/>;
+const MoonIcon      = (p) => <_Icon {...p} d={<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>}/>;
+
+Object.assign(window, {
+  UserIcon, TargetIcon, MapPinIcon, GitBranchIcon, FileTextIcon, AlertTriIcon,
+  WalletIcon, BanknoteIcon, UserCircleIcon, ZapIcon, StarIcon, AlertIcon,
+  TrendIcon, HashIcon, BuildIcon, CheckIcon, XIcon, ArrowRIcon, ArrowLIcon,
+  DownloadIcon, EditIcon, InstaIcon, TwitterIcon, FacebookIcon, YoutubeIcon, TiktokIcon,
+  BriefcaseIcon, ExternalIcon, CalendarIcon, CircleIcon, DotsIcon, SunIcon, MoonIcon,
+});
+
+</script>
+
+<script type="text/babel" data-presets="react">
+/* === src/data.jsx === */
+/* ==== shared data layer ==== */
+
+const ARCHETYPES = {
+  fenomeno:    { label: "Fenômeno",       cls: "chip-blue",   dot: "dot-blue" },
+  trabalhador: { label: "Trabalhador",    cls: "chip-green",  dot: "dot-green" },
+  articulador: { label: "Articulador",    cls: "chip-purple", dot: "dot-purple" },
+  chefeBase:   { label: "Chefe de base",  cls: "chip-orange", dot: "dot-orange" },
+};
+
+const DIMENSIONS = [
+  { key: "PRS", label: "Presença",    hint: "Participação em votações e sessões" },
+  { key: "LEG", label: "Legislativo", hint: "Autoria, relatoria e aprovação de PLs" },
+  { key: "BSE", label: "Base",        hint: "Força eleitoral no colégio" },
+  { key: "INF", label: "Influência",  hint: "Articulação e poder de pauta" },
+  { key: "MID", label: "Mídia",       hint: "Exposição e engajamento público" },
+  { key: "PAC", label: "Pactuação",   hint: "Capacidade de formar alianças" },
+];
+
+const STATS = {
+  wagner: { PRS: 94, LEG: 79, BSE: 93, INF: 88, MID: 72, PAC: 91 },
+  marcal: { PRS: 12, LEG:  4, BSE: 68, INF: 22, MID: 96, PAC: 18 },
+};
+
+const STAT_BREAKDOWN = {
+  PRS: [
+    { k: "Presença plenário",   v: 94, w: "40%" },
+    { k: "Presença comissões",  v: 96, w: "30%" },
+    { k: "Sessões conjuntas",   v: 91, w: "30%" },
+  ],
+  LEG: [
+    { k: "PLs de autoria",      v: 82, w: "35%" },
+    { k: "PLs aprovados",       v: 76, w: "40%" },
+    { k: "Relatorias",          v: 80, w: "25%" },
+  ],
+  BSE: [
+    { k: "Votação absoluta",    v: 95, w: "40%" },
+    { k: "Capilaridade UF",     v: 92, w: "35%" },
+    { k: "Fidelidade do eleitor", v: 90, w: "25%" },
+  ],
+  INF: [
+    { k: "Liderança partidária", v: 90, w: "35%" },
+    { k: "Cargos em comissões",  v: 85, w: "30%" },
+    { k: "Rede de apoios",       v: 89, w: "35%" },
+  ],
+  MID: [
+    { k: "Menções mídia",       v: 68, w: "40%" },
+    { k: "Engajamento redes",   v: 74, w: "35%" },
+    { k: "Entrevistas TV",      v: 75, w: "25%" },
+  ],
+  PAC: [
+    { k: "Acordos interpartidários", v: 93, w: "50%" },
+    { k: "Base governista",     v: 90, w: "30%" },
+    { k: "Diálogo com oposição", v: 88, w: "20%" },
+  ],
+};
+
+const PROFILES = {
+  wagner: {
+    id: "wagner",
+    firstName: "JAQUES",
+    lastName: "WAGNER",
+    cargo: "SEN",
+    meta: "SENADOR · BA · 2018",
+    bio: "Ex-governador da Bahia (2007–2014), ex-ministro da Defesa e da Casa Civil. Base histórica do PT no Nordeste.",
+    rating: 87,
+    position: "SEN",
+    shortName: "J. WAGNER",
+    percentile: "Top 12% entre senadores",
+    archetypes: ["fenomeno","trabalhador","articulador","chefeBase"],
+    traits: [{ label: "Fenômeno", variant: "gold" }, { label: "Fera regional", variant: "silver" }],
+    stats: [
+      { k: "Mandatos", v: "04" },
+      { k: "PL aprovados", v: "127" },
+      { k: "Presença", v: "94%" },
+      { k: "Emendas", v: "R$ 42M" },
+    ],
+    eleitoral: {
+      uf: "BA", escopo: "ESTADO · BAHIA",
+      votos: "4.2M", percentValidos: "48%", ano: "2018",
+      topMunis: [
+        { nome: "Salvador",        pct: 52, votos: "680K" },
+        { nome: "Feira de Santana", pct: 49, votos: "210K" },
+        { nome: "Vitória da Conquista", pct: 47, votos: "145K" },
+      ],
+      // abstract choropleth — array of polygons with intensity 0-100
+      mapIntensity: { BA: 92, PE: 38, SE: 62, AL: 34, CE: 28, PI: 22, MA: 18, BR: 0 },
+    },
+    trajetoria: [
+      { ano: "1986", cargo: "Vereador",         uf: "Salvador/BA", votos: "4.210",   status: "eleito", partido: "PT" },
+      { ano: "1990", cargo: "Dep. Estadual",    uf: "BA",          votos: "38.540",  status: "eleito", partido: "PT" },
+      { ano: "1994", cargo: "Dep. Federal",     uf: "BA",          votos: "62.100",  status: "eleito", partido: "PT" },
+      { ano: "2002", cargo: "Dep. Federal",     uf: "BA",          votos: "89.320",  status: "eleito", partido: "PT" },
+      { ano: "2006", cargo: "Governador",       uf: "BA",          votos: "3.187.000", status: "eleito", partido: "PT" },
+      { ano: "2010", cargo: "Governador (reel.)", uf: "BA",        votos: "3.995.000", status: "eleito", partido: "PT" },
+      { ano: "2014", cargo: "Min. Defesa / Casa Civil", uf: "BR",  votos: "—",       status: "nomeado", partido: "PT" },
+      { ano: "2018", cargo: "Senador",          uf: "BA",          votos: "4.241.830", status: "eleito", partido: "PT" },
+    ],
+    legislativo: {
+      disponivel: true,
+      aprovados: { count: 127, recentes: [
+        { em: "Marco legal das energias do mar",         data: "mar/25" },
+        { em: "Fundo de segurança hídrica do Nordeste",   data: "fev/25" },
+        { em: "Regulamentação do crédito rural familiar", data: "dez/24" },
+      ]},
+      tramitando: { count: 18, recentes: [
+        { em: "Incentivo fiscal à indústria naval baiana", data: "abr/26" },
+        { em: "Política nacional de agroecologia",        data: "mar/26" },
+        { em: "Bônus de produtividade ao SUS municipal",  data: "fev/26" },
+      ]},
+      vetados: { count: 4, recentes: [
+        { em: "Isenção de IPVA para veículos elétricos",  data: "out/24" },
+        { em: "Remanejo emergencial de emendas RP-9",     data: "jun/24" },
+        { em: "Criação do piso salarial técnico",         data: "mar/24" },
+      ]},
+      comissoes: [
+        { sigla: "CRE",  nome: "Relações Exteriores e Defesa Nacional", cargo: "Presidente", ativa: true },
+        { sigla: "CAE",  nome: "Assuntos Econômicos",                    cargo: "Titular",    ativa: true },
+        { sigla: "CCJ",  nome: "Constituição e Justiça",                 cargo: "Suplente",   ativa: true },
+        { sigla: "CRA",  nome: "Agricultura e Reforma Agrária",          cargo: "Titular",    ativa: true },
+        { sigla: "CMA",  nome: "Meio Ambiente",                          cargo: "Vice",       ativa: false },
+      ],
+      relatorias: [
+        { em: "PLS 421/2024 — Incentivo à energia eólica offshore", data: "abr/26", situ: "Em análise" },
+        { em: "PLS 318/2024 — Regularização fundiária na zona rural", data: "mar/26", situ: "Aprovado" },
+        { em: "PEC 12/2023 — Reforma do sistema portuário", data: "fev/26", situ: "Em análise" },
+        { em: "PLS 104/2023 — Royalties do pré-sal", data: "nov/25", situ: "Aprovado" },
+        { em: "PLS 088/2023 — Fundo estadual de turismo", data: "ago/25", situ: "Arquivado" },
+      ],
+    },
+    alertas: {
+      fichaLimpa: true,
+      itens: [], // ficha limpa
+    },
+    financeiro: {
+      disponivel: true,
+      arrecadado: "R$ 18.420.000",
+      gasto:       "R$ 17.810.000",
+      saldo:       "R$ 610.000",
+      cpv: { valor: "R$ 4,20", medianaCargo: "R$ 6,80", deltaPct: -38, label: "mediana senador BA" },
+      fontes: [
+        { k: "Fundo Partidário", v: 58 },
+        { k: "Pessoa Física",    v: 24 },
+        { k: "Pessoa Jurídica",  v:  9 },
+        { k: "Recursos Próprios",v:  6 },
+        { k: "Outros",           v:  3 },
+      ],
+      topDoadores: [
+        { nome: "João Silva Ribeiro",       v: "R$ 410.000" },
+        { nome: "Maria Helena Costa",       v: "R$ 380.000" },
+        { nome: "Antônio Carlos Menezes",   v: "R$ 320.000" },
+        { nome: "Luiza Almeida",            v: "R$ 280.000" },
+        { nome: "Pedro Henrique Rocha",     v: "R$ 260.000" },
+        { nome: "Ana Paula Moraes",         v: "R$ 240.000" },
+        { nome: "Carlos Eduardo Freitas",   v: "R$ 220.000" },
+        { nome: "Fernanda Braga",           v: "R$ 200.000" },
+        { nome: "Roberto Souza",            v: "R$ 180.000" },
+        { nome: "Gabriela Nunes",           v: "R$ 160.000" },
+      ],
+    },
+    emendas: {
+      aplicavel: true,
+      apresentado:  "R$ 82.500.000",
+      aprovado:     "R$ 61.200.000",
+      executado:    "R$ 42.100.000",
+      taxa: 69,
+      anual: [
+        { ano: "2019", v: 22 },
+        { ano: "2020", v: 38 },
+        { ano: "2021", v: 51 },
+        { ano: "2022", v: 58 },
+        { ano: "2023", v: 64 },
+        { ano: "2024", v: 72 },
+        { ano: "2025", v: 69 },
+      ],
+      areas: [
+        { k: "Saúde",            v: 34, c: "#3b82f6" },
+        { k: "Educação",         v: 22, c: "#22c55e" },
+        { k: "Obras",            v: 20, c: "#f97316" },
+        { k: "Assist. Social",    v: 14, c: "#a855f7" },
+        { k: "Cultura",          v: 10, c: "#eab308" },
+      ],
+      top: [
+        { muni: "Salvador/BA",         area: "Saúde",     v: "R$ 4.200.000", st: "Pago" },
+        { muni: "Feira de Santana/BA", area: "Educação",  v: "R$ 3.100.000", st: "Pago" },
+        { muni: "Vitória da Conquista/BA", area: "Obras", v: "R$ 2.800.000", st: "Em execução" },
+        { muni: "Juazeiro/BA",         area: "Saúde",     v: "R$ 2.400.000", st: "Pago" },
+        { muni: "Ilhéus/BA",           area: "Cultura",   v: "R$ 2.100.000", st: "Em execução" },
+        { muni: "Itabuna/BA",          area: "Educação",  v: "R$ 1.900.000", st: "Pago" },
+        { muni: "Barreiras/BA",        area: "Obras",     v: "R$ 1.700.000", st: "Em execução" },
+        { muni: "Teixeira de Freitas/BA", area: "Assist. Social", v: "R$ 1.500.000", st: "Pago" },
+        { muni: "Jequié/BA",           area: "Saúde",     v: "R$ 1.400.000", st: "Pago" },
+        { muni: "Paulo Afonso/BA",     area: "Obras",     v: "R$ 1.200.000", st: "Cancelado" },
+      ],
+    },
+    perfil: {
+      bioLong: "Jaques Wagner nasceu em Salvador em 1951. Engenheiro formado pela UFBA, iniciou a militância sindical no movimento estudantil dos anos 70. Foi um dos fundadores do PT na Bahia e ocupou cargos executivos de destaque tanto no governo estadual quanto federal, consolidando-se como uma das principais lideranças históricas do partido no Nordeste.",
+      nascimento: "Salvador · 1951 · 75 anos",
+      formacao: "Engenharia — UFBA (1974)",
+      partidos: [{ p: "PT", desde: "1980" }],
+      redes: [
+        { rede: "Instagram", handle: "@jaqueswagner", seguidores: "1.2M", engajamento: "4.8%", verificado: true },
+        { rede: "Twitter",   handle: "@jaqueswagner", seguidores: "890K", engajamento: "2.1%", verificado: true },
+        { rede: "Facebook",  handle: "Jaques Wagner", seguidores: "1.8M", engajamento: "3.2%", verificado: true },
+        { rede: "YouTube",   handle: "Jaques Wagner", seguidores: "210K", engajamento: "1.4%", verificado: false },
+      ],
+      gabinete: "Senado Federal · Anexo II · Ala Teotônio Vilela · Gab 15",
+      email: "sen.jaqueswagner@senado.leg.br",
+    },
+  },
+
+  marcal: {
+    id: "marcal",
+    firstName: "PABLO",
+    lastName: "MARÇAL",
+    cargo: "NONE",
+    meta: "SEM MANDATO · SP",
+    bio: "Empresário, coach e pré-candidato. Sem histórico parlamentar consolidado. Perfil em construção.",
+    rating: null,
+    position: "—",
+    shortName: "P. MARÇAL",
+    percentile: "Dados insuficientes para ranking",
+    archetypes: [],
+    traits: [],
+    sparse: true,
+    stats: [
+      { k: "Mandatos", v: "—" },
+      { k: "PL aprovados", v: "—" },
+      { k: "Presença", v: "—" },
+      { k: "Emendas", v: "—" },
+    ],
+    eleitoral: {
+      uf: "SP", escopo: "MUNICÍPIO · SÃO PAULO",
+      votos: "1.72M", percentValidos: "28%", ano: "2024",
+      topMunis: [
+        { nome: "São Paulo (capital)", pct: 28, votos: "1.72M" },
+      ],
+      mapIntensity: { SP: 62, MG: 8, RJ: 12, PR: 10, BR: 0 },
+    },
+    trajetoria: [
+      { ano: "2022", cargo: "Presidente", uf: "BR", votos: "28.114", status: "nao-eleito", partido: "PRTB" },
+      { ano: "2024", cargo: "Prefeito SP", uf: "SP", votos: "1.720.000", status: "2o-turno", partido: "PRTB" },
+    ],
+    legislativo: { disponivel: false },
+    alertas: {
+      fichaLimpa: false,
+      itens: [
+        { tipo: "CEAF",       orgao: "CGU",  data: "jan/24", valor: null,          desc: "Registro no Cadastro de Expulsões da Administração Federal", severidade: "alto",   url: "#" },
+        { tipo: "Execução Fiscal", orgao: "PGFN", data: "ago/23", valor: "R$ 2.1M", desc: "Débito inscrito em dívida ativa — em negociação", severidade: "medio",  url: "#" },
+        { tipo: "TCU",        orgao: "TCU",  data: "out/22", valor: "R$ 480K",     desc: "Tomada de contas especial — em andamento", severidade: "medio",  url: "#" },
+      ],
+    },
+    financeiro: { disponivel: false },
+    emendas: { aplicavel: false },
+    perfil: {
+      bioLong: "Pablo Henrique Costa Marçal é empresário e influenciador digital, com atuação focada em mentoria de negócios e marketing pessoal. Em 2024 concorreu à Prefeitura de São Paulo, obtendo votação expressiva apesar de não alcançar o segundo turno na disputa final.",
+      nascimento: "Goianésia · 1987 · 39 anos",
+      formacao: "Educação Física (não concluído)",
+      partidos: [{ p: "PRTB", desde: "2024" }, { p: "PROS", desde: "2022 (até 2023)" }],
+      redes: [
+        { rede: "Instagram", handle: "@pablomarcal1", seguidores: "12.4M", engajamento: "8.2%", verificado: true },
+        { rede: "TikTok",    handle: "@pablomarcalofc", seguidores: "6.8M", engajamento: "11.4%", verificado: true },
+        { rede: "YouTube",   handle: "Pablo Marçal", seguidores: "3.1M", engajamento: "6.0%", verificado: true },
+        { rede: "Twitter",   handle: "@pablomarcal", seguidores: "2.9M", engajamento: "4.1%", verificado: true },
+      ],
+      gabinete: "—",
+      email: "—",
+    },
+  },
+};
+
+Object.assign(window, { ARCHETYPES, DIMENSIONS, STATS, STAT_BREAKDOWN, PROFILES });
+
+</script>
+
+<script type="text/babel" data-presets="react">
+/* === src/primitives.jsx === */
+/* small reusable primitives */
+const { useState, useEffect, useMemo, useRef } = React;
+
+function SectionShell({ id, label, title, sub, kicker, children, pad = true }) {
+  return (
+    <section id={id} data-screen-label={label} className="rounded-2xl t-bg-card ring-soft overflow-hidden">
+      <div className="px-6 py-4 flex items-center justify-between" style={{ borderBottom: "1px solid var(--rule)" }}>
+        <div className="flex items-baseline gap-3">
+          <div className="text-[10px] font-bold tracking-[0.25em] uppercase t-fg-dim">{title}</div>
+          {sub && <div className="text-[11px] font-mono t-fg-ghost">/ {sub}</div>}
+        </div>
+        {kicker && <div className="text-[11px] font-mono t-fg-dim">{kicker}</div>}
+      </div>
+      <div className={pad ? "p-6" : ""}>{children}</div>
+    </section>
+  );
+}
+
+function EmptyState({ icon, title, text, tone = "muted" }) {
+  const toneCls = {
+    muted:   { bg: "var(--bg-card-2)", fg: "var(--fg-muted)", border: "var(--rule)" },
+    ok:      { bg: "rgba(34,197,94,0.06)", fg: "var(--ok)",   border: "rgba(34,197,94,0.35)" },
+    warn:    { bg: "rgba(251,191,36,0.06)", fg: "var(--warn)", border: "rgba(251,191,36,0.35)" },
+  }[tone];
+  return (
+    <div className="rounded-xl px-6 py-8 flex flex-col items-center text-center"
+      style={{ background: toneCls.bg, border: `1px dashed ${toneCls.border}` }}>
+      <div style={{ color: toneCls.fg }}>{icon}</div>
+      <div className="mt-3 text-[14px] font-bold t-fg-strong">{title}</div>
+      {text && <div className="mt-1 text-[12px] t-fg-muted max-w-sm">{text}</div>}
+    </div>
+  );
+}
+
+function KPI({ label, value, hint, tone = "default" }) {
+  const color = { default: "t-fg-strong", ok: "", warn: "", danger: "" }[tone] || "t-fg-strong";
+  const style = {
+    default: {},
+    ok:     { color: "var(--ok)" },
+    warn:   { color: "var(--warn)" },
+    danger: { color: "var(--danger)" },
+  }[tone] || {};
+  return (
+    <div className="rounded-lg px-4 py-3.5" style={{ background: "var(--bg-card-2)", border: "1px solid var(--rule)" }}>
+      <div className="text-[10px] font-mono tracking-[0.15em] uppercase t-fg-dim">{label}</div>
+      <div className={`text-[22px] font-black tnum mt-1 font-display ${color}`} style={style}>{value}</div>
+      {hint && <div className="text-[11px] t-fg-muted mt-0.5">{hint}</div>}
+    </div>
+  );
+}
+
+function Divider() { return <div className="h-px" style={{ background: "var(--rule)" }}/>; }
+
+Object.assign(window, { SectionShell, EmptyState, KPI, Divider });
+
+</script>
+
+<script type="text/babel" data-presets="react">
+/* === src/section-header.jsx === */
+/* Section 01 — Header Hero */
+
+function FifaCardPlaceholder({ rating = 87, name = "J. WAGNER", position = "SEN", variant = "gold" }) {
+  return (
+    <div className="relative" style={{ width: 240, height: 422 }}>
+      <div className="fifa-card w-full h-full rounded-xl p-4 flex flex-col relative overflow-hidden">
+        <div className="flex items-start justify-between">
+          <div className="flex flex-col items-center leading-none">
+            <div className="text-[56px] font-black text-amber-200 tnum" style={{lineHeight:1}}>{rating}</div>
+            <div className="text-[14px] font-bold text-amber-300/80 tracking-[0.2em] -mt-1">{position}</div>
+          </div>
+          <div className="flex flex-col items-end gap-1.5">
+            <div className="w-8 h-6 rounded-sm bg-gradient-to-br from-emerald-500 to-yellow-400 opacity-80"/>
+            <div className="w-8 h-6 rounded-sm bg-zinc-700/80"/>
+          </div>
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="w-32 h-32 rounded-full border border-amber-500/20 bg-gradient-to-b from-amber-500/10 to-transparent flex items-center justify-center">
+            <div className="text-amber-200/40 text-[11px] tracking-[0.25em] font-mono">RETRATO</div>
+          </div>
+        </div>
+        <div className="fifa-stripe h-px my-2"/>
+        <div className="text-center"><div className="text-amber-100 text-[18px] font-black tracking-[0.08em]">{name}</div></div>
+        <div className="grid grid-cols-3 gap-2 mt-3 text-center">
+          {[["PAC","82"],["PRS","91"],["INF","88"]].map(([k,v])=>(
+            <div key={k} className="flex flex-col leading-none">
+              <div className="text-amber-200 font-black text-[14px] tnum">{v}</div>
+              <div className="text-amber-400/60 text-[9px] tracking-[0.15em] mt-1">{k}</div>
+            </div>
+          ))}
+        </div>
+        <div className="grid grid-cols-3 gap-2 mt-2 text-center">
+          {[["LEG","79"],["BSE","93"],["MID","85"]].map(([k,v])=>(
+            <div key={k} className="flex flex-col leading-none">
+              <div className="text-amber-200 font-black text-[14px] tnum">{v}</div>
+              <div className="text-amber-400/60 text-[9px] tracking-[0.15em] mt-1">{k}</div>
+            </div>
+          ))}
+        </div>
+        <div className="absolute bottom-2 left-0 right-0 text-center text-[9px] tracking-[0.3em] text-amber-300/30 font-mono">
+          FIFA CARD · 240 × 422
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ArchetypeChip({ type }) {
+  const a = ARCHETYPES[type]; if (!a) return null;
+  return <span className={`chip ${a.cls}`}><span className={`chip-dot ${a.dot}`}/>{a.label}</span>;
+}
+function AlertChip() {
+  return (
+    <span className="chip chip-red"><span className="chip-dot dot-red"/>
+      <AlertIcon size={10} stroke={2.5}/>Alerta jurídico</span>
+  );
+}
+function TraitBadge({ variant = "gold", label, icon }) {
+  return (
+    <div className={`${variant === "gold" ? "trait-gold" : "trait-silver"} rounded-md px-2 py-1.5 flex items-center gap-1.5`}>
+      <span>{icon}</span>
+      <span className="text-[10px] font-black tracking-[0.12em] uppercase leading-none">{label}</span>
+    </div>
+  );
+}
+
+function HeaderHero({ profile, alert }) {
+  const p = profile; const isSparse = !!p.sparse;
+  return (
+    <section data-screen-label="01 Identidade" id="sec-identidade"
+      className={`relative rounded-2xl t-bg-card ring-soft overflow-hidden ${alert ? "ring-danger" : ""}`}>
+      {alert && (
+        <div className="alert-bar px-6 py-2.5 flex items-center gap-3">
+          <div className="flex items-center gap-2" style={{ color: "var(--danger)" }}>
+            <AlertIcon size={14} stroke={2.5}/>
+            <span className="text-[11px] font-bold tracking-[0.12em] uppercase">Alerta jurídico ativo</span>
+          </div>
+          <span className="t-fg-dim text-[12px]">Ação penal em tramitação · STF · Processo nº 4421/2024</span>
+          <div className="ml-auto flex items-center gap-1.5 t-fg-muted text-[11px] font-medium cursor-pointer">
+            Ver detalhes <span className="font-mono">→</span>
+          </div>
+        </div>
+      )}
+      <div className="grid gap-6 p-6" style={{ gridTemplateColumns: "240px 1fr 340px" }}>
+        <div className="flex-shrink-0">
+          <FifaCardPlaceholder rating={p.rating ?? "—"} position={p.position} name={p.shortName}
+            variant={isSparse ? "silver" : "gold"}/>
+        </div>
+        <div className="flex flex-col min-w-0 pt-1">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-[10px] font-mono t-fg-dim tracking-[0.2em]">CAND_ID</span>
+            <span className="text-[10px] font-mono t-fg-muted tracking-[0.15em]">
+              BR-{p.lastName.slice(0,3).toUpperCase()}-{p.rating ?? "XX"}
+            </span>
+            <span className="w-1 h-1 rounded-full" style={{ background: "var(--fg-ghost)" }}/>
+            <span className="text-[10px] font-mono t-ok tracking-[0.15em] flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--verified)" }}/> VERIFICADO
+            </span>
+          </div>
+          <h1 className="font-display leading-[0.95]">
+            <span className="block text-[28px] font-light t-fg-muted tracking-tight">{p.firstName}</span>
+            <span className="block text-[48px] font-black t-fg-strong tracking-[-0.03em] -mt-1">{p.lastName}</span>
+          </h1>
+          <div className="mt-4 flex items-center gap-3">
+            <span className="text-[11px] font-bold t-fg tracking-[0.2em] uppercase">{p.meta}</span>
+            {!isSparse && <span className="t-fg-ghost">·</span>}
+            {!isSparse && (
+              <span className="text-[11px] font-mono t-fg-dim flex items-center gap-1.5">
+                <TrendIcon size={11}/> +3 pts YoY
+              </span>
+            )}
+          </div>
+          <p className="mt-3 text-[14px] t-fg-muted leading-[1.55] max-w-[460px]">{p.bio}</p>
+          <div className="mt-auto pt-5 grid grid-cols-4" style={{ borderTop: "1px solid var(--rule)" }}>
+            {p.stats.map((s, i) => (
+              <div key={s.k} className="pt-4" style={i>0 ? {borderLeft:"1px solid var(--rule)",paddingLeft:16} : {}}>
+                <div className="text-[10px] font-mono t-fg-dim tracking-[0.15em] uppercase">{s.k}</div>
+                <div className={`text-[18px] font-semibold tnum mt-1 ${isSparse ? "t-fg-ghost" : "t-fg-strong"}`}>{s.v}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="pl-6 flex flex-col" style={{ borderLeft: "1px solid var(--rule)" }}>
+          <div className="flex items-start gap-4">
+            <div className="flex-shrink-0">
+              <div className={`${isSparse ? "overall-muted" : "overall-num"} font-black tnum font-display leading-[0.85]`}
+                style={{ fontSize: 88 }}>{p.rating ?? "—"}</div>
+              <div className="mt-1 text-[10px] font-bold tracking-[0.15em] uppercase t-fg-dim">Overall</div>
+            </div>
+            {!isSparse && p.traits.length > 0 && (
+              <div className="flex flex-col gap-1.5 pt-2">
+                {p.traits.map((t) => (
+                  <TraitBadge key={t.label} variant={t.variant} label={t.label}
+                    icon={t.variant === "gold" ? <ZapIcon size={11} stroke={2.5}/> : <StarIcon size={11} stroke={2.5}/>}/>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className={`mt-2 text-[13px] flex items-center gap-1.5 ${isSparse ? "t-fg-dim" : "t-accent"}`}>
+            {!isSparse && <HashIcon size={12}/>}
+            {isSparse && <BuildIcon size={12}/>}
+            <span>{p.percentile}</span>
+          </div>
+          {!isSparse && (
+            <div className="mt-4">
+              <div className="h-1 w-full rounded-full rank-track overflow-hidden">
+                <div className="h-full rounded-full rank-fill" style={{ width: `${p.rating}%` }}/>
+              </div>
+              <div className="flex justify-between mt-1.5 text-[9px] font-mono t-fg-ghost tracking-[0.1em]">
+                <span>0</span><span>50</span><span className="t-accent">{p.rating}</span><span>100</span>
+              </div>
+            </div>
+          )}
+          <div className="mt-5 pt-5" style={{ borderTop: "1px solid var(--rule)" }}>
+            <div className="text-[10px] font-bold tracking-[0.15em] uppercase t-fg-dim mb-2.5">
+              {isSparse ? "Status" : "Arquétipos"}
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {isSparse ? (
+                <span className="chip chip-muted"><BuildIcon size={10}/>Perfil em construção</span>
+              ) : (
+                <>
+                  {p.archetypes.map((a) => <ArchetypeChip key={a} type={a}/>)}
+                  {alert && <AlertChip/>}
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+Object.assign(window, { HeaderHero });
+
+</script>
+
+<script type="text/babel" data-presets="react">
+/* === src/section-overall.jsx === */
+/* Section 02 — Overall Map (radar + breakdown) */
+
+function scoreColor(v) {
+  if (v >= 85) return { ring: "rgba(34,197,94,0.35)",  fg: "#22c55e", bg: "rgba(34,197,94,0.10)",  grade: "A" };
+  if (v >= 70) return { ring: "rgba(59,130,246,0.35)", fg: "#3b82f6", bg: "rgba(59,130,246,0.10)", grade: "B" };
+  if (v >= 50) return { ring: "rgba(234,179,8,0.40)",  fg: "#eab308", bg: "rgba(234,179,8,0.10)",  grade: "C" };
+  if (v >= 30) return { ring: "rgba(249,115,22,0.40)", fg: "#f97316", bg: "rgba(249,115,22,0.10)", grade: "D" };
+  return         { ring: "rgba(239,68,68,0.45)",  fg: "#ef4444", bg: "rgba(239,68,68,0.10)",  grade: "F" };
+}
+
+function HexRadar({ values, size = 260 }) {
+  const cx = size/2, cy = size/2, R = size*0.38;
+  const rings = [0.25, 0.5, 0.75, 1.0];
+  const angle = (i) => (Math.PI*2*i)/6 - Math.PI/2;
+  const ringPoints = (r) => DIMENSIONS.map((_,i)=>{ const a=angle(i); return [cx+Math.cos(a)*R*r, cy+Math.sin(a)*R*r]; });
+  const valuePoints = DIMENSIONS.map((d,i)=>{ const a=angle(i); const r=(values[d.key]??0)/100; return [cx+Math.cos(a)*R*r, cy+Math.sin(a)*R*r]; });
+  const poly = (pts) => pts.map(([x,y])=>`${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
+  return (
+    <svg viewBox={`0 0 ${size} ${size}`} style={{ width:"100%", maxWidth:size, height:"auto" }}>
+      {rings.map((r,i)=>(
+        <polygon key={r} points={poly(ringPoints(r))} fill="none" stroke="var(--rule-strong)" strokeWidth={i===rings.length-1?1.25:0.75}/>
+      ))}
+      {DIMENSIONS.map((d,i)=>{ const [x,y]=ringPoints(1)[i]; return <line key={d.key} x1={cx} y1={cy} x2={x} y2={y} stroke="var(--rule)" strokeWidth="0.75"/>; })}
+      <defs>
+        <radialGradient id="radar-fill" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#60a5fa" stopOpacity="0.45"/>
+          <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.18"/>
+        </radialGradient>
+      </defs>
+      <polygon points={poly(valuePoints)} fill="url(#radar-fill)" stroke="#3b82f6" strokeWidth="1.5" strokeLinejoin="round"/>
+      {valuePoints.map(([x,y],i)=><circle key={i} cx={x} cy={y} r="3.5" fill="var(--bg-card)" stroke="#60a5fa" strokeWidth="1.5"/>)}
+      {DIMENSIONS.map((d,i)=>{ const a=angle(i); const lx=cx+Math.cos(a)*(R+22); const ly=cy+Math.sin(a)*(R+22); const v=values[d.key]??0;
+        return (
+          <g key={d.key}>
+            <text x={lx} y={ly-4} textAnchor="middle" fontSize="10" fontWeight="700" letterSpacing="0.15em" fill="var(--fg-muted)" fontFamily="Inter">{d.key}</text>
+            <text x={lx} y={ly+9} textAnchor="middle" fontSize="12" fontWeight="800" fill="var(--fg-strong)" fontFamily="Inter" style={{ fontVariantNumeric:"tabular-nums" }}>{v}</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+function StatRow({ dim, value, isActive, onClick }) {
+  const c = scoreColor(value);
+  return (
+    <button type="button" onClick={onClick}
+      className="w-full text-left rounded-lg px-3 py-2.5 flex items-center gap-3 transition-colors"
+      style={{ background: isActive?"var(--rule)":"transparent", border:`1px solid ${isActive?"var(--rule-strong)":"transparent"}` }}>
+      <div className="flex-shrink-0 w-10 h-10 rounded-md flex flex-col items-center justify-center"
+        style={{ background:c.bg, boxShadow:`inset 0 0 0 1px ${c.ring}` }}>
+        <div className="text-[9px] font-bold tracking-[0.15em]" style={{color:c.fg}}>{dim.key}</div>
+        <div className="text-[11px] font-black tnum leading-none mt-0.5" style={{color:c.fg}}>{value}</div>
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between mb-1">
+          <div className="text-[12px] font-semibold t-fg-strong">{dim.label}</div>
+          <div className="text-[10px] font-mono t-fg-dim">
+            <span className="font-bold" style={{color:c.fg}}>{c.grade}</span>
+            <span className="t-fg-ghost"> · </span>
+            <span className="tnum">{value}/100</span>
+          </div>
+        </div>
+        <div className="h-1.5 rounded-full overflow-hidden" style={{ background:"var(--rule)" }}>
+          <div className="h-full rounded-full transition-all duration-500" style={{ width:`${value}%`, background:`linear-gradient(90deg, ${c.fg}88, ${c.fg})` }}/>
+        </div>
+      </div>
+    </button>
+  );
+}
+
+function StatBreakdown({ dim, value }) {
+  const rows = STAT_BREAKDOWN[dim.key] || [];
+  const c = scoreColor(value);
+  return (
+    <div className="h-full rounded-lg p-5" style={{ background:"var(--bg-card-2)", border:"1px solid var(--rule)" }}>
+      <div className="flex items-start justify-between mb-1">
+        <div>
+          <div className="text-[10px] font-bold tracking-[0.2em] uppercase t-fg-dim">{dim.key}</div>
+          <div className="text-[22px] font-black t-fg-strong font-display mt-0.5">{dim.label}</div>
+        </div>
+        <div className="text-right">
+          <div className="text-[48px] font-black font-display tnum leading-[0.9]" style={{color:c.fg}}>{value}</div>
+          <div className="text-[10px] font-bold tracking-[0.15em] uppercase mt-0.5" style={{color:c.fg}}>Grade {c.grade}</div>
+        </div>
+      </div>
+      <p className="text-[12px] t-fg-muted leading-relaxed mt-2 mb-4">{dim.hint}</p>
+      <div className="text-[10px] font-bold tracking-[0.15em] uppercase t-fg-dim mb-2">Composição</div>
+      <div className="space-y-2.5">
+        {rows.map(r=>{ const rc=scoreColor(r.v); return (
+          <div key={r.k}>
+            <div className="flex items-center justify-between mb-1">
+              <div className="text-[12px] t-fg">{r.k}</div>
+              <div className="text-[11px] font-mono t-fg-dim flex items-center gap-2">
+                <span className="tnum" style={{color:rc.fg}}>{r.v}</span>
+                <span className="t-fg-ghost">peso</span>
+                <span className="t-fg-muted">{r.w}</span>
+              </div>
+            </div>
+            <div className="h-1 rounded-full overflow-hidden" style={{ background:"var(--rule)" }}>
+              <div className="h-full rounded-full" style={{ width:`${r.v}%`, background:rc.fg }}/>
+            </div>
+          </div>
+        ); })}
+      </div>
+      <div className="mt-5 pt-4 grid grid-cols-3 gap-3" style={{ borderTop:"1px solid var(--rule)" }}>
+        <div>
+          <div className="text-[9px] font-mono tracking-[0.15em] uppercase t-fg-dim">Percentil</div>
+          <div className="text-[15px] font-bold tnum t-fg-strong mt-0.5">Top {value>=85?"10":value>=70?"25":value>=50?"50":"70"}%</div>
+        </div>
+        <div>
+          <div className="text-[9px] font-mono tracking-[0.15em] uppercase t-fg-dim">Variação</div>
+          <div className="text-[15px] font-bold tnum mt-0.5" style={{color: value>=60?"#22c55e":"#ef4444"}}>{value>=60?"▲ +4":"▼ -7"}</div>
+        </div>
+        <div>
+          <div className="text-[9px] font-mono tracking-[0.15em] uppercase t-fg-dim">Fonte</div>
+          <div className="text-[11px] t-fg-muted mt-0.5 leading-tight">TSE · Câmara · Senado</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function OverallMap({ profile }) {
+  const values = STATS[profile.sparse ? "marcal" : "wagner"];
+  const [selKey, setSelKey] = useState("BSE");
+  const dim = DIMENSIONS.find(d=>d.key===selKey);
+  const overall = Math.round(Object.values(values).reduce((a,b)=>a+b,0)/DIMENSIONS.length);
+  return (
+    <SectionShell id="sec-overall" label="02 Overall" title="Mapa do Overall" sub="stat breakdown"
+      kicker={<><span>Média ponderada: <span className="t-fg-strong font-bold tnum">{overall}</span></span><span className="t-fg-ghost mx-2">·</span><span>6 dimensões</span></>}>
+      <div className="grid gap-6" style={{ gridTemplateColumns: "320px 280px 1fr" }}>
+        <div className="flex flex-col">
+          <div className="flex items-center justify-center flex-1" style={{minHeight:280}}>
+            <HexRadar values={values} size={280}/>
+          </div>
+          <div className="mt-2 pt-4 flex items-center justify-between text-[10px] font-mono t-fg-dim" style={{borderTop:"1px solid var(--rule)"}}>
+            <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-sm" style={{background:"#3b82f6"}}/>Candidato</div>
+            <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-sm" style={{background:"var(--rule-strong)",boxShadow:"inset 0 0 0 1px var(--fg-ghost)"}}/>Grade (0–100)</div>
+          </div>
+        </div>
+        <div className="flex flex-col gap-1">
+          <div className="text-[10px] font-bold tracking-[0.15em] uppercase t-fg-dim mb-2 px-1">Dimensões</div>
+          {DIMENSIONS.map(d=>(
+            <StatRow key={d.key} dim={d} value={values[d.key]} isActive={d.key===selKey} onClick={()=>setSelKey(d.key)}/>
+          ))}
+        </div>
+        <div><StatBreakdown dim={dim} value={values[dim.key]}/></div>
+      </div>
+    </SectionShell>
+  );
+}
+
+Object.assign(window, { OverallMap, scoreColor });
+
+</script>
+
+<script type="text/babel" data-presets="react">
+/* === src/section-eleitoral.jsx === */
+/* Section 03 — Mapa Eleitoral (abstract choropleth) */
+
+const UF_POLYS = {
+  BA: "M 280 180 L 340 170 L 360 200 L 380 240 L 360 290 L 310 300 L 280 280 L 260 240 Z",
+  PE: "M 290 150 L 340 140 L 360 160 L 340 170 L 280 180 L 270 160 Z",
+  SE: "M 340 170 L 360 170 L 370 185 L 360 200 Z",
+  AL: "M 360 170 L 380 165 L 395 180 L 375 195 L 360 200 Z",
+  CE: "M 280 100 L 340 90 L 360 110 L 340 140 L 290 150 L 280 135 Z",
+  PI: "M 230 110 L 280 100 L 280 135 L 270 160 L 250 170 L 220 140 Z",
+  MA: "M 180 90 L 230 95 L 240 130 L 220 140 L 180 135 L 165 115 Z",
+  SP: "M 200 320 L 260 310 L 280 340 L 260 370 L 210 370 L 190 350 Z",
+  MG: "M 230 240 L 290 230 L 310 260 L 290 300 L 240 300 L 215 270 Z",
+  RJ: "M 280 310 L 310 305 L 325 320 L 310 335 L 285 335 Z",
+  PR: "M 190 360 L 240 355 L 260 380 L 240 400 L 200 400 L 180 380 Z",
+};
+
+function intensityColor(v) {
+  // 5-level ramp using --accent (candidate/party blue)
+  if (v >= 80) return "#1e40af";
+  if (v >= 60) return "#2563eb";
+  if (v >= 40) return "#60a5fa";
+  if (v >= 20) return "#93c5fd";
+  if (v > 0)   return "#dbeafe";
+  return "var(--rule-strong)";
+}
+function intensityLabel(v) {
+  if (v >= 80) return "Domina";
+  if (v >= 60) return "Forte";
+  if (v >= 40) return "Médio";
+  if (v >= 20) return "Fraco";
+  return "Ausente";
+}
+
+function MapaEleitoral({ profile }) {
+  const e = profile.eleitoral;
+  return (
+    <SectionShell id="sec-mapa" label="03 Mapa Eleitoral" title="Mapa Eleitoral" sub={e.escopo.toLowerCase()}
+      kicker={<span>Ano-referência: <span className="t-fg-strong tnum">{e.ano}</span></span>} pad={false}>
+      <div className="relative" style={{ height: 480 }}>
+        {/* choropleth */}
+        <svg viewBox="0 0 600 480" className="absolute inset-0 w-full h-full">
+          <defs>
+            <linearGradient id="map-bg" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="var(--bg-card)"/>
+              <stop offset="100%" stopColor="var(--bg-card-2)"/>
+            </linearGradient>
+            <pattern id="grid-dots" width="18" height="18" patternUnits="userSpaceOnUse">
+              <circle cx="1" cy="1" r="0.5" fill="var(--fg-ghost)" opacity="0.35"/>
+            </pattern>
+          </defs>
+          <rect width="600" height="480" fill="url(#map-bg)"/>
+          <rect width="600" height="480" fill="url(#grid-dots)"/>
+          {/* ocean label */}
+          <text x="480" y="240" fontSize="10" letterSpacing="0.25em" fill="var(--fg-ghost)" fontFamily="JetBrains Mono">ATLÂNTICO</text>
+          {/* polygons */}
+          {Object.entries(UF_POLYS).map(([uf, d])=>{
+            const v = e.mapIntensity[uf] ?? 0;
+            const c = intensityColor(v);
+            return (
+              <g key={uf} className="map-region">
+                <path d={d} fill={c} fillOpacity={v>0?0.9:0.15} stroke="var(--bg-card)" strokeWidth="1.5"/>
+                {v >= 40 && (() => {
+                  // centroid approximation from path - simple text at heuristic pos
+                  const pos = { BA:[315,235], PE:[315,160], SP:[230,345], MG:[270,270], CE:[315,120], PI:[250,135], MA:[205,115], RJ:[300,322], PR:[220,380], SE:[355,188], AL:[378,183] }[uf];
+                  return pos ? (
+                    <text x={pos[0]} y={pos[1]} fontSize="11" fontWeight="800" fill={v>=60?"#fff":"var(--fg-strong)"} textAnchor="middle" fontFamily="Inter">{uf}</text>
+                  ) : null;
+                })()}
+              </g>
+            );
+          })}
+        </svg>
+
+        {/* chip top-left: context */}
+        <div className="absolute top-5 left-5">
+          <div className="chip chip-blue !h-auto !px-3 !py-2 !text-[11px]">
+            <span className="t-fg-strong font-bold">Eleito em {e.ano}</span>
+            <span className="t-fg-ghost">·</span>
+            <span className="tnum">{e.votos} votos</span>
+            <span className="t-fg-ghost">·</span>
+            <span>{e.percentValidos} válidos</span>
+          </div>
+        </div>
+
+        {/* badge top-right */}
+        <div className="absolute top-5 right-5 rounded-lg px-3 py-2"
+          style={{ background:"var(--bg-card)", border:"1px solid var(--rule-strong)" }}>
+          <div className="text-[9px] font-mono t-fg-dim tracking-[0.2em]">ESCOPO</div>
+          <div className="text-[13px] font-bold t-fg-strong mt-0.5">{e.escopo}</div>
+        </div>
+
+        {/* top 3 munis card */}
+        <div className="absolute right-5 bottom-16 w-[240px] rounded-xl p-4"
+          style={{ background:"var(--bg-card)", border:"1px solid var(--rule-strong)", boxShadow:"0 20px 40px -20px rgba(0,0,0,0.5)" }}>
+          <div className="text-[10px] font-bold tracking-[0.2em] uppercase t-fg-dim mb-3">Top 3 municípios</div>
+          <div className="space-y-2.5">
+            {e.topMunis.map((m,i)=>(
+              <div key={m.nome} className="flex items-center gap-3">
+                <div className="text-[10px] font-mono t-fg-ghost w-4">{String(i+1).padStart(2,'0')}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-[12px] font-semibold t-fg-strong truncate">{m.nome}</div>
+                  <div className="text-[10px] font-mono t-fg-dim">{m.votos} votos</div>
+                </div>
+                <div className="text-[13px] font-black tnum t-accent">{m.pct}%</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* legend */}
+      <div className="px-6 py-4 flex items-center justify-between" style={{ borderTop:"1px solid var(--rule)" }}>
+        <div className="text-[10px] font-bold tracking-[0.2em] uppercase t-fg-dim">Intensidade</div>
+        <div className="flex items-center gap-0">
+          {[0,20,40,60,80].map((v,i)=>(
+            <div key={v} className="flex items-center gap-2 px-3" style={i>0?{borderLeft:"1px solid var(--rule)"}:{}}>
+              <div className="w-5 h-3 rounded-sm" style={{ background: intensityColor(v+1), opacity: v===0?0.25:1 }}/>
+              <div className="text-[11px] t-fg-muted">{intensityLabel(v+1)}</div>
+            </div>
+          ))}
+        </div>
+        <div className="text-[10px] font-mono t-fg-dim">Fonte: TSE</div>
+      </div>
+    </SectionShell>
+  );
+}
+
+Object.assign(window, { MapaEleitoral });
+
+</script>
+
+<script type="text/babel" data-presets="react">
+/* === src/section-trajetoria.jsx === */
+/* Section 04 — Trajetória (timeline horizontal) */
+
+function TrajetoriaTimeline({ profile }) {
+  const events = profile.trajetoria || [];
+  const scrollRef = useRef(null);
+  const scroll = (dx) => scrollRef.current?.scrollBy({ left: dx, behavior: "smooth" });
+
+  const nodeClass = (s) => ({
+    "eleito":    "node-eleito",
+    "nao-eleito":"node-naoeleito",
+    "2o-turno":  "node-2turno",
+    "nomeado":   "node-nomeado",
+  }[s] || "node-naoeleito");
+
+  const statusLabel = (s) => ({
+    "eleito":    ["ELEITO",  "var(--ok)"],
+    "nao-eleito":["NÃO ELEITO", "var(--fg-dim)"],
+    "2o-turno":  ["2º TURNO", "#fbbf24"],
+    "nomeado":   ["NOMEADO", "#a855f7"],
+  }[s] || ["-", "var(--fg-dim)"]);
+
+  return (
+    <SectionShell id="sec-trajetoria" label="04 Trajetória" title="Trajetória Política" sub="linha do tempo"
+      kicker={<span>{events.length} eventos</span>}>
+      <div className="relative">
+        {/* arrows */}
+        <button onClick={()=>scroll(-360)}
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full flex items-center justify-center"
+          style={{ background:"var(--bg-card)", border:"1px solid var(--rule-strong)", color:"var(--fg-muted)" }}>
+          <ArrowLIcon size={14}/>
+        </button>
+        <button onClick={()=>scroll(360)}
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full flex items-center justify-center"
+          style={{ background:"var(--bg-card)", border:"1px solid var(--rule-strong)", color:"var(--fg-muted)" }}>
+          <ArrowRIcon size={14}/>
+        </button>
+
+        <div ref={scrollRef} className="timeline-scroll overflow-x-auto px-10 pb-2">
+          <div className="relative" style={{ minWidth: events.length * 220 }}>
+            {/* horizontal line */}
+            <div className="absolute left-0 right-0 h-px" style={{ top: 32, background:"var(--rule-strong)" }}/>
+            {/* events */}
+            <div className="flex items-start" style={{ gap: 0 }}>
+              {events.map((ev, i) => {
+                const prev = events[i-1];
+                const gap = prev ? (parseInt(ev.ano) - parseInt(prev.ano)) : 0;
+                const [stLabel, stColor] = statusLabel(ev.status);
+                return (
+                  <div key={i} className="flex-shrink-0 relative flex flex-col items-center" style={{ width: 220 }}>
+                    {/* dotted if gap */}
+                    {prev && gap > 4 && (
+                      <div className="absolute" style={{ top: 30, left: "-50%", width: "50%", height: 4, borderTop: "2px dotted var(--fg-ghost)" }}/>
+                    )}
+                    {/* node */}
+                    <div className={`w-4 h-4 rounded-full ${nodeClass(ev.status)}`} style={{ marginTop: 24 }}/>
+                    {/* card */}
+                    <div className="mt-5 w-[200px] rounded-lg px-3 py-3 text-center"
+                      style={{ background:"var(--bg-card-2)", border:"1px solid var(--rule)" }}>
+                      <div className="text-[18px] font-black font-display t-fg-strong leading-none">{ev.ano}</div>
+                      <div className="text-[10px] font-bold uppercase tracking-[0.15em] mt-1.5" style={{ color: stColor }}>{stLabel}</div>
+                      <div className="text-[12px] font-semibold t-fg mt-1">{ev.cargo}</div>
+                      <div className="text-[11px] t-fg-dim mt-0.5 flex items-center justify-center gap-1.5">
+                        <span className="font-mono">{ev.uf}</span>
+                        <span className="t-fg-ghost">·</span>
+                        <span className="chip chip-muted !h-[16px] !px-1.5 !text-[9px]">{ev.partido}</span>
+                      </div>
+                      <div className="text-[11px] font-mono tnum t-fg-muted mt-1.5">{ev.votos} votos</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* legend */}
+        <div className="mt-3 pt-4 flex items-center gap-5 text-[10px] font-mono t-fg-dim" style={{ borderTop:"1px solid var(--rule)" }}>
+          <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full node-eleito"/>Eleito</div>
+          <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full node-2turno"/>2º turno</div>
+          <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full node-naoeleito"/>Não eleito</div>
+          <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full node-nomeado"/>Nomeado</div>
+          <div className="ml-auto">Fonte: TSE</div>
+        </div>
+      </div>
+    </SectionShell>
+  );
+}
+
+Object.assign(window, { TrajetoriaTimeline });
+
+</script>
+
+<script type="text/babel" data-presets="react">
+/* === src/section-legislativo.jsx === */
+/* Section 05 — Atividade Legislativa */
+
+function LegislativoCard({ title, count, tone, items }) {
+  const map = {
+    green:  { chip:"chip-green",  fg:"var(--ok)" },
+    amber:  { chip:"chip-amber",  fg:"var(--warn)" },
+    red:    { chip:"chip-red",    fg:"var(--danger)" },
+  };
+  const c = map[tone];
+  return (
+    <div className="rounded-xl p-5 flex flex-col" style={{ background:"var(--bg-card-2)", border:"1px solid var(--rule)" }}>
+      <div className="flex items-baseline justify-between">
+        <div className={`chip ${c.chip}`}>{title}</div>
+        <div className="text-[36px] font-black font-display tnum" style={{ color: c.fg }}>{String(count).padStart(2,"0")}</div>
+      </div>
+      <div className="mt-4 pt-4 space-y-2.5" style={{ borderTop:"1px solid var(--rule)" }}>
+        <div className="text-[9px] font-mono tracking-[0.2em] uppercase t-fg-dim">Últimas 3</div>
+        {items.map((it, i) => (
+          <a key={i} href="#" className="block group">
+            <div className="text-[12px] t-fg group-hover:t-fg-strong leading-snug">{it.em}</div>
+            <div className="text-[10px] font-mono t-fg-dim mt-0.5 flex items-center gap-1.5">
+              <span>{it.data}</span>
+              <ExternalIcon size={9}/>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AtividadeLegislativa({ profile }) {
+  const L = profile.legislativo;
+  if (!L.disponivel) {
+    return (
+      <SectionShell id="sec-legislativo" label="05 Legislativo" title="Atividade Legislativa" sub="mandato ativo">
+        <EmptyState icon={<FileTextIcon size={28}/>} title="Sem mandato legislativo ativo"
+          text="Este candidato não possui mandato parlamentar ativo no período analisado."/>
+      </SectionShell>
+    );
+  }
+
+  const cargoCls = (c) => ({
+    "Presidente":"chip-green",
+    "Vice":"chip-blue",
+    "Titular":"chip-muted",
+    "Suplente":"chip-amber",
+    "Relator":"chip-purple",
+  }[c] || "chip-muted");
+
+  return (
+    <SectionShell id="sec-legislativo" label="05 Legislativo" title="Atividade Legislativa" sub="PLs · comissões · relatorias"
+      kicker={<><span>Mandato: <span className="t-fg-strong">Senador · BA</span></span><span className="t-fg-ghost mx-2">·</span><span>2019–2027</span></>}>
+      <div className="grid grid-cols-3 gap-4">
+        <LegislativoCard title="Aprovados" count={L.aprovados.count} tone="green" items={L.aprovados.recentes}/>
+        <LegislativoCard title="Em tramitação" count={L.tramitando.count} tone="amber" items={L.tramitando.recentes}/>
+        <LegislativoCard title="Vetados" count={L.vetados.count} tone="red" items={L.vetados.recentes}/>
+      </div>
+
+      {/* comissões */}
+      <div className="mt-6 rounded-xl overflow-hidden" style={{ background:"var(--bg-card-2)", border:"1px solid var(--rule)" }}>
+        <div className="px-5 py-3 flex items-center justify-between" style={{ borderBottom:"1px solid var(--rule)" }}>
+          <div className="text-[11px] font-bold tracking-[0.15em] uppercase t-fg-strong">Comissões atuais</div>
+          <div className="text-[10px] font-mono t-fg-dim">{L.comissoes.length} comissões</div>
+        </div>
+        <div>
+          {L.comissoes.map((c, i) => (
+            <div key={c.sigla} className="px-5 py-3 flex items-center gap-4"
+              style={i>0?{borderTop:"1px solid var(--rule)"}:{}}>
+              <div className="text-[11px] font-mono font-bold t-fg-strong w-14">{c.sigla}</div>
+              <div className="flex-1 text-[13px] t-fg">{c.nome}</div>
+              <span className={`chip ${cargoCls(c.cargo)}`}>{c.cargo}</span>
+              <div className="text-[10px] font-mono tracking-[0.15em] uppercase flex items-center gap-1.5"
+                style={{ color: c.ativa ? "var(--ok)" : "var(--fg-dim)" }}>
+                <span className="w-1.5 h-1.5 rounded-full" style={{ background: c.ativa ? "var(--ok)" : "var(--fg-dim)" }}/>
+                {c.ativa ? "Ativa" : "Inativa"}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* relatorias */}
+      <div className="mt-6">
+        <div className="flex items-center justify-between mb-3">
+          <div className="text-[11px] font-bold tracking-[0.15em] uppercase t-fg-strong">Relatorias recentes</div>
+          <div className="text-[10px] font-mono t-fg-dim">Top 5</div>
+        </div>
+        <div className="rounded-xl overflow-hidden" style={{ border:"1px solid var(--rule)" }}>
+          {L.relatorias.map((r, i) => (
+            <div key={i} className="px-5 py-3 flex items-center gap-4"
+              style={{ background: i%2===0 ? "var(--bg-card-2)" : "transparent", ...(i>0?{borderTop:"1px solid var(--rule)"}:{}) }}>
+              <div className="flex-1 text-[13px] t-fg">{r.em}</div>
+              <div className="text-[10px] font-mono t-fg-dim w-16 text-right">{r.data}</div>
+              <span className={`chip ${r.situ==="Aprovado"?"chip-green":r.situ==="Arquivado"?"chip-red":"chip-amber"} w-[88px] justify-center`}>{r.situ}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </SectionShell>
+  );
+}
+
+Object.assign(window, { AtividadeLegislativa });
+
+</script>
+
+<script type="text/babel" data-presets="react">
+/* === src/section-alertas.jsx === */
+/* Section 06 — Alertas Jurídicos */
+
+function AlertasJuridicos({ profile }) {
+  const A = profile.alertas;
+  if (!A.itens.length && A.fichaLimpa) {
+    return (
+      <SectionShell id="sec-alertas" label="06 Alertas" title="Alertas Jurídicos" sub="sanções e processos">
+        <EmptyState tone="ok" icon={<CheckIcon size={28}/>} title="Ficha limpa — sem sanções ativas"
+          text="Não há registros do candidato nos cadastros CEIS, CEAF ou TCU no período verificado."/>
+      </SectionShell>
+    );
+  }
+
+  const sevMap = {
+    critico: { cls:"sev-critico", chip:"chip-red",    label:"Crítico" },
+    alto:    { cls:"sev-alto",    chip:"chip-red",    label:"Alto" },
+    medio:   { cls:"sev-medio",   chip:"chip-amber",  label:"Médio" },
+    baixo:   { cls:"sev-baixo",   chip:"chip-muted",  label:"Baixo" },
+  };
+
+  return (
+    <SectionShell id="sec-alertas" label="06 Alertas" title="Alertas Jurídicos" sub="sanções e processos"
+      kicker={<span>{A.itens.length} {A.itens.length===1?"alerta":"alertas"} · última verif. ontem</span>}>
+      <div className="space-y-3">
+        {A.itens.map((it, i) => {
+          const s = sevMap[it.severidade] || sevMap.baixo;
+          return (
+            <div key={i} className={`rounded-xl p-5 ${s.cls}`} style={{ background:"var(--bg-card-2)" }}>
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center"
+                  style={{ background:"rgba(239,68,68,0.10)", color:"var(--danger)" }}>
+                  <AlertTriIcon size={18} stroke={2}/>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className={`chip ${s.chip}`}>{it.tipo}</span>
+                    <span className="text-[10px] font-mono t-fg-dim tracking-[0.15em] uppercase">{it.orgao}</span>
+                    <span className="t-fg-ghost">·</span>
+                    <span className="text-[10px] font-mono t-fg-dim">{it.data}</span>
+                    {it.valor && <>
+                      <span className="t-fg-ghost">·</span>
+                      <span className="text-[11px] font-mono font-bold tnum t-fg-strong">{it.valor}</span>
+                    </>}
+                    <span className="ml-auto text-[10px] font-bold tracking-[0.15em] uppercase"
+                      style={{ color: it.severidade==="critico"||it.severidade==="alto"?"var(--danger)":it.severidade==="medio"?"var(--warn)":"var(--fg-muted)" }}>
+                      {s.label}
+                    </span>
+                  </div>
+                  <div className="mt-2 text-[13px] t-fg leading-snug">{it.desc}</div>
+                  <a href={it.url} className="mt-2 inline-flex items-center gap-1 text-[11px] t-accent font-medium">
+                    Ver fonte oficial <ExternalIcon size={10}/>
+                  </a>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </SectionShell>
+  );
+}
+
+Object.assign(window, { AlertasJuridicos });
+
+</script>
+
+<script type="text/babel" data-presets="react">
+/* === src/section-financeiro.jsx === */
+/* Section 07 — Financeiro de campanha */
+
+function BarRow({ k, v, max }) {
+  return (
+    <div className="flex items-center gap-3">
+      <div className="text-[12px] t-fg w-36">{k}</div>
+      <div className="flex-1 h-6 rounded-md overflow-hidden" style={{ background:"var(--rule)" }}>
+        <div className="h-full rounded-md flex items-center justify-end pr-2"
+          style={{ width:`${(v/max)*100}%`, background:"linear-gradient(90deg, #3b82f666, #60a5fa)" }}>
+          <span className="text-[11px] font-mono font-bold tnum t-fg-strong">{v}%</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Financeiro({ profile }) {
+  const F = profile.financeiro;
+  if (!F.disponivel) {
+    return (
+      <SectionShell id="sec-financeiro" label="07 Financeiro" title="Financeiro de Campanha" sub="arrecadação · gasto · CPV">
+        <EmptyState icon={<WalletIcon size={28}/>} title="TSE ainda não publicou dados do ciclo"
+          text="A prestação de contas do ciclo eleitoral atual ainda está em análise no TSE."/>
+      </SectionShell>
+    );
+  }
+  const max = Math.max(...F.fontes.map(f=>f.v));
+  return (
+    <SectionShell id="sec-financeiro" label="07 Financeiro" title="Financeiro de Campanha" sub="arrecadação · gasto · CPV"
+      kicker={<span>Ciclo <span className="t-fg-strong tnum">2022</span> · TSE</span>}>
+      <div className="grid grid-cols-3 gap-4">
+        <KPI label="Arrecadado" value={F.arrecadado} tone="ok"/>
+        <KPI label="Gasto" value={F.gasto}/>
+        <KPI label="Saldo" value={F.saldo} tone={F.saldo.startsWith("-") ? "danger" : "ok"}/>
+      </div>
+
+      {/* CPV benchmark */}
+      <div className="mt-6 rounded-xl p-5" style={{ background:"var(--bg-card-2)", border:"1px solid var(--rule)" }}>
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="text-[10px] font-bold tracking-[0.2em] uppercase t-fg-dim">Custo por voto (CPV)</div>
+            <div className="flex items-baseline gap-2 mt-1">
+              <div className="text-[32px] font-black font-display tnum t-fg-strong">{F.cpv.valor}</div>
+              <div className="text-[11px] t-fg-muted">/voto</div>
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="text-[11px] t-fg-muted">{F.cpv.label}: <span className="font-mono t-fg tnum">{F.cpv.medianaCargo}</span></div>
+            <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md"
+              style={{ background:"rgba(34,197,94,0.10)", color:"var(--ok)" }}>
+              <CheckIcon size={12} stroke={2.5}/>
+              <span className="text-[12px] font-bold tnum">{Math.abs(F.cpv.deltaPct)}% abaixo</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Fontes */}
+      <div className="mt-6">
+        <div className="text-[11px] font-bold tracking-[0.15em] uppercase t-fg-strong mb-3">Origem das doações</div>
+        <div className="space-y-2">
+          {F.fontes.map(f => <BarRow key={f.k} k={f.k} v={f.v} max={max}/>)}
+        </div>
+      </div>
+
+      {/* Top doadores */}
+      <div className="mt-6">
+        <div className="flex items-center justify-between mb-3">
+          <div className="text-[11px] font-bold tracking-[0.15em] uppercase t-fg-strong">Top 10 doadores (PF)</div>
+          <div className="text-[10px] font-mono t-fg-dim">ordenado por valor</div>
+        </div>
+        <div className="rounded-xl overflow-hidden" style={{ border:"1px solid var(--rule)" }}>
+          {F.topDoadores.map((d, i) => (
+            <div key={i} className="px-4 py-2.5 flex items-center gap-4"
+              style={{ background: i%2===0 ? "var(--bg-card-2)" : "transparent", ...(i>0?{borderTop:"1px solid var(--rule)"}:{}) }}>
+              <div className="text-[10px] font-mono t-fg-ghost w-6">{String(i+1).padStart(2,"0")}</div>
+              <div className="flex-1 text-[13px] t-fg">{d.nome}</div>
+              <div className="text-[13px] font-mono font-bold tnum t-fg-strong">{d.v}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </SectionShell>
+  );
+}
+
+Object.assign(window, { Financeiro });
+
+</script>
+
+<script type="text/babel" data-presets="react">
+/* === src/section-emendas.jsx === */
+/* Section 08 — Emendas parlamentares */
+
+function Donut({ data, size = 180 }) {
+  const total = data.reduce((a,b)=>a+b.v,0);
+  const cx = size/2, cy = size/2, R = size/2 - 8, r = size/2 - 34;
+  let acc = 0;
+  const arcs = data.map(d => {
+    const start = acc/total * Math.PI*2 - Math.PI/2;
+    acc += d.v;
+    const end = acc/total * Math.PI*2 - Math.PI/2;
+    const large = (end-start) > Math.PI ? 1 : 0;
+    const x1 = cx+Math.cos(start)*R, y1=cy+Math.sin(start)*R;
+    const x2 = cx+Math.cos(end)*R,   y2=cy+Math.sin(end)*R;
+    const x3 = cx+Math.cos(end)*r,   y3=cy+Math.sin(end)*r;
+    const x4 = cx+Math.cos(start)*r, y4=cy+Math.sin(start)*r;
+    return { d, path: `M ${x1} ${y1} A ${R} ${R} 0 ${large} 1 ${x2} ${y2} L ${x3} ${y3} A ${r} ${r} 0 ${large} 0 ${x4} ${y4} Z` };
+  });
+  return (
+    <svg viewBox={`0 0 ${size} ${size}`} width={size} height={size}>
+      {arcs.map((a,i)=><path key={i} d={a.path} fill={a.d.c} opacity={0.9}/>)}
+      <circle cx={cx} cy={cy} r={r-2} fill="var(--bg-card)"/>
+      <text x={cx} y={cy-4} textAnchor="middle" fontSize="10" fill="var(--fg-dim)" fontFamily="Inter" fontWeight="700" letterSpacing="0.15em">EXECUTADO</text>
+      <text x={cx} y={cy+14} textAnchor="middle" fontSize="18" fill="var(--fg-strong)" fontFamily="Inter" fontWeight="900" style={{fontVariantNumeric:"tabular-nums"}}>R$ 42M</text>
+    </svg>
+  );
+}
+
+function Emendas({ profile }) {
+  const E = profile.emendas;
+  if (!E.aplicavel) {
+    return (
+      <SectionShell id="sec-emendas" label="08 Emendas" title="Emendas Parlamentares" sub="execução e destino">
+        <EmptyState icon={<BanknoteIcon size={28}/>} title="Seção não aplicável"
+          text="Emendas parlamentares são um indicador exclusivo de parlamentares com mandato ativo."/>
+      </SectionShell>
+    );
+  }
+  const maxYear = Math.max(...E.anual.map(a=>a.v));
+  const statusCls = { "Pago":"chip-green","Em execução":"chip-amber","Cancelado":"chip-red" };
+  return (
+    <SectionShell id="sec-emendas" label="08 Emendas" title="Emendas Parlamentares" sub="RP-6 · RP-9 · individuais"
+      kicker={<span>Ciclos <span className="t-fg-strong tnum">2019–2025</span></span>}>
+      <div className="grid grid-cols-4 gap-3">
+        <KPI label="Apresentado" value={E.apresentado}/>
+        <KPI label="Aprovado" value={E.aprovado}/>
+        <KPI label="Executado" value={E.executado} tone="ok"/>
+        <div className="rounded-lg px-4 py-3.5 flex flex-col justify-between"
+          style={{ background:"linear-gradient(135deg, rgba(34,197,94,0.12), rgba(34,197,94,0.02))", border:"1px solid rgba(34,197,94,0.35)" }}>
+          <div className="text-[10px] font-mono tracking-[0.15em] uppercase" style={{color:"var(--ok)"}}>Taxa de execução</div>
+          <div className="flex items-baseline justify-between mt-1">
+            <div className="text-[30px] font-black font-display tnum" style={{color:"var(--ok)"}}>{E.taxa}%</div>
+            <div className="text-[10px] font-mono" style={{color:"var(--ok)"}}>▲ alta</div>
+          </div>
+        </div>
+      </div>
+
+      {/* charts row */}
+      <div className="mt-6 grid gap-4" style={{ gridTemplateColumns: "1fr 280px" }}>
+        {/* anual bars */}
+        <div className="rounded-xl p-5" style={{ background:"var(--bg-card-2)", border:"1px solid var(--rule)" }}>
+          <div className="flex items-center justify-between mb-4">
+            <div className="text-[11px] font-bold tracking-[0.15em] uppercase t-fg-strong">Execução anual</div>
+            <div className="text-[10px] font-mono t-fg-dim">R$ milhões</div>
+          </div>
+          <div className="flex items-end gap-3 h-40">
+            {E.anual.map(a => (
+              <div key={a.ano} className="flex-1 h-full flex flex-col items-center justify-end gap-1.5">
+                <div className="text-[10px] font-mono font-bold tnum t-fg-muted">{a.v}</div>
+                <div className="w-full rounded-t-sm" style={{ height:`${(a.v/maxYear)*80}%`, minHeight:4, background:"linear-gradient(180deg, #60a5fa, #3b82f6)" }}/>
+                <div className="text-[10px] font-mono t-fg-dim">{a.ano}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* donut */}
+        <div className="rounded-xl p-5" style={{ background:"var(--bg-card-2)", border:"1px solid var(--rule)" }}>
+          <div className="text-[11px] font-bold tracking-[0.15em] uppercase t-fg-strong mb-3">Por área</div>
+          <div className="flex flex-col items-center">
+            <Donut data={E.areas} size={160}/>
+            <div className="mt-3 w-full space-y-1.5">
+              {E.areas.map(a => (
+                <div key={a.k} className="flex items-center gap-2 text-[11px]">
+                  <span className="w-2.5 h-2.5 rounded-sm" style={{ background:a.c }}/>
+                  <span className="flex-1 t-fg-muted">{a.k}</span>
+                  <span className="font-mono tnum t-fg-strong font-bold">{a.v}%</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* top 10 emendas */}
+      <div className="mt-6">
+        <div className="flex items-center justify-between mb-3">
+          <div className="text-[11px] font-bold tracking-[0.15em] uppercase t-fg-strong">Top 10 emendas por valor</div>
+          <div className="text-[10px] font-mono t-fg-dim">SIOP</div>
+        </div>
+        <div className="rounded-xl overflow-hidden" style={{ border:"1px solid var(--rule)" }}>
+          {E.top.map((t, i) => (
+            <div key={i} className="px-4 py-3 flex items-center gap-4"
+              style={{ background: i%2===0?"var(--bg-card-2)":"transparent", ...(i>0?{borderTop:"1px solid var(--rule)"}:{}) }}>
+              <div className="text-[10px] font-mono t-fg-ghost w-6">{String(i+1).padStart(2,"0")}</div>
+              <div className="flex-1 text-[13px] t-fg">{t.muni}</div>
+              <div className="text-[11px] t-fg-muted w-28">{t.area}</div>
+              <div className="text-[13px] font-mono font-bold tnum t-fg-strong w-32 text-right">{t.v}</div>
+              <span className={`chip ${statusCls[t.st]} w-[100px] justify-center`}>{t.st}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-4 rounded-lg px-4 py-3 flex items-start gap-2"
+        style={{ background:"var(--bg-card-2)", border:"1px dashed var(--rule-strong)" }}>
+        <div className="text-[11px] t-fg-muted"><span className="font-bold t-fg">Contexto:</span> Taxa de execução alta indica articulação real com o Executivo para liberação orçamentária.</div>
+      </div>
+    </SectionShell>
+  );
+}
+
+Object.assign(window, { Emendas });
+
+</script>
+
+<script type="text/babel" data-presets="react">
+/* === src/section-perfil.jsx === */
+/* Section 09 — Perfil */
+
+function SocialCard({ r }) {
+  const icons = { Instagram: InstaIcon, Twitter: TwitterIcon, Facebook: FacebookIcon, YouTube: YoutubeIcon, TikTok: TiktokIcon };
+  const Icon = icons[r.rede] || InstaIcon;
+  return (
+    <div className="rounded-lg p-3 flex items-center gap-3" style={{ background:"var(--bg-card-2)", border:"1px solid var(--rule)" }}>
+      <div className="flex-shrink-0 w-9 h-9 rounded-md flex items-center justify-center" style={{ background:"var(--rule)", color:"var(--fg)" }}>
+        <Icon size={16}/>
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1.5">
+          <div className="text-[12px] font-semibold t-fg-strong truncate">{r.handle}</div>
+          {r.verificado && <span style={{color:"var(--verified)"}}><CheckIcon size={10} stroke={3}/></span>}
+        </div>
+        <div className="text-[10px] font-mono t-fg-dim mt-0.5 flex items-center gap-1.5">
+          <span className="tnum">{r.seguidores}</span>
+          <span className="t-fg-ghost">·</span>
+          <span>eng. {r.engajamento}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Perfil({ profile }) {
+  const P = profile.perfil;
+  return (
+    <SectionShell id="sec-perfil" label="09 Perfil" title="Perfil" sub="biografia · redes · contato">
+      <div className="grid gap-8" style={{ gridTemplateColumns: "1fr 360px" }}>
+        <div>
+          <div className="text-[11px] font-bold tracking-[0.15em] uppercase t-fg-strong mb-3">Biografia</div>
+          <p className="text-[14px] t-fg leading-[1.7]" style={{ textWrap:"pretty" }}>{P.bioLong}</p>
+
+          <div className="mt-6 grid grid-cols-2 gap-4">
+            <div className="rounded-lg p-4" style={{ background:"var(--bg-card-2)", border:"1px solid var(--rule)" }}>
+              <div className="text-[10px] font-mono tracking-[0.15em] uppercase t-fg-dim">Nascimento</div>
+              <div className="text-[13px] font-semibold t-fg-strong mt-1">{P.nascimento}</div>
+            </div>
+            <div className="rounded-lg p-4" style={{ background:"var(--bg-card-2)", border:"1px solid var(--rule)" }}>
+              <div className="text-[10px] font-mono tracking-[0.15em] uppercase t-fg-dim">Formação</div>
+              <div className="text-[13px] font-semibold t-fg-strong mt-1">{P.formacao}</div>
+            </div>
+          </div>
+
+          <div className="mt-4 rounded-lg p-4" style={{ background:"var(--bg-card-2)", border:"1px solid var(--rule)" }}>
+            <div className="text-[10px] font-mono tracking-[0.15em] uppercase t-fg-dim mb-2">Histórico partidário</div>
+            <div className="flex flex-wrap gap-2">
+              {P.partidos.map((p, i) => (
+                <div key={i} className="flex items-center gap-2 px-2.5 py-1.5 rounded-md"
+                  style={{ background:"var(--rule)" }}>
+                  <span className="text-[11px] font-bold tracking-[0.1em] t-fg-strong">{p.p}</span>
+                  <span className="text-[10px] font-mono t-fg-dim">desde {p.desde}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {(P.gabinete !== "—" || P.email !== "—") && (
+            <div className="mt-4 rounded-lg p-4" style={{ background:"var(--bg-card-2)", border:"1px solid var(--rule)" }}>
+              <div className="text-[10px] font-mono tracking-[0.15em] uppercase t-fg-dim mb-2">Contato oficial</div>
+              <div className="space-y-1.5">
+                <div className="flex items-start gap-2 text-[12px]">
+                  <BriefcaseIcon size={12} className="mt-0.5" style={{color:"var(--fg-dim)"}}/>
+                  <span className="t-fg">{P.gabinete}</span>
+                </div>
+                <div className="flex items-center gap-2 text-[12px] font-mono">
+                  <span style={{color:"var(--fg-dim)"}}>@</span>
+                  <span className="t-accent">{P.email}</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div>
+          <div className="text-[11px] font-bold tracking-[0.15em] uppercase t-fg-strong mb-3">Redes sociais</div>
+          <div className="space-y-2">
+            {P.redes.map(r => <SocialCard key={r.rede} r={r}/>)}
+          </div>
+        </div>
+      </div>
+    </SectionShell>
+  );
+}
+
+Object.assign(window, { Perfil });
+
+</script>
+
+<script type="text/babel" data-presets="react">
+/* === src/sidebar.jsx === */
+/* Sidebar + top bar */
+
+const NAV = [
+  { n: "01", id: "sec-identidade",  label: "Identidade",           Icon: UserIcon },
+  { n: "02", id: "sec-overall",     label: "Overall",              Icon: TargetIcon },
+  { n: "03", id: "sec-mapa",        label: "Mapa eleitoral",       Icon: MapPinIcon },
+  { n: "04", id: "sec-trajetoria",  label: "Trajetória",           Icon: GitBranchIcon },
+  { n: "05", id: "sec-legislativo", label: "Atividade legislativa",Icon: FileTextIcon },
+  { n: "06", id: "sec-alertas",     label: "Alertas jurídicos",    Icon: AlertTriIcon },
+  { n: "07", id: "sec-financeiro",  label: "Financeiro",           Icon: WalletIcon },
+  { n: "08", id: "sec-emendas",     label: "Emendas",              Icon: BanknoteIcon },
+  { n: "09", id: "sec-perfil",      label: "Perfil",               Icon: UserCircleIcon },
+];
+
+function Sidebar({ profile, activeId, onNavClick, scrollPct }) {
+  return (
+    <aside className="sidebar-col sticky top-0 self-start h-screen flex flex-col t-bg-sidebar" style={{ borderRight:"1px solid var(--rule)" }}>
+      <div className="px-5 pt-5 pb-4">
+        <div className="text-[10px] font-mono tracking-[0.25em] t-fg-dim">DOSSIÊ</div>
+        <div className="text-[14px] font-bold t-fg-strong mt-0.5 leading-tight">
+          {profile.firstName} {profile.lastName}
+        </div>
+        <div className="text-[10px] font-mono t-fg-dim mt-0.5">{profile.meta}</div>
+      </div>
+      <div className="flex-1 overflow-y-auto py-2 relative">
+        {/* progress bar */}
+        <div className="absolute left-0 top-0 bottom-0 w-[2px]" style={{ background:"var(--rule)" }}>
+          <div className="w-full" style={{ height:`${scrollPct*100}%`, background:"var(--accent-blue-strong)", transition:"height .15s" }}/>
+        </div>
+        <nav className="flex flex-col py-2" style={{ gap: 2 }}>
+          {NAV.map(it => {
+            const active = it.id === activeId;
+            const Icon = it.Icon;
+            return (
+              <a key={it.id} href={`#${it.id}`} onClick={(e)=>{ e.preventDefault(); onNavClick(it.id); }}
+                className={`nav-item ${active?"active":""}`}>
+                <span className="nav-num">{it.n}</span>
+                <Icon size={13}/>
+                <span>{it.label}</span>
+              </a>
+            );
+          })}
+        </nav>
+      </div>
+      <div className="px-4 pt-3 pb-4 flex flex-col gap-2" style={{ borderTop:"1px solid var(--rule)" }}>
+        <button className="btn-ghost flex items-center justify-center gap-2">
+          <DownloadIcon size={12}/><span>Baixar PDF</span>
+        </button>
+        <button className="btn-ghost flex items-center justify-center gap-2">
+          <EditIcon size={12}/><span>Modo de edição</span>
+        </button>
+      </div>
+    </aside>
+  );
+}
+
+function TopBar({ profile, theme, onToggleTheme }) {
+  return (
+    <div className="flex items-center justify-between px-6 py-3" style={{ borderBottom:"1px solid var(--rule)" }}>
+      <div className="text-[10px] font-mono tracking-[0.2em] t-fg-dim flex items-center gap-2">
+        <span>DOSSIÊ</span>
+        <span className="t-fg-ghost">/</span>
+        <span>candidato</span>
+        <span className="t-fg-ghost">/</span>
+        <span className="t-fg uppercase">{profile.firstName} {profile.lastName}</span>
+      </div>
+      <div className="flex items-center gap-4 text-[11px] font-mono t-fg-dim">
+        <span>v2.4.1</span>
+        <span className="t-fg-ghost">·</span>
+        <span>atualizado há 2h</span>
+        <button onClick={onToggleTheme} className="btn-ghost flex items-center gap-1.5">
+          {theme==="dark" ? <SunIcon size={12}/> : <MoonIcon size={12}/>}
+          <span>{theme==="dark"?"Light":"Dark"}</span>
+        </button>
+        <button className="btn-ghost flex items-center gap-1.5">
+          <ArrowLIcon size={12}/><span>Voltar</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { Sidebar, TopBar, NAV });
+
+</script>
+
+<script type="text/babel" data-presets="react">
+/* === src/tweaks.jsx === */
+/* Tweaks panel */
+
+function TweakToggle({ label, value, options, onChange }) {
+  return (
+    <div className="mb-3">
+      <div className="text-[9px] font-mono tracking-[0.15em] uppercase t-fg-dim mb-1.5">{label}</div>
+      <div className="flex flex-wrap gap-1">
+        {options.map(o => (
+          <button key={o.v} onClick={()=>onChange(o.v)}
+            className={`btn-ghost ${value===o.v?"active":""}`}>
+            {o.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function TweaksPanel({ state, setState, onClose }) {
+  return (
+    <div className="fixed bottom-5 right-5 z-50 w-[280px] rounded-xl p-4"
+      style={{ background:"var(--bg-card)", border:"1px solid var(--rule-strong)", boxShadow:"0 20px 60px -20px rgba(0,0,0,0.6)" }}>
+      <div className="flex items-center justify-between mb-3">
+        <div className="text-[11px] font-bold tracking-[0.2em] uppercase t-fg-strong">Tweaks</div>
+        <button onClick={onClose} className="t-fg-dim hover:t-fg"><XIcon size={14}/></button>
+      </div>
+
+      <TweakToggle label="Perfil" value={state.profile}
+        options={[{v:"wagner",label:"Wagner"},{v:"marcal",label:"Marçal (esparso)"}]}
+        onChange={(v)=>setState({ ...state, profile: v })}/>
+
+      <TweakToggle label="Alerta jurídico (hero)" value={state.alert?"on":"off"}
+        options={[{v:"off",label:"Off"},{v:"on",label:"On"}]}
+        onChange={(v)=>setState({ ...state, alert: v==="on" })}/>
+
+      <TweakToggle label="Tema" value={state.theme}
+        options={[{v:"dark",label:"Dark"},{v:"light",label:"Light"}]}
+        onChange={(v)=>setState({ ...state, theme: v })}/>
+
+      <TweakToggle label="Cargo (contextual)" value={state.cargo}
+        options={[
+          {v:"SEN",label:"Sen"},{v:"DEP_F",label:"Dep F."},{v:"DEP_E",label:"Dep E."},
+          {v:"GOV",label:"Gov"},{v:"PRES",label:"Pres"},{v:"PREF",label:"Pref"},{v:"VER",label:"Ver"}
+        ]}
+        onChange={(v)=>setState({ ...state, cargo: v })}/>
+
+      <TweakToggle label="Densidade" value={state.densidade}
+        options={[{v:"completo",label:"Completo"},{v:"esparso",label:"Esparso"}]}
+        onChange={(v)=>setState({ ...state, densidade: v })}/>
+    </div>
+  );
+}
+
+Object.assign(window, { TweaksPanel });
+
+</script>
+
+<script type="text/babel" data-presets="react">
+/* === src/app.jsx === */
+/* App shell: sidebar + content + tweaks */
+
+const DEFAULTS = /*EDITMODE-BEGIN*/{
+  "profile": "wagner",
+  "alert": false,
+  "theme": "light",
+  "cargo": "PRES",
+  "densidade": "completo"
+}/*EDITMODE-END*/;
+
+function App() {
+  const [state, setState] = useState(() => {
+    try { const s = localStorage.getItem("dossie-state"); if (s) return { ...DEFAULTS, ...JSON.parse(s) }; } catch(e){}
+    return DEFAULTS;
+  });
+  const [tweaksOpen, setTweaksOpen] = useState(false);
+  const [activeId, setActiveId] = useState("sec-identidade");
+  const [scrollPct, setScrollPct] = useState(0);
+
+  useEffect(() => {
+    document.body.dataset.theme = state.theme;
+    try { localStorage.setItem("dossie-state", JSON.stringify(state)); } catch(e){}
+  }, [state]);
+
+  // edit-mode bridge
+  useEffect(() => {
+    const onMsg = (e) => {
+      if (!e.data) return;
+      if (e.data.type === "__activate_edit_mode")  setTweaksOpen(true);
+      if (e.data.type === "__deactivate_edit_mode") setTweaksOpen(false);
+    };
+    window.addEventListener("message", onMsg);
+    window.parent.postMessage({ type: "__edit_mode_available" }, "*");
+    return () => window.removeEventListener("message", onMsg);
+  }, []);
+
+  const updateState = (next) => {
+    setState(next);
+    const keys = {};
+    for (const k of Object.keys(next)) if (next[k] !== state[k]) keys[k] = next[k];
+    if (Object.keys(keys).length) window.parent.postMessage({ type: "__edit_mode_set_keys", edits: keys }, "*");
+  };
+
+  // active section tracking
+  useEffect(() => {
+    const onScroll = () => {
+      const h = document.documentElement;
+      const pct = h.scrollTop / Math.max(1, h.scrollHeight - h.clientHeight);
+      setScrollPct(pct);
+      for (const n of NAV) {
+        const el = document.getElementById(n.id);
+        if (!el) continue;
+        const r = el.getBoundingClientRect();
+        if (r.top < window.innerHeight * 0.35 && r.bottom > 0) { setActiveId(n.id); }
+      }
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const onNavClick = (id) => {
+    const el = document.getElementById(id);
+    if (el) window.scrollTo({ top: el.offsetTop - 20, behavior: "smooth" });
+  };
+
+  const profile = PROFILES[state.profile];
+
+  return (
+    <div className="shell-grid">
+      <Sidebar profile={profile} activeId={activeId} onNavClick={onNavClick} scrollPct={scrollPct}/>
+      <div className="min-w-0">
+        <TopBar profile={profile}
+          theme={state.theme}
+          onToggleTheme={() => updateState({ ...state, theme: state.theme==="dark"?"light":"dark" })}/>
+        <div className="p-6 space-y-8 max-w-[1400px]">
+          <HeaderHero profile={profile} alert={state.alert}/>
+          <OverallMap profile={profile}/>
+          <MapaEleitoral profile={profile}/>
+          <TrajetoriaTimeline profile={profile}/>
+          <AtividadeLegislativa profile={profile}/>
+          <AlertasJuridicos profile={profile}/>
+          <Financeiro profile={profile}/>
+          <Emendas profile={profile}/>
+          <Perfil profile={profile}/>
+          <div className="py-8 text-center text-[10px] font-mono t-fg-ghost tracking-[0.2em]">
+            FIM DO DOSSIÊ · v2.4.1 · {profile.firstName} {profile.lastName}
+          </div>
+        </div>
+      </div>
+      {tweaksOpen && <TweaksPanel state={state} setState={updateState} onClose={()=>setTweaksOpen(false)}/>}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+
+</script>
+
+</body>
+</html>

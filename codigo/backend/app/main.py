@@ -202,13 +202,16 @@ _ORIGINS = [
     "https://app.mazzeltech.com",
     "https://www.mazzeltech.com",
     "https://mazzeltech.com",
+    "https://app.mazzelag.com",
 ]
 if settings.FRONTEND_URL:
     _ORIGINS.append(settings.FRONTEND_URL)
 
+# Regex para permitir qualquer subdominio trycloudflare.com (tuneis dev)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_ORIGINS,
+    allow_origin_regex=r"https://[a-z0-9-]+\.trycloudflare\.com",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

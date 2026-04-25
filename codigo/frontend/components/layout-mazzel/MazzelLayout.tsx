@@ -66,7 +66,7 @@ function LayoutInner({
  * - Topbar (breadcrumbs, search, role badge)
  *
  * NOTA: não substitui AppLayout.jsx existente.
- * Usada apenas em rotas novas (ex: /mazzel-preview) como sandbox visual.
+ * Usada apenas em rotas novas (ex: /v1) como sandbox visual.
  *
  * TODO (fase posterior): receber tenant/role do user logado via API.
  */

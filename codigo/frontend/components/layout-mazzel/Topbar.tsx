@@ -16,7 +16,7 @@ interface TopbarProps {
  * Usa lucide-react para ícones.
  *
  * NOTA: não substitui componentes de topbar existentes.
- * Usada apenas em MazzelLayout / rota /mazzel-preview.
+ * Usada apenas em MazzelLayout / rota /v1.
  */
 export function Topbar({
   breadcrumbs = [],

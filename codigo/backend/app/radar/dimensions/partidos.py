@@ -27,6 +27,8 @@ from typing import Optional
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+import logging
+
 from app.schemas.radar import (
     FiltrosPartidos,
     MetricaDestaque,
@@ -36,6 +38,8 @@ from app.schemas.radar import (
 from app.services.cores_partidos import get_cor_partido
 from app.services.validacao_dados import sanear_crescimento
 from app.radar.overall_partido import calcular_overall_partido
+
+logger = logging.getLogger(__name__)
 
 
 PARTIDOS_UB = (44, 25, 17)
@@ -154,7 +158,8 @@ async def listar_partidos(
                 ano=ano_ref,
                 escopo="nacional",
             )
-        except Exception:
+        except Exception as e:
+            logger.exception(f"Erro overall partido {card.sigla}: {e}")
             card.fifa = None
 
     return RadarPartidosResponse(

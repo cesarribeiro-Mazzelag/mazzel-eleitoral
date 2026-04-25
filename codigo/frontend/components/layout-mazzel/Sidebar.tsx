@@ -44,25 +44,25 @@ interface ModuleItemExt extends ModuleItem {
 }
 
 const MODULES: ModuleItemExt[] = [
-  { id: "home",          label: "Dashboard",      icon: Home,           href: "/mazzel-preview/home",          roles: ["presidente","diretoria","candidato"] },
-  { id: "mapa",          label: "Mapa Eleitoral", icon: MapPin,         href: "/mazzel-preview/mapa",          roles: ["presidente","diretoria","candidato"] },
-  { id: "radar",         label: "Radar Político", icon: Target,         href: "/mazzel-preview/radar",         roles: ["presidente","diretoria"] },
-  { id: "dossies",       label: "Dossiês",        icon: FileSearch,     href: "/mazzel-preview/dossies",       roles: ["presidente","diretoria","candidato"] },
-  { id: "estudo",        label: "Módulo Estudo",  icon: BarChart3,      href: "/mazzel-preview/estudo",        roles: ["presidente","diretoria"] },
-  { id: "campanha",      label: "Campanha 2026",  icon: Flag,           href: "/mazzel-preview/campanha",      roles: ["presidente","diretoria","candidato"] },
-  { id: "delegados",     label: "Delegados",      icon: Shield,         href: "/mazzel-preview/delegados",     roles: ["presidente","diretoria"] },
-  { id: "coordenadores", label: "Coordenadores",  icon: Network,        href: "/mazzel-preview/coordenadores", roles: ["presidente","diretoria"] },
-  { id: "liderancas",    label: "Lideranças",     icon: Crown,          href: "/mazzel-preview/liderancas",    roles: ["presidente","diretoria"] },
-  { id: "cabos",         label: "Cabos Eleitorais", icon: Megaphone,    href: "/mazzel-preview/cabos",         roles: ["presidente","diretoria"] },
-  { id: "suplentes",     label: "Suplentes",      icon: UserPlus,       href: "/mazzel-preview/suplentes",     roles: ["presidente","diretoria"] },
-  { id: "filiados",      label: "Filiados",       icon: UserCheck,      href: "/mazzel-preview/afiliados",     roles: ["presidente","diretoria"], badgeLabel: "NEW" },
-  { id: "chat",          label: "Chat",           icon: MessageCircle,  href: "/mazzel-preview/chat",          roles: ["presidente","diretoria","candidato"] },
-  { id: "alertas",       label: "Alertas",        icon: Bell,           href: "/mazzel-preview/alertas",       roles: ["presidente","diretoria","candidato"], badge: 7 },
-  { id: "ia",            label: "IA Assistente",  icon: Sparkles,       href: "/mazzel-preview/ia",            roles: ["presidente","diretoria","candidato"] },
-  { id: "relatorios",    label: "Relatórios",     icon: FileText,       href: "/mazzel-preview/relatorios",    roles: ["presidente","diretoria"] },
-  { id: "portal",        label: "Meu Painel",     icon: UserCircle,     href: "/mazzel-preview/portal",        roles: ["presidente","diretoria","candidato"] },
-  { id: "glossario",     label: "Glossário",      icon: BookOpen,       href: "/mazzel-preview/glossario",     roles: ["presidente","diretoria","candidato"] },
-  { id: "admin",         label: "Admin",          icon: Settings,       href: "/mazzel-preview/admin",         roles: ["presidente"] },
+  { id: "home",          label: "Dashboard",      icon: Home,           href: "/v1/home",          roles: ["presidente","diretoria","candidato"] },
+  { id: "mapa",          label: "Mapa Eleitoral", icon: MapPin,         href: "/v1/mapa",          roles: ["presidente","diretoria","candidato"] },
+  { id: "radar",         label: "Radar Político", icon: Target,         href: "/v1/radar",         roles: ["presidente","diretoria"] },
+  { id: "dossies",       label: "Dossiês",        icon: FileSearch,     href: "/v1/dossies",       roles: ["presidente","diretoria","candidato"] },
+  { id: "estudo",        label: "Módulo Estudo",  icon: BarChart3,      href: "/v1/estudo",        roles: ["presidente","diretoria"] },
+  { id: "campanha",      label: "Campanha 2026",  icon: Flag,           href: "/v1/campanha",      roles: ["presidente","diretoria","candidato"] },
+  { id: "delegados",     label: "Delegados",      icon: Shield,         href: "/v1/delegados",     roles: ["presidente","diretoria"] },
+  { id: "coordenadores", label: "Coordenadores",  icon: Network,        href: "/v1/coordenadores", roles: ["presidente","diretoria"] },
+  { id: "liderancas",    label: "Lideranças",     icon: Crown,          href: "/v1/liderancas",    roles: ["presidente","diretoria"] },
+  { id: "cabos",         label: "Cabos Eleitorais", icon: Megaphone,    href: "/v1/cabos",         roles: ["presidente","diretoria"] },
+  { id: "suplentes",     label: "Suplentes",      icon: UserPlus,       href: "/v1/suplentes",     roles: ["presidente","diretoria"] },
+  { id: "filiados",      label: "Filiados",       icon: UserCheck,      href: "/v1/afiliados",     roles: ["presidente","diretoria"], badgeLabel: "NEW" },
+  { id: "chat",          label: "Chat",           icon: MessageCircle,  href: "/v1/chat",          roles: ["presidente","diretoria","candidato"] },
+  { id: "alertas",       label: "Alertas",        icon: Bell,           href: "/v1/alertas",       roles: ["presidente","diretoria","candidato"], badge: 7 },
+  { id: "ia",            label: "IA Assistente",  icon: Sparkles,       href: "/v1/ia",            roles: ["presidente","diretoria","candidato"] },
+  { id: "relatorios",    label: "Relatórios",     icon: FileText,       href: "/v1/relatorios",    roles: ["presidente","diretoria"] },
+  { id: "portal",        label: "Meu Painel",     icon: UserCircle,     href: "/v1/portal",        roles: ["presidente","diretoria","candidato"] },
+  { id: "glossario",     label: "Glossário",      icon: BookOpen,       href: "/v1/glossario",     roles: ["presidente","diretoria","candidato"] },
+  { id: "admin",         label: "Admin",          icon: Settings,       href: "/v1/admin",         roles: ["presidente"] },
 ];
 
 // ── Props ─────────────────────────────────────────────────────────────────────
@@ -100,7 +100,7 @@ function getUserName(role: RoleId): string {
  * Usa lucide-react (já instalado) em vez do Icon custom do fonte.
  *
  * NOTA: não substitui o AppLayout.jsx existente.
- * Usada apenas em MazzelLayout / rota /mazzel-preview.
+ * Usada apenas em MazzelLayout / rota /v1.
  */
 export function Sidebar({ activeModule, onNavigate }: SidebarProps) {
   const { tenant } = useTenant();
@@ -131,7 +131,7 @@ export function Sidebar({ activeModule, onNavigate }: SidebarProps) {
         {visibleModules.map((m) => {
           const Icon = m.icon;
           const isActive = activeModule === m.id;
-          // Quando navegando em /mazzel-preview/*, prefixar hrefs pra manter
+          // Quando navegando em /v1/*, prefixar hrefs pra manter
           // o usuario dentro do sandbox do design system.
           return (
             <Link

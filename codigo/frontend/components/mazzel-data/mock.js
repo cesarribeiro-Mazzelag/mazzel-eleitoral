@@ -1,4 +1,4 @@
-/* Dados mock para rotas /mazzel-preview - portados de platform-data.jsx e platform-data2.jsx */
+/* Dados mock para rotas /v1 - portados de platform-data.jsx e platform-data2.jsx */
 
 // ── Party colors ──────────────────────────────────────────────────────────────
 

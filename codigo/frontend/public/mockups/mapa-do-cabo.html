@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapa do Cabo · Coordenação Territorial · UB Salvador</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root, [data-theme="light"] {
+  --bg-page: #f4f4f5; --bg-page-2: #fafafa;
+  --bg-card: #ffffff; --bg-card-2: rgba(0,0,0,0.02);
+  --bg-sidebar: #fafafa; --bg-topbar: #ffffff;
+  --bg-elevated: #ffffff;
+  --fg: #18181b; --fg-strong: #09090b; --fg-muted: #52525b;
+  --fg-dim: #71717a; --fg-faint: #a1a1aa; --fg-ghost: #d4d4d8;
+  --rule: rgba(0,0,0,0.06); --rule-strong: rgba(0,0,0,0.10);
+  --ok: #059669; --warn: #d97706; --danger: #dc2626;
+  --chart-hover: rgba(0,0,0,0.04);
+  --kbd-bg: rgba(0,0,0,0.06); --kbd-fg: #18181b;
+  --tenant-primary: #002A7B; --tenant-primary-rgb: 0, 42, 123; --tenant-accent: #FFCC00;
+}
+[data-theme="dark"] {
+  --bg-page: #0a0a0b; --bg-page-2: #0c0c0e;
+  --bg-card: #0e0e11; --bg-card-2: rgba(255,255,255,0.015);
+  --bg-sidebar: #0b0b0d; --bg-topbar: #09090b;
+  --bg-elevated: #131316;
+  --fg: #e4e4e7; --fg-strong: #ffffff; --fg-muted: #a1a1aa;
+  --fg-dim: #71717a; --fg-faint: #52525b; --fg-ghost: #3f3f46;
+  --rule: rgba(255,255,255,0.06); --rule-strong: rgba(255,255,255,0.10);
+  --ok: #34d399; --warn: #fbbf24; --danger: #f87171;
+  --chart-hover: rgba(255,255,255,0.06);
+}
+html, body { background: var(--bg-page); color: var(--fg); height: 100%; margin: 0; overflow: hidden; }
+body { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
+.tnum { font-variant-numeric: tabular-nums; font-feature-settings: "tnum","cv11"; }
+.font-display { letter-spacing: -0.02em; }
+.font-mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+.t-fg{color:var(--fg)} .t-fg-strong{color:var(--fg-strong)} .t-fg-muted{color:var(--fg-muted)}
+.t-fg-dim{color:var(--fg-dim)} .t-fg-faint{color:var(--fg-faint)} .t-fg-ghost{color:var(--fg-ghost)}
+.t-ok{color:var(--ok)} .t-warn{color:var(--warn)} .t-danger{color:var(--danger)}
+.t-bg-card{background:var(--bg-card)}
+.ring-soft { box-shadow: inset 0 0 0 1px var(--rule); }
+
+.btn-ghost { padding: 6px 10px; border-radius: 6px; font: 600 11px/1 Inter, sans-serif; background: var(--rule); color: var(--fg); cursor: pointer; transition: all .12s; border: 1px solid transparent; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.btn-ghost:hover { background: var(--rule-strong); color: var(--fg-strong); }
+.btn-ghost.active { background: var(--fg-strong); color: var(--bg-card); }
+.btn-primary { padding: 7px 12px; border-radius: 6px; font: 700 12px/1 Inter, sans-serif; background: var(--tenant-primary); color: #fff; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 1px 0 rgba(255,255,255,0.15) inset, 0 4px 12px -4px rgba(var(--tenant-primary-rgb), 0.4); transition: filter .12s; }
+.btn-primary:hover { filter: brightness(1.1); }
+
+.topbar { height: 56px; background: var(--bg-topbar); border-bottom: 1px solid var(--rule); display: flex; align-items: center; padding: 0 18px; gap: 18px; flex-shrink: 0; }
+.card { background: var(--bg-card); border: 1px solid var(--rule); border-radius: 12px; }
+.card-sub   { font: 600 10px/1.2 Inter,sans-serif; color: var(--fg-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+.thin-scroll { scrollbar-width: thin; scrollbar-color: var(--rule-strong) transparent; }
+.thin-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+.thin-scroll::-webkit-scrollbar-thumb { background: var(--rule-strong); border-radius: 999px; }
+
+.chip { display: inline-flex; align-items: center; gap: 4px; padding: 0 8px; height: 20px; border-radius: 999px; font-size: 10.5px; font-weight: 700; white-space: nowrap; letter-spacing: 0.02em; }
+.chip-blue   { background: rgba(37,99,235,0.10);  color: #1d4ed8; box-shadow: inset 0 0 0 1px rgba(37,99,235,0.30); }
+.chip-green  { background: rgba(5,150,105,0.10);  color: #047857; box-shadow: inset 0 0 0 1px rgba(5,150,105,0.25); }
+.chip-amber  { background: rgba(217,119,6,0.10);  color: #a16207; box-shadow: inset 0 0 0 1px rgba(217,119,6,0.35); }
+.chip-red    { background: rgba(220,38,38,0.10);  color: #b91c1c; box-shadow: inset 0 0 0 1px rgba(220,38,38,0.40); }
+.chip-gray   { background: rgba(82,82,91,0.08);   color: #52525b; box-shadow: inset 0 0 0 1px rgba(82,82,91,0.18); }
+
+/* Tweak panel */
+.tweak-panel { position: fixed; bottom: 14px; right: 14px; width: 300px; z-index: 80; background: var(--bg-elevated); border: 1px solid var(--rule-strong); border-radius: 12px; padding: 12px 14px; box-shadow: 0 16px 40px -10px rgba(0,0,0,0.25); }
+
+/* quadra (tile clicável) */
+.quadra { cursor: pointer; transition: stroke .1s, fill-opacity .1s, transform .1s; transform-origin: center; transform-box: fill-box; }
+.quadra:hover { stroke: var(--fg-strong); stroke-width: 1.4; }
+.quadra.selected { stroke: var(--tenant-primary); stroke-width: 2.2; }
+.quadra.lasso { stroke: var(--tenant-primary); stroke-width: 2; stroke-dasharray: 3 2; }
+
+/* pulse orfãs */
+@keyframes orfanPulse { 0%,100% { opacity: 0.4 } 50% { opacity: 1 } }
+.orfan-ring { animation: orfanPulse 2s ease-in-out infinite; }
+
+/* rota trail */
+.route-trail { stroke-dasharray: 4 3; animation: routeMove 30s linear infinite; }
+@keyframes routeMove { to { stroke-dashoffset: -200; } }
+
+/* checklist */
+.checklist-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--rule); font-size: 11.5px; }
+.checklist-row:last-child { border-bottom: 0; }
+.check-dot { width: 14px; height: 14px; border-radius: 3px; border: 1.5px solid var(--fg-ghost); flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; }
+.check-dot.done { background: var(--ok); border-color: var(--ok); color: #fff; }
+.check-dot.partial { background: var(--warn); border-color: var(--warn); color: #fff; }
+
+/* micro bars */
+.mini-bar { height: 5px; background: var(--rule); border-radius: 3px; overflow: hidden; }
+.mini-bar-fill { height: 100%; border-radius: 3px; }
+
+/* responsive: narrow viewports */
+@media (max-width: 1100px) {
+  .w-\[360px\] { width: 300px !important; }
+  .w-\[260px\] { width: 220px !important; }
+}
+@media (max-width: 960px) {
+  .w-\[360px\] {
+    position: absolute !important; right: 0; top: 0; bottom: 0;
+    width: 320px !important; z-index: 40;
+    box-shadow: -20px 0 60px -20px rgba(0,0,0,0.25);
+  }
+  .w-\[260px\] { width: 200px !important; }
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" data-presets="react">
+/* =========================================================================
+ * Icons (subset)
+ * ========================================================================= */
+const ICONS = {
+  MapPin:  <><path d="M12 22s-7-8.5-7-13a7 7 0 1 1 14 0c0 4.5-7 13-7 13Z"/><circle cx="12" cy="9" r="2.8"/></>,
+  Users:   <><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.5 3-6 7-6s7 2.5 7 6"/><circle cx="17" cy="7" r="3"/><path d="M15 14c3 0 6 2 6 5.5"/></>,
+  Home:    <><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1z"/></>,
+  Target:  <><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></>,
+  Check:   <path d="M4 12l5 5L20 6"/>,
+  X:       <><path d="M6 6l12 12M18 6L6 18"/></>,
+  Edit:    <><path d="M4 20h4l10-10-4-4L4 16v4z"/></>,
+  Eye:     <><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></>,
+  Route:   <><circle cx="5" cy="5" r="2.2"/><circle cx="19" cy="19" r="2.2"/><path d="M7 5h9a3 3 0 0 1 0 6H8a3 3 0 0 0 0 6h9"/></>,
+  AlertTriangle: <><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18h.01"/></>,
+  UserPlus:<><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.5 3-6 7-6s7 2.5 7 6"/><path d="M18 8v6M15 11h6"/></>,
+  Search:  <><circle cx="11" cy="11" r="7"/><path d="M20 20l-3-3"/></>,
+  Phone:   <><path d="M5 3h4l2 5-3 2a12 12 0 0 0 6 6l2-3 5 2v4c0 1-1 2-2 2A18 18 0 0 1 3 5c0-1 1-2 2-2z"/></>,
+  MessagesSquare: <><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></>,
+  Filter:  <><path d="M3 5h18l-7 9v6l-4-2v-4z"/></>,
+  Layers:  <><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 12l9 5 9-5"/><path d="M3 17l9 5 9-5"/></>,
+  Plus:    <><path d="M12 5v14M5 12h14"/></>,
+  Minus:   <path d="M5 12h14"/>,
+  Download:<><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/></>,
+  ChevronRight: <path d="M9 6l6 6-6 6"/>,
+  ChevronLeft:  <path d="M15 6l-6 6 6 6"/>,
+  Menu:    <><path d="M4 6h16M4 12h16M4 18h16"/></>,
+  Settings:<><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></>,
+  Clock:   <><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></>,
+  Calendar:<><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></>,
+  Trophy:  <><path d="M7 4h10v3a5 5 0 0 1-10 0z"/><path d="M5 6H3a3 3 0 0 0 3 4M19 6h2a3 3 0 0 1-3 4"/><path d="M9 14h6v3H9z"/><path d="M7 20h10"/></>,
+  Flag:    <><path d="M5 21V4"/><path d="M5 4h12l-2 4 2 4H5"/></>,
+  BarChart3: <><path d="M3 3v18h18"/><path d="M8 16v-5M13 16V8M18 16v-3"/></>,
+  Crosshair: <><circle cx="12" cy="12" r="9"/><path d="M22 12h-4M6 12H2M12 2v4M12 22v-4"/></>,
+  Lasso:   <><path d="M4 17a5 5 0 1 1 10 0c0 2-2 3-4 3H7v2"/><path d="M14 12c3 0 6-2 6-5s-3-5-6-5-6 2-6 5"/></>,
+  Zap:     <path d="M13 2L4 14h6l-1 8 9-12h-6z"/>,
+  Copy:    <><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h2"/></>,
+  Star:    <path d="M12 2l3 7 7 .6-5.2 4.6 1.7 7.3L12 17.7 5.5 21.5 7.2 14.2 2 9.6 9 9z"/>,
+  GitBranch: <><circle cx="6" cy="5" r="2"/><circle cx="18" cy="19" r="2"/><circle cx="6" cy="19" r="2"/><path d="M6 7v10"/><path d="M16 19H9a3 3 0 0 1-3-3V5"/></>,
+};
+function CIcon({ name, size = 14, className = "", style }) {
+  const d = ICONS[name];
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className={className} style={style}>{d}</svg>;
+}
+
+/* =========================================================================
+ * MOCK DATA — Bairro Tomba · Feira de Santana
+ * ========================================================================= */
+
+// 6 cabos eleitorais, com scores e tiers
+const CABOS = [
+  { id: "rita",   nome: "Rita Lima",        tier: "ouro",   score: 89, fone: "(75) 9 9811-2211", visitasHoje: 42, metaHoje: 50, conv: 0.68, cor: "#2563eb" },
+  { id: "marcos", nome: "Marcos Oliveira",  tier: "prata",  score: 72, fone: "(75) 9 9822-3344", visitasHoje: 28, metaHoje: 50, conv: 0.54, cor: "#059669" },
+  { id: "ana",    nome: "Ana Paula Ribeiro",tier: "prata",  score: 76, fone: "(75) 9 9833-4455", visitasHoje: 31, metaHoje: 40, conv: 0.61, cor: "#7c3aed" },
+  { id: "jose",   nome: "José Roberto",     tier: "bronze", score: 54, fone: "(75) 9 9844-5566", visitasHoje: 12, metaHoje: 35, conv: 0.32, cor: "#d97706" },
+  { id: "helena", nome: "Helena Barreto",   tier: "ouro",   score: 82, fone: "(75) 9 9855-6677", visitasHoje: 38, metaHoje: 45, conv: 0.72, cor: "#db2777" },
+];
+
+// Nomes de rua dos blocos (ciclo)
+const RUAS = [
+  "Rua São Domingos", "Rua das Palmeiras", "Av. Getúlio Vargas", "Rua Coronel Juca Sobrinho",
+  "Rua Olavo Bilac", "Rua dos Girassóis", "Rua Manoel Vitorino", "Av. Artêmio Castro",
+  "Rua Pedro Álvares", "Rua da Matriz", "Travessa do Cruzeiro", "Rua Nilo Peçanha",
+];
+
+// Grid 8×5 = 40 quadras no bairro Tomba, esquemático
+// Cada célula tem coordenadas em uma malha 800×500
+function buildQuadras() {
+  const cols = 8, rows = 5;
+  const cellW = 84, cellH = 78;
+  const gapX = 8, gapY = 8;
+  const originX = 40, originY = 40;
+  const arr = [];
+  let id = 1;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const x = originX + c * (cellW + gapX);
+      const y = originY + r * (cellH + gapY);
+      // irregular shapes: skew polygon corners slightly
+      const jx = (Math.sin(id * 1.3) * 4);
+      const jy = (Math.cos(id * 1.7) * 4);
+      const pts = [
+        [x + jx, y + jy],
+        [x + cellW - jy, y + jx],
+        [x + cellW + jx, y + cellH - jy],
+        [x - jy, y + cellH + jx],
+      ];
+      arr.push({
+        id: `Q${String(id).padStart(2,"0")}`,
+        centroid: [x + cellW/2, y + cellH/2],
+        points: pts,
+        domicilios: 40 + ((id * 7) % 60),
+        rua: RUAS[id % RUAS.length],
+      });
+      id++;
+    }
+  }
+  return arr;
+}
+
+const QUADRAS_BASE = buildQuadras();
+
+// atribuições: cada quadra → cabo (ou null = órfã). 40 quadras.
+// cria 6 "sub-áreas" coerentes (clusters contíguos) + órfãos + conflitos
+const OWNERS = {
+  // Rita — canto superior esquerdo (quadras 1-3, 9-11)
+  "Q01":"rita","Q02":"rita","Q03":"rita","Q09":"rita","Q10":"rita","Q11":"rita",
+  // Marcos — centro-norte (quadras 4-6, 12-14)
+  "Q04":"marcos","Q05":"marcos","Q06":"marcos","Q12":"marcos","Q13":"marcos","Q14":"marcos",
+  // Ana — lateral direita (7,8,15,16,23,24)
+  "Q07":"ana","Q08":"ana","Q15":"ana","Q16":"ana","Q23":"ana","Q24":"ana",
+  // José — meio-sul (17-20, 25-28)
+  "Q17":"jose","Q18":"jose","Q19":"jose","Q20":"jose","Q25":"jose","Q26":"jose","Q27":"jose","Q28":"jose",
+  // Helena — sul (33-37)
+  "Q33":"helena","Q34":"helena","Q35":"helena","Q36":"helena","Q37":"helena",
+  // Órfãs: 21, 22, 29, 30, 38, 39, 40, 31, 32 — dispersas
+};
+
+// conflito: Q20 também reivindicada por Helena (sobreposição)
+const CONFLICTS = {
+  "Q20": ["jose","helena"],
+};
+
+// Performance por quadra (visitadas / domicílios, conversão 0-1)
+function perfFor(qId) {
+  const cabo = OWNERS[qId];
+  if (!cabo) return { visitas: 0, conv: 0, feitoHoje: 0 };
+  const c = CABOS.find(x => x.id === cabo);
+  const seed = (qId.charCodeAt(1) + qId.charCodeAt(2));
+  const ratio = 0.3 + ((seed * 7) % 60) / 100;
+  return {
+    cobertura: Math.min(0.95, ratio * (c.score / 80)),
+    conversao: c.conv * (0.8 + ((seed * 11) % 30) / 100),
+    feitoHoje: Math.round((seed % 7) + 1),
+  };
+}
+
+// Rotas percorridas hoje — lista de centroids por cabo, em ordem
+function routesForCabo(caboId) {
+  const qs = Object.entries(OWNERS).filter(([,v]) => v === caboId).map(([k]) => k);
+  return qs.map(q => QUADRAS_BASE.find(x => x.id === q).centroid);
+}
+
+/* =========================================================================
+ * UI primitives
+ * ========================================================================= */
+function Card({ children, className = "", style }) {
+  return <div className={`card ${className}`} style={style}>{children}</div>;
+}
+function Chip({ tone = "gray", children }) {
+  return <span className={`chip chip-${tone}`}>{children}</span>;
+}
+function MiniStat({ label, value, sub, color }) {
+  return (
+    <div>
+      <div className="text-[9.5px] t-fg-dim uppercase tracking-wider font-semibold mb-0.5">{label}</div>
+      <div className="text-[17px] font-black tnum font-display" style={{ color: color || "var(--fg-strong)" }}>{value}</div>
+      {sub && <div className="text-[10px] t-fg-dim mt-0.5">{sub}</div>}
+    </div>
+  );
+}
+function ProgressBar({ value, color, height = 6 }) {
+  return (
+    <div className="mini-bar" style={{ height }}>
+      <div className="mini-bar-fill" style={{ width: `${Math.min(100, Math.max(0, value))}%`, background: color || "var(--fg-strong)" }}/>
+    </div>
+  );
+}
+
+Object.assign(window, { CABOS, QUADRAS_BASE, OWNERS, CONFLICTS, RUAS, perfFor, routesForCabo, CIcon, Card, Chip, MiniStat, ProgressBar });
+</script>
+
+<script type="text/babel" data-presets="react">
+/* =========================================================================
+ * MapCanvas — SVG do bairro
+ * ========================================================================= */
+const { useState, useMemo, useRef, useEffect } = React;
+
+function polyToPath(points) {
+  return "M " + points.map(p => p.join(",")).join(" L ") + " Z";
+}
+
+function colorForQuadra(q, layer, selection, lassoSet) {
+  const cabo = OWNERS[q.id];
+  const p = perfFor(q.id);
+  if (layer === "responsavel") {
+    if (CONFLICTS[q.id]) return { fill: "#dc2626", fillOpacity: 0.35, stroke: "#dc2626" };
+    if (!cabo) return { fill: "#a1a1aa", fillOpacity: 0.15, stroke: "#dc2626" };
+    const c = CABOS.find(x => x.id === cabo);
+    return { fill: c.cor, fillOpacity: 0.22, stroke: c.cor };
+  }
+  if (layer === "cobertura") {
+    const v = p.cobertura || 0;
+    const hue = Math.round(v * 135); // red → green
+    return { fill: `hsl(${hue},65%,55%)`, fillOpacity: 0.45, stroke: `hsl(${hue},65%,40%)` };
+  }
+  if (layer === "performance") {
+    const v = p.conversao || 0;
+    if (v > 0.6) return { fill: "#059669", fillOpacity: 0.38, stroke: "#047857" };
+    if (v > 0.45) return { fill: "#d97706", fillOpacity: 0.32, stroke: "#b45309" };
+    if (v > 0) return { fill: "#dc2626", fillOpacity: 0.30, stroke: "#b91c1c" };
+    return { fill: "#a1a1aa", fillOpacity: 0.12, stroke: "#71717a" };
+  }
+  if (layer === "orfaos") {
+    if (CONFLICTS[q.id]) return { fill: "#dc2626", fillOpacity: 0.32, stroke: "#dc2626" };
+    if (!cabo) return { fill: "#dc2626", fillOpacity: 0.40, stroke: "#b91c1c" };
+    return { fill: "#a1a1aa", fillOpacity: 0.08, stroke: "#a1a1aa" };
+  }
+  if (layer === "conflitos") {
+    if (CONFLICTS[q.id]) return { fill: "#dc2626", fillOpacity: 0.45, stroke: "#b91c1c" };
+    if (!cabo) return { fill: "#a1a1aa", fillOpacity: 0.08, stroke: "#71717a" };
+    const c = CABOS.find(x => x.id === cabo);
+    return { fill: c.cor, fillOpacity: 0.14, stroke: c.cor };
+  }
+  return { fill: "#a1a1aa", fillOpacity: 0.1, stroke: "#71717a" };
+}
+
+function MapCanvas({ layer, selected, onSelect, hoverQ, setHoverQ, editMode, lassoSet, onLassoAdd, showRoutes, caboFocus }) {
+  const svgRef = useRef(null);
+  const [lassoPath, setLassoPath] = useState([]);
+  const [dragging, setDragging] = useState(false);
+
+  function svgPoint(e) {
+    const pt = svgRef.current.createSVGPoint();
+    pt.x = e.clientX; pt.y = e.clientY;
+    return pt.matrixTransform(svgRef.current.getScreenCTM().inverse());
+  }
+
+  function onMouseDown(e) {
+    if (editMode !== "lasso") return;
+    const p = svgPoint(e);
+    setLassoPath([[p.x, p.y]]);
+    setDragging(true);
+  }
+  function onMouseMove(e) {
+    if (!dragging) return;
+    const p = svgPoint(e);
+    setLassoPath(pp => [...pp, [p.x, p.y]]);
+  }
+  function onMouseUp() {
+    if (!dragging) return;
+    setDragging(false);
+    // calc which quadras are inside lassoPath (via centroid)
+    if (lassoPath.length > 2) {
+      const inside = [];
+      for (const q of QUADRAS_BASE) {
+        if (pointInPoly(q.centroid, lassoPath)) inside.push(q.id);
+      }
+      onLassoAdd(inside);
+    }
+    setLassoPath([]);
+  }
+
+  function pointInPoly(pt, poly) {
+    let [x, y] = pt, inside = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const [xi, yi] = poly[i], [xj, yj] = poly[j];
+      const intersect = ((yi > y) != (yj > y)) && (x < ((xj - xi) * (y - yi)) / (yj - yi + 1e-9) + xi);
+      if (intersect) inside = !inside;
+    }
+    return inside;
+  }
+
+  return (
+    <div className="relative w-full h-full" style={{ background: "var(--bg-page-2)" }}>
+      <svg ref={svgRef} viewBox="0 0 800 500" style={{ width: "100%", height: "100%", display: "block", cursor: editMode === "lasso" ? "crosshair" : "default" }}
+           onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseUp={onMouseUp} onMouseLeave={onMouseUp}>
+        <defs>
+          <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
+            <path d="M 24 0 L 0 0 0 24" fill="none" stroke="var(--rule)" strokeWidth="0.5"/>
+          </pattern>
+          <filter id="softShadow"><feDropShadow dx="0" dy="1" stdDeviation="1.2" floodOpacity="0.15"/></filter>
+        </defs>
+        <rect width="800" height="500" fill="url(#grid)"/>
+
+        {/* Bordas do bairro Tomba (envelope) */}
+        <path d="M 20 30 L 790 30 L 790 475 L 20 475 Z"
+              fill="none" stroke="var(--tenant-primary)" strokeWidth="1.5" strokeDasharray="6 4" opacity="0.35"/>
+
+        {/* Avenida principal horizontal */}
+        <line x1="20" y1="244" x2="790" y2="244" stroke="var(--fg-ghost)" strokeWidth="3"/>
+        <text x="780" y="240" textAnchor="end" fontSize="8.5" fontWeight="600" fill="var(--fg-dim)" letterSpacing="0.1em">AV. GETÚLIO VARGAS</text>
+        {/* Avenida vertical */}
+        <line x1="410" y1="30" x2="410" y2="475" stroke="var(--fg-ghost)" strokeWidth="3"/>
+
+        {/* Quadras */}
+        {QUADRAS_BASE.map(q => {
+          const col = colorForQuadra(q, layer, selected, lassoSet);
+          const isSelected = selected === q.id;
+          const isLasso = lassoSet.has(q.id);
+          const isOrphan = !OWNERS[q.id];
+          const isConflict = !!CONFLICTS[q.id];
+          const isCaboFocus = caboFocus && OWNERS[q.id] === caboFocus;
+          const dim = caboFocus && !isCaboFocus;
+          return (
+            <g key={q.id}>
+              <path d={polyToPath(q.points)}
+                    className={`quadra ${isSelected ? "selected" : ""} ${isLasso ? "lasso" : ""}`}
+                    fill={col.fill}
+                    fillOpacity={dim ? col.fillOpacity * 0.25 : col.fillOpacity}
+                    stroke={isLasso ? "var(--tenant-primary)" : col.stroke}
+                    strokeWidth={isSelected ? 2.2 : (isLasso ? 2 : 1)}
+                    style={{ filter: isSelected ? "url(#softShadow)" : "none", opacity: dim ? 0.5 : 1 }}
+                    onMouseEnter={() => setHoverQ(q.id)}
+                    onMouseLeave={() => setHoverQ(null)}
+                    onClick={e => { e.stopPropagation(); onSelect(q.id); }}/>
+              {(isOrphan && (layer === "orfaos" || layer === "responsavel")) && (
+                <circle cx={q.centroid[0]} cy={q.centroid[1]} r={14} fill="none" stroke="#dc2626" strokeWidth="1.4" className="orfan-ring"/>
+              )}
+              {isConflict && (layer === "conflitos" || layer === "responsavel") && (
+                <g>
+                  <circle cx={q.centroid[0]} cy={q.centroid[1]} r={12} fill="#fff" stroke="#b91c1c" strokeWidth="1.6"/>
+                  <text x={q.centroid[0]} y={q.centroid[1] + 4} textAnchor="middle" fontSize="11" fontWeight="900" fill="#b91c1c">!</text>
+                </g>
+              )}
+              <text x={q.centroid[0]} y={q.centroid[1] + 3} textAnchor="middle" fontSize="9" fontWeight="700"
+                    fill={dim ? "var(--fg-faint)" : "var(--fg-strong)"} opacity={isConflict ? 0 : 1} pointerEvents="none">
+                {q.id}
+              </text>
+            </g>
+          );
+        })}
+
+        {/* Rotas percorridas hoje por cada cabo */}
+        {showRoutes && CABOS.map(c => {
+          if (caboFocus && c.id !== caboFocus) return null;
+          const pts = routesForCabo(c.id);
+          if (pts.length < 2) return null;
+          const d = pts.reduce((acc, p, i) => acc + (i === 0 ? `M ${p[0]},${p[1]}` : ` L ${p[0]},${p[1]}`), "");
+          return <path key={c.id} d={d} fill="none" stroke={c.cor} strokeWidth="2" strokeOpacity="0.75" className="route-trail"/>;
+        })}
+
+        {/* Pins de cabos (início de rota = primeiro centroid) */}
+        {CABOS.map(c => {
+          if (caboFocus && c.id !== caboFocus) return null;
+          const pts = routesForCabo(c.id);
+          if (!pts.length) return null;
+          const [x, y] = pts[pts.length - 1]; // posição atual = último ponto
+          return (
+            <g key={c.id}>
+              <circle cx={x} cy={y} r={9} fill="#fff" stroke={c.cor} strokeWidth="2.2"/>
+              <circle cx={x} cy={y} r={4} fill={c.cor}/>
+            </g>
+          );
+        })}
+
+        {/* Lasso path */}
+        {lassoPath.length > 1 && (
+          <path d={"M " + lassoPath.map(p => p.join(",")).join(" L ")} fill="rgba(0,42,123,0.08)" stroke="var(--tenant-primary)" strokeWidth="1.5" strokeDasharray="5 3"/>
+        )}
+
+        {/* Legenda título mapa */}
+        <text x="28" y="22" fontSize="10" fontWeight="700" fill="var(--fg-dim)" letterSpacing="0.14em">BAIRRO TOMBA · FEIRA DE SANTANA · ~40 QUADRAS</text>
+        <text x="28" y="490" fontSize="8.5" fill="var(--fg-faint)" fontFamily="JetBrains Mono">
+          zoom 1:2.5k  ·  {QUADRAS_BASE.length} quadras  ·  {Object.keys(OWNERS).length} atribuídas  ·  {QUADRAS_BASE.length - Object.keys(OWNERS).length} órfãs  ·  {Object.keys(CONFLICTS).length} conflitos
+        </text>
+      </svg>
+
+      {/* Hover tooltip */}
+      {hoverQ && !dragging && (() => {
+        const q = QUADRAS_BASE.find(x => x.id === hoverQ);
+        const cabo = OWNERS[q.id];
+        const c = cabo ? CABOS.find(x => x.id === cabo) : null;
+        const p = perfFor(q.id);
+        const conflict = CONFLICTS[q.id];
+        return (
+          <div className="absolute pointer-events-none card p-3 text-[11px]"
+               style={{ top: 14, right: 14, width: 210, boxShadow: "0 6px 18px rgba(0,0,0,0.12)" }}>
+            <div className="flex items-center justify-between mb-1">
+              <div className="font-mono font-bold t-fg-strong text-[13px]">{q.id}</div>
+              {conflict && <Chip tone="red">conflito</Chip>}
+              {!cabo && !conflict && <Chip tone="red">órfã</Chip>}
+              {cabo && !conflict && <Chip tone="green">atribuída</Chip>}
+            </div>
+            <div className="t-fg-muted mb-2">{q.rua} · {q.domicilios} domicílios</div>
+            {c && (
+              <div className="flex items-center gap-2 mb-2">
+                <div style={{ width: 8, height: 8, borderRadius: 99, background: c.cor }}/>
+                <span className="t-fg-strong font-semibold">{c.nome}</span>
+              </div>
+            )}
+            {cabo && (
+              <div className="grid grid-cols-2 gap-x-3 gap-y-1">
+                <div className="t-fg-dim">Cobertura</div><div className="tnum font-semibold">{Math.round(p.cobertura*100)}%</div>
+                <div className="t-fg-dim">Conversão</div><div className="tnum font-semibold">{Math.round(p.conversao*100)}%</div>
+                <div className="t-fg-dim">Hoje</div><div className="tnum font-semibold">{p.feitoHoje} visitas</div>
+              </div>
+            )}
+          </div>
+        );
+      })()}
+    </div>
+  );
+}
+
+Object.assign(window, { MapCanvas });
+</script>
+
+<script type="text/babel" data-presets="react">
+/* =========================================================================
+ * Sidebars (esquerda: modos + filtros; direita: drawer contextual)
+ * ========================================================================= */
+const { useState: useS2 } = React;
+
+function LeftToolbar({ layer, setLayer, editMode, setEditMode, showRoutes, setShowRoutes, caboFocus, setCaboFocus, onOpenOrfas, onOpenConflitos }) {
+  const layers = [
+    { k: "responsavel", l: "Responsável", i: "Users" },
+    { k: "cobertura",   l: "Cobertura",   i: "Eye" },
+    { k: "performance", l: "Performance", i: "Target" },
+    { k: "orfaos",      l: "Órfãs",       i: "AlertTriangle" },
+    { k: "conflitos",   l: "Conflitos",   i: "Zap" },
+  ];
+  const orfanCount = QUADRAS_BASE.filter(q => !OWNERS[q.id]).length;
+  const conflictCount = Object.keys(CONFLICTS).length;
+
+  return (
+    <aside className="w-[260px] flex-shrink-0 border-r overflow-y-auto thin-scroll" style={{ borderColor: "var(--rule)", background: "var(--bg-sidebar)" }}>
+      <div className="p-4 border-b" style={{ borderColor: "var(--rule)" }}>
+        <div className="card-sub mb-2">Modo de trabalho</div>
+        <div className="grid grid-cols-2 gap-1.5">
+          <button onClick={() => setEditMode("view")} className={`btn-ghost ${editMode === "view" ? "active" : ""}`} style={{ padding: "7px 8px", justifyContent: "center", fontSize: 10.5 }}>
+            <CIcon name="Eye" size={11}/>Visão
+          </button>
+          <button onClick={() => setEditMode("lasso")} className={`btn-ghost ${editMode === "lasso" ? "active" : ""}`} style={{ padding: "7px 8px", justifyContent: "center", fontSize: 10.5 }}>
+            <CIcon name="Lasso" size={11}/>Lasso
+          </button>
+        </div>
+        {editMode === "lasso" && (
+          <div className="mt-2 p-2 rounded text-[10.5px] t-fg-muted" style={{ background: "rgba(0,42,123,0.06)", border: "1px solid rgba(0,42,123,0.2)" }}>
+            Arraste no mapa para selecionar quadras e atribuir a um cabo.
+          </div>
+        )}
+      </div>
+
+      <div className="p-4 border-b" style={{ borderColor: "var(--rule)" }}>
+        <div className="card-sub mb-2">Camada</div>
+        <div className="space-y-1">
+          {layers.map(o => (
+            <button key={o.k} onClick={() => setLayer(o.k)}
+                    className={`btn-ghost w-full ${layer === o.k ? "active" : ""}`}
+                    style={{ padding: "7px 10px", justifyContent: "flex-start", fontSize: 11 }}>
+              <CIcon name={o.i} size={11}/>{o.l}
+              {o.k === "orfaos" && orfanCount > 0 && <Chip tone="red">{orfanCount}</Chip>}
+              {o.k === "conflitos" && conflictCount > 0 && <Chip tone="red">{conflictCount}</Chip>}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="p-4 border-b" style={{ borderColor: "var(--rule)" }}>
+        <div className="flex items-center justify-between mb-2">
+          <div className="card-sub">Rotas de hoje</div>
+          <button className="btn-ghost" style={{ padding: "3px 7px", fontSize: 10 }} onClick={() => setShowRoutes(!showRoutes)}>
+            {showRoutes ? "ocultar" : "mostrar"}
+          </button>
+        </div>
+        <div className="text-[10.5px] t-fg-dim">Trilha de cada cabo · atualizada a cada 15 min</div>
+      </div>
+
+      <div className="p-4">
+        <div className="card-sub mb-2">Equipe do bairro · {CABOS.length}</div>
+        <div className="space-y-1.5">
+          <button onClick={() => setCaboFocus(null)}
+                  className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-left"
+                  style={{ background: !caboFocus ? "var(--rule-strong)" : "transparent" }}>
+            <div style={{ width: 8, height: 8, borderRadius: 99, background: "var(--fg-muted)" }}/>
+            <span className="text-[11.5px] t-fg-strong font-semibold">Todos</span>
+            <span className="text-[10px] t-fg-dim ml-auto">{CABOS.length}</span>
+          </button>
+          {CABOS.map(c => {
+            const n = Object.values(OWNERS).filter(v => v === c.id).length;
+            return (
+              <button key={c.id} onClick={() => setCaboFocus(caboFocus === c.id ? null : c.id)}
+                      className="w-full flex items-center gap-2 px-2 py-2 rounded-md text-left"
+                      style={{ background: caboFocus === c.id ? "var(--rule-strong)" : "transparent" }}
+                      onMouseEnter={e => { if (caboFocus !== c.id) e.currentTarget.style.background = "var(--chart-hover)"; }}
+                      onMouseLeave={e => { if (caboFocus !== c.id) e.currentTarget.style.background = "transparent"; }}>
+                <div style={{ width: 9, height: 9, borderRadius: 99, background: c.cor, boxShadow: `0 0 0 2px ${c.cor}22` }}/>
+                <div className="flex-1 min-w-0">
+                  <div className="text-[11.5px] font-semibold t-fg-strong truncate">{c.nome}</div>
+                  <div className="text-[10px] t-fg-dim">{n} quadras · {c.visitasHoje}/{c.metaHoje} hoje</div>
+                </div>
+                <span className="text-[10px] tnum font-bold" style={{ color: c.score >= 80 ? "var(--ok)" : c.score >= 65 ? "var(--warn)" : "var(--danger)" }}>{c.score}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+Object.assign(window, { LeftToolbar });
+</script>
+
+<script type="text/babel" data-presets="react">
+/* =========================================================================
+ * Right drawer — contexto da quadra / sub-área / cabo
+ * ========================================================================= */
+const { useState: useS3, useMemo: useM3 } = React;
+
+function RightDrawer({ selected, setSelected, lassoSet, setLassoSet, onAssign, caboFocus }) {
+  // modo 1: sub-área selecionada via lasso → formulário de atribuição
+  // modo 2: quadra única clicada → detalhes
+  // modo 3: cabo em foco → painel de performance
+
+  if (lassoSet.size > 0) {
+    return <AssignPanel lassoSet={lassoSet} onAssign={onAssign} onClose={() => setLassoSet(new Set())}/>;
+  }
+  if (caboFocus) {
+    return <CaboPanel caboId={caboFocus}/>;
+  }
+  if (selected) {
+    return <QuadraPanel qId={selected} onClose={() => setSelected(null)}/>;
+  }
+  return <OverviewPanel/>;
+}
+
+function OverviewPanel() {
+  const totais = useM3(() => {
+    const orfas = QUADRAS_BASE.filter(q => !OWNERS[q.id]);
+    const confl = Object.keys(CONFLICTS);
+    const domTotal = QUADRAS_BASE.reduce((s, q) => s + q.domicilios, 0);
+    const visitasHoje = CABOS.reduce((s, c) => s + c.visitasHoje, 0);
+    const metaHoje = CABOS.reduce((s, c) => s + c.metaHoje, 0);
+    return { orfas: orfas.length, conflitos: confl.length, domTotal, visitasHoje, metaHoje };
+  }, []);
+
+  return (
+    <aside className="w-[340px] flex-shrink-0 border-l overflow-y-auto thin-scroll" style={{ borderColor: "var(--rule)", background: "var(--bg-card)" }}>
+      <div className="p-5 border-b" style={{ borderColor: "var(--rule)" }}>
+        <div className="card-sub mb-1">Coordenação territorial</div>
+        <div className="text-[20px] font-black font-display t-fg-strong leading-tight">Sala de comando</div>
+        <div className="text-[11px] t-fg-muted mt-0.5">Bairro Tomba · Feira de Santana · BA</div>
+      </div>
+
+      <div className="p-5 grid grid-cols-2 gap-3 border-b" style={{ borderColor: "var(--rule)" }}>
+        <MiniStat label="Domicílios" value={totais.domTotal.toLocaleString("pt-BR")}/>
+        <MiniStat label="Visitas hoje" value={`${totais.visitasHoje}/${totais.metaHoje}`} color={totais.visitasHoje/totais.metaHoje >= 0.7 ? "var(--ok)" : "var(--warn)"}/>
+        <MiniStat label="Órfãs" value={totais.orfas} color={totais.orfas ? "var(--danger)" : "var(--ok)"}/>
+        <MiniStat label="Conflitos" value={totais.conflitos} color={totais.conflitos ? "var(--danger)" : "var(--ok)"}/>
+      </div>
+
+      <div className="p-5 border-b" style={{ borderColor: "var(--rule)" }}>
+        <div className="flex items-center justify-between mb-2">
+          <div className="card-sub">Ranking do dia</div>
+          <CIcon name="Trophy" size={12} className="t-fg-dim"/>
+        </div>
+        <div className="space-y-2">
+          {[...CABOS].sort((a,b) => (b.visitasHoje/b.metaHoje) - (a.visitasHoje/a.metaHoje)).map((c, i) => {
+            const pct = c.visitasHoje / c.metaHoje;
+            return (
+              <div key={c.id} className="flex items-center gap-2 text-[11px]">
+                <div className="tnum t-fg-dim w-4 text-right">{i+1}</div>
+                <div style={{ width: 8, height: 8, borderRadius: 99, background: c.cor }}/>
+                <div className="flex-1 min-w-0 truncate t-fg-strong font-semibold">{c.nome}</div>
+                <div className="flex-1 max-w-[80px]"><ProgressBar value={pct*100} color={pct>=0.8 ? "var(--ok)" : pct>=0.5 ? "var(--warn)" : "var(--danger)"}/></div>
+                <div className="tnum t-fg-muted w-10 text-right">{Math.round(pct*100)}%</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="p-5 border-b" style={{ borderColor: "var(--rule)" }}>
+        <div className="card-sub mb-2">Agenda · hoje</div>
+        <div className="space-y-1.5 text-[11.5px]">
+          <div className="flex items-center gap-2"><CIcon name="Clock" size={11} className="t-fg-dim"/><span className="tnum t-fg-dim">08:00</span><span className="t-fg-strong">Briefing equipe · ponto de encontro</span></div>
+          <div className="flex items-center gap-2"><CIcon name="Clock" size={11} className="t-fg-dim"/><span className="tnum t-fg-dim">09:30</span><span className="t-fg-strong">Rita · Rua São Domingos</span></div>
+          <div className="flex items-center gap-2"><CIcon name="Clock" size={11} className="t-fg-dim"/><span className="tnum t-fg-dim">14:00</span><span className="t-fg-strong">Marcos · Av. Getúlio Vargas</span></div>
+          <div className="flex items-center gap-2"><CIcon name="Clock" size={11} className="t-fg-dim"/><span className="tnum t-fg-dim">17:00</span><span className="t-fg-strong">Check-in diário · chat furtivo</span></div>
+        </div>
+      </div>
+
+      <div className="p-5 space-y-2">
+        <button className="btn-primary w-full" style={{ justifyContent: "center" }}>
+          <CIcon name="UserPlus" size={12}/>Contratar novo cabo
+        </button>
+        <button className="btn-ghost w-full" style={{ justifyContent: "center" }}>
+          <CIcon name="Download" size={12}/>Exportar mapa + performance
+        </button>
+        <button className="btn-ghost w-full" style={{ justifyContent: "center" }}>
+          <CIcon name="MessagesSquare" size={12}/>Abrir chat do bairro
+        </button>
+      </div>
+    </aside>
+  );
+}
+
+function QuadraPanel({ qId, onClose }) {
+  const q = QUADRAS_BASE.find(x => x.id === qId);
+  const cabo = OWNERS[qId];
+  const c = cabo ? CABOS.find(x => x.id === cabo) : null;
+  const p = perfFor(qId);
+  const conflict = CONFLICTS[qId];
+
+  // Eleitores cadastrados mock
+  const eleitores = [
+    { nome: "Maria das Graças S.", idade: 62, status: "confirmado" },
+    { nome: "João Batista R.",      idade: 48, status: "confirmado" },
+    { nome: "Sandra Pereira",       idade: 35, status: "pendente" },
+    { nome: "Carlos Augusto M.",    idade: 71, status: "confirmado" },
+    { nome: "Joana Silva Reis",     idade: 29, status: "contactada" },
+  ];
+
+  // checklist porta-a-porta
+  const checklist = [
+    { label: "Nº 12 — D. Maria",   status: "done" },
+    { label: "Nº 18 — Sr. João",   status: "done" },
+    { label: "Nº 24 — F. Sandra",  status: "partial" },
+    { label: "Nº 31 — Sr. Carlos", status: "done" },
+    { label: "Nº 45 — Joana",      status: "partial" },
+    { label: "Nº 52 — vago",       status: "pending" },
+    { label: "Nº 58 — a identificar", status: "pending" },
+  ];
+
+  return (
+    <aside className="w-[360px] flex-shrink-0 border-l overflow-y-auto thin-scroll" style={{ borderColor: "var(--rule)", background: "var(--bg-card)" }}>
+      <div className="p-5 border-b" style={{ borderColor: "var(--rule)" }}>
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <div>
+            <div className="card-sub mb-0.5">Quadra · <span className="font-mono">{q.id}</span></div>
+            <div className="text-[17px] font-black font-display t-fg-strong leading-tight">{q.rua}</div>
+            <div className="text-[11px] t-fg-muted mt-0.5">{q.domicilios} domicílios</div>
+          </div>
+          <button className="btn-ghost" onClick={onClose} style={{ padding: "5px 7px" }}><CIcon name="X" size={11}/></button>
+        </div>
+        {conflict && (
+          <div className="mt-2 p-2 rounded flex items-start gap-2" style={{ background: "rgba(220,38,38,0.08)", border: "1px solid rgba(220,38,38,0.25)" }}>
+            <CIcon name="AlertTriangle" size={12} className="t-danger mt-0.5 flex-shrink-0"/>
+            <div className="flex-1 text-[11px]">
+              <div className="font-bold t-danger mb-0.5">Conflito de atribuição</div>
+              <div className="t-fg-muted">Reivindicada por <b>{CABOS.find(x=>x.id===conflict[0]).nome}</b> e <b>{CABOS.find(x=>x.id===conflict[1]).nome}</b>. Escolha quem fica:</div>
+              <div className="flex gap-1 mt-2">
+                {conflict.map(id => {
+                  const k = CABOS.find(x => x.id === id);
+                  return <button key={id} className="btn-ghost" style={{ padding: "4px 8px", fontSize: 10.5 }}>{k.nome.split(" ")[0]}</button>;
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+        {!cabo && !conflict && (
+          <div className="mt-2 p-2 rounded flex items-start gap-2" style={{ background: "rgba(220,38,38,0.08)", border: "1px solid rgba(220,38,38,0.25)" }}>
+            <CIcon name="AlertTriangle" size={12} className="t-danger mt-0.5 flex-shrink-0"/>
+            <div className="flex-1 text-[11px] t-fg-muted">
+              <b className="t-danger">Órfã</b> · sem cabo responsável há 8 dias. Atribua abaixo ↓
+            </div>
+          </div>
+        )}
+        {c && !conflict && (
+          <div className="mt-2 flex items-center gap-2 p-2 rounded" style={{ background: "var(--bg-page)" }}>
+            <div style={{ width: 28, height: 28, borderRadius: 99, background: c.cor, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 11 }}>{c.nome.split(" ").map(x=>x[0]).slice(0,2).join("")}</div>
+            <div className="flex-1 min-w-0">
+              <div className="text-[12px] font-semibold t-fg-strong truncate">{c.nome}</div>
+              <div className="text-[10px] t-fg-dim">Cabo · tier {c.tier} · score {c.score}</div>
+            </div>
+            <button className="btn-ghost" style={{ padding: "5px 7px" }}><CIcon name="Phone" size={10}/></button>
+            <button className="btn-ghost" style={{ padding: "5px 7px" }}><CIcon name="MessagesSquare" size={10}/></button>
+          </div>
+        )}
+      </div>
+
+      {cabo && (
+        <div className="p-5 grid grid-cols-3 gap-3 border-b" style={{ borderColor: "var(--rule)" }}>
+          <MiniStat label="Cobertura" value={`${Math.round(p.cobertura*100)}%`} color={p.cobertura>=0.6 ? "var(--ok)" : "var(--warn)"}/>
+          <MiniStat label="Conversão" value={`${Math.round(p.conversao*100)}%`} color={p.conversao>=0.6 ? "var(--ok)" : "var(--warn)"}/>
+          <MiniStat label="Hoje" value={`${p.feitoHoje}v`}/>
+        </div>
+      )}
+
+      <div className="p-5 border-b" style={{ borderColor: "var(--rule)" }}>
+        <div className="flex items-center justify-between mb-2">
+          <div className="card-sub">Checklist porta-a-porta</div>
+          <div className="text-[10px] t-fg-dim tnum">{checklist.filter(x=>x.status==="done").length}/{checklist.length}</div>
+        </div>
+        <div>
+          {checklist.map((it, i) => (
+            <div key={i} className="checklist-row">
+              <span className={`check-dot ${it.status === "done" ? "done" : it.status === "partial" ? "partial" : ""}`}>
+                {it.status === "done" && "✓"}
+                {it.status === "partial" && "½"}
+              </span>
+              <span className={`flex-1 ${it.status === "pending" ? "t-fg-dim" : "t-fg"}`}>{it.label}</span>
+              {it.status !== "pending" && <span className="text-[9.5px] t-fg-dim font-mono">hoje</span>}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="p-5 border-b" style={{ borderColor: "var(--rule)" }}>
+        <div className="flex items-center justify-between mb-2">
+          <div className="card-sub">Eleitores cadastrados · {eleitores.length}</div>
+          <button className="btn-ghost" style={{ padding: "3px 7px", fontSize: 10 }}><CIcon name="Plus" size={10}/>Novo</button>
+        </div>
+        <div className="space-y-1.5">
+          {eleitores.map((e, i) => (
+            <div key={i} className="flex items-center gap-2 py-1 text-[11px]">
+              <span className="flex-1 t-fg-strong truncate">{e.nome}</span>
+              <span className="t-fg-dim tnum">{e.idade} anos</span>
+              <Chip tone={e.status === "confirmado" ? "green" : e.status === "pendente" ? "amber" : "blue"}>{e.status}</Chip>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {!cabo && !conflict && (
+        <div className="p-5 space-y-2">
+          <div className="card-sub mb-2">Atribuir a</div>
+          {CABOS.map(k => (
+            <button key={k.id} className="w-full flex items-center gap-2 px-3 py-2 rounded" style={{ background: "var(--rule)" }}>
+              <div style={{ width: 8, height: 8, borderRadius: 99, background: k.cor }}/>
+              <span className="text-[11.5px] font-semibold t-fg-strong flex-1 text-left">{k.nome}</span>
+              <span className="text-[10px] t-fg-dim">{Object.values(OWNERS).filter(v=>v===k.id).length} q.</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </aside>
+  );
+}
+
+function CaboPanel({ caboId }) {
+  const c = CABOS.find(x => x.id === caboId);
+  const quadras = Object.entries(OWNERS).filter(([,v]) => v === caboId).map(([k]) => QUADRAS_BASE.find(x => x.id === k));
+  const domicilios = quadras.reduce((s, q) => s + q.domicilios, 0);
+  const avgCob = quadras.reduce((s, q) => s + perfFor(q.id).cobertura, 0) / (quadras.length || 1);
+  const avgConv = quadras.reduce((s, q) => s + perfFor(q.id).conversao, 0) / (quadras.length || 1);
+
+  return (
+    <aside className="w-[360px] flex-shrink-0 border-l overflow-y-auto thin-scroll" style={{ borderColor: "var(--rule)", background: "var(--bg-card)" }}>
+      <div className="p-5 border-b" style={{ borderColor: "var(--rule)" }}>
+        <div className="flex items-center gap-3 mb-3">
+          <div style={{ width: 44, height: 44, borderRadius: 99, background: c.cor, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 14 }}>
+            {c.nome.split(" ").map(x=>x[0]).slice(0,2).join("")}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="card-sub mb-0">Cabo eleitoral</div>
+            <div className="text-[17px] font-black font-display t-fg-strong leading-tight truncate">{c.nome}</div>
+            <div className="flex items-center gap-1.5 mt-1">
+              <Chip tone={c.tier === "ouro" ? "amber" : c.tier === "prata" ? "gray" : "red"}>tier {c.tier}</Chip>
+              <Chip tone="blue">score {c.score}</Chip>
+            </div>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <button className="btn-primary flex-1" style={{ justifyContent: "center", fontSize: 11 }}><CIcon name="Phone" size={11}/>Ligar</button>
+          <button className="btn-ghost flex-1" style={{ justifyContent: "center", fontSize: 11 }}><CIcon name="MessagesSquare" size={11}/>Chat</button>
+        </div>
+      </div>
+
+      <div className="p-5 grid grid-cols-2 gap-3 border-b" style={{ borderColor: "var(--rule)" }}>
+        <MiniStat label="Quadras" value={quadras.length}/>
+        <MiniStat label="Domicílios" value={domicilios.toLocaleString("pt-BR")}/>
+        <MiniStat label="Visitas hoje" value={`${c.visitasHoje}/${c.metaHoje}`} color={c.visitasHoje/c.metaHoje >= 0.7 ? "var(--ok)" : "var(--warn)"}/>
+        <MiniStat label="Conversão" value={`${Math.round(avgConv*100)}%`} color={avgConv >= 0.6 ? "var(--ok)" : "var(--warn)"}/>
+      </div>
+
+      <div className="p-5 border-b" style={{ borderColor: "var(--rule)" }}>
+        <div className="card-sub mb-2">Próximo ponto de visita</div>
+        <div className="flex items-center gap-3 p-3 rounded" style={{ background: "var(--bg-page)" }}>
+          <div style={{ width: 36, height: 36, borderRadius: 8, background: c.cor, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <CIcon name="MapPin" size={16}/>
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-[13px] font-bold t-fg-strong">{quadras[0]?.rua || "—"}</div>
+            <div className="text-[10.5px] t-fg-dim">Quadra {quadras[0]?.id} · em 12 min</div>
+          </div>
+          <div className="text-[11px] font-mono tnum t-fg-strong">14:30</div>
+        </div>
+      </div>
+
+      <div className="p-5 border-b" style={{ borderColor: "var(--rule)" }}>
+        <div className="card-sub mb-2">Cronograma da semana</div>
+        <div className="grid grid-cols-7 gap-1 mb-1">
+          {["S","T","Q","Q","S","S","D"].map((d, i) => <div key={i} className="text-center text-[9.5px] t-fg-dim font-semibold">{d}</div>)}
+        </div>
+        <div className="grid grid-cols-7 gap-1">
+          {[85,92,78,88,0,0,0].map((v, i) => (
+            <div key={i} className="h-12 rounded flex items-end" style={{ background: v ? "var(--rule)" : "var(--chart-hover)" }} title={`${v}%`}>
+              {v > 0 && <div style={{ width: "100%", height: `${v}%`, background: c.cor, borderRadius: "3px 3px 0 0" }}/>}
+            </div>
+          ))}
+        </div>
+        <div className="flex justify-between mt-1 text-[9.5px] t-fg-dim">
+          <span>semana 16/abr</span>
+          <span className="tnum">meta 86%</span>
+        </div>
+      </div>
+
+      <div className="p-5">
+        <div className="card-sub mb-2">Quadras sob responsabilidade · {quadras.length}</div>
+        <div className="space-y-1">
+          {quadras.map(q => {
+            const p = perfFor(q.id);
+            return (
+              <div key={q.id} className="flex items-center gap-2 py-1 text-[11px]">
+                <span className="font-mono t-fg-dim font-bold w-8">{q.id}</span>
+                <span className="flex-1 truncate t-fg-strong">{q.rua}</span>
+                <div className="w-14"><ProgressBar value={p.cobertura*100} color={c.cor}/></div>
+                <span className="tnum t-fg-muted w-9 text-right">{Math.round(p.cobertura*100)}%</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+function AssignPanel({ lassoSet, onAssign, onClose }) {
+  const ids = [...lassoSet];
+  const totalDom = ids.reduce((s, id) => {
+    const q = QUADRAS_BASE.find(x => x.id === id);
+    return s + (q?.domicilios || 0);
+  }, 0);
+
+  return (
+    <aside className="w-[340px] flex-shrink-0 border-l overflow-y-auto thin-scroll" style={{ borderColor: "var(--rule)", background: "var(--bg-card)" }}>
+      <div className="p-5 border-b" style={{ borderColor: "var(--rule)" }}>
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <div>
+            <div className="card-sub mb-0.5">Nova sub-área</div>
+            <div className="text-[20px] font-black font-display t-fg-strong leading-tight">{ids.length} quadras</div>
+            <div className="text-[11px] t-fg-muted mt-0.5">{totalDom.toLocaleString("pt-BR")} domicílios · ~{Math.round(totalDom * 2.2).toLocaleString("pt-BR")} eleitores estimados</div>
+          </div>
+          <button className="btn-ghost" onClick={onClose} style={{ padding: "5px 7px" }}><CIcon name="X" size={11}/></button>
+        </div>
+        <div className="flex flex-wrap gap-1 mt-2">
+          {ids.slice(0, 12).map(id => <span key={id} className="font-mono text-[10px] px-1.5 py-0.5 rounded" style={{ background: "var(--rule)", color: "var(--fg-muted)" }}>{id}</span>)}
+          {ids.length > 12 && <span className="text-[10px] t-fg-dim">+{ids.length - 12}</span>}
+        </div>
+      </div>
+
+      <div className="p-5 border-b" style={{ borderColor: "var(--rule)" }}>
+        <div className="card-sub mb-2">Atribuir para</div>
+        <div className="space-y-1.5">
+          {CABOS.map(c => {
+            const current = Object.values(OWNERS).filter(v => v === c.id).length;
+            return (
+              <button key={c.id} onClick={() => onAssign(c.id)}
+                      className="w-full flex items-center gap-2 px-3 py-2.5 rounded"
+                      style={{ background: "var(--rule)", transition: "all 0.1s" }}
+                      onMouseEnter={e => { e.currentTarget.style.background = "var(--rule-strong)"; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = "var(--rule)"; }}>
+                <div style={{ width: 10, height: 10, borderRadius: 99, background: c.cor }}/>
+                <div className="flex-1 min-w-0 text-left">
+                  <div className="text-[12px] font-semibold t-fg-strong">{c.nome}</div>
+                  <div className="text-[10px] t-fg-dim">atualmente {current} quadras · +{ids.length} = <b className="t-fg-strong">{current + ids.length}</b></div>
+                </div>
+                <Chip tone={c.tier === "ouro" ? "amber" : "gray"}>{c.tier}</Chip>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="p-5 border-b" style={{ borderColor: "var(--rule)" }}>
+        <div className="card-sub mb-2">Metas sugeridas</div>
+        <div className="grid grid-cols-2 gap-3 text-[11px]">
+          <div>
+            <div className="t-fg-dim mb-0.5">Cadastros / dia</div>
+            <div className="text-[15px] font-bold tnum">{Math.round(totalDom * 0.04)}</div>
+          </div>
+          <div>
+            <div className="t-fg-dim mb-0.5">Cobertura até 30d</div>
+            <div className="text-[15px] font-bold tnum">75%</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-5">
+        <button className="btn-ghost w-full" style={{ justifyContent: "center" }} onClick={onClose}>Cancelar seleção</button>
+      </div>
+    </aside>
+  );
+}
+
+Object.assign(window, { RightDrawer });
+</script>
+
+<script type="text/babel" data-presets="react">
+/* =========================================================================
+ * Tweak panel
+ * ========================================================================= */
+const { useState: useTS, useEffect: useTE } = React;
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "theme": "light",
+  "layer": "conflitos",
+  "showRoutes": true,
+  "showTweaks": false
+}/*EDITMODE-END*/;
+
+function TweakPanel({ theme, setTheme, layer, setLayer, showRoutes, setShowRoutes, onClose }) {
+  return (
+    <div className="tweak-panel">
+      <div className="flex items-center justify-between mb-3">
+        <div className="font-bold text-[12.5px] t-fg-strong flex items-center gap-1.5">
+          <CIcon name="Settings" size={12}/>Tweaks
+        </div>
+        <button onClick={onClose} className="btn-ghost" style={{ padding: "3px 6px" }}><CIcon name="X" size={10}/></button>
+      </div>
+
+      <div className="space-y-3 text-[11px]">
+        <div>
+          <div className="card-sub mb-1.5">Tema</div>
+          <div className="flex gap-1">
+            {["light","dark"].map(t => (
+              <button key={t} onClick={() => setTheme(t)}
+                      className={`btn-ghost flex-1 ${theme === t ? "active" : ""}`}
+                      style={{ justifyContent: "center", fontSize: 10.5, textTransform: "capitalize" }}>
+                {t}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <div className="card-sub mb-1.5">Camada inicial</div>
+          <div className="grid grid-cols-3 gap-1">
+            {[["responsavel","Resp."],["cobertura","Cob."],["performance","Perf."],["orfaos","Órfãs"],["conflitos","Confl."]].map(([k,l]) => (
+              <button key={k} onClick={() => setLayer(k)}
+                      className={`btn-ghost ${layer === k ? "active" : ""}`}
+                      style={{ justifyContent: "center", fontSize: 10, padding: "5px 4px" }}>
+                {l}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between pt-1">
+          <div className="t-fg-muted">Rotas animadas</div>
+          <button onClick={() => setShowRoutes(!showRoutes)}
+                  className="btn-ghost" style={{ padding: "4px 10px", fontSize: 10.5 }}>
+            {showRoutes ? "Ligado" : "Desligado"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { TweakPanel, TWEAK_DEFAULTS });
+
+/* =========================================================================
+ * App (topbar + shell)
+ * ========================================================================= */
+
+function Topbar({ onToggleTweaks }) {
+  return (
+    <header className="topbar">
+      <div className="flex items-center gap-3">
+        <div style={{ width: 34, height: 34, borderRadius: 8, background: "var(--tenant-primary)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: 12, letterSpacing: "-0.02em" }}>UB</div>
+        <div style={{ whiteSpace: "nowrap" }}>
+          <div className="text-[10px] t-fg-dim uppercase tracking-[0.14em] font-semibold" style={{ whiteSpace: "nowrap" }}>União Brasil · Campanha 2026</div>
+          <div className="text-[14px] font-bold t-fg-strong leading-tight" style={{ whiteSpace: "nowrap" }}>Mapa do Cabo · Coordenação territorial</div>
+        </div>
+      </div>
+
+      <div className="flex-1"/>
+
+      <div className="flex items-center gap-2">
+        <div className="text-[11px] t-fg-dim">Coordenador:</div>
+        <div className="flex items-center gap-2 px-2 py-1 rounded" style={{ background: "var(--rule)" }}>
+          <div style={{ width: 20, height: 20, borderRadius: 99, background: "linear-gradient(135deg,#fbbf24,#d97706)", color: "#78350f", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 9 }}>OC</div>
+          <span className="text-[12px] font-semibold t-fg-strong" style={{ whiteSpace: "nowrap" }}>Otávio Campos</span>
+          <span className="text-[10px] t-fg-dim" style={{ whiteSpace: "nowrap" }}>· Recôncavo</span>
+        </div>
+        <div style={{ width: 1, height: 18, background: "var(--rule)" }}/>
+        <button className="btn-ghost"><CIcon name="Download" size={11}/>Exportar</button>
+        <button className="btn-ghost" onClick={onToggleTweaks}><CIcon name="Settings" size={11}/>Tweaks</button>
+      </div>
+    </header>
+  );
+}
+
+function App() {
+  // Load tweaks from DOM defaults
+  const [theme, setTheme] = useState(TWEAK_DEFAULTS.theme);
+  const [layer, setLayer] = useState(TWEAK_DEFAULTS.layer);
+  const [showRoutes, setShowRoutes] = useState(TWEAK_DEFAULTS.showRoutes);
+  const [showTweaks, setShowTweaks] = useState(TWEAK_DEFAULTS.showTweaks);
+
+  const [selected, setSelected] = useState(null);
+  const [hoverQ, setHoverQ] = useState(null);
+  const [editMode, setEditMode] = useState("view");
+  const [lassoSet, setLassoSet] = useState(new Set());
+  const [caboFocus, setCaboFocus] = useState(null);
+  const [liveOwners, setLiveOwners] = useState({ ...OWNERS });
+
+  useEffect(() => { document.documentElement.setAttribute("data-theme", theme); }, [theme]);
+
+  // Edit-mode protocol (host parent toolbar)
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.data?.type === "__activate_edit_mode") setShowTweaks(true);
+      if (e.data?.type === "__deactivate_edit_mode") setShowTweaks(false);
+    };
+    window.addEventListener("message", handler);
+    try { window.parent.postMessage({ type: "__edit_mode_available" }, "*"); } catch {}
+    return () => window.removeEventListener("message", handler);
+  }, []);
+
+  function persistTweak(patch) {
+    try { window.parent.postMessage({ type: "__edit_mode_set_keys", edits: patch }, "*"); } catch {}
+  }
+
+  function onLassoAdd(ids) {
+    setLassoSet(new Set(ids));
+    setSelected(null);
+    setCaboFocus(null);
+  }
+
+  function onAssign(caboId) {
+    const next = { ...liveOwners };
+    for (const id of lassoSet) next[id] = caboId;
+    setLiveOwners(next);
+    // mirror in OWNERS runtime for downstream reads
+    Object.keys(OWNERS).forEach(k => delete OWNERS[k]);
+    Object.assign(OWNERS, next);
+    setLassoSet(new Set());
+    setEditMode("view");
+  }
+
+  return (
+    <>
+      <div className="flex flex-col h-screen">
+        <Topbar onToggleTweaks={() => { setShowTweaks(!showTweaks); persistTweak({ showTweaks: !showTweaks }); }}/>
+        <div className="flex-1 flex min-h-0">
+          <LeftToolbar
+            layer={layer} setLayer={(v) => { setLayer(v); persistTweak({ layer: v }); }}
+            editMode={editMode} setEditMode={setEditMode}
+            showRoutes={showRoutes} setShowRoutes={(v) => { setShowRoutes(v); persistTweak({ showRoutes: v }); }}
+            caboFocus={caboFocus} setCaboFocus={setCaboFocus}/>
+          <div className="flex-1 min-w-0 relative">
+            <MapCanvas
+              layer={layer}
+              selected={selected} onSelect={(id) => { setSelected(id); setCaboFocus(null); setLassoSet(new Set()); }}
+              hoverQ={hoverQ} setHoverQ={setHoverQ}
+              editMode={editMode} lassoSet={lassoSet} onLassoAdd={onLassoAdd}
+              showRoutes={showRoutes} caboFocus={caboFocus}/>
+          </div>
+          <RightDrawer
+            selected={selected} setSelected={setSelected}
+            lassoSet={lassoSet} setLassoSet={setLassoSet}
+            onAssign={onAssign}
+            caboFocus={caboFocus}/>
+        </div>
+      </div>
+      {showTweaks && (
+        <TweakPanel
+          theme={theme} setTheme={(v) => { setTheme(v); persistTweak({ theme: v }); }}
+          layer={layer} setLayer={(v) => { setLayer(v); persistTweak({ layer: v }); }}
+          showRoutes={showRoutes} setShowRoutes={(v) => { setShowRoutes(v); persistTweak({ showRoutes: v }); }}
+          onClose={() => { setShowTweaks(false); persistTweak({ showTweaks: false }); }}/>
+      )}
+    </>
+  );
+}
+
+Object.assign(window, { App });
+</script>
+
+<script>
+// Defer render until Babel has processed all text/babel scripts
+function __boot() {
+  if (typeof window.App !== "function") { setTimeout(__boot, 30); return; }
+  try {
+    ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(window.App));
+  } catch (err) {
+    console.error("App render failed:", err);
+    document.getElementById("root").innerHTML = "<pre style='padding:20px;color:red;font:12px monospace;white-space:pre-wrap'>" + (err.stack || err.message) + "</pre>";
+  }
+}
+__boot();
+</script>
+
+</body>
+</html>

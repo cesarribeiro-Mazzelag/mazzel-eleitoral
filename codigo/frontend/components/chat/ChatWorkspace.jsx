@@ -3,8 +3,8 @@
 /**
  * ChatWorkspace — UI compartilhada do Chat Sigiloso.
  * Usada em:
- *   - app/mazzel-preview/campanha/_tabs/CampanhaChat.jsx
- *   - app/mazzel-preview/chat/page.jsx
+ *   - app/v1/campanha/_tabs/CampanhaChat.jsx
+ *   - app/v1/chat/page.jsx
  *
  * Props:
  *   campanhaId?: string   — filtra salas por campanha

@@ -5,6 +5,12 @@ const nextConfig = {
   typescript: { ignoreBuildErrors: true },
   eslint: { ignoreDuringBuilds: true },
 
+  // Next dev indicator fica sobreposto ao avatar da sessao no sidebar bottom-left
+  // da plataforma v2. Mover pra bottom-right.
+  devIndicators: {
+    position: "bottom-right",
+  },
+
   // Mapas e fontes externas
   images: {
     remotePatterns: [
