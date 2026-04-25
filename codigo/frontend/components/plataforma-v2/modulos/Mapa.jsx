@@ -1,5 +1,22 @@
 "use client";
 
+/* @deprecated em 25/04/2026 (noite).
+ *
+ * Este componente foi um wrapper SKELETAL do Mapa Eleitoral durante o porte
+ * inicial pra V2. So implementava ~10% do que o V1 (preservada) tinha:
+ * sem drill-down, sem foto-on-hover, sem tabs turno, sem tooltip X9, sem
+ * microbairros, sem 9 dos 11 endpoints.
+ *
+ * O componente completo (3196 linhas) sempre esteve em
+ * `components/map/MapaEleitoral.tsx`. A rota `/mazzel-preview/mapa` agora
+ * importa direto de la (ver `app/mazzel-preview/mapa/page.jsx`).
+ *
+ * Este arquivo fica preservado como referencia historica do estado anterior
+ * pra Designer entender o que mudou. Pode ser removido depois que o
+ * Designer redesenhar o Mapa Estrategico (decisao 25/04 manha) que vai
+ * substituir esta rota na sidebar principal.
+ */
+
 /* Container Mapa Eleitoral adaptado de designer/platform-mapa.jsx.
  * O <BrasilChoropleth> SVG é placeholder - na Fase 4 será substituído
  * por MapLibre GL JS rendering real (UF -> municípios -> micro-bairros IBGE). */

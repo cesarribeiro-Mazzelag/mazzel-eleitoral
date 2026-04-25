@@ -444,17 +444,21 @@ Cada usuário configura preferência por tipo de evento (convite recebido, opera
 
 ---
 
-## 13. Bug crítico: Mapa Eleitoral V2 quebrado
+## 13. Mapa Eleitoral — corrigido em 25/04/2026 (noite)
 
-**Diagnóstico:** o mapa eleitoral foi rebatido na V2 mal feito — não acompanha o layout da V2, perdeu navegação e perdeu as automações do MapLibre que existiam na versão preservada (V1).
+**Diagnóstico original:** o mapa eleitoral aparecia como rebatido mal feito na V2 — wrapper skeletal `plataforma-v2/modulos/Mapa.jsx` com ~10% das features (sem drill-down, sem foto-on-hover, sem tabs turno, sem tooltip X9, sem microbairros, sem 9 dos 11 endpoints).
 
-**Funcionalidade perdida que mais machuca:** foto do candidato aparecendo na sidebar quando o usuário passa o mouse na região. Existe na V1, foi perdida no porte. César considera essa interação "muito foda" — núcleo da experiência.
+**Causa raiz descoberta:** o componente completo `MapaEleitoral.tsx` (3.196 linhas, com TODAS as features) **já estava no repo** em `components/map/`. A rota `/mazzel-preview/mapa/page.jsx` é que importava o wrapper skeletal por engano.
 
-**Direção pra Claude Code (próxima sessão):**
-1. Auditar `/mazzel-preview/mapa` na V2 vs `/mapa` na preservada
-2. Listar uma a uma as funcionalidades perdidas (foto-on-hover, drill-down 5 níveis, sidebar contextual, escala de cores, tabs turno, etc.)
-3. Portar com cuidado — não é refazer, é trazer o que já funcionava
-4. Lembrando: o **Mapa Eleitoral** vai pro **módulo Estudo** (decisão 25/04). A sidebar principal tem o novo **Mapa Estratégico** (que o Designer está desenhando). Mas o Eleitoral em si precisa estar funcional onde quer que esteja.
+**Correção aplicada:**
+- `app/mazzel-preview/mapa/page.jsx` agora importa direto `@/components/map/MapaEleitoral`
+- Wrapper skeletal `plataforma-v2/modulos/Mapa.jsx` marcado `@deprecated` (mantido como referência histórica)
+- Compilou OK; HTTP 200 confirmado na rota
+- Designer pode abrir o GitHub agora e ver TODAS as automações que existem (drill-down 5 níveis, foto-on-hover, sidebar contextual, tabs turno, tooltip X9, microbairros SP, 11 endpoints)
+
+**Pendências relacionadas:**
+- Decisão 25/04 manhã mantém: Mapa Eleitoral vai pra sub-tela do **módulo Estudo**, e a sidebar principal recebe **Mapa Estratégico** (que o Designer vai desenhar). A rota atual `/mazzel-preview/mapa` é transicional até o Estudo ficar pronto.
+- Layout: o Mapa hoje funciona, mas pode ter pequenos ajustes de estilo pra acompanhar 100% o look-and-feel V2 (Designer revisa).
 
 ---
 

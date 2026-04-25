@@ -37,7 +37,7 @@ Isso significa que **o Designer sempre vê algo preenchido na tela**, mesmo sem 
 | `/mazzel-preview` (Home) | `modulos/Home.jsx` | `/dashboard/visao-geral`, `/alertas`, `/dossies`, `/admin/auditoria` | 🟡 HÍBRIDO (todos os 4 fetches) |
 | `/mazzel-preview/dossies` | `modulos/Dossies.jsx` | `/dossies` | ✅ REAL (cobertura ~70k eleitos backfilled em `politico_overall_v9`) |
 | `/mazzel-preview/dossies/[id]` | `app/mazzel-preview/dossies/[id]/page.jsx` | `/dossie/{id}` | ✅ REAL (compila + lazy warmup) |
-| `/mazzel-preview/mapa` | `modulos/Mapa.jsx` | `/mapa/estado/*` | 🟡 HÍBRIDO + cores do mapa Brasil ainda mock (`PARTY_STRENGTH`) |
+| `/mazzel-preview/mapa` | `components/map/MapaEleitoral.tsx` (3196 linhas — corrigido 25/04 noite) | `/mapa/farol`, `/mapa/estado/*`, `/mapa/municipio/*/top2`, `/mapa/geojson/*`, `/mapa/distritos-geojson`, `/mapa/escola/*`, `/mapa/totais-apuracao` | ✅ REAL com TODAS as features (drill-down 5 níveis, foto-on-hover, sidebar contextual, tabs turno, tooltip X9, microbairros SP). Componente skeletal antigo `modulos/Mapa.jsx` marcado @deprecated |
 | `/mazzel-preview/radar` | `modulos/Radar.jsx` | — | ⚪ PLACEHOLDER (vai virar observatório dinâmico — decisão 21/04) |
 | `/mazzel-preview/aliancas` | `app/mazzel-preview/aliancas/page.jsx` | — | ⚪ PLACEHOLDER |
 | `/mazzel-preview/estudo` | `modulos/Estudo.jsx` | — | ⚪ PLACEHOLDER (módulo Estudo de panorama nacional, planejado) |
