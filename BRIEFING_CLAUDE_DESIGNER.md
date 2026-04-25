@@ -16,7 +16,8 @@ Para esta sessão você vai entregar a **especificação técnica final do produ
 | 4 | `docs/principio_portabilidade_perfil.md` | **Político é dono do dado pessoal; partido é dono da estratégia.** Quando político troca de partido: pessoal migra, estratégia fica. Diferencial competitivo + LGPD por design. |
 | 5 | `docs/modulo_operacoes.md` | **Módulo central:** Operações estilo Facebook Ads + cascata de delegação (Pres → Coord → Cabo) + score subindo + Mapa Estratégico como base + Chat evoluído (Discord-style com salas de áudio). Substitui o nome temporário "Campanha 2026". |
 | 6 | `docs/anderson_milton_briefing.md` | **Quem aprova o produto:** Milton Leite (Pres Estadual SP, perfil CEO). Crítica do mock, dossiê personalizado por cargo, sistema de IDs+convites Discord-style, bug crítico do Mapa Eleitoral V2, lista de 13 seções de entregáveis priorizados. |
-| 7 | `STATUS_DADOS_V2.md` (raiz do worktree) | Qual módulo é REAL, qual é HIBRIDO (API+fallback mock), qual é MOCK puro, qual é PLACEHOLDER. Pra você não estilizar baseado em magnitudes erradas. |
+| 7 | `docs/mapa_eleitoral_evolucao.md` | **Pra onde o Mapa precisa evoluir** — conceito de navegação atual aprovado (drill-down 5 níveis + foto-on-hover), 10 áreas de salto pra produção (performance, camadas estratégicas, modos comparativos, mobile-first, ações executivas, integração com Operações, etc.). Lista o que produzir nesta sessão + decisões já tomadas (não revisar) + decisões em aberto (Designer pode propor). |
+| 8 | `STATUS_DADOS_V2.md` (raiz do worktree) | Qual módulo é REAL, qual é HIBRIDO (API+fallback mock), qual é MOCK puro, qual é PLACEHOLDER. Pra você não estilizar baseado em magnitudes erradas. |
 
 E também os **arquivos oficiais do cliente** em `docs/anderson_referencias/`:
 - `modelo_nominata_atual.docx` — papel timbrado oficial UB com logo + número 44 (extraído pra `codigo/frontend/public/branding/uniao-brasil/papel_timbrado.png`)
