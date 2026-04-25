@@ -4,6 +4,25 @@ Oi Claude Designer. Vou te dar tudo que precisa para integrar e aplicar os desig
 
 ---
 
+## ⚠️ LEITURA OBRIGATÓRIA ANTES DE TUDO (atualizado 25/04/2026 noite)
+
+Para esta sessão você vai entregar a **especificação técnica final do produto** + designs de tudo que falta. Pra fazer isso bem, abrir e absorver os 4 documentos abaixo NA ORDEM, antes de começar:
+
+| # | Documento | O que tem |
+|---|-----------|-----------|
+| 1 | `docs/BRIEFING_NARRATIVA_PROJETO.md` | Narrativa completa do projeto (origem, evolução 12/04→25/04, estado atual, roadmap, regras). 50 KB de contexto. |
+| 2 | `docs/UB_estrutura_partidaria.md` | Como o União Brasil se organiza (nominata, hierarquia Nacional→Estadual→Municipal, ficha de filiação, RBAC scoped, módulos administrativos novos, DocuSign). |
+| 3 | `docs/anderson_milton_briefing.md` | **Quem aprova o produto:** Milton Leite (perfil CEO, direto). O que ele precisa ver, crítica do mock atual, dossiê personalizado por cargo, sidebar lógica por perfil, white label UB, lista de entregáveis desta sessão. |
+| 4 | `STATUS_DADOS_V2.md` (raiz do worktree) | Qual módulo é REAL, qual é HIBRIDO (API+fallback mock), qual é MOCK puro, qual é PLACEHOLDER. Pra você não estilizar baseado em magnitudes erradas. |
+
+E também os **arquivos oficiais do cliente** em `docs/anderson_referencias/`:
+- `modelo_nominata_atual.docx` — papel timbrado oficial UB com logo + número 44 (extraído pra `codigo/frontend/public/branding/uniao-brasil/papel_timbrado.png`)
+- `ficha_filiacao_partidaria.pdf` — formulário oficial de filiação
+
+**Resumo dos 4 docs em uma frase:** o produto é uma plataforma de inteligência eleitoral pro União Brasil que precisa fazer sentido pra um Presidente do partido (perfil CEO) controlar/organizar/crescer o negócio dele, com dossiês personalizados por cargo, sidebar por perfil, white label azul/amarelo, e infraestrutura administrativa (nominata + DocuSign) que reflita a estrutura real do partido.
+
+---
+
 # PARTE 0 · ESTRUTURA DE BRANCHES (atualizado 25/04/2026)
 
 O repositório tem **3 branches** depois da reorganização de 25/04. Você trabalha **sempre na branch `v2-dev`**.
