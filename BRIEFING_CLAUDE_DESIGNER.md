@@ -4,6 +4,28 @@ Oi Claude Designer. Vou te dar tudo que precisa para integrar e aplicar os desig
 
 ---
 
+# PARTE 0 · ESTRUTURA DE BRANCHES (atualizado 25/04/2026)
+
+O repositório tem **3 branches** depois da reorganização de 25/04. Você trabalha **sempre na branch `v2-dev`**.
+
+| Branch | O que é | Você mexe? |
+|--------|---------|------------|
+| **`v2-dev`** | Plataforma nova em desenvolvimento - é onde você atua | SIM |
+| **`preservada`** | Versão antiga congelada para a reunião com cliente UB-SP | NÃO. Não tocar. |
+| **`main`** | Apenas config de Docker (`docker-compose.yml`) e meta-doc (`VERSOES.md`) | NÃO |
+
+Pastas principais pra design (todos na branch `v2-dev`):
+- `codigo/frontend/app/mazzel-preview/` - todas as rotas da plataforma
+- `codigo/frontend/components/plataforma-v2/` - Shell + Sidebar + Topbar + RBAC + 18 módulos
+- `codigo/frontend/components/plataforma-v2/modulos/` - implementação de cada módulo
+- `codigo/frontend/components/radar/CardPolitico.jsx` - Card FIFA V8 (zona protegida, aprovado 19/04)
+- `codigo/frontend/components/dossie/DossieBureau.jsx` - dossiê estilo Bureau (zona protegida, aprovado 19/04)
+- `codigo/frontend/app/globals-mazzel.css` - tokens de tema
+- `codigo/frontend/public/mockups/` - HTMLs originais que você gerou (Plataforma-v2, Dossie, Mapa do Cabo, Sidebar Condicional, etc)
+- `codigo/backend/` - API FastAPI (só pra entender endpoints e schemas v9)
+
+---
+
 # PARTE 1 · ACESSO E STACK
 
 ## Stack técnica
@@ -16,19 +38,13 @@ Oi Claude Designer. Vou te dar tudo que precisa para integrar e aplicar os desig
 
 ## Repositório GitHub (público)
 
-`https://github.com/cesarribeiro-Mazzelag/mazzel-eleitoral`
-
-Pastas principais pra design:
-- `codigo/frontend/app/mazzel-preview/` - todas as rotas da plataforma
-- `codigo/frontend/components/layout-mazzel/` - MazzelLayout, Sidebar, Topbar
-- `codigo/frontend/components/radar/CardPolitico.jsx` - Card FIFA V8 (zona protegida, aprovado 19/04)
-- `codigo/frontend/components/dossie/DossieBureau.jsx` - dossiê completo estilo Bureau (zona protegida, aprovado 19/04)
-- `codigo/frontend/app/globals-mazzel.css` - tokens de tema
-- `codigo/backend/` - API FastAPI (só pra entender os endpoints)
+`https://github.com/cesarribeiro-Mazzelag/mazzel-eleitoral` (lembre: branch **`v2-dev`** é onde você atua)
 
 ## Site rodando ao vivo (pode acessar)
 
-**URL pública:** `https://packs-transcription-catalyst-fig.trycloudflare.com/login`
+**URL pública:** `https://secondary-donald-legacy-could.trycloudflare.com/login`
+
+(URL muda toda vez que o tunnel reinicia - se cair, peço o César gerar nova URL)
 
 **Credenciais (perfil admin Mazzel):**
 - Email: `cesar.ribeiro@mazzelag.com`
@@ -40,10 +56,32 @@ Rotas pra inspecionar depois do login:
 - `/mazzel-preview/dossies/931510` - dossiê Bureau do Lula (exemplo completo)
 - `/mazzel-preview/campanha` - 7 tabs
 - `/mazzel-preview/chat` - chat sigiloso
-- `/mazzel-preview/mapa` - mapa eleitoral (hoje em mock estático)
+- `/mazzel-preview/mapa` - **Mapa Estratégico** (ver mudança crítica abaixo)
 - `/mazzel-preview/delegados`, `/coordenadores`, `/liderancas`, `/cabos`, `/suplentes`, `/afiliados`, `/alertas`, `/ia`, `/portal`, `/relatorios`, `/glossario`, `/estudo`, `/admin`
 
 **Observação:** a URL é um tunnel Cloudflare grátis rodando no Mac do César. Só fica no ar quando o computador dele está ligado. A URL pode mudar quando reiniciar o tunnel. Pra produção migramos depois pra `app.mazzelag.com`.
+
+### ⚠️ MUDANÇA CRÍTICA: Mapa Estratégico vs Mapa Eleitoral (decisão 25/04/2026)
+
+A sidebar principal **NÃO** terá Mapa Eleitoral. O Mapa Eleitoral é motor de dados (TSE, votação, eleitos históricos), mas pra rotina do partido faz mais sentido um **Mapa Estratégico** mostrando o que o partido está fazendo HOJE no território.
+
+| Mapa | Foco | Onde fica | Status |
+|------|------|-----------|--------|
+| **Mapa Estratégico** (NOVO) | Domínio territorial: equipe + lideranças + candidatos eleitos + emendas + scores | Sidebar principal (`/mazzel-preview/mapa`) | A redesenhar pelo Designer |
+| **Mapa Eleitoral** (existente) | Votação histórica TSE com drill-down | Sub-tela do módulo **Estudo** (`/mazzel-preview/estudo/mapa-eleitoral` ou similar) | Reaproveitar lógica existente |
+
+**Como deve funcionar o Mapa Estratégico:**
+- Drill-down 5 níveis (Brasil→UF→Município→Bairro→Microregião) - **mesma lógica do Mapa Eleitoral, apenas voltada pra pessoas da equipe**
+- Click numa região → painel lateral mostra:
+  - Lideranças daquela área (com card resumo)
+  - Trabalho das lideranças (atividades, presença, etc)
+  - Candidatos eleitos da região
+  - Emendas executadas
+  - Scores Overall v9
+  - Cobertura da equipe (quantos cabos/coordenadores ativos)
+- **Navegação integrada:** click numa liderança no mapa → abre dossiê dela direto
+
+Importante: o Designer já tinha proposto algo nesse sentido em `Plataforma-v2.html` ou correlatos, mas implementações de agentes posteriores quebraram a lógica subindo o Mapa Eleitoral como principal. **Voltar pra proposta original do Designer.**
 
 ---
 
