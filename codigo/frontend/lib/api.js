@@ -49,12 +49,15 @@ async function apiFetch(path, options = {}) {
     credentials: "include",
   });
 
-  // 401 → limpa sessão e vai para login
+  // 401 → limpa sessão e vai para login (preservando rota atual em ?next=)
   if (resp.status === 401) {
     const isAuthRoute = path.startsWith("/auth/");
     if (!isAuthRoute) {
       clearSession();
-      window.location.href = "/login";
+      if (typeof window !== "undefined" && !window.location.pathname.startsWith("/login")) {
+        const here = window.location.pathname + window.location.search;
+        window.location.href = `/login?next=${encodeURIComponent(here)}`;
+      }
     }
     const err = await resp.json().catch(() => ({ detail: "Não autorizado." }));
     throw new Error(err.detail ?? "Não autorizado.");

@@ -63,11 +63,7 @@ export default function Page() {
           setStatus("ok");
           return;
         }
-        if (err instanceof ApiError && (err.status === 401 || err.status === 403)) {
-          setStatus("unauth");
-          setProfile(null);
-          setErrorMsg("Sem sessão ativa. Faça login para visualizar o dossiê.");
-        } else if (err instanceof ApiError && err.status === 404) {
+        if (err instanceof ApiError && err.status === 404) {
           setStatus("notfound");
           setProfile(null);
           setErrorMsg(`Candidato ${id} não encontrado no backend.`);
@@ -102,10 +98,8 @@ export default function Page() {
     );
   }
 
-  if (status === "notfound" || status === "unauth" || status === "error" || !profile) {
-    const titulo = status === "unauth"
-      ? "Sessão expirada"
-      : status === "notfound"
+  if (status === "notfound" || status === "error" || !profile) {
+    const titulo = status === "notfound"
       ? "Perfil não encontrado"
       : status === "error"
       ? "Falha ao carregar dossiê"

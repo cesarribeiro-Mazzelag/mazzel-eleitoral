@@ -3,14 +3,23 @@
  * Página de Login — Mazzel Tech · Inteligência Eleitoral
  */
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
 import { api } from "@/lib/api";
 import { useToast } from "@/lib/toast";
 import { LogoMazzel } from "@/components/ui/LogoUniao";
 
+function safeNext(raw) {
+  if (!raw || typeof raw !== "string") return "/mazzel-preview";
+  if (!raw.startsWith("/") || raw.startsWith("//")) return "/mazzel-preview";
+  if (raw.startsWith("/login")) return "/mazzel-preview";
+  return raw;
+}
+
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const next = safeNext(searchParams.get("next"));
   const toast = useToast();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -32,7 +41,7 @@ export default function LoginPage() {
         setPrecisa2fa(true);
       } else {
         api.setSession(resp.access_token, resp.usuario);
-        router.replace("/dashboard");
+        router.replace(next);
       }
     } catch (err) {
       toast(err.message ?? "E-mail ou senha incorretos.", "error");
@@ -47,7 +56,7 @@ export default function LoginPage() {
     try {
       const resp = await api.auth.verificar2fa(codigo2fa, token2fa);
       api.setSession(resp.access_token, resp.usuario);
-      router.replace("/dashboard");
+      router.replace(next);
     } catch (err) {
       toast(err.message ?? "Código inválido.", "error");
       setCodigo2fa("");

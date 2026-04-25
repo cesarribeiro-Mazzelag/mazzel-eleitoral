@@ -27,6 +27,17 @@ export class ApiError extends Error {
   }
 }
 
+function redirectToLogin() {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem("ub_token");
+    localStorage.removeItem("ub_user");
+  } catch {}
+  const here = window.location.pathname + window.location.search;
+  if (window.location.pathname.startsWith("/login")) return;
+  window.location.href = `/login?next=${encodeURIComponent(here)}`;
+}
+
 export async function fetchJson(path, opts = {}) {
   const url = path.startsWith("http") ? path : `${API_BASE}${path}`;
   const headers = new Headers(opts.headers || {});
@@ -47,12 +58,14 @@ export async function fetchJson(path, opts = {}) {
   if (!r.ok) {
     let body = null;
     try { body = await r.json(); } catch {}
-    // body.detail pode ser string (erro simples) ou array (422 validacao) - normalizamos pra string
     let detail = body?.detail ?? body?.message;
     if (Array.isArray(detail)) {
       detail = detail.map((e) => e?.msg || JSON.stringify(e)).join("; ");
     } else if (detail && typeof detail === "object") {
       detail = JSON.stringify(detail);
+    }
+    if (r.status === 401 && !path.startsWith("/auth/")) {
+      redirectToLogin();
     }
     throw new ApiError(String(detail || `HTTP ${r.status}`), r.status, body);
   }
@@ -65,8 +78,13 @@ export const API = {
   dashboard: (params = {}) =>
     fetchJson(`/dashboard/visao-geral${toQuery(params)}`),
   dossie: (id) => fetchJson(`/dossie/${encodeURIComponent(id)}`),
+  // Listagem de dossies (Biblioteca). Endpoint canonico: /dossies.
+  dossies: (params = {}) =>
+    fetchJson(`/dossies${toQuery(params)}`),
+  // Alias deprecado: codigo novo deve usar API.dossies().
+  // Mantido pra nao quebrar imports antigos durante a migracao.
   radar: (params = {}) =>
-    fetchJson(`/radar/politicos${toQuery(params)}`),
+    fetchJson(`/dossies${toQuery(params)}`),
   filiados: (params = {}) =>
     fetchJson(`/filiados${toQuery(params)}`),
   delegados: () => fetchJson(`/delegados`),
