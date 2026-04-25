@@ -23,6 +23,7 @@ from app.core.deps import requer_qualquer
 from app.core.security import criar_access_token
 from app.models.operacional import Usuario
 from app.schemas.dossie import DossiePolitico
+from app.services.overall_v9_batch import persistir_overall_v9_de_dossie
 from app.services.pdf_browser import gerar_pdf_dossie_via_browser
 
 
@@ -39,9 +40,20 @@ async def get_dossie(
 ) -> DossiePolitico:
     """Dossie politico. Parametro ?ano= filtra financeiro/desempenho/mapa para aquele ciclo."""
     try:
-        return await compilar_dossie(db, candidato_id, ano_ciclo=ano)
+        dossie = await compilar_dossie(db, candidato_id, ano_ciclo=ano)
     except ValueError as e:
         raise HTTPException(404, str(e))
+
+    # Lazy warmup: persiste overall na politico_overall_v9 pra que o /radar
+    # passe a mostrar valor coerente com o dossie. Idempotente, ~5ms. Falha
+    # silenciosa pra nao quebrar a resposta do dossie.
+    if ano is None:
+        try:
+            await persistir_overall_v9_de_dossie(db, candidato_id, dossie)
+        except Exception:
+            logger.exception("Falha ao persistir overall_v9 (lazy warmup)")
+
+    return dossie
 
 
 @router.get("/{candidato_id}/pdf")

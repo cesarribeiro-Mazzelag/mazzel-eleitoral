@@ -7,7 +7,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.api.v1.endpoints import auth, mapa, mapa_historia, politicos, politico_portal, delegados, filiados, validar, ia, alertas, admin, fotos, coordenadores, dashboard, liderancas, cabos, dossie, radar, sistema, seguranca, campanha, afiliados, chat
+from app.api.v1.endpoints import auth, mapa, mapa_historia, politicos, politico_portal, delegados, filiados, validar, ia, alertas, admin, fotos, coordenadores, dashboard, liderancas, cabos, dossie, dossies_listagem, radar, sistema, seguranca, campanha, afiliados, chat
 
 logger = logging.getLogger(__name__)
 
@@ -226,6 +226,7 @@ app.include_router(politicos.router,       prefix="/politicos",   tags=["politic
 app.include_router(radar.router,           prefix="/radar",       tags=["radar"])
 app.include_router(sistema.router,         prefix="/sistema",     tags=["sistema"])
 app.include_router(dossie.router,          prefix="/dossie",      tags=["dossie"])
+app.include_router(dossies_listagem.router, prefix="/dossies",    tags=["dossies"])
 app.include_router(politico_portal.router, prefix="/meu-painel",  tags=["meu-painel"])
 app.include_router(delegados.router,       prefix="/delegados",   tags=["delegados"])
 app.include_router(filiados.router,        prefix="/filiados",    tags=["filiados"])

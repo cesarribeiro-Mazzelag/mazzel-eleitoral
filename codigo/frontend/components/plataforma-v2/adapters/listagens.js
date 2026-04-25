@@ -25,26 +25,28 @@ function tierNormalize(t) {
   return "bronze";
 }
 
-// Mapeia atributos_6 do backend (8 dim antigas: VOT/EFI/ART/FID/INT/TER/POT/FIN)
-// para as 6 dim v9 (ATV/LEG/BSE/INF/MID/PAC) conforme o estudo de matriz aprovado em 24/04/2026.
-// Mapeamento aproximado ate o backend retornar overall_v9 nativo - cada v9 mapeia
-// para UMA antiga distinta (sem duplicar) pra preservar variacao entre candidatos.
-function mapAtributos6ToV9(atr) {
+// Fallback aproximado: backend pode nao ter overall_v9 ainda (candidato sem
+// linha em politico_overall_v9). Mapeia atributos_6 (V8) -> v9 com perda
+// quando aparecer. Mapeamento original do estudo de 24/04/2026.
+function mapAtributos6ToV9Fallback(atr) {
   if (!atr) return null;
   return {
-    ATV: atr.EFI ?? atr.efi ?? null,    // Atividade ~ Eficiencia (taxa vitoria + custo/voto)
-    LEG: atr.ART ?? atr.art ?? null,    // Legislativo ~ Articulacao (PLs aprovados)
-    BSE: atr.VOT ?? atr.vot ?? null,    // Base ~ Votacao (volume eleitoral)
-    INF: atr.FID ?? atr.fid ?? null,    // Influencia ~ Fidelidade (coerencia partidaria)
-    MID: atr.POT ?? atr.pot ?? null,    // Midia ~ Potencial midiatico (momentum)
-    PAC: atr.TER ?? atr.ter ?? null,    // Pactuacao ~ Territorial (alcance geografico = capacidade de pactuar regioes)
+    ATV: atr.EFI ?? atr.efi ?? null,
+    LEG: atr.ART ?? atr.art ?? null,
+    BSE: atr.VOT ?? atr.vot ?? null,
+    INF: atr.FID ?? atr.fid ?? null,
+    MID: atr.POT ?? atr.pot ?? null,
+    PAC: atr.TER ?? atr.ter ?? null,
   };
 }
 
 export function radarCardsFromApi(apiResp) {
   if (!apiResp?.items) return null;
   return apiResp.items.map((p) => {
-    const v9 = p.overall_v9 || mapAtributos6ToV9(p.atributos_6);
+    // Fonte unica: backend retorna overall_v9 quando ha linha em
+    // politico_overall_v9. Cai pro fallback aproximado quando o candidato
+    // ainda nao foi backfilled.
+    const v9 = p.overall_v9 || mapAtributos6ToV9Fallback(p.atributos_6);
     return {
       // Campos legados (FifaMiniCard usa)
       id: p.candidato_id,

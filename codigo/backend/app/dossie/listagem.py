@@ -1,5 +1,13 @@
 """
-Listagem do Radar - Politicos (V2 Champion Select).
+Listagem do modulo Dossies (Biblioteca de Dossies Politicos).
+
+Antes vivia em `app/radar/dimensions/politicos.py` quando o modulo se chamava
+"Radar Politico". Em 21/04/2026 o modulo foi renomeado para "Dossies" e
+em 25/04/2026 o codigo foi movido pra ca pra alinhar a semantica do backend.
+
+Serve (e ainda via alias /radar/politicos) a grade de cartinhas FIFA da
+biblioteca de dossies. Cada item da grade abre um dossie detalhado em
+/dossie/{id}.
 
 Uma query SQL agregada que calcula classificacao + risco + metrica_destaque
 + status (ELEITO/NAO_ELEITO/SUPLENTE_ASSUMIU/SUPLENTE_ESPERA) em SQL puro.
@@ -40,10 +48,10 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.radar import (
-    FiltrosPoliticos,
+    DossieCard,
+    DossiesListagemResponse,
+    FiltrosDossies,
     MetricaDestaque,
-    PoliticoCard,
-    RadarPoliticosResponse,
     TrajetoriaItem,
 )
 from app.services.cores_partidos import get_cor_partido
@@ -61,13 +69,15 @@ _ORDENACAO_SQL = {
     "nome":                  "nome ASC",
     "nome_asc":              "nome ASC",
     "votos_desc":            "votos_total DESC NULLS LAST",
-    # overall_desc e calculado em Python, no SQL usamos potencial como proxy
-    "overall_desc":          "potencial_estrategico DESC NULLS LAST, votos_total DESC NULLS LAST",
+    # overall_desc agora le da tabela politico_overall_v9 (fonte unica). Candidatos
+    # sem linha na tabela ficam com NULL e caem para o final, com ordenacao
+    # secundaria por potencial_estrategico (proxy).
+    "overall_desc":          "pov_overall DESC NULLS LAST, potencial_estrategico DESC NULLS LAST, votos_total DESC NULLS LAST",
     "votos_faltando":        "votos_faltando ASC NULLS LAST, votos_total DESC NULLS LAST",
 }
 
 
-def _build_filtros(filtros: FiltrosPoliticos) -> tuple[str, dict]:
+def _build_filtros(filtros: FiltrosDossies) -> tuple[str, dict]:
     """
     Monta a clausula WHERE para o SELECT FINAL (depois da CTE base).
     Usa nomes das colunas da CTE (sem prefixo de tabela).
@@ -110,7 +120,7 @@ def _build_filtros(filtros: FiltrosPoliticos) -> tuple[str, dict]:
 # ══════════════════════════════════════════════════════════════════════════════
 # NOTA (17/04/2026): a CTE que calculava classificacao/risco/potencial em
 # tempo de request foi MATERIALIZADA em `mv_radar_politicos`
-# (migration 039). A query em `listar_politicos` abaixo le direto da MV.
+# (migration 039). A query em `listar_dossies` abaixo le direto da MV.
 #
 # Se precisar alterar a logica (cortes de pct_rank, formula do potencial,
 # criterios de classificacao): editar o SQL da MV na migration 039 ou
@@ -121,10 +131,10 @@ def _build_filtros(filtros: FiltrosPoliticos) -> tuple[str, dict]:
 # ══════════════════════════════════════════════════════════════════════════════
 
 
-async def listar_politicos(
+async def listar_dossies(
     db: AsyncSession,
-    filtros: FiltrosPoliticos,
-) -> RadarPoliticosResponse:
+    filtros: FiltrosDossies,
+) -> DossiesListagemResponse:
     """
     Devolve a pagina da listagem do Radar - Politicos.
 
@@ -143,14 +153,27 @@ async def listar_politicos(
     # Quando ativos, puxamos batch maior e aplicamos post-filter + paginacao em memoria.
     tem_filtro_fifa = bool(filtros.tier or filtros.trait)
 
-    # Dedup por candidato: UM card por pessoa, preferindo candidatura mais recente.
-    # Historico completo e obtido via dossie (clique no card).
-    # DISTINCT ON (candidato_id) ORDER BY candidato_id, ano DESC garante a logica.
+    # Le da `mv_dossies_listagem` (migration 052) - MV ja com 1 row por
+    # candidato_id (DISTINCT ON precomputado). Antes faziamos DISTINCT ON em
+    # runtime sobre mv_radar_politicos, que custava ~1.95s de sort em disco.
+    #
+    # LEFT JOIN politico_overall_v9 traz overall pre-calculado quando o
+    # candidato ja foi backfilled. Sem linha -> pov_* = NULL e _calcular_fifa_lite
+    # cobre via batches. Backfill prioriza eleitos; demais ganham linha sob
+    # demanda no /dossie/{id} (lazy warmup).
     base_query = f"""
-        SELECT DISTINCT ON (candidato_id) *
-        FROM mv_radar_politicos
+        SELECT
+            distintos.*,
+            pov.overall AS pov_overall,
+            pov.tier    AS pov_tier,
+            pov.traits  AS pov_traits,
+            pov.atv AS pov_atv, pov.leg AS pov_leg, pov.bse AS pov_bse,
+            pov.inf AS pov_inf, pov.mid AS pov_mid, pov.pac AS pov_pac
+        FROM mv_dossies_listagem AS distintos
+        LEFT JOIN politico_overall_v9 pov
+          ON pov.candidato_id = distintos.candidato_id
+         AND pov.ciclo_ano = distintos.ano
         {where_sql}
-        ORDER BY candidato_id, ano DESC
     """
 
     if tem_filtro_fifa:
@@ -183,15 +206,14 @@ async def listar_politicos(
             )
             for r in rows
         ]
-        # Filtro em Python
+        # Filtro em Python (tier/trait preferem valores da tabela quando disponiveis)
         if filtros.tier:
             items_all = [i for i in items_all if i.tier == filtros.tier]
         if filtros.trait:
             items_all = [i for i in items_all if filtros.trait in (i.traits or [])]
 
-        # Ordenacao por overall quando for o criterio
-        if filtros.ordenar_por == "overall_desc":
-            items_all.sort(key=lambda x: (x.overall or 0), reverse=True)
+        # Sort por overall ja foi feito em SQL via JOIN com politico_overall_v9.
+        # Nao reordenamos em Python pra nao misturar overall real (tabela) com lite.
 
         total = len(items_all)
         inicio = (filtros.pagina - 1) * filtros.por_pagina
@@ -213,14 +235,27 @@ async def listar_politicos(
         rows = (await db.execute(text(sql), params)).mappings().all()
         total = (await db.execute(text(count_sql), params)).scalar() or 0
 
-        # Batch: juridico + financeiro + legislativo + executivo
-        cids = {r["candidato_id"] for r in rows}
-        candids = {r["candidatura_id"] for r in rows}
-        juri_por_cand = await _buscar_juridico_batch(db, cids)
-        fin_por_candid = await _buscar_financeiro_batch(db, candids)
-        legis_por_cand = await _buscar_legislativo_lite_batch(db, cids)
-        exec_por_cand = await _buscar_executivo_lite_batch(db, cids)
-        recordes_por_candid = await _buscar_recordes_batch(db, list(rows))
+        # Otimizacao: se TODAS as rows ja tem pov_overall (do JOIN), pulamos os
+        # batches que so existem para alimentar _calcular_fifa_lite. Reduz a
+        # latencia de paginas onde o backfill esta completo.
+        precisa_batches = any(r.get("pov_overall") is None for r in rows)
+
+        if precisa_batches:
+            cids = {r["candidato_id"] for r in rows if r.get("pov_overall") is None}
+            candids = {r["candidatura_id"] for r in rows if r.get("pov_overall") is None}
+            juri_por_cand = await _buscar_juridico_batch(db, cids)
+            fin_por_candid = await _buscar_financeiro_batch(db, candids)
+            legis_por_cand = await _buscar_legislativo_lite_batch(db, cids)
+            exec_por_cand = await _buscar_executivo_lite_batch(db, cids)
+            recordes_por_candid = await _buscar_recordes_batch(
+                db, [r for r in rows if r.get("pov_overall") is None]
+            )
+        else:
+            juri_por_cand = {}
+            fin_por_candid = {}
+            legis_por_cand = {}
+            exec_por_cand = {}
+            recordes_por_candid = {}
         items = [
             _row_to_card(
                 r,
@@ -233,9 +268,7 @@ async def listar_politicos(
             for r in rows
         ]
 
-        # Ordenacao por overall em memoria (post-sort)
-        if filtros.ordenar_por == "overall_desc":
-            items.sort(key=lambda x: (x.overall or 0), reverse=True)
+        # Sort por overall ja foi feito em SQL via JOIN com politico_overall_v9.
 
     # Batch fetch de trajetoria + votos corretos por turno. 2 queries IN (...)
     # para toda a pagina, evita N+1. Latencia total: ~10-20ms.
@@ -243,7 +276,7 @@ async def listar_politicos(
         await _anexar_votos_turno(db, items)
         await _anexar_trajetoria(db, items)
 
-    return RadarPoliticosResponse(
+    return DossiesListagemResponse(
         items=items,
         total=int(total),
         pagina=filtros.pagina,
@@ -398,7 +431,7 @@ async def _buscar_juridico_batch(
     return resultado
 
 
-async def _anexar_votos_turno(db: AsyncSession, items: list[PoliticoCard]) -> None:
+async def _anexar_votos_turno(db: AsyncSession, items: list[DossieCard]) -> None:
     """
     Corrige `votos_total` usando a tabela `votos_por_zona` como fonte de verdade.
 
@@ -447,7 +480,7 @@ async def _anexar_votos_turno(db: AsyncSession, items: list[PoliticoCard]) -> No
             it.votos_melhor_turno = v1
 
 
-async def _anexar_trajetoria(db: AsyncSession, items: list[PoliticoCard]) -> None:
+async def _anexar_trajetoria(db: AsyncSession, items: list[DossieCard]) -> None:
     """
     Preenche o campo `trajetoria` de cada card com os cargos anteriores do
     candidato (exceto a candidatura atual que ja esta no card).
@@ -933,8 +966,8 @@ def _row_to_card(
     legis_lite: Optional[object] = None,
     exec_lite: Optional[object] = None,
     recorde_tipo: Optional[str] = None,
-) -> PoliticoCard:
-    """Converte uma linha SQL em PoliticoCard, escolhendo a metrica destaque.
+) -> DossieCard:
+    """Converte uma linha SQL em DossieCard, escolhendo a metrica destaque.
 
     score_juridico_real vem do _buscar_juridico_batch. None quando candidato
     nao tem dado juridico (nao entra na media do overall).
@@ -959,12 +992,27 @@ def _row_to_card(
             formato="numero",
         )
 
-    overall, tier, traits, atributos_6 = _calcular_fifa_lite(
-        row, score_juridico_real, dados_financeiros, legis_lite, exec_lite,
-        recorde_tipo=recorde_tipo,
-    )
+    # Fonte unica: prefere politico_overall_v9 (LEFT JOIN traz pov_*) sobre o
+    # calculo lite. Fallback pro lite quando o candidato ainda nao foi backfilled.
+    pov_overall = row.get("pov_overall")
+    if pov_overall is not None:
+        overall = int(pov_overall)
+        tier = row.get("pov_tier")
+        traits = list(row.get("pov_traits") or [])
+        overall_v9 = {
+            "ATV": row.get("pov_atv"), "LEG": row.get("pov_leg"),
+            "BSE": row.get("pov_bse"), "INF": row.get("pov_inf"),
+            "MID": row.get("pov_mid"), "PAC": row.get("pov_pac"),
+        }
+        atributos_6 = None  # frontend deve preferir overall_v9 quando presente
+    else:
+        overall, tier, traits, atributos_6 = _calcular_fifa_lite(
+            row, score_juridico_real, dados_financeiros, legis_lite, exec_lite,
+            recorde_tipo=recorde_tipo,
+        )
+        overall_v9 = None
 
-    return PoliticoCard(
+    return DossieCard(
         candidato_id=row["candidato_id"],
         candidatura_id=row["candidatura_id"],
         nome=row["nome"],
@@ -990,9 +1038,10 @@ def _row_to_card(
         votos_ultimo_eleito=int(row["votos_ultimo_eleito"]) if row.get("votos_ultimo_eleito") is not None else None,
         situacao_tse=row.get("situacao_tse"),
         disputou_segundo_turno=bool(row.get("disputou_segundo_turno", False)),
-        # FIFA lite
+        # FIFA: pov (tabela) tem prioridade; lite fica como fallback
         overall=overall,
         tier=tier,
         traits=traits,
         atributos_6=atributos_6,
+        overall_v9=overall_v9,
     )

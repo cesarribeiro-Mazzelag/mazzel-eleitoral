@@ -1,17 +1,11 @@
-"""
-Endpoints do Radar Politico - LEGADO.
+"""Endpoint canonico do modulo Dossies (Biblioteca de Dossies Politicos).
 
-Em 21/04/2026 o "Radar Politico" foi unificado com "Dossies" (decisao Cesar).
-A listagem canonica de candidatos vive agora em `app/dossie/listagem.py` e e
-servida pelo endpoint `GET /dossies` (ver `dossies_listagem.py`).
+GET /dossies        - lista paginada de cartinhas com filtros e ordenacao
+GET /dossie/{id}    - dossie completo (single source of truth, em dossie.py)
 
-Este modulo mantem `/radar/politicos` como ALIAS pra compatibilidade com a
-versao preservada (UB-SP). O Radar Politico tambem mantem `/radar/partidos`,
-que continua sendo um observatorio de partidos legitimo.
-
-Quando a V2 for promovida e a versao preservada for descomissionada, o alias
-`/radar/politicos` pode ser removido. O Radar permanecera como observatorio
-dinamico (timeline + sentinela) - ver decisao 21/04/2026 no Cerebro.
+Em 21/04/2026 o "Radar Politico" foi unificado com "Dossies". Este endpoint
+e a fonte canonica da listagem. O alias `/radar/politicos` (em radar.py)
+delega pra mesma funcao e existe so pra nao quebrar a versao preservada.
 """
 from typing import Optional
 
@@ -22,13 +16,7 @@ from app.core.database import get_db
 from app.core.deps import requer_qualquer
 from app.dossie.listagem import listar_dossies
 from app.models.operacional import Usuario
-from app.radar.dimensions.partidos import listar_partidos
-from app.schemas.radar import (
-    DossiesListagemResponse,
-    FiltrosDossies,
-    FiltrosPartidos,
-    RadarPartidosResponse,
-)
+from app.schemas.radar import DossiesListagemResponse, FiltrosDossies
 
 
 router = APIRouter()
@@ -56,8 +44,8 @@ def _split_csv_int(value: Optional[str]) -> Optional[list[int]]:
     return out or None
 
 
-@router.get("/politicos", deprecated=True)
-async def get_radar_politicos(
+@router.get("")
+async def get_dossies(
     classificacao: Optional[str] = Query(None, description="CSV: FORTE,EM_RISCO,..."),
     risco:         Optional[str] = Query(None, description="CSV: BAIXO,MEDIO,ALTO"),
     status:        Optional[str] = Query(None, description="CSV: ELEITO,NAO_ELEITO,SUPLENTE_ASSUMIU,SUPLENTE_ESPERA"),
@@ -73,7 +61,7 @@ async def get_radar_politicos(
     db: AsyncSession = Depends(get_db),
     _: Usuario = Depends(requer_qualquer),
 ) -> DossiesListagemResponse:
-    """ALIAS DEPRECADO: usar GET /dossies. Mantido pra V1 (preservada UB-SP)."""
+    """Biblioteca de Dossies Politicos - paginada, com filtros e ordenacao."""
     filtros = FiltrosDossies(
         classificacao=_split_csv(classificacao),  # type: ignore[arg-type]
         risco=_split_csv(risco),                  # type: ignore[arg-type]
@@ -89,24 +77,3 @@ async def get_radar_politicos(
         por_pagina=por_pagina,
     )
     return await listar_dossies(db, filtros)
-
-
-@router.get("/partidos", response_model=RadarPartidosResponse)
-async def get_radar_partidos(
-    ano:           Optional[int] = Query(None),
-    busca:         Optional[str] = Query(None, min_length=2),
-    ordenar_por:   str = Query("votos_total"),
-    pagina:        int = Query(1, ge=1),
-    por_pagina:    int = Query(30, ge=1, le=100),
-    db: AsyncSession = Depends(get_db),
-    _: Usuario = Depends(requer_qualquer),
-) -> RadarPartidosResponse:
-    """Lista de partidos do Radar — paginada, com filtros."""
-    filtros = FiltrosPartidos(
-        ano=ano,
-        busca=busca,
-        ordenar_por=ordenar_por,                  # type: ignore[arg-type]
-        pagina=pagina,
-        por_pagina=por_pagina,
-    )
-    return await listar_partidos(db, filtros)

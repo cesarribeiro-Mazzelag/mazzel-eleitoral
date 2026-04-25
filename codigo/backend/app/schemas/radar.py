@@ -146,8 +146,11 @@ class PoliticoCard(BaseModel):
     overall: Optional[int] = None
     tier: Optional[str] = None  # dourado | ouro | prata | bronze
     traits: list[str] = Field(default_factory=list)
-    # 6 atributos compactos pra carta (VOT/EFI/ART/FID/INT/TER)
+    # 6 atributos compactos pra carta (VOT/EFI/ART/FID/INT/TER) - LEGADO
     atributos_6: Optional[dict] = None
+    # Sub-medidas v9 (ATV/LEG/BSE/INF/MID/PAC) precalculadas em politico_overall_v9.
+    # Quando preenchido, frontend deve preferir este sobre atributos_6 (fonte unica).
+    overall_v9: Optional[dict] = None
 
     # Trajetoria politica: cargos disputados anteriormente (rodape da carta)
     trajetoria: list[TrajetoriaItem] = Field(default_factory=list)
@@ -174,6 +177,15 @@ class RadarPoliticosResponse(BaseModel):
     total: int
     pagina: int
     por_pagina: int
+
+
+# ── Aliases semanticos (modulo virou Dossies em 21/04/2026) ──────────────────
+# Nomes "Politico"/"Radar" foram herdados do antigo Radar Politico, que foi
+# unificado com Dossies. Codigo novo deve preferir os aliases abaixo. Os nomes
+# antigos continuam exportados para nao quebrar a versao preservada.
+DossieCard = PoliticoCard
+FiltrosDossies = FiltrosPoliticos
+DossiesListagemResponse = RadarPoliticosResponse
 
 
 # ══════════════════════════════════════════════════════════════════════════════

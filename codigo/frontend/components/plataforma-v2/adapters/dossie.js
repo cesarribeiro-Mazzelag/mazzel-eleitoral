@@ -478,18 +478,11 @@ export function adaptDossie(dossie) {
     ciclo.ciclo_ano,
   ].filter(Boolean).join(" · ");
 
-  // Cartinha embarcada (Card V8): shape compativel com /components/radar/CardPolitico.jsx
-  // Tenta consumir dados da cartinha persistidos pelo Dossies.jsx (sessionStorage) pra
-  // garantir consistencia entre grade e dossie. Fallback: dados do proprio /dossie/{id}.
+  // Cartinha embarcada (Card V8): shape compativel com /components/radar/CardPolitico.jsx.
+  // Backend agora le de politico_overall_v9 (fonte unica) - grade e dossie batem por
+  // construcao, sem necessidade de sessionStorage workaround.
   const overallStatsForCard = adaptOverallStats(dossie);
-  let cartinhaFromGrid = null;
-  if (typeof window !== "undefined") {
-    try {
-      const raw = sessionStorage.getItem(`dossie_card_${id.id}`);
-      if (raw) cartinhaFromGrid = JSON.parse(raw);
-    } catch {}
-  }
-  const cartinha = cartinhaFromGrid || {
+  const cartinha = {
     candidato_id: id.id,
     nome: id.nome,
     nome_urna: id.nome_urna,
@@ -499,15 +492,13 @@ export function adaptDossie(dossie) {
     estado_uf: id.estado_uf || ciclo.ciclo_uf,
     foto_url: id.foto_url,
     overall: rating,
-    overall_v9: overallStatsForCard,  // ATV/LEG/BSE/INF/MID/PAC
+    overall_v9: overallStatsForCard,
     votos_total: ciclo.ciclo_votos ?? id.ultimos_votos,
     ano: ciclo.ciclo_ano,
   };
 
-  // Quando temos cartinha vinda da grade, alinhamos overall do header com o da grade
-  // (mesma fonte = mesmo numero pro usuario, evita "99 na grade vs 85 no dossie").
-  const ratingExibido = cartinhaFromGrid?.overall ?? rating;
-  const overallStatsExibidos = cartinhaFromGrid?.overall_v9 ?? overallStatsForCard;
+  const ratingExibido = rating;
+  const overallStatsExibidos = overallStatsForCard;
 
   return {
     id: id.id,
