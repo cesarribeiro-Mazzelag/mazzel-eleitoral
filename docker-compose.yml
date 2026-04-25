@@ -56,6 +56,9 @@ services:
       # Backend compartilhado: aponta pro worktree V2 (tem schemas v9, coletas atividade,
       # JOIN dossie, CORS regex trycloudflare). Migration HEAD do banco = 050.
       - ../uniao-brasil-v2/codigo/backend:/app
+      # Fotos do TSE (~57 GB) vivem no root worktree e nao foram replicadas pros worktrees.
+      # Override aqui pra ambos worktrees verem o mesmo asset compartilhado.
+      - ./codigo/backend/dados_brutos:/app/dados_brutos
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
 volumes:
