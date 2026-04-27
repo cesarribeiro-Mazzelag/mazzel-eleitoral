@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark" data-tenant="ub">
+<head>
+<meta charset="UTF-8">
+<title>Documentos · UB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../F1-fundacao/tokens.css">
+<script src="../F1-fundacao/theme-bootstrap.js"></script>
+<style>
+html, body { height: 100%; margin: 0; overflow: hidden; }
+.app { display: grid; grid-template-columns: 240px 1fr 460px; height: 100vh; }
+
+/* LEFT: pastas */
+.side { background: var(--mz-bg-sidebar); border-right: 1px solid var(--mz-rule); display: flex; flex-direction: column; overflow-y: auto; }
+.side::-webkit-scrollbar { width: 4px; } .side::-webkit-scrollbar-thumb { background: var(--mz-rule-strong); }
+.brand { padding: 16px 18px; border-bottom: 1px solid var(--mz-rule); display: flex; gap: 10px; align-items: center; }
+.brand .logo { width: 32px; height: 32px; background: var(--mz-tenant-primary); border: 1px solid var(--mz-tenant-accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; color: var(--mz-tenant-accent); font-size: 14px; }
+.brand .name { font-size: 13px; font-weight: 800; color: var(--mz-fg-strong); }
+.brand .name span { display: block; font-size: 9px; color: var(--mz-fg-faint); font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; margin-top: 1px; }
+
+.upload-zone { margin: 14px 16px; padding: 18px 12px; border: 1.5px dashed var(--mz-rule-strong); border-radius: var(--mz-r-md); text-align: center; cursor: pointer; transition: all 120ms; background: var(--mz-bg-card); }
+.upload-zone:hover { border-color: var(--mz-tenant-accent); background: var(--mz-bg-card-2); }
+.upload-zone .ico { font-size: 22px; margin-bottom: 6px; }
+.upload-zone b { display: block; font-size: 12px; color: var(--mz-fg-strong); font-weight: 700; }
+.upload-zone span { font-size: 10px; color: var(--mz-fg-faint); display: block; margin-top: 3px; }
+
+.tree-section { padding: 6px 8px 14px; }
+.tree-section h3 { font-size: 9.5px; letter-spacing: 0.16em; color: var(--mz-fg-faint); text-transform: uppercase; font-weight: 700; margin: 12px 10px 6px; }
+.folder { display: grid; grid-template-columns: 12px 18px 1fr auto; gap: 8px; padding: 6px 10px; cursor: pointer; align-items: center; font-size: 12px; color: var(--mz-fg); border-radius: var(--mz-r-sm); }
+.folder:hover { background: var(--mz-bg-card); }
+.folder.active { background: var(--mz-tenant-primary-soft); border-left: 3px solid var(--mz-tenant-accent); padding-left: 7px; }
+.folder .arr { color: var(--mz-fg-faint); font-size: 9px; }
+.folder .ico { font-size: 13px; }
+.folder b { font-weight: 600; color: var(--mz-fg-strong); }
+.folder .qty { font-family: var(--mz-font-mono); font-size: 9.5px; color: var(--mz-fg-faint); }
+.folder.warn .qty { background: var(--mz-warn); color: var(--mz-fg-on-accent); padding: 1px 4px; border-radius: 3px; font-weight: 800; }
+.children { margin-left: 16px; }
+
+/* CENTER */
+main { overflow: hidden; display: flex; flex-direction: column; background: var(--mz-bg-page); }
+.top-bar { padding: 12px 22px; border-bottom: 1px solid var(--mz-rule); background: var(--mz-bg-topbar); display: flex; align-items: center; gap: 14px; }
+.crumb { font-size: 11.5px; color: var(--mz-fg-muted); flex: 1; display: flex; gap: 6px; }
+.crumb b { color: var(--mz-fg-strong); font-weight: 600; }
+.crumb span::after { content: '›'; margin: 0 6px; color: var(--mz-rule-strong); }
+.crumb span:last-child::after { display: none; }
+.search { width: 280px; position: relative; }
+.search input { width: 100%; background: var(--mz-bg-card); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-md); padding: 7px 30px 7px 30px; font-size: 11.5px; color: var(--mz-fg); outline: none; }
+.search::before { content: '🔍'; position: absolute; left: 10px; top: 7px; font-size: 11px; }
+.btn { font-size: 11.5px; font-weight: 600; padding: 7px 12px; border-radius: var(--mz-r-md); border: 1px solid var(--mz-rule); background: var(--mz-bg-card); color: var(--mz-fg); cursor: pointer; }
+.btn.primary { background: var(--mz-tenant-primary); color: #fff; border-color: var(--mz-tenant-primary-strong); }
+.btn.tenant { background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent); border-color: var(--mz-tenant-accent); font-weight: 800; }
+
+.tabs-bar { padding: 0 22px; border-bottom: 1px solid var(--mz-rule); background: var(--mz-bg-topbar); display: flex; gap: 0; }
+.tab { font-size: 11.5px; font-weight: 600; padding: 11px 14px; background: none; border: 0; color: var(--mz-fg-muted); cursor: pointer; border-bottom: 2px solid transparent; display: flex; gap: 6px; align-items: center; }
+.tab.active { color: var(--mz-fg-strong); border-color: var(--mz-tenant-accent); }
+.tab .num { font-family: var(--mz-font-mono); font-size: 9.5px; background: var(--mz-bg-card); padding: 1px 5px; border-radius: 3px; color: var(--mz-fg-faint); }
+.tab.active .num { background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent); }
+.tab .num.warn { background: var(--mz-warn); color: var(--mz-fg-on-accent); }
+
+.view-bar { padding: 10px 22px; border-bottom: 1px solid var(--mz-rule); background: var(--mz-bg-page); display: flex; align-items: center; gap: 12px; font-size: 11px; color: var(--mz-fg-muted); }
+.view-bar .right { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+.view-bar select { background: var(--mz-bg-card); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-sm); padding: 4px 8px; font-size: 11px; color: var(--mz-fg); outline: none; }
+.view-toggle { display: flex; background: var(--mz-bg-card); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-sm); }
+.view-toggle button { background: none; border: 0; padding: 5px 9px; font-size: 11px; color: var(--mz-fg-muted); cursor: pointer; }
+.view-toggle button.on { background: var(--mz-tenant-primary); color: #fff; }
+
+.docs-area { flex: 1; overflow-y: auto; padding: 16px 22px; }
+.docs-area::-webkit-scrollbar { width: 6px; } .docs-area::-webkit-scrollbar-thumb { background: var(--mz-rule-strong); }
+
+/* table */
+.doc-head { display: grid; grid-template-columns: 26px 1fr 110px 130px 90px 100px 110px 60px; gap: 10px; padding: 8px 14px; font-size: 9.5px; letter-spacing: 0.14em; color: var(--mz-fg-faint); text-transform: uppercase; font-weight: 700; border-bottom: 1px solid var(--mz-rule); }
+.doc-row { display: grid; grid-template-columns: 26px 1fr 110px 130px 90px 100px 110px 60px; gap: 10px; padding: 11px 14px; border-bottom: 1px solid var(--mz-rule); align-items: center; cursor: pointer; }
+.doc-row:hover { background: var(--mz-bg-card); }
+.doc-row.selected { background: var(--mz-tenant-primary-soft); border-left: 3px solid var(--mz-tenant-accent); padding-left: 11px; }
+.doc-row .check { width: 16px; height: 16px; border: 1.5px solid var(--mz-rule-strong); border-radius: 3px; }
+.doc-row.selected .check { background: var(--mz-tenant-accent); border-color: var(--mz-tenant-accent); }
+.doc-row .file { display: flex; gap: 12px; align-items: center; }
+.doc-row .file-ico { width: 36px; height: 44px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 11px; color: #fff; flex-shrink: 0; letter-spacing: 0.04em; }
+.fi-pdf { background: #c2410c; }
+.fi-doc { background: #1d4ed8; }
+.fi-xls { background: #047857; }
+.fi-img { background: #7c3aed; }
+.fi-zip { background: #4b5563; }
+.doc-row .file b { font-size: 12.5px; color: var(--mz-fg-strong); display: block; font-weight: 600; line-height: 1.3; }
+.doc-row .file small { font-size: 10.5px; color: var(--mz-fg-faint); display: block; margin-top: 2px; }
+.doc-row .cell { font-size: 11.5px; color: var(--mz-fg); }
+.doc-row .cell b { color: var(--mz-fg-strong); font-weight: 600; }
+.doc-row .cell small { display: block; color: var(--mz-fg-faint); font-size: 10px; font-family: var(--mz-font-mono); }
+.stat { font-size: 9.5px; padding: 3px 7px; border-radius: 3px; font-weight: 800; letter-spacing: 0.04em; display: inline-block; }
+.stat.vigente { background: var(--mz-ok-soft); color: var(--mz-ok); }
+.stat.assinado { background: var(--mz-ok-soft); color: var(--mz-ok); }
+.stat.pendente { background: var(--mz-warn-soft); color: var(--mz-warn); }
+.stat.rascunho { background: var(--mz-bg-elevated); color: var(--mz-fg-muted); }
+.stat.exp { background: var(--mz-danger-soft); color: var(--mz-danger); }
+.stat.protocolado { background: var(--mz-info-soft); color: var(--mz-info); }
+.lock-tag { font-size: 9px; padding: 2px 5px; border-radius: 3px; background: rgba(168,85,247,0.18); color: #c084fc; font-weight: 800; margin-left: 6px; }
+.doc-row .actions { display: flex; gap: 4px; opacity: 0; }
+.doc-row:hover .actions, .doc-row.selected .actions { opacity: 1; }
+.doc-row .actions button { width: 24px; height: 24px; border: 0; background: var(--mz-bg-card); border-radius: 4px; color: var(--mz-fg-muted); cursor: pointer; font-size: 11px; }
+
+.ds-progress { display: flex; align-items: center; gap: 6px; }
+.ds-progress .bar { flex: 1; height: 4px; background: var(--mz-bg-elevated); border-radius: 2px; overflow: hidden; min-width: 50px; }
+.ds-progress .bar > span { display: block; height: 100%; background: var(--mz-warn); }
+.ds-progress small { font-family: var(--mz-font-mono); font-size: 9.5px; color: var(--mz-fg-faint); }
+
+/* RIGHT - DocuSign drawer */
+.side-r { background: var(--mz-bg-sidebar); border-left: 1px solid var(--mz-rule); overflow-y: auto; }
+.side-r::-webkit-scrollbar { width: 4px; } .side-r::-webkit-scrollbar-thumb { background: var(--mz-rule-strong); }
+.doc-h { padding: 22px 22px 18px; border-bottom: 1px solid var(--mz-rule); background: linear-gradient(135deg, rgba(0,42,123,0.18), transparent); }
+.doc-h .row1 { display: flex; gap: 14px; align-items: flex-start; }
+.doc-h .file-ico { width: 52px; height: 64px; border-radius: 5px; background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 14px; font-weight: 800; flex-shrink: 0; }
+.doc-h h2 { margin: 0; font-size: 16px; color: var(--mz-fg-strong); font-weight: 800; line-height: 1.2; }
+.doc-h .meta { font-size: 11px; color: var(--mz-fg-muted); margin-top: 6px; font-family: var(--mz-font-mono); }
+.doc-h .pills { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 12px; }
+.doc-h .pill { font-size: 10px; padding: 3px 8px; border-radius: var(--mz-r-pill); background: var(--mz-bg-card); border: 1px solid var(--mz-rule); color: var(--mz-fg-muted); }
+.doc-h .pill.warn { background: var(--mz-warn-soft); color: var(--mz-warn); border-color: transparent; font-weight: 700; }
+
+.r-section { padding: 16px 22px; border-bottom: 1px solid var(--mz-rule); }
+.r-section h4 { font-size: 9.5px; letter-spacing: 0.16em; color: var(--mz-fg-faint); text-transform: uppercase; font-weight: 700; margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
+.r-section h4 .qty { margin-left: auto; font-family: var(--mz-font-mono); background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent); padding: 1px 5px; border-radius: 3px; font-size: 9.5px; font-weight: 800; }
+.r-section h4 .qty.warn { background: var(--mz-warn); }
+
+.kv { display: grid; grid-template-columns: 100px 1fr; gap: 6px 12px; font-size: 11.5px; }
+.kv dt { color: var(--mz-fg-faint); }
+.kv dd { margin: 0; color: var(--mz-fg-strong); font-weight: 600; }
+.kv dd small { display: block; color: var(--mz-fg-faint); font-weight: 400; font-family: var(--mz-font-mono); font-size: 10px; margin-top: 1px; }
+
+/* DocuSign envelope */
+.envelope { background: linear-gradient(135deg, rgba(0,42,123,0.16), var(--mz-bg-card)); border: 1px solid var(--mz-tenant-accent); border-radius: var(--mz-r-md); padding: 14px; }
+.envelope .h { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--mz-rule); }
+.envelope .h .ico { width: 38px; height: 38px; background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-weight: 800; font-size: 12px; }
+.envelope .h b { font-size: 13px; color: var(--mz-fg-strong); display: block; font-weight: 700; }
+.envelope .h span { font-size: 10px; color: var(--mz-fg-faint); font-family: var(--mz-font-mono); }
+.env-progress { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
+.env-step { flex: 1; height: 6px; background: var(--mz-bg-elevated); border-radius: 3px; }
+.env-step.done { background: var(--mz-ok); }
+.env-step.cur { background: var(--mz-warn); animation: pulse-warn 1.6s ease-in-out infinite; }
+@keyframes pulse-warn { 50% { opacity: 0.5; } }
+.env-progress small { font-family: var(--mz-font-mono); font-size: 10px; color: var(--mz-fg-faint); white-space: nowrap; }
+
+.signer { display: grid; grid-template-columns: 32px 1fr auto; gap: 10px; padding: 10px 0; border-top: 1px solid var(--mz-rule); align-items: center; font-size: 11.5px; }
+.signer:first-of-type { border-top: 0; }
+.signer .av { width: 32px; height: 32px; border-radius: 50%; background: var(--mz-tenant-primary); color: var(--mz-tenant-accent); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 12px; }
+.signer.done .av { background: var(--mz-ok); color: #fff; }
+.signer.cur .av { background: var(--mz-warn); color: #fff; }
+.signer b { color: var(--mz-fg-strong); display: block; font-weight: 600; }
+.signer span { color: var(--mz-fg-faint); font-size: 10px; }
+.signer .stt { font-size: 9.5px; padding: 2px 6px; border-radius: 3px; font-weight: 800; }
+.signer.done .stt { background: var(--mz-ok-soft); color: var(--mz-ok); }
+.signer.cur .stt { background: var(--mz-warn-soft); color: var(--mz-warn); animation: pulse-text 2s ease-in-out infinite; }
+@keyframes pulse-text { 50% { opacity: 0.5; } }
+.signer.pending .stt { background: var(--mz-bg-elevated); color: var(--mz-fg-faint); }
+
+/* PDF preview */
+.pdf-preview { background: #f5f5f0; border: 1px solid var(--mz-rule); border-radius: 4px; padding: 24px 18px; color: #1a1a1a; font-family: 'Times New Roman', serif; font-size: 9.5px; line-height: 1.45; max-height: 280px; overflow: hidden; position: relative; }
+.pdf-preview h5 { text-align: center; font-size: 11px; font-weight: 800; margin: 0 0 10px; letter-spacing: 0.06em; }
+.pdf-preview p { margin: 6px 0; text-align: justify; }
+.pdf-preview .sig-zone { margin-top: 14px; border-top: 1px solid #999; padding-top: 8px; display: flex; gap: 14px; font-size: 9px; }
+.pdf-preview .sig-zone .col { flex: 1; }
+.pdf-preview .sig-zone .line { border-bottom: 1px solid #333; height: 24px; margin-bottom: 4px; display: flex; align-items: flex-end; justify-content: center; }
+.pdf-preview .sig-zone .line .stamp { font-family: 'Brush Script MT', cursive; font-size: 16px; color: #002a7b; transform: rotate(-3deg); padding-bottom: 2px; }
+.pdf-preview .sig-zone .line.empty { background: rgba(214,162,49,0.15); border-bottom: 1px dashed #d6a231; }
+.pdf-preview::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: linear-gradient(to bottom, transparent, #f5f5f0); pointer-events: none; }
+
+/* version history */
+.ver-row { display: grid; grid-template-columns: 28px 1fr auto; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--mz-rule); font-size: 11.5px; align-items: center; }
+.ver-row:last-child { border: 0; }
+.ver-row .v { font-family: 'Bebas Neue', sans-serif; font-size: 13px; background: var(--mz-bg-elevated); color: var(--mz-fg-muted); padding: 1px 6px; border-radius: 3px; min-width: 36px; text-align: center; letter-spacing: 0.04em; }
+.ver-row.current .v { background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent); font-weight: 800; }
+.ver-row b { color: var(--mz-fg-strong); display: block; font-weight: 600; }
+.ver-row span { color: var(--mz-fg-faint); font-size: 10px; font-family: var(--mz-font-mono); }
+.ver-row .when { font-size: 10px; color: var(--mz-fg-faint); font-family: var(--mz-font-mono); }
+
+.audit-row { display: grid; grid-template-columns: 12px 1fr; gap: 10px; padding: 6px 0; font-size: 11px; align-items: start; }
+.audit-row::before { content: '●'; color: var(--mz-tenant-accent); font-size: 8px; line-height: 1.4; }
+.audit-row b { color: var(--mz-fg); font-weight: 600; }
+.audit-row .when { font-family: var(--mz-font-mono); color: var(--mz-fg-faint); font-size: 10px; }
+
+.action-stack { display: flex; flex-direction: column; gap: 6px; }
+.action-stack .btn { text-align: left; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="side">
+    <div class="brand">
+      <div class="logo">UB</div>
+      <div class="name">Mazzel · UB<span>Documentos</span></div>
+    </div>
+
+    <div class="upload-zone">
+      <div class="ico">📤</div>
+      <b>Arraste arquivos aqui</b>
+      <span>ou clique para enviar · PDF, DOCX, XLSX</span>
+    </div>
+
+    <div class="tree-section">
+      <h3>Repositório</h3>
+      <div class="folder"><span class="arr">▾</span><span class="ico">🗂️</span><b>Estatutários</b><span class="qty">147</span></div>
+      <div class="children">
+        <div class="folder"><span class="arr">▸</span><span class="ico">📁</span><b>Estatuto Nacional</b><span class="qty">12</span></div>
+        <div class="folder active"><span class="arr">▸</span><span class="ico">📁</span><b>Atas Mun. SP</b><span class="qty">38</span></div>
+        <div class="folder"><span class="arr">▸</span><span class="ico">📁</span><b>Resoluções</b><span class="qty">24</span></div>
+        <div class="folder"><span class="arr">▸</span><span class="ico">📁</span><b>Termos & Procurações</b><span class="qty">73</span></div>
+      </div>
+      <div class="folder"><span class="arr">▸</span><span class="ico">🗂️</span><b>Filiação</b><span class="qty">124k</span></div>
+      <div class="folder"><span class="arr">▸</span><span class="ico">🗂️</span><b>Tesouraria</b><span class="qty">2.4k</span></div>
+      <div class="folder"><span class="arr">▸</span><span class="ico">🗂️</span><b>Operações</b><span class="qty">412</span></div>
+      <div class="folder"><span class="arr">▸</span><span class="ico">🗂️</span><b>Eleitoral / TSE</b><span class="qty">187</span></div>
+      <div class="folder warn"><span class="arr">▸</span><span class="ico">🗂️</span><b>Jurídico</b><span class="qty">23</span></div>
+      <div class="folder"><span class="arr">▸</span><span class="ico">🗂️</span><b>Comunicação</b><span class="qty">156</span></div>
+      <div class="folder"><span class="arr">▸</span><span class="ico">🗂️</span><b>Gabinete</b><span class="qty">847</span></div>
+
+      <h3>Marcadores</h3>
+      <div class="folder"><span></span><span class="ico">⭐</span><b>Favoritos</b><span class="qty">17</span></div>
+      <div class="folder warn"><span></span><span class="ico">🔔</span><b>Vencendo</b><span class="qty">8</span></div>
+      <div class="folder"><span></span><span class="ico">🔒</span><b>Sigilosos</b><span class="qty">4</span></div>
+      <div class="folder"><span></span><span class="ico">🗑️</span><b>Lixeira</b><span class="qty">12</span></div>
+    </div>
+  </aside>
+
+  <main>
+    <div class="top-bar">
+      <div class="crumb"><span>Repositório</span><span><b>Estatutários</b></span><span><b>Atas Mun. SP</b></span><span><b>2026</b></span></div>
+      <div class="search"><input value="Q1 2026" /></div>
+      <button class="btn">📂 Nova Pasta</button>
+      <button class="btn primary">+ Novo Documento</button>
+      <button class="btn tenant">📤 Enviar p/ DocuSign</button>
+    </div>
+
+    <div class="tabs-bar">
+      <button class="tab active">Todos <span class="num">38</span></button>
+      <button class="tab">DocuSign Pendentes <span class="num warn">12</span></button>
+      <button class="tab">Vigentes <span class="num">19</span></button>
+      <button class="tab">Vencendo <span class="num warn">3</span></button>
+      <button class="tab">Sigilosos <span class="num">2</span></button>
+      <button class="tab">Rascunhos <span class="num">2</span></button>
+    </div>
+
+    <div class="view-bar">
+      <span><b style="color: var(--mz-fg-strong);">38</b> documentos · ordenados por <b style="color: var(--mz-fg-strong);">data desc.</b></span>
+      <div class="right">
+        <span>Ordenar:</span>
+        <select><option>Data desc.</option><option>Nome A-Z</option><option>Tipo</option><option>Status DocuSign</option></select>
+        <span>Filtrar:</span>
+        <select><option>Todos os tipos</option><option>PDF</option><option>DOCX</option><option>Atas</option></select>
+        <div class="view-toggle"><button class="on">☰</button><button>▦</button></div>
+      </div>
+    </div>
+
+    <div class="docs-area">
+      <div class="doc-head">
+        <span></span><span>Documento</span><span>Tipo</span><span>Atualizado</span><span>Versão</span><span>Status</span><span>DocuSign</span><span></span>
+      </div>
+
+      <div class="doc-row selected">
+        <span class="check"></span>
+        <div class="file"><div class="file-ico fi-pdf">PDF</div><div><b>Ata Reunião Executiva 04/2026</b><small>Mesa Diretora · 18/abr/2026 · 9 presentes</small></div></div>
+        <span class="cell"><b>Ata</b><small>2.4 MB</small></span>
+        <span class="cell"><b>18/abr/2026</b><small>há 7 dias</small></span>
+        <span class="cell"><b>v1.2</b><small>3 versões</small></span>
+        <span class="cell"><span class="stat assinado">ASSINADA</span></span>
+        <span class="cell"><b style="color: var(--mz-ok)">9/9</b><small>concluída</small></span>
+        <div class="actions"><button>👁</button><button>⬇</button><button>⋯</button></div>
+      </div>
+
+      <div class="doc-row">
+        <span class="check"></span>
+        <div class="file"><div class="file-ico fi-doc">DOC</div><div><b>Reg. Interno Comissão Ética 2026 <span class="lock-tag">SIGILOSO</span></b><small>aguardando contra-assinaturas · 5 signatários</small></div></div>
+        <span class="cell"><b>Regulamento</b><small>847 KB</small></span>
+        <span class="cell"><b>22/abr/2026</b><small>há 3 dias</small></span>
+        <span class="cell"><b>v0.4</b><small>rascunho</small></span>
+        <span class="cell"><span class="stat pendente">PENDENTE</span></span>
+        <span class="cell"><div class="ds-progress"><div class="bar"><span style="width: 60%"></span></div><small>3/5</small></div></span>
+        <div class="actions"><button>👁</button><button>⬇</button><button>⋯</button></div>
+      </div>
+
+      <div class="doc-row">
+        <span class="check"></span>
+        <div class="file"><div class="file-ico fi-pdf">PDF</div><div><b>Procuração TSE · Pres. Mun. (renovação)</b><small>Milton Leite · vence em 65 dias · gerar nova</small></div></div>
+        <span class="cell"><b>Procuração</b><small>412 KB</small></span>
+        <span class="cell"><b>15/abr/2026</b><small>há 10 dias</small></span>
+        <span class="cell"><b>v1.0</b><small>—</small></span>
+        <span class="cell"><span class="stat exp">VENCENDO</span></span>
+        <span class="cell"><b style="color: var(--mz-warn)">A renovar</b><small>30/jun/2026</small></span>
+        <div class="actions"><button>👁</button><button>⬇</button><button>⋯</button></div>
+      </div>
+
+      <div class="doc-row">
+        <span class="check"></span>
+        <div class="file"><div class="file-ico fi-pdf">PDF</div><div><b>Resolução 04/2026 · Comissões Setoriais</b><small>vigência 2026—2028 · aprovada unanimemente</small></div></div>
+        <span class="cell"><b>Resolução</b><small>1.1 MB</small></span>
+        <span class="cell"><b>18/abr/2026</b><small>há 7 dias</small></span>
+        <span class="cell"><b>v1.0</b><small>—</small></span>
+        <span class="cell"><span class="stat vigente">VIGENTE</span></span>
+        <span class="cell"><b style="color: var(--mz-ok)">3/3</b><small>concluída</small></span>
+        <div class="actions"><button>👁</button><button>⬇</button><button>⋯</button></div>
+      </div>
+
+      <div class="doc-row">
+        <span class="check"></span>
+        <div class="file"><div class="file-ico fi-pdf">PDF</div><div><b>Memorando OP-014 · Alocação orçamentária</b><small>R$ 850k aprovado · Operações + Tesouraria</small></div></div>
+        <span class="cell"><b>Memorando</b><small>284 KB</small></span>
+        <span class="cell"><b>04/abr/2026</b><small>há 21 dias</small></span>
+        <span class="cell"><b>v1.0</b><small>—</small></span>
+        <span class="cell"><span class="stat protocolado">PROTOCOLADO</span></span>
+        <span class="cell"><b style="color: var(--mz-ok)">2/2</b><small>concluída</small></span>
+        <div class="actions"><button>👁</button><button>⬇</button><button>⋯</button></div>
+      </div>
+
+      <div class="doc-row">
+        <span class="check"></span>
+        <div class="file"><div class="file-ico fi-doc">DOC</div><div><b>Ata Vacância · Comissão de Ética</b><small>Renúncia formal Mariana Lopes · necessita reposição</small></div></div>
+        <span class="cell"><b>Ata</b><small>156 KB</small></span>
+        <span class="cell"><b>22/abr/2026</b><small>há 3 dias</small></span>
+        <span class="cell"><b>v1.0</b><small>—</small></span>
+        <span class="cell"><span class="stat pendente">PENDENTE</span></span>
+        <span class="cell"><div class="ds-progress"><div class="bar"><span style="width: 33%"></span></div><small>1/3</small></div></span>
+        <div class="actions"><button>👁</button><button>⬇</button><button>⋯</button></div>
+      </div>
+
+      <div class="doc-row">
+        <span class="check"></span>
+        <div class="file"><div class="file-ico fi-xls">XLS</div><div><b>Prestação Contas Q1/2026</b><small>Tesouraria Mun. · receita R$ 2.4M / despesa R$ 1.8M</small></div></div>
+        <span class="cell"><b>Planilha</b><small>3.2 MB</small></span>
+        <span class="cell"><b>15/abr/2026</b><small>há 10 dias</small></span>
+        <span class="cell"><b>v2.1</b><small>5 versões</small></span>
+        <span class="cell"><span class="stat assinado">ASSINADA</span></span>
+        <span class="cell"><b style="color: var(--mz-ok)">3/3</b><small>concluída</small></span>
+        <div class="actions"><button>👁</button><button>⬇</button><button>⋯</button></div>
+      </div>
+
+      <div class="doc-row">
+        <span class="check"></span>
+        <div class="file"><div class="file-ico fi-pdf">PDF</div><div><b>Convocação Convenção Mun. Extraord.</b><small>10/mai/2026 · pauta única: chapa 2026</small></div></div>
+        <span class="cell"><b>Convocação</b><small>198 KB</small></span>
+        <span class="cell"><b>20/abr/2026</b><small>há 5 dias</small></span>
+        <span class="cell"><b>v1.1</b><small>2 versões</small></span>
+        <span class="cell"><span class="stat vigente">VIGENTE</span></span>
+        <span class="cell"><b style="color: var(--mz-ok)">2/2</b><small>concluída</small></span>
+        <div class="actions"><button>👁</button><button>⬇</button><button>⋯</button></div>
+      </div>
+
+      <div class="doc-row">
+        <span class="check"></span>
+        <div class="file"><div class="file-ico fi-doc">DOC</div><div><b>Termo de Filiação UB · template v2024.r3</b><small>com cláusula LGPD · 124k filiados ativos</small></div></div>
+        <span class="cell"><b>Template</b><small>92 KB</small></span>
+        <span class="cell"><b>14/mar/2024</b><small>há 2 anos</small></span>
+        <span class="cell"><b>v2024.r3</b><small>14 versões</small></span>
+        <span class="cell"><span class="stat vigente">VIGENTE</span></span>
+        <span class="cell"><b>—</b><small>template</small></span>
+        <div class="actions"><button>👁</button><button>⬇</button><button>⋯</button></div>
+      </div>
+
+      <div class="doc-row">
+        <span class="check"></span>
+        <div class="file"><div class="file-ico fi-zip">ZIP</div><div><b>Backup Atas Q1 2026 · arquivo morto</b><small>14 atas · checksum SHA-256 verificado</small></div></div>
+        <span class="cell"><b>Arquivo</b><small>18.4 MB</small></span>
+        <span class="cell"><b>02/abr/2026</b><small>há 23 dias</small></span>
+        <span class="cell"><b>—</b><small>—</small></span>
+        <span class="cell"><span class="stat protocolado">ARQUIVADO</span></span>
+        <span class="cell"><b>—</b><small>imutável</small></span>
+        <div class="actions"><button>👁</button><button>⬇</button><button>⋯</button></div>
+      </div>
+
+      <div class="doc-row">
+        <span class="check"></span>
+        <div class="file"><div class="file-ico fi-doc">DOC</div><div><b>Rascunho · Carta abertura Convenção</b><small>autoria Milton Leite · ainda em edição</small></div></div>
+        <span class="cell"><b>Discurso</b><small>48 KB</small></span>
+        <span class="cell"><b>25/abr/2026</b><small>hoje · 09:14</small></span>
+        <span class="cell"><b>v0.7</b><small>rascunho</small></span>
+        <span class="cell"><span class="stat rascunho">RASCUNHO</span></span>
+        <span class="cell"><b>—</b><small>—</small></span>
+        <div class="actions"><button>👁</button><button>⬇</button><button>⋯</button></div>
+      </div>
+    </div>
+  </main>
+
+  <aside class="side-r">
+    <div class="doc-h">
+      <div class="row1">
+        <div class="file-ico">PDF</div>
+        <div>
+          <h2>Ata Reunião Executiva 04/2026</h2>
+          <div class="meta">SHA-256: 4f7a...c819 · 2.4 MB</div>
+        </div>
+      </div>
+      <div class="pills">
+        <span class="pill ok" style="background: var(--mz-ok-soft); color: var(--mz-ok); border-color: transparent; font-weight: 700;">✓ Assinada</span>
+        <span class="pill">9/9 signatários</span>
+        <span class="pill">v1.2 · vigente</span>
+        <span class="pill">14 acessos (30d)</span>
+      </div>
+    </div>
+
+    <div class="r-section">
+      <h4>Metadados</h4>
+      <dl class="kv">
+        <dt>Tipo</dt><dd>Ata de reunião<small>órgão estatutário</small></dd>
+        <dt>Origem</dt><dd>Mesa Diretora · Pres. Mun.</dd>
+        <dt>Reunião</dt><dd>04/2026 (4ª do exercício)<small>18/abr/2026 · 14h-17h</small></dd>
+        <dt>Local</dt><dd>Diretório Mun. SP<small>R. Augusta, 1234</small></dd>
+        <dt>Quórum</dt><dd>9 de 11 (82%)</dd>
+        <dt>Pauta</dt><dd>3 itens<small>orçamento Q2 · OP-014 · vacância ética</small></dd>
+        <dt>Confidencial.</dt><dd>Pública</dd>
+        <dt>Retenção</dt><dd>Permanente<small>art. 47 Estatuto</small></dd>
+      </dl>
+    </div>
+
+    <div class="r-section">
+      <h4>DocuSign · Envelope <span class="qty">DS-2026-04719</span></h4>
+      <div class="envelope">
+        <div class="h">
+          <div class="ico">DS</div>
+          <div><b>Ata 04/2026 · 9 signatários</b><span>aberto 18/abr · concluído 19/abr · 28h36m</span></div>
+        </div>
+        <div class="env-progress">
+          <div class="env-step done"></div>
+          <div class="env-step done"></div>
+          <div class="env-step done"></div>
+          <div class="env-step done"></div>
+          <div class="env-step done"></div>
+          <div class="env-step done"></div>
+          <small>9/9 ✓</small>
+        </div>
+        <div class="signer done"><div class="av">ML</div><div><b>Milton Leite</b><span>Pres. · 18/abr 17:42 · IP 187.X.X.42</span></div><span class="stt">ASSINADO</span></div>
+        <div class="signer done"><div class="av">CV</div><div><b>Carla Vieira</b><span>Vice · 18/abr 18:14 · IP 200.X.X.91</span></div><span class="stt">ASSINADO</span></div>
+        <div class="signer done"><div class="av">RA</div><div><b>Rogério Almeida</b><span>Tes. · 18/abr 19:28 · IP 191.X.X.07</span></div><span class="stt">ASSINADO</span></div>
+        <div class="signer done"><div class="av">PS</div><div><b>Patrícia Souza</b><span>Sec. Geral · 19/abr 09:12 · IP 187.X.X.42</span></div><span class="stt">ASSINADO</span></div>
+        <div class="signer done"><div class="av">+5</div><div><b>+ 5 outros signatários</b><span>último: 19/abr 22:18</span></div><span class="stt">ASSINADO</span></div>
+      </div>
+    </div>
+
+    <div class="r-section">
+      <h4>Pré-visualização <span class="qty">pág 1/8</span></h4>
+      <div class="pdf-preview">
+        <h5>ATA DA REUNIÃO 04/2026 DA COMISSÃO EXECUTIVA · UB SP</h5>
+        <p>Aos dezoito dias do mês de abril de dois mil e vinte e seis, às quatorze horas, reuniu-se a Comissão Executiva do Diretório Municipal de São Paulo da União Brasil, sob a presidência do Sr. Milton Leite, com a presença dos demais membros abaixo identificados, para deliberação dos seguintes pontos de pauta:</p>
+        <p><b>1.</b> Revisão do Plano Operacional 2026-014 (OP-014), com apresentação do orçamento alocado de R$ 850.000,00 destinado à mobilização de cabos eleitorais nas zonas leste e sul da capital, conforme proposta encaminhada pela Coordenação de Operações.</p>
+        <p><b>2.</b> Vacância em cadeira da Comissão de Ética por renúncia formal protocolada por Mariana Lopes, deliberando-se pela convocação do suplente em prazo de até trinta dias, nos termos do art. 47 do Estatuto.</p>
+        <div class="sig-zone">
+          <div class="col"><div class="line"><span class="stamp">Milton Leite</span></div>Pres. Mun.</div>
+          <div class="col"><div class="line"><span class="stamp">C. Vieira</span></div>Vice-Pres.</div>
+          <div class="col"><div class="line"><span class="stamp">P. Souza</span></div>Sec. Geral</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="r-section">
+      <h4>Histórico de Versões <span class="qty">3</span></h4>
+      <div class="ver-row current"><span class="v">v1.2</span><div><b>Versão atual</b><span>Patrícia Souza · ajustes finais</span></div><span class="when">19/abr 09:12</span></div>
+      <div class="ver-row"><span class="v">v1.1</span><div><b>Revisão jurídica</b><span>Patrícia Souza · grafias e datas</span></div><span class="when">18/abr 22:30</span></div>
+      <div class="ver-row"><span class="v">v1.0</span><div><b>Primeira versão</b><span>Sec. Geral · transcrição em ata</span></div><span class="when">18/abr 17:14</span></div>
+    </div>
+
+    <div class="r-section">
+      <h4>Auditoria de Acessos · LGPD <span class="qty">14 (30d)</span></h4>
+      <div class="audit-row"><div><b>Vc abriu o documento agora</b><div class="when">25/abr/2026 09:14:23 · IP 187.X.X.42</div></div></div>
+      <div class="audit-row"><div><b>Rita Tavares baixou (PDF)</b><div class="when">22/abr/2026 14:08 · IP 200.X.X.91</div></div></div>
+      <div class="audit-row"><div><b>Milton Leite leu</b><div class="when">22/abr/2026 11:30</div></div></div>
+      <div class="audit-row"><div><b>Sistema · ingestão p/ busca</b><div class="when">19/abr/2026 09:15 (cron)</div></div></div>
+      <div style="font-size: 10px; color: var(--mz-fg-faint); margin-top: 8px; line-height: 1.5;">Acesso auditado · LGPD art. 37 · retenção 5 anos · imutável.</div>
+    </div>
+
+    <div class="r-section">
+      <h4>Ações</h4>
+      <div class="action-stack">
+        <button class="btn">👁 Abrir leitor PDF</button>
+        <button class="btn">⬇ Baixar com selo digital</button>
+        <button class="btn">📤 Compartilhar (link expira em 7d)</button>
+        <button class="btn">🔁 Solicitar nova versão</button>
+        <button class="btn">🏷️ Editar metadados</button>
+        <button class="btn">🔐 Mudar para sigiloso</button>
+        <button class="btn primary">+ Vincular a operação</button>
+      </div>
+    </div>
+  </aside>
+</div>
+</body>
+</html>

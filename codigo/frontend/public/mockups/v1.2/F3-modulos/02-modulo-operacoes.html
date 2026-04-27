@@ -1,0 +1,1858 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark" data-tenant="ub">
+<head>
+<meta charset="UTF-8">
+<title>Módulo Operações · UB</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../F1-fundacao/tokens.css">
+<script src="../F1-fundacao/theme-bootstrap.js"></script>
+<style>
+html, body { height: 100%; margin: 0; overflow: hidden; }
+.app { display: flex; flex-direction: column; height: 100vh; }
+
+/* ========== TOPBAR DE MODOS ========== */
+.modes {
+  height: 56px; flex-shrink: 0;
+  background: var(--mz-bg-topbar);
+  border-bottom: 1px solid var(--mz-rule);
+  display: flex; align-items: center;
+  padding: 0 24px; gap: 24px;
+}
+.modes h1 {
+  font-size: 13px; font-weight: 800;
+  color: var(--mz-fg-strong);
+  letter-spacing: -0.01em; margin: 0;
+}
+.mode-tabs { display: flex; gap: 2px; }
+.mode-tab {
+  font-size: 12px; font-weight: 600;
+  padding: 8px 14px;
+  background: none; border: 0; color: var(--mz-fg-muted);
+  border-radius: var(--mz-r-md);
+  cursor: pointer;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.mode-tab:hover { background: var(--mz-bg-card); color: var(--mz-fg); }
+.mode-tab.active {
+  background: var(--mz-tenant-primary);
+  color: #fff;
+}
+.mode-tab .num {
+  font-family: var(--mz-font-mono); font-size: 9.5px;
+  background: rgba(0,0,0,0.3); padding: 1px 5px; border-radius: 3px;
+}
+.mode-tab.active .num { background: rgba(255,204,0,0.25); color: #FFCC00; }
+.mode-meta {
+  margin-left: auto;
+  display: flex; gap: 16px;
+  font-size: 11px; color: var(--mz-fg-faint);
+  align-items: center;
+}
+.mode-meta b { color: var(--mz-fg); font-weight: 600; }
+
+/* ========== MAIN ========== */
+main {
+  flex: 1; overflow-y: auto;
+  background:
+    radial-gradient(800px 400px at 70% -100px, rgba(0,42,123,0.08), transparent),
+    var(--mz-bg-page);
+}
+main::-webkit-scrollbar { width: 6px; }
+main::-webkit-scrollbar-thumb { background: var(--mz-rule-strong); }
+
+.view { display: none; padding: 24px 28px 48px; max-width: 1480px; margin: 0 auto; }
+.view.active { display: block; }
+
+/* ========== VIEW 1: HUB ========== */
+.hub-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.hub-kpi {
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  border-radius: var(--mz-r-lg);
+  padding: 16px;
+}
+.hub-kpi .lbl {
+  font-size: 9.5px; letter-spacing: 0.16em;
+  color: var(--mz-fg-faint); text-transform: uppercase;
+  font-weight: 700;
+}
+.hub-kpi .v {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px; color: var(--mz-fg-strong);
+  letter-spacing: 0.02em; line-height: 1;
+  margin: 6px 0 4px;
+}
+.hub-kpi .delta { font-size: 11px; font-variant-numeric: tabular-nums; }
+.hub-kpi .delta.up { color: var(--mz-ok); }
+
+.hub-actions {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.hub-action {
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  border-radius: var(--mz-r-lg);
+  padding: 16px;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 14px;
+  transition: all 120ms;
+}
+.hub-action:hover { border-color: var(--mz-tenant-accent); transform: translateY(-2px); }
+.hub-action.primary {
+  background: linear-gradient(135deg, var(--mz-tenant-primary), var(--mz-tenant-primary-strong));
+  border-color: var(--mz-tenant-accent);
+  color: #fff;
+}
+.hub-action .icon {
+  width: 40px; height: 40px;
+  background: var(--mz-tenant-accent);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  color: var(--mz-fg-on-accent);
+  flex-shrink: 0;
+}
+.hub-action.primary .icon { background: rgba(0,0,0,0.25); color: #FFCC00; }
+.hub-action b {
+  font-size: 14px; color: var(--mz-fg-strong); display: block;
+  letter-spacing: -0.01em;
+}
+.hub-action.primary b { color: #fff; }
+.hub-action span { font-size: 11px; color: var(--mz-fg-muted); }
+.hub-action.primary span { color: rgba(255,255,255,0.75); }
+
+.section {
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  border-radius: var(--mz-r-lg);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.section header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--mz-rule);
+  display: flex; align-items: center; gap: 12px;
+  background: var(--mz-bg-card-2);
+}
+.section header h2 {
+  font-size: 13px; font-weight: 700;
+  color: var(--mz-fg-strong); margin: 0;
+  letter-spacing: 0.02em;
+}
+.section header .count {
+  font-family: var(--mz-font-mono); font-size: 10px;
+  color: var(--mz-tenant-accent); font-weight: 700;
+}
+.section header .filter-bar {
+  margin-left: auto;
+  display: flex; gap: 6px;
+}
+.filter-chip {
+  font-size: 10px; font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--mz-r-pill);
+  background: var(--mz-bg-elevated);
+  color: var(--mz-fg-muted);
+  cursor: pointer;
+}
+.filter-chip:hover { color: var(--mz-fg); }
+.filter-chip.on {
+  background: var(--mz-tenant-primary);
+  color: #fff;
+}
+
+/* op cards */
+.ops-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding: 16px;
+}
+.op-card {
+  background: var(--mz-bg-card-2);
+  border: 1px solid var(--mz-rule);
+  border-radius: var(--mz-r-md);
+  padding: 14px;
+  cursor: pointer;
+  transition: all 120ms;
+  position: relative;
+}
+.op-card:hover { border-color: var(--mz-tenant-accent); }
+
+.op-card .op-head {
+  display: flex; align-items: start; gap: 10px;
+  margin-bottom: 10px;
+}
+.op-card .op-status {
+  font-size: 9px; font-weight: 700;
+  padding: 2px 7px;
+  border-radius: var(--mz-r-pill);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+.op-card .op-status.live { background: var(--mz-ok-soft); color: var(--mz-ok); }
+.op-card .op-status.live::before { content:''; display:inline-block; width:6px;height:6px; background: var(--mz-ok); border-radius:50%; margin-right:4px; vertical-align: middle; animation: pulse 1.6s ease infinite; }
+.op-card .op-status.plan { background: var(--mz-info-soft); color: var(--mz-info); }
+.op-card .op-status.done { background: var(--mz-bg-elevated); color: var(--mz-fg-faint); }
+.op-card .op-status.alert { background: var(--mz-warn-soft); color: var(--mz-warn); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+.op-card .op-id {
+  font-family: var(--mz-font-mono); font-size: 10px;
+  color: var(--mz-fg-faint);
+  font-weight: 700;
+}
+.op-card h3 {
+  font-size: 14px; font-weight: 700;
+  color: var(--mz-fg-strong); margin: 4px 0 0;
+  letter-spacing: -0.01em;
+}
+.op-card .op-where {
+  font-size: 11px; color: var(--mz-fg-muted);
+  margin-top: 2px;
+  display: flex; align-items: center; gap: 6px;
+}
+.op-card .op-where .crumb { color: var(--mz-fg-faint); }
+.op-card .op-where .crumb::after { content: '›'; margin: 0 4px; color: var(--mz-rule-strong); }
+.op-card .op-where .crumb:last-of-type::after { display: none; }
+
+.op-card .progress {
+  margin: 12px 0 8px;
+  height: 6px; background: var(--mz-bg-elevated);
+  border-radius: 3px; overflow: hidden;
+}
+.op-card .progress > span {
+  display: block; height: 100%;
+  background: linear-gradient(90deg, var(--mz-tenant-primary), var(--mz-tenant-accent));
+}
+
+.op-card .op-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+}
+.op-card .op-stats .s {
+  background: var(--mz-bg-card);
+  border-radius: 4px;
+  padding: 6px 8px;
+  text-align: center;
+}
+.op-card .op-stats .s .lbl {
+  font-size: 8.5px; letter-spacing: 0.10em;
+  color: var(--mz-fg-faint); text-transform: uppercase;
+  font-weight: 700;
+}
+.op-card .op-stats .s .v {
+  font-family: var(--mz-font-mono);
+  font-size: 14px; font-weight: 700;
+  color: var(--mz-fg-strong); line-height: 1.2;
+}
+.op-card .op-foot {
+  margin-top: 10px; padding-top: 10px;
+  border-top: 1px dashed var(--mz-rule);
+  display: flex; align-items: center;
+  font-size: 10.5px; color: var(--mz-fg-muted);
+  gap: 8px;
+}
+.op-card .op-foot .lead {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--mz-tenant-primary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9.5px; font-weight: 700;
+  color: var(--mz-tenant-accent);
+}
+.op-card .op-foot b { color: var(--mz-fg); font-weight: 600; }
+.op-card .op-foot .dot { color: var(--mz-rule-strong); margin: 0 4px; }
+.op-card .op-foot .live-tag { margin-left: auto; color: var(--mz-tenant-accent); font-weight: 700; }
+
+/* ========== VIEW 2: WIZARD ========== */
+.wizard-shell {
+  display: grid; grid-template-columns: 280px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+.wizard-stepper {
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  border-radius: var(--mz-r-lg);
+  padding: 18px;
+  position: sticky; top: 0;
+}
+.wizard-stepper h3 {
+  font-size: 9.5px; letter-spacing: 0.16em;
+  color: var(--mz-fg-faint); text-transform: uppercase;
+  font-weight: 700; margin: 0 0 16px;
+}
+.step {
+  display: grid; grid-template-columns: 28px 1fr;
+  gap: 12px; padding: 10px 0;
+  cursor: pointer;
+  position: relative;
+}
+.step:not(:last-child)::after {
+  content: ''; position: absolute;
+  left: 13px; top: 36px; bottom: -8px;
+  width: 2px; background: var(--mz-rule);
+}
+.step.done:not(:last-child)::after { background: var(--mz-ok); }
+.step .num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--mz-bg-elevated);
+  border: 2px solid var(--mz-rule);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mz-font-mono); font-size: 11px;
+  color: var(--mz-fg-faint); font-weight: 700;
+}
+.step.active .num {
+  background: var(--mz-tenant-accent);
+  border-color: var(--mz-tenant-accent);
+  color: var(--mz-fg-on-accent);
+}
+.step.done .num {
+  background: var(--mz-ok);
+  border-color: var(--mz-ok);
+  color: #fff;
+}
+.step.done .num::before { content: '✓'; }
+.step.done .num span { display: none; }
+.step .body b {
+  font-size: 12px; font-weight: 600; color: var(--mz-fg);
+  display: block;
+}
+.step.active .body b { color: var(--mz-fg-strong); }
+.step.done .body b { color: var(--mz-fg-muted); text-decoration: line-through; }
+.step .body span {
+  font-size: 10.5px; color: var(--mz-fg-faint); margin-top: 1px;
+}
+
+.wizard-canvas {
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  border-radius: var(--mz-r-lg);
+  overflow: hidden;
+}
+.wizard-canvas header {
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--mz-rule);
+  background: var(--mz-bg-card-2);
+}
+.wizard-canvas header .step-num {
+  font-family: var(--mz-font-mono); font-size: 10px;
+  color: var(--mz-tenant-accent); font-weight: 700;
+  letter-spacing: 0.10em;
+}
+.wizard-canvas header h2 {
+  font-size: 22px; font-weight: 800;
+  color: var(--mz-fg-strong); margin: 4px 0 4px;
+  letter-spacing: -0.015em;
+}
+.wizard-canvas header p {
+  font-size: 12px; color: var(--mz-fg-muted);
+  margin: 0;
+}
+.wizard-canvas .body { padding: 24px; }
+
+.wizard-canvas footer {
+  padding: 14px 24px;
+  border-top: 1px solid var(--mz-rule);
+  display: flex; gap: 10px;
+  align-items: center;
+  background: var(--mz-bg-card-2);
+}
+.wizard-canvas footer .progress-info {
+  font-size: 11px; color: var(--mz-fg-muted);
+}
+.wizard-canvas footer .progress-info b { color: var(--mz-fg); font-weight: 600; }
+.wizard-canvas footer .actions { margin-left: auto; display: flex; gap: 8px; }
+.btn {
+  font-size: 12px; font-weight: 600;
+  padding: 8px 16px;
+  border-radius: var(--mz-r-md);
+  border: 1px solid var(--mz-rule);
+  background: var(--mz-bg-card);
+  color: var(--mz-fg);
+  cursor: pointer;
+}
+.btn:hover { border-color: var(--mz-fg-faint); }
+.btn.primary {
+  background: var(--mz-tenant-primary);
+  border-color: var(--mz-tenant-primary-strong);
+  color: #fff;
+}
+.btn.primary:hover { background: var(--mz-tenant-primary-strong); border-color: var(--mz-tenant-accent); }
+.btn.ghost { background: none; border-color: transparent; color: var(--mz-fg-muted); }
+
+/* PASSO 1 — Tipo de Operação */
+.op-type-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.op-type {
+  border: 2px solid var(--mz-rule);
+  border-radius: var(--mz-r-md);
+  padding: 18px;
+  cursor: pointer;
+  transition: all 120ms;
+}
+.op-type:hover { border-color: var(--mz-tenant-primary-soft); }
+.op-type.selected {
+  border-color: var(--mz-tenant-accent);
+  background: var(--mz-tenant-primary-soft);
+}
+.op-type .ico {
+  width: 36px; height: 36px;
+  background: var(--mz-bg-elevated);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+.op-type.selected .ico {
+  background: var(--mz-tenant-accent);
+  color: var(--mz-fg-on-accent);
+}
+.op-type b { font-size: 14px; font-weight: 700; color: var(--mz-fg-strong); display: block; }
+.op-type .desc {
+  font-size: 11.5px; color: var(--mz-fg-muted);
+  margin-top: 4px; line-height: 1.5;
+}
+.op-type .meta {
+  display: flex; gap: 10px;
+  margin-top: 10px;
+  font-size: 10px; color: var(--mz-fg-faint);
+}
+.op-type .meta span { display: inline-flex; align-items: center; gap: 4px; }
+.op-type .meta b { font-size: 10px; color: var(--mz-fg); font-weight: 700; }
+
+/* PASSO 2 — Cascata UF→Mun→Bairro */
+.cascata {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  height: 380px;
+}
+.cascata-col {
+  background: var(--mz-bg-card-2);
+  border: 1px solid var(--mz-rule);
+  border-radius: var(--mz-r-md);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.cascata-col h4 {
+  padding: 10px 14px;
+  font-size: 10px; letter-spacing: 0.14em;
+  color: var(--mz-fg-faint); text-transform: uppercase;
+  font-weight: 700;
+  border-bottom: 1px solid var(--mz-rule);
+  margin: 0;
+  background: var(--mz-bg-card);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.cascata-col h4 .badge {
+  font-family: var(--mz-font-mono); font-size: 9.5px;
+  background: var(--mz-tenant-accent);
+  color: var(--mz-fg-on-accent);
+  padding: 1px 5px; border-radius: 3px;
+}
+.cascata-col .scope-search {
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--mz-rule);
+}
+.cascata-col input.scope {
+  width: 100%; background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  border-radius: var(--mz-r-sm);
+  padding: 6px 10px;
+  font-size: 11px;
+  color: var(--mz-fg);
+  outline: none;
+}
+.cascata-col input.scope::placeholder { color: var(--mz-fg-faint); }
+.cascata-col input.scope:focus { border-color: var(--mz-tenant-accent); }
+.cascata-col .list {
+  flex: 1; overflow-y: auto;
+  padding: 4px 8px;
+}
+.cascata-col .list::-webkit-scrollbar { width: 4px; }
+.cascata-col .list::-webkit-scrollbar-thumb { background: var(--mz-rule-strong); }
+
+.cascata-row {
+  display: grid; grid-template-columns: 14px 1fr auto;
+  gap: 8px; padding: 6px 8px;
+  border-radius: var(--mz-r-sm);
+  cursor: pointer;
+  font-size: 11.5px;
+  align-items: center;
+  color: var(--mz-fg);
+}
+.cascata-row:hover { background: var(--mz-bg-card); }
+.cascata-row.selected {
+  background: var(--mz-tenant-primary-soft);
+  color: var(--mz-fg-strong);
+}
+.cascata-row .check {
+  width: 14px; height: 14px;
+  border: 1px solid var(--mz-rule-strong);
+  border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px;
+}
+.cascata-row.selected .check {
+  background: var(--mz-tenant-accent);
+  border-color: var(--mz-tenant-accent);
+  color: var(--mz-fg-on-accent);
+}
+.cascata-row .name b { font-weight: 600; color: var(--mz-fg-strong); }
+.cascata-row .meta {
+  font-family: var(--mz-font-mono); font-size: 9.5px;
+  color: var(--mz-fg-faint);
+}
+
+.cascata-col .summary {
+  padding: 10px 14px;
+  border-top: 1px solid var(--mz-rule);
+  background: var(--mz-bg-card);
+  font-size: 10.5px; color: var(--mz-fg-muted);
+  display: flex; justify-content: space-between;
+}
+.cascata-col .summary b { color: var(--mz-tenant-accent); }
+
+/* breadcrumb cascata */
+.cascata-breadcrumb {
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px;
+  flex-wrap: wrap;
+}
+.cascata-breadcrumb .crumb {
+  background: var(--mz-bg-card-2);
+  padding: 4px 10px;
+  border-radius: var(--mz-r-pill);
+  color: var(--mz-fg);
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.cascata-breadcrumb .crumb b { color: var(--mz-tenant-accent); font-weight: 700; }
+.cascata-breadcrumb .arr { color: var(--mz-fg-faint); }
+
+/* PASSO 3 — Liderança & Equipe */
+.team-cols {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.team-card {
+  background: var(--mz-bg-card-2);
+  border-radius: var(--mz-r-md);
+  padding: 16px;
+}
+.team-card h4 {
+  font-size: 11px; letter-spacing: 0.10em;
+  color: var(--mz-fg-faint); text-transform: uppercase;
+  font-weight: 700; margin: 0 0 10px;
+}
+.input-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+.input-group label {
+  font-size: 10px; letter-spacing: 0.06em;
+  color: var(--mz-fg-faint); font-weight: 600;
+  text-transform: uppercase;
+}
+.input-group input,
+.input-group select {
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  border-radius: var(--mz-r-sm);
+  padding: 8px 10px;
+  font-size: 12px;
+  color: var(--mz-fg);
+  outline: none;
+}
+.input-group input:focus,
+.input-group select:focus { border-color: var(--mz-tenant-accent); }
+
+.lead-picker {
+  display: flex; gap: 6px; flex-wrap: wrap;
+}
+.lead-pick {
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  border-radius: var(--mz-r-pill);
+  padding: 4px 10px 4px 4px;
+  display: inline-flex; align-items: center; gap: 6px;
+  cursor: pointer;
+  font-size: 11px;
+}
+.lead-pick:hover { border-color: var(--mz-tenant-accent); }
+.lead-pick.on {
+  background: var(--mz-tenant-primary);
+  color: #fff;
+  border-color: var(--mz-tenant-accent);
+}
+.lead-pick .av {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--mz-tenant-primary-strong);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 11px; color: var(--mz-tenant-accent);
+  display: flex; align-items: center; justify-content: center;
+}
+.lead-pick .ovr {
+  font-family: var(--mz-font-mono); font-size: 9.5px;
+  background: rgba(0,0,0,0.3); color: var(--mz-tenant-accent);
+  padding: 1px 4px; border-radius: 3px;
+}
+
+/* PASSO 4 — Cronograma */
+.timeline-edit {
+  display: grid; grid-template-columns: 200px 1fr;
+  gap: 16px;
+}
+.phases-list { display: flex; flex-direction: column; gap: 8px; }
+.phase-item {
+  background: var(--mz-bg-card-2);
+  border-radius: var(--mz-r-md);
+  padding: 10px 12px;
+  display: grid; grid-template-columns: 24px 1fr auto;
+  gap: 8px; align-items: center;
+  font-size: 11.5px;
+  cursor: pointer;
+  border-left: 3px solid var(--mz-rule);
+}
+.phase-item.active { border-left-color: var(--mz-tenant-accent); background: var(--mz-tenant-primary-soft); }
+.phase-item .n {
+  font-family: var(--mz-font-mono); font-size: 10px;
+  color: var(--mz-fg-faint); font-weight: 700;
+}
+.phase-item b { font-weight: 600; color: var(--mz-fg-strong); }
+.phase-item span { font-size: 10px; color: var(--mz-fg-faint); display: block; }
+.phase-item .dur {
+  font-family: var(--mz-font-mono); font-size: 9.5px;
+  color: var(--mz-tenant-accent); font-weight: 700;
+}
+
+.gantt {
+  background: var(--mz-bg-card-2);
+  border-radius: var(--mz-r-md);
+  padding: 14px;
+  position: relative;
+  overflow-x: auto;
+}
+.gantt-grid {
+  display: grid;
+  grid-template-columns: 130px repeat(8, 1fr);
+  gap: 0;
+  font-size: 10px;
+  min-width: 600px;
+}
+.gantt-grid .week-h {
+  padding: 6px 8px; text-align: center;
+  border-bottom: 1px solid var(--mz-rule);
+  color: var(--mz-fg-faint);
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+.gantt-grid .row-label {
+  padding: 8px;
+  font-size: 11px; color: var(--mz-fg);
+  font-weight: 500;
+  border-right: 1px solid var(--mz-rule);
+  border-bottom: 1px solid var(--mz-rule);
+}
+.gantt-grid .cell {
+  height: 32px; border-right: 1px solid var(--mz-rule);
+  border-bottom: 1px solid var(--mz-rule);
+  position: relative;
+}
+.gantt-bar {
+  position: absolute;
+  top: 6px; bottom: 6px;
+  background: linear-gradient(90deg, var(--mz-tenant-primary), var(--mz-tenant-accent));
+  border-radius: 4px;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--mz-fg-on-accent);
+  padding: 0 8px;
+  display: flex; align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* PASSO 5 — Metas & Orçamento */
+.metas-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.meta-card {
+  background: var(--mz-bg-card-2);
+  border-radius: var(--mz-r-md);
+  padding: 16px;
+}
+.meta-card h4 {
+  font-size: 10px; letter-spacing: 0.10em;
+  color: var(--mz-fg-faint); text-transform: uppercase;
+  font-weight: 700; margin: 0 0 12px;
+}
+.meta-row {
+  display: grid; grid-template-columns: 1fr 90px;
+  gap: 12px; align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--mz-rule);
+  font-size: 12px;
+}
+.meta-row:last-child { border-bottom: 0; }
+.meta-row b { color: var(--mz-fg-strong); font-weight: 600; }
+.meta-row span { font-size: 10.5px; color: var(--mz-fg-muted); display: block; }
+.meta-row input {
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  border-radius: var(--mz-r-sm);
+  padding: 6px 10px;
+  font-family: var(--mz-font-mono);
+  font-size: 12px; font-weight: 700;
+  color: var(--mz-fg-strong);
+  text-align: right;
+  outline: none;
+}
+.meta-total {
+  display: flex; justify-content: space-between;
+  padding: 12px 0 0;
+  margin-top: 8px;
+  border-top: 2px solid var(--mz-tenant-accent);
+  font-size: 13px;
+}
+.meta-total b { color: var(--mz-tenant-accent); font-weight: 800; font-family: var(--mz-font-mono); }
+
+/* PASSO 6 — Revisão */
+.review-shell {
+  display: grid; grid-template-columns: 1fr 280px;
+  gap: 18px;
+}
+.review-block {
+  background: var(--mz-bg-card-2);
+  border-radius: var(--mz-r-md);
+  padding: 14px 18px;
+  margin-bottom: 12px;
+}
+.review-block h4 {
+  font-size: 10px; letter-spacing: 0.14em;
+  color: var(--mz-fg-faint); text-transform: uppercase;
+  font-weight: 700; margin: 0 0 8px;
+  display: flex; justify-content: space-between;
+}
+.review-block h4 .edit {
+  font-size: 10px; color: var(--mz-tenant-accent); cursor: pointer;
+}
+.review-block .field {
+  display: grid; grid-template-columns: 130px 1fr;
+  gap: 12px; padding: 5px 0;
+  font-size: 12px;
+}
+.review-block .field .lbl { color: var(--mz-fg-faint); font-size: 11px; }
+.review-block .field .val { color: var(--mz-fg-strong); font-weight: 600; }
+
+.review-summary {
+  background: linear-gradient(135deg, var(--mz-tenant-primary), var(--mz-tenant-primary-strong));
+  border: 1px solid var(--mz-tenant-accent);
+  border-radius: var(--mz-r-md);
+  padding: 18px;
+  position: sticky; top: 0;
+}
+.review-summary h4 {
+  font-size: 10px; letter-spacing: 0.14em;
+  color: var(--mz-tenant-accent); text-transform: uppercase;
+  font-weight: 700; margin: 0 0 14px;
+}
+.review-summary .big {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px; line-height: 1;
+  color: var(--mz-tenant-accent);
+  letter-spacing: 0.02em;
+}
+.review-summary .name {
+  font-size: 16px; font-weight: 700;
+  color: #fff; margin: 4px 0 14px;
+}
+.review-summary .row {
+  display: flex; justify-content: space-between;
+  font-size: 11px; color: rgba(255,255,255,0.8);
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.review-summary .row:last-child { border-bottom: 0; }
+.review-summary .row b { color: #fff; font-weight: 700; font-family: var(--mz-font-mono); }
+.review-summary .launch {
+  width: 100%;
+  background: var(--mz-tenant-accent);
+  border: 0; color: var(--mz-fg-on-accent);
+  font-weight: 800; font-size: 13px;
+  letter-spacing: 0.04em;
+  padding: 12px;
+  border-radius: var(--mz-r-md);
+  margin-top: 18px;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+/* ========== VIEW 3: GESTÃO ATIVA ========== */
+.live-shell {
+  display: grid; grid-template-columns: 1fr 360px;
+  gap: 18px;
+  align-items: start;
+}
+.live-main { display: flex; flex-direction: column; gap: 14px; }
+
+.live-hero {
+  background:
+    linear-gradient(135deg, rgba(0,42,123,0.30), transparent),
+    var(--mz-bg-card);
+  border: 1px solid var(--mz-tenant-accent-soft);
+  border-radius: var(--mz-r-lg);
+  padding: 20px 24px;
+}
+.live-hero .h-top {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 12px;
+}
+.live-hero .h-top .live-tag {
+  font-size: 10px; font-weight: 700;
+  background: var(--mz-ok-soft); color: var(--mz-ok);
+  padding: 4px 10px; border-radius: var(--mz-r-pill);
+  letter-spacing: 0.10em;
+}
+.live-hero .h-top .live-tag::before { content:''; display:inline-block; width:6px;height:6px; background: var(--mz-ok); border-radius:50%; margin-right:4px; vertical-align: middle; animation: pulse 1.6s ease infinite; }
+.live-hero h1 {
+  font-size: 24px; font-weight: 800;
+  color: var(--mz-fg-strong); margin: 0;
+  letter-spacing: -0.02em;
+}
+.live-hero .where {
+  display: flex; gap: 14px; align-items: center;
+  font-size: 12px; color: var(--mz-fg-muted);
+  margin-top: 6px;
+}
+.live-hero .where .crumb b { color: var(--mz-fg); font-weight: 600; }
+.live-hero .where .crumb::after { content: '›'; margin: 0 6px; color: var(--mz-rule-strong); }
+.live-hero .where .crumb:last-child::after { display: none; }
+
+.live-progress {
+  margin: 18px 0 6px;
+  height: 28px;
+  background: var(--mz-bg-card-2);
+  border-radius: var(--mz-r-sm);
+  position: relative;
+  overflow: hidden;
+}
+.live-progress > .fill {
+  position: absolute; inset: 0;
+  width: 67%;
+  background: linear-gradient(90deg, var(--mz-tenant-primary), var(--mz-tenant-accent));
+  border-radius: var(--mz-r-sm);
+}
+.live-progress .label {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mz-font-mono);
+  font-size: 12px; font-weight: 800;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+.live-progress .markers {
+  position: absolute; inset: 0;
+}
+.live-progress .markers > div {
+  position: absolute; top: 0; bottom: 0;
+  width: 2px;
+  background: rgba(255,255,255,0.3);
+}
+
+.live-kpis {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin-top: 14px;
+}
+.live-kpi {
+  background: var(--mz-bg-card-2);
+  border-radius: var(--mz-r-md);
+  padding: 10px 12px;
+  text-align: center;
+}
+.live-kpi .lbl {
+  font-size: 9px; letter-spacing: 0.10em;
+  color: var(--mz-fg-faint); text-transform: uppercase;
+  font-weight: 700;
+}
+.live-kpi .v {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px; color: var(--mz-fg-strong);
+  letter-spacing: 0.02em; line-height: 1.05;
+  margin: 4px 0 2px;
+}
+.live-kpi .delta { font-size: 10px; font-variant-numeric: tabular-nums; }
+.live-kpi .delta.up { color: var(--mz-ok); }
+.live-kpi .delta.down { color: var(--mz-danger); }
+
+/* live activity feed */
+.live-feed {
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  border-radius: var(--mz-r-lg);
+}
+.live-feed .feed-list { padding: 6px 0; max-height: 380px; overflow-y: auto; }
+.live-feed .feed-list::-webkit-scrollbar { width: 4px; }
+.live-feed .feed-list::-webkit-scrollbar-thumb { background: var(--mz-rule-strong); }
+.feed-row {
+  display: grid; grid-template-columns: 36px 1fr auto;
+  gap: 12px; padding: 10px 16px;
+  border-bottom: 1px solid var(--mz-rule);
+  align-items: start;
+}
+.feed-row:last-child { border-bottom: 0; }
+.feed-row:hover { background: var(--mz-bg-card-2); }
+.feed-row .av {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--mz-tenant-primary);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 13px;
+  color: var(--mz-tenant-accent);
+}
+.feed-row .av.alert { background: var(--mz-danger); color: #fff; }
+.feed-row .av.system { background: var(--mz-bg-elevated); color: var(--mz-fg-faint); font-size: 14px; }
+.feed-row .body { font-size: 12px; color: var(--mz-fg); line-height: 1.4; }
+.feed-row .body b { color: var(--mz-fg-strong); font-weight: 600; }
+.feed-row .body span { color: var(--mz-fg-faint); font-size: 11px; display: block; margin-top: 2px; }
+.feed-row .when { font-family: var(--mz-font-mono); font-size: 10px; color: var(--mz-fg-faint); white-space: nowrap; }
+
+/* live side panel */
+.live-side { display: flex; flex-direction: column; gap: 14px; }
+.side-card {
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  border-radius: var(--mz-r-lg);
+  padding: 16px;
+}
+.side-card h3 {
+  font-size: 10px; letter-spacing: 0.16em;
+  color: var(--mz-fg-faint); text-transform: uppercase;
+  font-weight: 700; margin: 0 0 12px;
+  display: flex; justify-content: space-between;
+}
+.side-card h3 .qty {
+  font-family: var(--mz-font-mono);
+  background: var(--mz-tenant-accent);
+  color: var(--mz-fg-on-accent);
+  padding: 1px 6px; border-radius: 3px;
+  font-size: 9.5px;
+}
+.cabos-mini { display: flex; flex-direction: column; gap: 6px; }
+.cabo-mini {
+  display: grid; grid-template-columns: 28px 1fr 50px;
+  gap: 8px; padding: 6px 8px;
+  background: var(--mz-bg-card-2);
+  border-radius: var(--mz-r-sm);
+  align-items: center;
+  font-size: 11px;
+}
+.cabo-mini .av {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--mz-tenant-primary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: var(--mz-tenant-accent);
+  font-family: 'Bebas Neue', sans-serif;
+}
+.cabo-mini b { color: var(--mz-fg-strong); display: block; font-size: 11.5px; font-weight: 600; }
+.cabo-mini span { color: var(--mz-fg-faint); font-size: 10px; }
+.cabo-mini .pct {
+  font-family: var(--mz-font-mono);
+  font-size: 11px; font-weight: 800;
+  text-align: right;
+}
+.cabo-mini .pct.high { color: var(--mz-ok); }
+.cabo-mini .pct.mid { color: var(--mz-warn); }
+.cabo-mini .pct.low { color: var(--mz-danger); }
+
+/* ========== VIEW 4: RELATÓRIO ========== */
+.report-paper {
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  border-radius: var(--mz-r-lg);
+  padding: 36px 48px;
+  max-width: 1100px;
+  margin: 0 auto;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+}
+.report-paper h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 56px; line-height: 1.05;
+  color: var(--mz-fg-strong);
+  margin: 0; letter-spacing: 0.02em;
+}
+.report-paper .lead {
+  font-size: 13px; color: var(--mz-fg-muted);
+  letter-spacing: 0.04em;
+  margin: 4px 0 24px;
+}
+.report-paper hr { border: 0; border-top: 2px solid var(--mz-tenant-accent); margin: 0 0 28px; }
+
+.report-section { margin-bottom: 28px; }
+.report-section h2 {
+  font-size: 15px; font-weight: 800;
+  color: var(--mz-tenant-accent);
+  letter-spacing: -0.01em;
+  margin: 0 0 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--mz-rule);
+}
+.report-section p {
+  font-size: 13px; color: var(--mz-fg);
+  line-height: 1.65; margin: 0 0 8px;
+}
+.report-section p b { color: var(--mz-fg-strong); }
+
+.report-kpi-row {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin: 18px 0;
+}
+.report-kpi {
+  border-left: 3px solid var(--mz-tenant-accent);
+  padding: 4px 0 4px 14px;
+}
+.report-kpi .lbl {
+  font-size: 9.5px; letter-spacing: 0.16em;
+  color: var(--mz-fg-faint); text-transform: uppercase;
+  font-weight: 700;
+}
+.report-kpi .v {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px; color: var(--mz-fg-strong);
+  line-height: 1; letter-spacing: 0.02em;
+  margin: 4px 0 2px;
+}
+.report-kpi .delta { font-size: 10.5px; font-variant-numeric: tabular-nums; }
+.report-kpi .delta.up { color: var(--mz-ok); }
+.report-kpi .delta.down { color: var(--mz-danger); }
+.report-kpi .delta.neutral { color: var(--mz-fg-muted); }
+
+.report-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 12px;
+}
+.report-table th, .report-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--mz-rule);
+  text-align: left;
+}
+.report-table th {
+  font-size: 10px; font-weight: 700;
+  color: var(--mz-fg-faint);
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+}
+.report-table td { color: var(--mz-fg); }
+.report-table td b { color: var(--mz-fg-strong); }
+.report-table .num { font-family: var(--mz-font-mono); font-variant-numeric: tabular-nums; text-align: right; }
+
+.report-footer {
+  margin-top: 32px; padding-top: 18px;
+  border-top: 1px solid var(--mz-rule);
+  display: flex; justify-content: space-between;
+  font-size: 10px; color: var(--mz-fg-faint);
+  letter-spacing: 0.06em;
+}
+
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ========== TOP MODES ========== -->
+  <header class="modes">
+    <h1>Operações Territoriais</h1>
+    <nav class="mode-tabs">
+      <button class="mode-tab active" data-view="hub"><span class="num">01</span><span>Hub</span></button>
+      <button class="mode-tab" data-view="wizard"><span class="num">02</span><span>Nova Operação · Wizard</span></button>
+      <button class="mode-tab" data-view="live"><span class="num">03</span><span>Gestão Ativa</span></button>
+      <button class="mode-tab" data-view="report"><span class="num">04</span><span>Relatório Final</span></button>
+    </nav>
+    <div class="mode-meta">
+      <span>Tenant: <b>União Brasil</b></span>
+      <span>Operações ativas: <b style="color:var(--mz-ok)">14</b></span>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ====================== VIEW 1: HUB ====================== -->
+    <section class="view active" data-view="hub">
+      <div class="hub-grid tnum">
+        <div class="hub-kpi"><div class="lbl">Operações Ativas</div><div class="v">14</div><div class="delta up">+3 (mês)</div></div>
+        <div class="hub-kpi"><div class="lbl">Cobertura agregada</div><div class="v">68%</div><div class="delta up">+12pp 90d</div></div>
+        <div class="hub-kpi"><div class="lbl">Lideranças engajadas</div><div class="v">2.847</div><div class="delta up">+187 (sem)</div></div>
+        <div class="hub-kpi"><div class="lbl">Investimento ativo</div><div class="v">R$ 14,2M</div><div class="delta">orçamento aprovado</div></div>
+      </div>
+
+      <div class="hub-actions">
+        <div class="hub-action primary" id="goWizard">
+          <div class="icon">+</div>
+          <div><b>Criar Nova Operação</b><span>Wizard guiado · 6 passos</span></div>
+        </div>
+        <div class="hub-action">
+          <div class="icon">📋</div>
+          <div><b>Template Library</b><span>14 modelos validados</span></div>
+        </div>
+        <div class="hub-action">
+          <div class="icon">⚡</div>
+          <div><b>Briefing IA</b><span>Sugere onde criar a próxima op</span></div>
+        </div>
+      </div>
+
+      <section class="section">
+        <header>
+          <h2>Operações em Curso</h2>
+          <span class="count">14 ATIVAS · 3 ALERTA</span>
+          <div class="filter-bar">
+            <span class="filter-chip on">Todas</span>
+            <span class="filter-chip">Capilarização</span>
+            <span class="filter-chip">Eleitoral</span>
+            <span class="filter-chip">Crise</span>
+            <span class="filter-chip">Filiação</span>
+          </div>
+        </header>
+        <div class="ops-grid" id="opsGrid"></div>
+      </section>
+
+      <section class="section">
+        <header>
+          <h2>Operações Concluídas · 30 dias</h2>
+          <span class="count">8 ENCERRADAS</span>
+        </header>
+        <div class="ops-grid" id="doneGrid"></div>
+      </section>
+    </section>
+
+    <!-- ====================== VIEW 2: WIZARD ====================== -->
+    <section class="view" data-view="wizard">
+      <div class="wizard-shell">
+        <aside class="wizard-stepper">
+          <h3>Wizard · 6 passos</h3>
+          <div id="steps"></div>
+        </aside>
+        <div class="wizard-canvas">
+          <header>
+            <div class="step-num" id="wzStep">PASSO 01 DE 06</div>
+            <h2 id="wzTitle">Tipo de Operação</h2>
+            <p id="wzDesc">Defina o objetivo macro · isso determina o template, fases, KPIs e gatilhos automáticos.</p>
+          </header>
+          <div class="body" id="wzBody"></div>
+          <footer>
+            <div class="progress-info">Progresso: <b id="wzProgress">17%</b> · 1 de 6 passos</div>
+            <div class="actions">
+              <button class="btn ghost" id="wzCancel">Cancelar</button>
+              <button class="btn" id="wzPrev">← Anterior</button>
+              <button class="btn primary" id="wzNext">Próximo →</button>
+            </div>
+          </footer>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================== VIEW 3: GESTÃO ATIVA ====================== -->
+    <section class="view" data-view="live">
+      <div class="live-shell">
+        <div class="live-main">
+
+          <div class="live-hero">
+            <div class="h-top">
+              <span class="live-tag">EM ANDAMENTO</span>
+              <span style="font-family: var(--mz-font-mono); font-size: 11px; color: var(--mz-fg-faint); font-weight: 700; letter-spacing: 0.06em;">OP-2026-014</span>
+            </div>
+            <h1>Capilarização SP Capital · Zona Sul</h1>
+            <div class="where">
+              <span class="crumb">UF: <b>São Paulo</b></span>
+              <span class="crumb">Município: <b>São Paulo (capital)</b></span>
+              <span class="crumb">Recorte: <b>Zona Sul · 14 distritos</b></span>
+              <span class="crumb">Cargo-foco: <b>Vereador 2028</b></span>
+            </div>
+
+            <div class="live-progress">
+              <div class="fill"></div>
+              <div class="markers">
+                <div style="left: 16.6%"></div>
+                <div style="left: 33.3%"></div>
+                <div style="left: 50%"></div>
+                <div style="left: 66.6%"></div>
+                <div style="left: 83.3%"></div>
+              </div>
+              <div class="label">Fase 4 de 6 · Mobilização · 67%</div>
+            </div>
+
+            <div class="live-kpis tnum">
+              <div class="live-kpi"><div class="lbl">Lideranças</div><div class="v">147 / 200</div><div class="delta up">+12 (sem)</div></div>
+              <div class="live-kpi"><div class="lbl">Cabos</div><div class="v">68 / 100</div><div class="delta up">+5 (sem)</div></div>
+              <div class="live-kpi"><div class="lbl">Filiações</div><div class="v">2.847</div><div class="delta up">+341 (sem)</div></div>
+              <div class="live-kpi"><div class="lbl">Eventos</div><div class="v">12 / 18</div><div class="delta">próximo: 28/abr</div></div>
+              <div class="live-kpi"><div class="lbl">Orçamento</div><div class="v">68%</div><div class="delta down">no ritmo</div></div>
+            </div>
+          </div>
+
+          <div class="live-feed section">
+            <header style="background: var(--mz-bg-card-2)">
+              <h2>Feed de Atividade · LIVE</h2>
+              <span class="count">347 eventos · 24h</span>
+              <div class="filter-bar">
+                <span class="filter-chip on">Todos</span>
+                <span class="filter-chip">Lideranças</span>
+                <span class="filter-chip">Filiações</span>
+                <span class="filter-chip">Alertas</span>
+              </div>
+            </header>
+            <div class="feed-list" id="feedList"></div>
+          </div>
+
+        </div>
+
+        <aside class="live-side">
+          <div class="side-card">
+            <h3>Coordenação<span class="qty">5</span></h3>
+            <div class="cabos-mini">
+              <div class="cabo-mini"><div class="av">RT</div><div><b>Rita Tavares</b><span>Líder · Zona Sul</span></div><div class="pct high">94%</div></div>
+              <div class="cabo-mini"><div class="av">JM</div><div><b>João Mendes</b><span>Sub · Capão Redondo</span></div><div class="pct high">91%</div></div>
+              <div class="cabo-mini"><div class="av">PS</div><div><b>Paula Silva</b><span>Sub · Cidade Ademar</span></div><div class="pct mid">73%</div></div>
+              <div class="cabo-mini"><div class="av">AF</div><div><b>André Fonseca</b><span>Sub · Santo Amaro</span></div><div class="pct mid">68%</div></div>
+              <div class="cabo-mini"><div class="av">LR</div><div><b>Luiz Ribeiro</b><span>Sub · M' Boi Mirim</span></div><div class="pct low">42%</div></div>
+            </div>
+          </div>
+
+          <div class="side-card">
+            <h3>Próximos Marcos<span class="qty">4</span></h3>
+            <div class="cabos-mini">
+              <div class="cabo-mini" style="grid-template-columns: 28px 1fr 60px"><div class="av" style="background: var(--mz-warn); color: #000">📅</div><div><b>Convenção Zona Sul</b><span>Comício · Cap. Redondo</span></div><div class="pct" style="color: var(--mz-warn); font-size: 9px">28/abr</div></div>
+              <div class="cabo-mini" style="grid-template-columns: 28px 1fr 60px"><div class="av" style="background: var(--mz-info); color: #fff">🎯</div><div><b>Meta · 200 lid.</b><span>Faltam 53 cadastros</span></div><div class="pct" style="color: var(--mz-info); font-size: 9px">15/mai</div></div>
+              <div class="cabo-mini" style="grid-template-columns: 28px 1fr 60px"><div class="av" style="background: var(--mz-tenant-accent); color: #000">📋</div><div><b>Audit · Tesouraria</b><span>Comprovação 50% orç.</span></div><div class="pct" style="color: var(--mz-tenant-accent); font-size: 9px">22/mai</div></div>
+              <div class="cabo-mini" style="grid-template-columns: 28px 1fr 60px"><div class="av" style="background: var(--mz-ok); color: #fff">✓</div><div><b>Encerramento</b><span>Relatório final</span></div><div class="pct" style="color: var(--mz-ok); font-size: 9px">30/jun</div></div>
+            </div>
+          </div>
+
+          <div class="side-card">
+            <h3>Alertas<span class="qty" style="background: var(--mz-warn)">3</span></h3>
+            <div class="cabos-mini">
+              <div class="cabo-mini" style="grid-template-columns: 28px 1fr"><div class="av" style="background: var(--mz-warn); color: #000">!</div><div><b>M' Boi Mirim · 42%</b><span>Sub-cabo abaixo da meta</span></div></div>
+              <div class="cabo-mini" style="grid-template-columns: 28px 1fr"><div class="av" style="background: var(--mz-warn); color: #000">!</div><div><b>Orçamento Q2</b><span>Adiantado · revisar</span></div></div>
+              <div class="cabo-mini" style="grid-template-columns: 28px 1fr"><div class="av" style="background: var(--mz-info); color: #fff">i</div><div><b>Concorrência PSD</b><span>Aumentou eventos +47%</span></div></div>
+            </div>
+          </div>
+
+          <div class="side-card">
+            <h3>Ações Rápidas</h3>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <button class="btn" style="text-align: left">📋 Exportar relatório parcial</button>
+              <button class="btn" style="text-align: left">💬 Abrir chat sigiloso</button>
+              <button class="btn" style="text-align: left">🎯 Ajustar metas</button>
+              <button class="btn primary" style="text-align: left">⏸️ Pausar operação</button>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ====================== VIEW 4: RELATÓRIO FINAL ====================== -->
+    <section class="view" data-view="report">
+      <div class="report-paper">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+          <div>
+            <div style="font-size: 10px; letter-spacing: 0.18em; color: var(--mz-tenant-accent); font-weight: 700;">RELATÓRIO FINAL · OPERAÇÃO TERRITORIAL</div>
+            <h1>Capilarização<br>BA · Salvador<br>Metropolitana</h1>
+            <div class="lead">OP-2025-007 · 18/jan/2025 — 22/abr/2026 · Encerrada com sucesso</div>
+          </div>
+          <div style="text-align: right">
+            <div style="width: 64px; height: 64px; background: var(--mz-tenant-primary); border: 1px solid var(--mz-tenant-accent); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--mz-tenant-accent); margin-left: auto;">UB</div>
+            <div style="font-size: 9px; letter-spacing: 0.10em; color: var(--mz-fg-faint); margin-top: 8px; font-weight: 700;">CONFIDENCIAL · MAZZEL</div>
+          </div>
+        </div>
+        <hr/>
+
+        <section class="report-section">
+          <h2>1. Resumo Executivo</h2>
+          <p>A operação <b>OP-2025-007 · Capilarização BA Metropolitana</b> foi conduzida em 47 bairros de Salvador e Região Metropolitana entre janeiro de 2025 e abril de 2026, sob coordenação do Pres. Estadual Wagner. Investimento total: <b>R$ 4,2M</b>. Resultado: <b>cobertura UB saltou de 41% para 78%</b> nos bairros-alvo, com <b>14.847 novas filiações</b> consolidadas — superando a meta original em <b>+18%</b>.</p>
+          <p>O modelo será replicado em <b>Recife</b> (PE) e <b>Fortaleza</b> (CE) no Q3/2026, totalizando R$ 11,8M de investimento previsto na expansão Nordeste.</p>
+        </section>
+
+        <section class="report-section">
+          <h2>2. Indicadores-Chave</h2>
+          <div class="report-kpi-row tnum">
+            <div class="report-kpi"><div class="lbl">Cobertura UB · Bairros-alvo</div><div class="v">78%</div><div class="delta up">+37pp vs. baseline</div></div>
+            <div class="report-kpi"><div class="lbl">Novas Filiações</div><div class="v">14.847</div><div class="delta up">+18% vs. meta</div></div>
+            <div class="report-kpi"><div class="lbl">Lideranças Ativas</div><div class="v">312</div><div class="delta up">+24% vs. meta</div></div>
+            <div class="report-kpi"><div class="lbl">Investimento</div><div class="v">R$ 4,2M</div><div class="delta neutral">Dentro do orçamento</div></div>
+          </div>
+          <div class="report-kpi-row tnum">
+            <div class="report-kpi"><div class="lbl">Eventos realizados</div><div class="v">47</div><div class="delta up">+9 vs. plan.</div></div>
+            <div class="report-kpi"><div class="lbl">Cabos engajados</div><div class="v">128</div><div class="delta up">retenção 91%</div></div>
+            <div class="report-kpi"><div class="lbl">Score Pres. Est.</div><div class="v">87</div><div class="delta up">+5 pts vs. início</div></div>
+            <div class="report-kpi"><div class="lbl">ROI estimado</div><div class="v">3.8x</div><div class="delta up">Excelente</div></div>
+          </div>
+        </section>
+
+        <section class="report-section">
+          <h2>3. Performance por Bairro · Top 10</h2>
+          <table class="report-table tnum">
+            <thead><tr><th>Bairro</th><th>Cabo Líder</th><th class="num">Cobertura</th><th class="num">Filiações</th><th class="num">Δ Score</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td><b>Pituba</b></td><td>Maria Souza</td><td class="num">94%</td><td class="num">1.247</td><td class="num" style="color: var(--mz-ok)">+12.4</td><td><span style="color: var(--mz-ok); font-weight: 700;">★ Excedeu</span></td></tr>
+              <tr><td><b>Brotas</b></td><td>João Lima</td><td class="num">91%</td><td class="num">1.108</td><td class="num" style="color: var(--mz-ok)">+10.8</td><td><span style="color: var(--mz-ok); font-weight: 700;">★ Excedeu</span></td></tr>
+              <tr><td><b>Itapuã</b></td><td>Paulo Santos</td><td class="num">87%</td><td class="num">982</td><td class="num" style="color: var(--mz-ok)">+9.1</td><td><span style="color: var(--mz-ok); font-weight: 700;">★ Excedeu</span></td></tr>
+              <tr><td><b>Cabula</b></td><td>Rita Mendes</td><td class="num">82%</td><td class="num">874</td><td class="num" style="color: var(--mz-ok)">+8.4</td><td>Atingiu</td></tr>
+              <tr><td><b>Pernambués</b></td><td>Carlos Dias</td><td class="num">79%</td><td class="num">821</td><td class="num" style="color: var(--mz-ok)">+7.9</td><td>Atingiu</td></tr>
+              <tr><td><b>Liberdade</b></td><td>Ana Cruz</td><td class="num">76%</td><td class="num">714</td><td class="num" style="color: var(--mz-ok)">+7.2</td><td>Atingiu</td></tr>
+              <tr><td><b>Periperi</b></td><td>Luiz Almeida</td><td class="num">62%</td><td class="num">524</td><td class="num" style="color: var(--mz-warn)">+4.8</td><td><span style="color: var(--mz-warn);">Parcial</span></td></tr>
+              <tr><td><b>Sussuarana</b></td><td>(órfão · vacância)</td><td class="num">48%</td><td class="num">312</td><td class="num" style="color: var(--mz-danger)">+2.1</td><td><span style="color: var(--mz-danger);">Aquém</span></td></tr>
+              <tr><td colspan="6" style="text-align: center; padding: 16px; color: var(--mz-fg-faint); font-size: 11px;">+ 39 bairros adicionais · ver anexo I</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="report-section">
+          <h2>4. Lições Aprendidas e Recomendações</h2>
+          <p><b>O que funcionou:</b> O modelo de cabo-líder + 4 sub-cabos por bairro mostrou-se ideal — bairros com essa estrutura completa atingiram média de <b>87% cobertura</b>, contra <b>52%</b> em bairros com estrutura incompleta.</p>
+          <p><b>O que não funcionou:</b> Sussuarana ficou aquém por vacância de cabo-líder na fase 4. Em <b>Recife</b>, designar 2 cabos-líder candidatos por bairro (redundância) elimina esse risco.</p>
+          <p><b>Principal aprendizado:</b> A primeira fase (mapeamento) é o que define o sucesso — bairros onde o mapeamento foi feito por equipe local <b>(não por consultoria externa)</b> tiveram performance <b>+34% superior</b>. Replicar esse padrão é mandatório.</p>
+        </section>
+
+        <div class="report-footer">
+          <span>Gerado por Mazzel · IA-assistida</span>
+          <span>Confidencial · UB Direção Nacional · 2026-04-25</span>
+          <span>Documento OP-2025-007-FINAL.pdf · v1.2</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+/* ============================================================
+   STATE
+   ============================================================ */
+const state = {
+  view: 'hub',
+  wizardStep: 0,
+  wizardData: {
+    type: 'capilarizacao',
+    uf: 'SP',
+    municipios: ['São Paulo'],
+    bairros: ['Vila Mariana', 'Itaim Bibi', 'Moema', 'Saúde', 'Mirandópolis'],
+    nome: 'Capilarização SP · Zona Sul',
+    leader: 'rita',
+    cabos: ['joao', 'paula', 'andre'],
+    fases: 6,
+    duracao: 8,
+    metaFiliacoes: 5000,
+    metaLideres: 200,
+    orcamento: 850000,
+  },
+};
+
+/* ============================================================
+   VIEW SWITCHING
+   ============================================================ */
+document.querySelectorAll('.mode-tab').forEach(tab => {
+  tab.addEventListener('click', () => switchView(tab.dataset.view));
+});
+
+function switchView(view) {
+  state.view = view;
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.toggle('active', t.dataset.view === view));
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view === view));
+  if (view === 'wizard') renderWizard();
+}
+
+document.getElementById('goWizard').addEventListener('click', () => switchView('wizard'));
+
+/* ============================================================
+   HUB · OPS LIST
+   ============================================================ */
+const ACTIVE_OPS = [
+  { id: 'OP-2026-014', status: 'live', tipo: 'Capilarização', nome: 'Capilarização SP Cap · Zona Sul', uf: 'SP', mun: 'São Paulo', recorte: 'Zona Sul · 14 distritos', progresso: 67, lid: 147, cabos: 68, fil: 2847, alertas: 3, leader: 'RT', leaderNome: 'Rita Tavares' },
+  { id: 'OP-2026-013', status: 'live', tipo: 'Eleitoral', nome: 'Pré-2026 · MG · Triângulo', uf: 'MG', mun: '12 mun.', recorte: 'Uberlândia + Uberaba metro', progresso: 48, lid: 89, cabos: 41, fil: 1284, alertas: 1, leader: 'CB', leaderNome: 'Carla Bessa' },
+  { id: 'OP-2026-012', status: 'alert', tipo: 'Crise', nome: 'Resposta · Pres. Mun. RO afastado', uf: 'RO', mun: 'Porto Velho', recorte: 'capital + entorno', progresso: 28, lid: 12, cabos: 4, fil: 187, alertas: 7, leader: 'MB', leaderNome: 'M. Bertaiolli' },
+  { id: 'OP-2026-011', status: 'live', tipo: 'Filiação', nome: 'Mutirão Filiação · CE', uf: 'CE', mun: '14 mun.', recorte: 'Fortaleza metropolitana', progresso: 72, lid: 124, cabos: 58, fil: 4124, alertas: 0, leader: 'PB', leaderNome: 'P. Bezerra' },
+  { id: 'OP-2026-010', status: 'live', tipo: 'Capilarização', nome: 'Capilarização PE · Sertão', uf: 'PE', mun: '23 mun.', recorte: 'Vale do São Francisco', progresso: 54, lid: 78, cabos: 32, fil: 1728, alertas: 2, leader: 'MS', leaderNome: 'M. Souza' },
+  { id: 'OP-2026-009', status: 'plan', tipo: 'Eleitoral', nome: 'Pré-Convenção · DF', uf: 'DF', mun: 'Brasília', recorte: 'plano piloto + RA-7', progresso: 12, lid: 24, cabos: 8, fil: 312, alertas: 0, leader: 'PR', leaderNome: 'P. Roberto' },
+];
+
+const DONE_OPS = [
+  { id: 'OP-2025-007', status: 'done', tipo: 'Capilarização', nome: 'Capilarização BA Metro', uf: 'BA', mun: 'Salvador + RM', recorte: '47 bairros', progresso: 100, lid: 312, cabos: 128, fil: 14847, alertas: 0, leader: 'JW', leaderNome: 'J. Wagner' },
+  { id: 'OP-2025-006', status: 'done', tipo: 'Eleitoral', nome: 'Pós-2024 · MG Triângulo', uf: 'MG', mun: '8 mun.', recorte: 'Uberlândia + cidades-foco', progresso: 100, lid: 87, cabos: 38, fil: 4280, alertas: 0, leader: 'CB', leaderNome: 'Carla Bessa' },
+];
+
+function renderOpsGrid(arr, target) {
+  document.getElementById(target).innerHTML = arr.map(op => `
+    <div class="op-card" onclick="document.querySelector('[data-view=live]').click()">
+      <div class="op-head">
+        <span class="op-status ${op.status}">${{live:'AO VIVO', plan:'PLANEJ.', done:'CONCLUÍDA', alert:'ALERTA'}[op.status]}</span>
+        <span class="op-id">${op.id} · ${op.tipo}</span>
+      </div>
+      <h3>${op.nome}</h3>
+      <div class="op-where">
+        <span class="crumb"><b>${op.uf}</b></span>
+        <span class="crumb">${op.mun}</span>
+        <span class="crumb">${op.recorte}</span>
+      </div>
+      <div class="progress"><span style="width: ${op.progresso}%"></span></div>
+      <div class="op-stats">
+        <div class="s"><div class="lbl">Líd.</div><div class="v">${op.lid}</div></div>
+        <div class="s"><div class="lbl">Cabos</div><div class="v">${op.cabos}</div></div>
+        <div class="s"><div class="lbl">Filiações</div><div class="v">${op.fil.toLocaleString('pt-BR')}</div></div>
+        <div class="s"><div class="lbl">Alertas</div><div class="v" style="color:${op.alertas >= 5 ? 'var(--mz-danger)' : op.alertas >= 1 ? 'var(--mz-warn)' : 'var(--mz-ok)'}">${op.alertas}</div></div>
+      </div>
+      <div class="op-foot">
+        <span class="lead">${op.leader}</span>
+        <span><b>${op.leaderNome}</b><span class="dot">·</span>Líder operação</span>
+        <span class="live-tag">${op.progresso}%</span>
+      </div>
+    </div>
+  `).join('');
+}
+renderOpsGrid(ACTIVE_OPS, 'opsGrid');
+renderOpsGrid(DONE_OPS, 'doneGrid');
+
+/* ============================================================
+   WIZARD
+   ============================================================ */
+const STEPS = [
+  { num: '01', title: 'Tipo de Operação', desc: 'Defina o objetivo macro · isso determina template, fases, KPIs e gatilhos automáticos.' },
+  { num: '02', title: 'Recorte Territorial', desc: 'Cascata UF → Municípios → Bairros. Defina onde a operação atua.' },
+  { num: '03', title: 'Liderança & Equipe', desc: 'Líder da operação + cabos-de-piso. A equipe vê tudo; o líder pode editar.' },
+  { num: '04', title: 'Cronograma & Fases', desc: '6 fases padrão · você pode renomear, reordenar e ajustar duração.' },
+  { num: '05', title: 'Metas & Orçamento', desc: 'KPIs alvo + valor empenhado. Auditável pela Tesouraria.' },
+  { num: '06', title: 'Revisão & Lançamento', desc: 'Conferir tudo + lançar a operação. Tudo o que vier depois é live.' },
+];
+
+function renderWizard() {
+  const stepsEl = document.getElementById('steps');
+  stepsEl.innerHTML = STEPS.map((s, i) => `
+    <div class="step ${i === state.wizardStep ? 'active' : ''} ${i < state.wizardStep ? 'done' : ''}" data-step="${i}">
+      <div class="num"><span>${s.num}</span></div>
+      <div class="body"><b>${s.title}</b><span>${s.desc.split('.')[0]}.</span></div>
+    </div>
+  `).join('');
+  stepsEl.querySelectorAll('.step').forEach(el => el.addEventListener('click', () => {
+    state.wizardStep = +el.dataset.step;
+    renderWizard();
+  }));
+
+  document.getElementById('wzStep').textContent = `PASSO ${STEPS[state.wizardStep].num} DE 06`;
+  document.getElementById('wzTitle').textContent = STEPS[state.wizardStep].title;
+  document.getElementById('wzDesc').textContent = STEPS[state.wizardStep].desc;
+  document.getElementById('wzProgress').textContent = Math.round((state.wizardStep + 1) / 6 * 100) + '%';
+  document.getElementById('wzPrev').disabled = state.wizardStep === 0;
+  document.getElementById('wzNext').textContent = state.wizardStep === 5 ? 'Lançar Operação ⚡' : 'Próximo →';
+
+  document.getElementById('wzBody').innerHTML = renderWizardStep(state.wizardStep);
+  bindWizardStep(state.wizardStep);
+}
+
+document.getElementById('wzNext').addEventListener('click', () => {
+  if (state.wizardStep < 5) {
+    state.wizardStep++;
+    renderWizard();
+  } else {
+    switchView('live');
+  }
+});
+document.getElementById('wzPrev').addEventListener('click', () => {
+  if (state.wizardStep > 0) { state.wizardStep--; renderWizard(); }
+});
+document.getElementById('wzCancel').addEventListener('click', () => switchView('hub'));
+
+function renderWizardStep(i) {
+  if (i === 0) {
+    return `<div class="op-type-grid">
+      <div class="op-type ${state.wizardData.type === 'capilarizacao' ? 'selected' : ''}" data-type="capilarizacao">
+        <div class="ico">⚙️</div>
+        <b>Capilarização Territorial</b>
+        <div class="desc">Expandir cobertura UB em região definida · cabos + filiações + presença local</div>
+        <div class="meta"><span><b>6</b> fases</span><span><b>3-12</b> meses</span><span><b>R$ 500k - 5M</b></span></div>
+      </div>
+      <div class="op-type ${state.wizardData.type === 'eleitoral' ? 'selected' : ''}" data-type="eleitoral">
+        <div class="ico">🎯</div>
+        <b>Pré/Pós Campanha Eleitoral</b>
+        <div class="desc">Preparação ou consolidação pós-eleição · candidaturas + chapas + alianças</div>
+        <div class="meta"><span><b>8</b> fases</span><span><b>6-18</b> meses</span><span><b>R$ 1M - 50M</b></span></div>
+      </div>
+      <div class="op-type ${state.wizardData.type === 'crise' ? 'selected' : ''}" data-type="crise">
+        <div class="ico">🚨</div>
+        <b>Resposta a Crise</b>
+        <div class="desc">Resposta rápida · escândalo, afastamento, judicialização · ciclo curto</div>
+        <div class="meta"><span><b>4</b> fases</span><span><b>2-8</b> semanas</span><span><b>R$ 100k - 2M</b></span></div>
+      </div>
+      <div class="op-type ${state.wizardData.type === 'filiacao' ? 'selected' : ''}" data-type="filiacao">
+        <div class="ico">📋</div>
+        <b>Mutirão de Filiação</b>
+        <div class="desc">Janela TSE · campanha intensiva pra fechar prazo de filiação</div>
+        <div class="meta"><span><b>5</b> fases</span><span><b>1-3</b> meses</span><span><b>R$ 300k - 2M</b></span></div>
+      </div>
+    </div>`;
+  }
+  if (i === 1) {
+    const ufs = ['SP', 'RJ', 'MG', 'BA', 'CE', 'PE', 'RS', 'PR', 'GO', 'DF', 'MA', 'AM', 'PA'];
+    const munSP = ['São Paulo', 'Guarulhos', 'Campinas', 'São Bernardo do Campo', 'Santo André', 'Osasco', 'Sorocaba', 'Ribeirão Preto', 'São José dos Campos', 'Mauá'];
+    const bairrosSP = ['Vila Mariana', 'Itaim Bibi', 'Moema', 'Saúde', 'Mirandópolis', 'Pinheiros', 'Vila Olímpia', 'Brooklin', 'Vila Nova Conceição', 'Jardim Paulista', 'Ipiranga', 'Aclimação', 'Liberdade', 'Bela Vista'];
+    return `
+      <div class="cascata-breadcrumb">
+        <span class="crumb">Selecionado: <b>${state.wizardData.uf || '—'}</b></span>
+        <span class="arr">›</span>
+        <span class="crumb">Municípios: <b>${state.wizardData.municipios.length}</b> selecionado${state.wizardData.municipios.length !== 1 ? 's' : ''}</span>
+        <span class="arr">›</span>
+        <span class="crumb">Bairros: <b>${state.wizardData.bairros.length}</b> selecionado${state.wizardData.bairros.length !== 1 ? 's' : ''}</span>
+      </div>
+      <div class="cascata">
+        <div class="cascata-col">
+          <h4>UF · 1 obrigatória <span class="badge">${state.wizardData.uf || '0'}</span></h4>
+          <div class="scope-search"><input class="scope" placeholder="Buscar UF..."/></div>
+          <div class="list">
+            ${ufs.map(u => `<div class="cascata-row ${state.wizardData.uf === u ? 'selected' : ''}" data-uf="${u}">
+              <span class="check">${state.wizardData.uf === u ? '✓' : ''}</span>
+              <span class="name"><b>${u}</b> · ${ ({SP: 'São Paulo', RJ: 'Rio de Janeiro', MG: 'Minas Gerais', BA: 'Bahia', CE: 'Ceará', PE: 'Pernambuco', RS: 'Rio G. Sul', PR: 'Paraná', GO: 'Goiás', DF: 'Distrito Federal', MA: 'Maranhão', AM: 'Amazonas', PA: 'Pará'}[u] || u) }</span>
+              <span class="meta">${ ({SP: '645 m', RJ: '92 m', MG: '853 m', BA: '417 m', CE: '184 m', PE: '185 m', RS: '497 m', PR: '399 m', GO: '246 m', DF: '1 m', MA: '217 m', AM: '62 m', PA: '144 m'}[u] || '— m') }</span>
+            </div>`).join('')}
+          </div>
+          <div class="summary">total: <b>1 selecionada</b></div>
+        </div>
+
+        <div class="cascata-col">
+          <h4>Municípios · 1+ obrigatório <span class="badge">${state.wizardData.municipios.length}</span></h4>
+          <div class="scope-search"><input class="scope" placeholder="Buscar município em ${state.wizardData.uf}..."/></div>
+          <div class="list">
+            ${munSP.map(m => `<div class="cascata-row ${state.wizardData.municipios.includes(m) ? 'selected' : ''}" data-mun="${m}">
+              <span class="check">${state.wizardData.municipios.includes(m) ? '✓' : ''}</span>
+              <span class="name"><b>${m}</b></span>
+              <span class="meta">${Math.floor(Math.random()*5000+800)}k</span>
+            </div>`).join('')}
+          </div>
+          <div class="summary">${state.wizardData.municipios.length} selecionado${state.wizardData.municipios.length !== 1 ? 's' : ''} · <b>${(state.wizardData.municipios.length * 1342).toLocaleString('pt-BR')}k pop.</b></div>
+        </div>
+
+        <div class="cascata-col">
+          <h4>Bairros · opcional <span class="badge">${state.wizardData.bairros.length}</span></h4>
+          <div class="scope-search"><input class="scope" placeholder="Buscar bairro em São Paulo..."/></div>
+          <div class="list">
+            ${bairrosSP.map(b => `<div class="cascata-row ${state.wizardData.bairros.includes(b) ? 'selected' : ''}" data-bairro="${b}">
+              <span class="check">${state.wizardData.bairros.includes(b) ? '✓' : ''}</span>
+              <span class="name"><b>${b}</b></span>
+              <span class="meta">${Math.floor(Math.random()*80+30)}k</span>
+            </div>`).join('')}
+          </div>
+          <div class="summary">${state.wizardData.bairros.length} selecionado${state.wizardData.bairros.length !== 1 ? 's' : ''} · <b>~520k pop. agregada</b></div>
+        </div>
+      </div>
+      <div style="margin-top: 14px; font-size: 11px; color: var(--mz-fg-muted); display: flex; gap: 14px;">
+        <span style="display: inline-flex; align-items: center; gap: 4px;">💡 Sem bairros = operação cobre municípios inteiros</span>
+        <span style="display: inline-flex; align-items: center; gap: 4px;">⚡ Suporta multi-UF — abre 2ª aba após confirmar a 1ª</span>
+      </div>
+    `;
+  }
+  if (i === 2) {
+    return `
+      <div class="team-cols">
+        <div class="team-card">
+          <h4>Identidade da Operação</h4>
+          <div class="input-group">
+            <label>Nome interno</label>
+            <input value="${state.wizardData.nome}"/>
+          </div>
+          <div class="input-group">
+            <label>Sigla TSE (opcional)</label>
+            <input placeholder="OP-2026-XXX" value="OP-2026-014"/>
+          </div>
+          <div class="input-group">
+            <label>Cargo-foco</label>
+            <select><option>Vereador 2028</option><option>Prefeito 2028</option><option>Dep. Estadual 2026</option><option>Senador 2026</option></select>
+          </div>
+          <div class="input-group">
+            <label>Visibilidade</label>
+            <select><option>Privada · só equipe</option><option>Tenant · todos da UB</option><option>Pública · transparência</option></select>
+          </div>
+        </div>
+
+        <div class="team-card">
+          <h4>Líder da Operação · 1 obrigatório</h4>
+          <div class="lead-picker" style="margin-bottom: 16px;">
+            <div class="lead-pick ${state.wizardData.leader === 'rita' ? 'on' : ''}" data-leader="rita"><span class="av">RT</span><span>Rita Tavares</span><span class="ovr">94</span></div>
+            <div class="lead-pick ${state.wizardData.leader === 'milton' ? 'on' : ''}" data-leader="milton"><span class="av">ML</span><span>Milton Leite</span><span class="ovr">78</span></div>
+            <div class="lead-pick ${state.wizardData.leader === 'paula' ? 'on' : ''}" data-leader="paula"><span class="av">PS</span><span>Paula Silva</span><span class="ovr">82</span></div>
+            <div class="lead-pick" style="cursor: default; opacity: 0.6">+ procurar</div>
+          </div>
+
+          <h4 style="margin-top: 16px">Cabos-de-Piso · 0 a 10</h4>
+          <div class="lead-picker">
+            <div class="lead-pick on"><span class="av">JM</span><span>João Mendes</span><span class="ovr">91</span></div>
+            <div class="lead-pick on"><span class="av">PS</span><span>Paula Silva</span><span class="ovr">82</span></div>
+            <div class="lead-pick on"><span class="av">AF</span><span>André Fonseca</span><span class="ovr">68</span></div>
+            <div class="lead-pick"><span class="av">LR</span><span>Luiz Ribeiro</span><span class="ovr">65</span></div>
+            <div class="lead-pick"><span class="av">CD</span><span>Carla Diniz</span><span class="ovr">71</span></div>
+            <div class="lead-pick" style="cursor: default; opacity: 0.6">+ buscar nome</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  if (i === 3) {
+    const fases = [
+      { n: '01', t: 'Mapeamento', d: 'Levantar lideranças latentes na região', dur: '2 sem' },
+      { n: '02', t: 'Recrutamento', d: 'Convidar e formalizar cabos-de-piso', dur: '3 sem' },
+      { n: '03', t: 'Treinamento', d: 'Capacitação obrigatória + onboarding', dur: '2 sem' },
+      { n: '04', t: 'Mobilização', d: 'Bater na porta · filiações · eventos', dur: '8 sem' },
+      { n: '05', t: 'Consolidação', d: 'Mensurar resultados · ajustes', dur: '4 sem' },
+      { n: '06', t: 'Encerramento', d: 'Relatório final · transição', dur: '2 sem' },
+    ];
+    return `
+      <div class="timeline-edit">
+        <div class="phases-list">
+          ${fases.map((f, idx) => `<div class="phase-item ${idx === 3 ? 'active' : ''}">
+            <span class="n">${f.n}</span>
+            <div><b>${f.t}</b><span>${f.d}</span></div>
+            <span class="dur">${f.dur}</span>
+          </div>`).join('')}
+          <button class="btn ghost" style="margin-top: 8px">+ adicionar fase</button>
+        </div>
+        <div class="gantt">
+          <div class="gantt-grid">
+            <div></div>
+            <div class="week-h">SEM 1-3</div>
+            <div class="week-h">SEM 4-6</div>
+            <div class="week-h">SEM 7-9</div>
+            <div class="week-h">SEM 10-12</div>
+            <div class="week-h">SEM 13-15</div>
+            <div class="week-h">SEM 16-18</div>
+            <div class="week-h">SEM 19-21</div>
+            <div class="week-h">SEM 22-24</div>
+
+            <div class="row-label">01 · Mapeamento</div>
+            <div class="cell"><div class="gantt-bar" style="left: 4%; right: 60%;">2 sem</div></div>
+            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+            <div class="row-label">02 · Recrutamento</div>
+            <div class="cell"></div>
+            <div class="cell"><div class="gantt-bar" style="left: 4%; right: 4%;">3 sem</div></div>
+            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+            <div class="row-label">03 · Treinamento</div>
+            <div class="cell"></div><div class="cell"></div>
+            <div class="cell"><div class="gantt-bar" style="left: 4%; right: 30%;">2 sem</div></div>
+            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+            <div class="row-label">04 · Mobilização</div>
+            <div class="cell"></div><div class="cell"></div>
+            <div class="cell"><div class="gantt-bar" style="left: 70%; right: -800%;">8 semanas</div></div>
+            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+            <div class="row-label">05 · Consolidação</div>
+            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+            <div class="cell"><div class="gantt-bar" style="left: 60%; right: -300%;">4 sem</div></div>
+            <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+            <div class="row-label">06 · Encerramento</div>
+            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+            <div class="cell"><div class="gantt-bar" style="left: 70%; right: -50%;">2 sem</div></div>
+            <div class="cell"></div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top: 14px; font-size: 11px; color: var(--mz-fg-muted); display: flex; gap: 14px;">
+        <span>📅 Início: <b style="color: var(--mz-fg)">28/abr/2026</b></span>
+        <span>🏁 Encerramento: <b style="color: var(--mz-fg)">29/out/2026</b></span>
+        <span>⏱️ Duração total: <b style="color: var(--mz-tenant-accent)">22 semanas (~5 meses)</b></span>
+      </div>
+    `;
+  }
+  if (i === 4) {
+    return `
+      <div class="metas-grid">
+        <div class="meta-card">
+          <h4>Metas de Performance</h4>
+          <div class="meta-row">
+            <div><b>Filiações novas</b><span>cadastradas + abonadas</span></div>
+            <input value="5.000"/>
+          </div>
+          <div class="meta-row">
+            <div><b>Cabos engajados</b><span>treinados + ativos</span></div>
+            <input value="100"/>
+          </div>
+          <div class="meta-row">
+            <div><b>Eventos realizados</b><span>comícios, plenárias, encontros</span></div>
+            <input value="18"/>
+          </div>
+          <div class="meta-row">
+            <div><b>Cobertura · % bairros</b><span>com pelo menos 1 cabo ativo</span></div>
+            <input value="80%"/>
+          </div>
+          <div class="meta-row">
+            <div><b>Score Pres. Mun. · meta</b><span>OVR atual: 78 · meta: +8 pts</span></div>
+            <input value="86"/>
+          </div>
+        </div>
+
+        <div class="meta-card">
+          <h4>Orçamento Detalhado</h4>
+          <div class="meta-row">
+            <div><b>Pessoal · cabos + coord.</b><span>R$ 4k/cabo/mês × 5 meses</span></div>
+            <input value="500.000"/>
+          </div>
+          <div class="meta-row">
+            <div><b>Eventos · mobilização</b><span>18 eventos × média R$ 6k</span></div>
+            <input value="108.000"/>
+          </div>
+          <div class="meta-row">
+            <div><b>Mídia digital</b><span>impulsionamento + criação</span></div>
+            <input value="120.000"/>
+          </div>
+          <div class="meta-row">
+            <div><b>Material gráfico</b><span>panfletos, banners, brindes</span></div>
+            <input value="62.000"/>
+          </div>
+          <div class="meta-row">
+            <div><b>Reserva imprevistos</b><span>~7%</span></div>
+            <input value="60.000"/>
+          </div>
+          <div class="meta-total">
+            <span>Orçamento Total</span>
+            <b>R$ 850.000</b>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  if (i === 5) {
+    return `
+      <div class="review-shell">
+        <div>
+          <div class="review-block">
+            <h4>Identidade <span class="edit">editar</span></h4>
+            <div class="field"><span class="lbl">Nome</span><span class="val">${state.wizardData.nome}</span></div>
+            <div class="field"><span class="lbl">Sigla</span><span class="val">OP-2026-014</span></div>
+            <div class="field"><span class="lbl">Tipo</span><span class="val">Capilarização Territorial</span></div>
+            <div class="field"><span class="lbl">Cargo-foco</span><span class="val">Vereador 2028</span></div>
+            <div class="field"><span class="lbl">Visibilidade</span><span class="val">Privada · só equipe</span></div>
+          </div>
+
+          <div class="review-block">
+            <h4>Recorte territorial <span class="edit">editar</span></h4>
+            <div class="field"><span class="lbl">UF</span><span class="val">São Paulo</span></div>
+            <div class="field"><span class="lbl">Municípios (1)</span><span class="val">São Paulo (capital)</span></div>
+            <div class="field"><span class="lbl">Bairros (5)</span><span class="val">Vila Mariana, Itaim Bibi, Moema, Saúde, Mirandópolis</span></div>
+            <div class="field"><span class="lbl">População</span><span class="val">~520.000 habitantes</span></div>
+          </div>
+
+          <div class="review-block">
+            <h4>Liderança & Equipe <span class="edit">editar</span></h4>
+            <div class="field"><span class="lbl">Líder</span><span class="val">Rita Tavares · OVR 94</span></div>
+            <div class="field"><span class="lbl">Cabos-de-piso (3)</span><span class="val">João Mendes (91), Paula Silva (82), André Fonseca (68)</span></div>
+          </div>
+
+          <div class="review-block">
+            <h4>Cronograma <span class="edit">editar</span></h4>
+            <div class="field"><span class="lbl">Fases</span><span class="val">6 fases padrão</span></div>
+            <div class="field"><span class="lbl">Início</span><span class="val">28/abr/2026</span></div>
+            <div class="field"><span class="lbl">Encerramento</span><span class="val">29/out/2026</span></div>
+            <div class="field"><span class="lbl">Duração</span><span class="val">22 semanas (~5 meses)</span></div>
+          </div>
+
+          <div class="review-block">
+            <h4>Metas & Orçamento <span class="edit">editar</span></h4>
+            <div class="field"><span class="lbl">Filiações alvo</span><span class="val">5.000</span></div>
+            <div class="field"><span class="lbl">Cabos alvo</span><span class="val">100</span></div>
+            <div class="field"><span class="lbl">Eventos alvo</span><span class="val">18</span></div>
+            <div class="field"><span class="lbl">Orçamento total</span><span class="val">R$ 850.000</span></div>
+          </div>
+        </div>
+
+        <aside class="review-summary">
+          <h4>Pronto para Lançar</h4>
+          <div class="big">OP-2026-014</div>
+          <div class="name">Capilarização SP · Zona Sul</div>
+          <div class="row"><span>Tipo</span><b>Capilarização</b></div>
+          <div class="row"><span>Duração</span><b>~5 meses</b></div>
+          <div class="row"><span>Equipe</span><b>1 + 3 cabos</b></div>
+          <div class="row"><span>Bairros</span><b>5</b></div>
+          <div class="row"><span>Investimento</span><b>R$ 850k</b></div>
+          <div class="row"><span>Meta filiações</span><b>5.000</b></div>
+          <button class="launch">⚡ Lançar Operação</button>
+          <div style="font-size: 10px; color: rgba(255,255,255,0.5); text-align: center; margin-top: 10px;">Auditoria pela Tesouraria · gravado em DOU interno</div>
+        </aside>
+      </div>
+    `;
+  }
+}
+
+function bindWizardStep(i) {
+  if (i === 0) {
+    document.querySelectorAll('.op-type').forEach(el => el.addEventListener('click', () => {
+      state.wizardData.type = el.dataset.type;
+      renderWizard();
+    }));
+  }
+  if (i === 1) {
+    document.querySelectorAll('[data-uf]').forEach(el => el.addEventListener('click', () => {
+      state.wizardData.uf = el.dataset.uf;
+      renderWizard();
+    }));
+    document.querySelectorAll('[data-mun]').forEach(el => el.addEventListener('click', () => {
+      const m = el.dataset.mun;
+      const arr = state.wizardData.municipios;
+      const idx = arr.indexOf(m);
+      if (idx >= 0) arr.splice(idx, 1); else arr.push(m);
+      renderWizard();
+    }));
+    document.querySelectorAll('[data-bairro]').forEach(el => el.addEventListener('click', () => {
+      const b = el.dataset.bairro;
+      const arr = state.wizardData.bairros;
+      const idx = arr.indexOf(b);
+      if (idx >= 0) arr.splice(idx, 1); else arr.push(b);
+      renderWizard();
+    }));
+  }
+  if (i === 2) {
+    document.querySelectorAll('[data-leader]').forEach(el => el.addEventListener('click', () => {
+      state.wizardData.leader = el.dataset.leader;
+      renderWizard();
+    }));
+  }
+}
+
+/* ============================================================
+   FEED MOCK
+   ============================================================ */
+const FEED = [
+  { tipo: 'fil', av: 'JM', t: '<b>João Mendes</b> registrou 12 novas filiações em <b>Capão Redondo</b>', sub: 'Lote validado pela Receita · 12/12 abonadas', when: '07:42' },
+  { tipo: 'sys', av: '⚡', t: 'Sistema · <b>Meta semanal de filiações batida</b> em Cidade Ademar (+105%)', sub: 'Gatilho automático · bonificação Rita Tavares', when: '06:18' },
+  { tipo: 'lid', av: 'RT', t: '<b>Rita Tavares</b> adicionou nova liderança: <b>Marcos Pereira (OVR 71)</b>', sub: 'Bairro: Vila Andrade · onboarding agendado 28/abr', when: '06:02' },
+  { tipo: 'alert', av: '!', t: 'Alerta · Sub-cabo <b>Luiz Ribeiro (M\' Boi Mirim)</b> abaixo de 50% da meta', sub: 'Recomendação: chamada 1:1 + plano de retomada', when: '05:48' },
+  { tipo: 'fil', av: 'PS', t: '<b>Paula Silva</b> realizou evento "Plenária Cidade Ademar"', sub: '147 presentes · 38 fichas de filiação coletadas', when: '21:14 24/abr' },
+  { tipo: 'sys', av: '📋', t: 'Sistema · <b>Tesouraria validou despesa</b> R$ 38.400 (eventos abr)', sub: 'Comprovação: 12 NFs + 1 boletim · sem ressalva', when: '17:30 24/abr' },
+  { tipo: 'lid', av: 'AF', t: '<b>André Fonseca</b> concluiu treinamento obrigatório', sub: 'Módulo 4/4 · Compliance + LGPD · status: ATIVO', when: '14:22 24/abr' },
+  { tipo: 'fil', av: 'JM', t: '<b>João Mendes</b> registrou 8 novas filiações em <b>Jardim São Luís</b>', sub: 'Lote validado · 7 abonadas + 1 pendente', when: '11:08 24/abr' },
+];
+
+document.getElementById('feedList').innerHTML = FEED.map(f => `
+  <div class="feed-row">
+    <div class="av ${f.tipo === 'sys' ? 'system' : f.tipo === 'alert' ? 'alert' : ''}">${f.av}</div>
+    <div class="body">${f.t}<span>${f.sub}</span></div>
+    <span class="when">${f.when}</span>
+  </div>
+`).join('');
+
+renderWizard();
+</script>
+
+</body>
+</html>

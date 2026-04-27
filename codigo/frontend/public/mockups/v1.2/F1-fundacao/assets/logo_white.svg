@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 90" role="img" aria-label="União Brasil 44 (versão branca)">
+  <g transform="translate(8, 12)">
+    <circle cx="33" cy="33" r="32" fill="none" stroke="#FFFFFF" stroke-width="1.4"></circle>
+    <ellipse cx="33" cy="33" rx="14" ry="32" fill="none" stroke="#FFCC00" stroke-width="1.6"></ellipse>
+    <ellipse cx="33" cy="33" rx="28" ry="32" fill="none" stroke="#FFFFFF" stroke-width="1" opacity="0.6"></ellipse>
+    <line x1="1" y1="33" x2="65" y2="33" stroke="#FFCC00" stroke-width="1.6"></line>
+    <line x1="6" y1="18" x2="60" y2="18" stroke="#FFFFFF" stroke-width="1" opacity="0.55"></line>
+    <line x1="6" y1="48" x2="60" y2="48" stroke="#FFFFFF" stroke-width="1" opacity="0.55"></line>
+    <polygon points="33,22 35,30 43,30 36.5,35 39,43 33,38 27,43 29.5,35 23,30 31,30" fill="#FFCC00"></polygon>
+  </g>
+
+  <g transform="translate(86, 32)" font-family="Inter, sans-serif" font-weight="900" letter-spacing="-0.01em">
+    <text x="0" y="0" font-size="22" fill="#FFFFFF">UNIÃO</text>
+    <text x="80" y="0" font-size="22" fill="#FFCC00">BRASIL</text>
+  </g>
+  <g transform="translate(86, 62)" font-family="Inter, sans-serif" font-weight="900" letter-spacing="-0.04em">
+    <text x="0" y="0" font-size="20" fill="#FFFFFF" opacity="0.92">44</text>
+    <line x1="28" y1="-8" x2="28" y2="2" stroke="#FFCC00" stroke-width="2.5"></line>
+    <text x="36" y="0" font-size="11" fill="#FFFFFF" opacity="0.6" font-weight="500" letter-spacing="0.06em">PARTIDO POLÍTICO</text>
+  </g>
+</svg>

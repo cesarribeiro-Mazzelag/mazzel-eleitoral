@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 60" role="img" aria-label="Footer papel timbrado União Brasil">
+  <rect x="0" y="0" width="1240" height="40" fill="#002A7B"></rect>
+  <rect x="0" y="40" width="1240" height="20" fill="#FFCC00"></rect>
+
+  <text x="40" y="26" font-family="Inter, sans-serif" font-weight="500" font-size="12" fill="#FFFFFF" letter-spacing="0.06em">
+    UNIÃO BRASIL · DIRETÓRIO NACIONAL · SCS QUADRA 02 · BLOCO C · BRASÍLIA / DF
+  </text>
+  <text x="1200" y="26" font-family="Inter, sans-serif" font-weight="600" font-size="12" fill="#FFCC00" letter-spacing="0.08em" text-anchor="end">
+    UNIAOBRASIL44.ORG.BR
+  </text>
+</svg>

@@ -615,3 +615,191 @@ section[data-screen-label] { scroll-margin-top: 56px; }
 .tnum { font-variant-numeric: tabular-nums; font-feature-settings: "tnum","cv11"; }
 .font-display { font-feature-settings: "cv11","ss01"; letter-spacing: -0.02em; }
 
+/* ============================================================
+   DESIGNER V1.2 (27/04/2026) - tokens estendidos por tenant
+   --------------------------------------------------------------
+   Adiciona ao sistema base (acima):
+   - Cores tenant UB (azul + amarelo) extraidas do papel timbrado
+   - Estados semanticos com variantes -soft
+   - Score farol percentil 0-5 (mapa)
+   - Spacing scale, tipografia escalas, raios e shadows
+   - Tenant overrides (psd, pt, mazzel) pra multi-tenant futuro
+   - Primitivas .chip e .btn-tenant
+   ============================================================ */
+
+:root, [data-theme="dark"] {
+  /* TENANT: Uniao Brasil (default) - extraido do papel timbrado oficial */
+  --mz-tenant-primary:        #002A7B;          /* azul UB principal */
+  --mz-tenant-primary-rgb:    0, 42, 123;
+  --mz-tenant-primary-strong: #001E5C;          /* azul UB escuro (header PDF) */
+  --mz-tenant-primary-soft:   rgba(0, 42, 123, 0.18);
+  --mz-tenant-accent:         #FFCC00;          /* amarelo UB */
+  --mz-tenant-accent-rgb:     255, 204, 0;
+  --mz-tenant-accent-strong:  #E6B800;
+  --mz-tenant-accent-soft:    rgba(255, 204, 0, 0.16);
+  --mz-tenant-name:           "União Brasil";
+  --mz-tenant-numero:         "44";
+
+  /* texto sobre faixas tenant */
+  --mz-fg-on-tenant: #ffffff;       /* texto sobre azul UB */
+  --mz-fg-on-accent: #0a0a0b;       /* texto sobre amarelo UB */
+
+  /* estados semanticos com variantes -soft (chips e backgrounds) */
+  --mz-ok-soft:     rgba(52,211,153,0.12);
+  --mz-warn-soft:   rgba(251,191,36,0.14);
+  --mz-danger-soft: rgba(248,113,113,0.14);
+  --mz-info:        #93c5fd;
+  --mz-info-soft:   rgba(147,197,253,0.12);
+
+  /* score farol percentil 0-5 (mapa) */
+  --mz-score-0: #1e3a8a;  /* azul muito escuro - sem dado / vazio */
+  --mz-score-1: #1d4ed8;  /* azul - baixissimo */
+  --mz-score-2: #2563eb;  /* azul medio - baixo */
+  --mz-score-3: #f59e0b;  /* ambar - medio */
+  --mz-score-4: #fb923c;  /* laranja - alto */
+  --mz-score-5: #dc2626;  /* vermelho - muito alto */
+
+  /* rules adicionais */
+  --mz-rule-bold: rgba(255,255,255,0.16);
+
+  /* raios */
+  --mz-r-xs: 4px;
+  --mz-r-sm: 6px;
+  --mz-r-md: 10px;
+  --mz-r-lg: 14px;
+  --mz-r-xl: 20px;
+  --mz-r-pill: 999px;
+
+  /* shadows */
+  --mz-shadow-card:   0 1px 0 rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04);
+  --mz-shadow-pop:    0 8px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08);
+  --mz-shadow-modal:  0 24px 64px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.08);
+  --mz-shadow-inset:  inset 0 1px 0 rgba(255,255,255,0.03);
+
+  /* spacing scale (4px base) */
+  --mz-s-1: 4px; --mz-s-2: 8px; --mz-s-3: 12px; --mz-s-4: 16px;
+  --mz-s-5: 20px; --mz-s-6: 24px; --mz-s-8: 32px; --mz-s-10: 40px;
+  --mz-s-12: 48px; --mz-s-16: 64px; --mz-s-20: 80px;
+
+  /* tipografia */
+  --mz-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --mz-font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* tipografia escalas (1920x1080) */
+  --mz-t-xs:   11px; --mz-t-sm: 12px; --mz-t-base: 13px; --mz-t-md: 14px;
+  --mz-t-lg:   16px; --mz-t-xl: 20px; --mz-t-2xl: 24px;
+  --mz-t-3xl:  32px; --mz-t-4xl: 44px; --mz-t-5xl: 56px; --mz-t-6xl: 72px;
+
+  /* line-heights e tracking */
+  --mz-lh-tight: 1.1; --mz-lh-snug: 1.25; --mz-lh-normal: 1.45; --mz-lh-relaxed: 1.6;
+  --mz-track-tight: -0.02em; --mz-track-snug: -0.01em;
+  --mz-track-wide:   0.02em; --mz-track-wider: 0.06em;
+}
+
+[data-theme="light"] {
+  /* texto sobre faixas tenant - inalterado */
+  --mz-fg-on-tenant: #ffffff;
+  --mz-fg-on-accent: #0a0a0b;
+
+  /* estados semanticos light - mais sobrio */
+  --mz-ok:        #059669;
+  --mz-ok-soft:   rgba(5,150,105,0.10);
+  --mz-warn:      #d97706;
+  --mz-warn-soft: rgba(217,119,6,0.10);
+  --mz-danger:    #dc2626;
+  --mz-danger-soft:rgba(220,38,38,0.10);
+  --mz-info:      #1d4ed8;
+  --mz-info-soft: rgba(29,78,216,0.10);
+
+  --mz-rule-bold: rgba(0,0,0,0.16);
+
+  --mz-shadow-card:  0 1px 2px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.05);
+  --mz-shadow-pop:   0 8px 24px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,0,0,0.06);
+  --mz-shadow-modal: 0 24px 64px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.06);
+  --mz-shadow-inset: inset 0 1px 0 rgba(255,255,255,0.4);
+}
+
+/* ============================================================
+   TENANT OVERRIDES - multi-tenant futuro
+   Trocar atributo data-tenant no <html> aplica paleta do partido
+   ============================================================ */
+
+/* PSD = laranja + azul-marinho */
+[data-tenant="psd"] {
+  --mz-tenant-primary:        #003366;
+  --mz-tenant-primary-rgb:    0, 51, 102;
+  --mz-tenant-primary-strong: #001F3D;
+  --mz-tenant-accent:         #FF6B00;
+  --mz-tenant-accent-rgb:     255, 107, 0;
+  --mz-tenant-name:           "PSD";
+}
+
+/* PT = vermelho + estrela */
+[data-tenant="pt"] {
+  --mz-tenant-primary:        #B00020;
+  --mz-tenant-primary-rgb:    176, 0, 32;
+  --mz-tenant-primary-strong: #7F0017;
+  --mz-tenant-accent:         #FFFFFF;
+  --mz-tenant-accent-rgb:     255, 255, 255;
+  --mz-tenant-name:           "PT";
+}
+
+/* Mazzel branco (fallback / demo) = roxo historico */
+[data-tenant="mazzel"] {
+  --mz-tenant-primary:        #7C3AED;
+  --mz-tenant-primary-rgb:    124, 58, 237;
+  --mz-tenant-primary-strong: #5B21B6;
+  --mz-tenant-accent:         #A78BFA;
+  --mz-tenant-accent-rgb:     167, 139, 250;
+  --mz-tenant-name:           "Mazzel";
+}
+
+/* ============================================================
+   PRIMITIVAS adicionais (Designer V1.2)
+   ============================================================ */
+
+/* chip semantico (substitui .mz-chip antigo se nao houver conflito) */
+.mz-chip-v2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--mz-r-pill);
+  font-size: var(--mz-t-xs);
+  font-weight: 500;
+  letter-spacing: var(--mz-track-wide);
+  border: 1px solid var(--mz-rule);
+  background: var(--mz-bg-elevated);
+  color: var(--mz-fg-muted);
+  white-space: nowrap;
+}
+.mz-chip-v2.ok      { color: var(--mz-ok);     background: var(--mz-ok-soft);     border-color: rgba(52,211,153,0.18); }
+.mz-chip-v2.warn    { color: var(--mz-warn);   background: var(--mz-warn-soft);   border-color: rgba(251,191,36,0.18); }
+.mz-chip-v2.danger  { color: var(--mz-danger); background: var(--mz-danger-soft); border-color: rgba(248,113,113,0.18); }
+.mz-chip-v2.info    { color: var(--mz-info);   background: var(--mz-info-soft);   border-color: rgba(147,197,253,0.18); }
+.mz-chip-v2.tenant  { color: var(--mz-tenant-accent); background: var(--mz-tenant-primary-soft); border-color: rgba(var(--mz-tenant-accent-rgb), 0.4); }
+
+/* botao primario tenant (azul UB) */
+.mz-btn-tenant {
+  background: var(--mz-tenant-primary);
+  color: var(--mz-fg-on-tenant);
+  border: 1px solid var(--mz-tenant-primary-strong);
+  padding: 8px 14px;
+  border-radius: var(--mz-r-md);
+  font-size: var(--mz-t-base);
+  font-weight: 600;
+  letter-spacing: var(--mz-track-snug);
+  cursor: pointer;
+  transition: filter 120ms ease;
+}
+.mz-btn-tenant:hover { filter: brightness(1.1); }
+.mz-btn-tenant.accent {
+  background: var(--mz-tenant-accent);
+  color: var(--mz-fg-on-accent);
+  border-color: var(--mz-tenant-accent-strong);
+}
+
+/* divisores */
+.mz-hr        { height: 1px; background: var(--mz-rule); border: 0; }
+.mz-hr-strong { height: 1px; background: var(--mz-rule-strong); border: 0; }
+

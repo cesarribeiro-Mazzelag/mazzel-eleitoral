@@ -1,0 +1,298 @@
+/* ============================================================
+   MAZZEL ELEITORAL · TENANT UNIÃO BRASIL — DESIGN TOKENS V2
+   ------------------------------------------------------------
+   Substitui o roxo Mazzel por azul + amarelo UB.
+   Multi-tenant ready: tokens --mz-tenant-* trocáveis por tenant.
+   Tema escuro = default; tema claro disponível como opção.
+
+   Arquitetura:
+     • --mz-bg-*      → backgrounds (page, card, sidebar, topbar)
+     • --mz-fg-*      → texto (forte, normal, muted, dim, faint)
+     • --mz-rule-*    → bordas e divisores
+     • --mz-accent-*  → cor de marca (deriva de --mz-tenant-primary)
+     • --mz-tenant-*  → cor do partido (UB hoje; PSD/PT no futuro)
+     • Estados semânticos: --mz-ok, --mz-warn, --mz-danger, --mz-info
+     • --mz-score-*   → escala farol percentil 0-5 do mapa
+
+   Guia de uso (dossiê, mapa, dashboard):
+     - Texto principal: var(--mz-fg)
+     - Números/big stats: var(--mz-fg-strong) + .tnum
+     - Hierarquia secundária: var(--mz-fg-muted)
+     - Bordas de card: var(--mz-rule)
+     - Faixa de marca: var(--mz-tenant-primary)
+     - Destaque positivo (ranqueamento, OVR alto): var(--mz-tenant-accent)
+   ============================================================ */
+
+:root,
+[data-theme="dark"] {
+  /* ---------- backgrounds ---------- */
+  --mz-bg-page:     #0a0a0b;
+  --mz-bg-page-2:   #0c0c0e;
+  --mz-bg-card:     #0e0e11;
+  --mz-bg-card-2:   rgba(255,255,255,0.015);
+  --mz-bg-sidebar:  #0b0b0d;
+  --mz-bg-topbar:   #09090b;
+  --mz-bg-elevated: #131316;
+  --mz-bg-overlay:  rgba(9,9,11,0.72);
+
+  /* ---------- foreground ---------- */
+  --mz-fg:         #e4e4e7;
+  --mz-fg-strong:  #ffffff;
+  --mz-fg-muted:   #a1a1aa;
+  --mz-fg-dim:     #71717a;
+  --mz-fg-faint:   #52525b;
+  --mz-fg-ghost:   #3f3f46;
+  --mz-fg-on-tenant: #ffffff;       /* texto sobre azul UB */
+  --mz-fg-on-accent: #0a0a0b;       /* texto sobre amarelo UB */
+
+  /* ---------- rules / hairlines ---------- */
+  --mz-rule:        rgba(255,255,255,0.06);
+  --mz-rule-strong: rgba(255,255,255,0.10);
+  --mz-rule-bold:   rgba(255,255,255,0.16);
+  --mz-hairline:    rgba(255,255,255,0.04);
+
+  /* ---------- semântica ---------- */
+  --mz-ok:        #34d399;
+  --mz-ok-soft:   rgba(52,211,153,0.12);
+  --mz-warn:      #fbbf24;
+  --mz-warn-soft: rgba(251,191,36,0.14);
+  --mz-danger:    #f87171;
+  --mz-danger-soft:rgba(248,113,113,0.14);
+  --mz-info:      #93c5fd;
+  --mz-info-soft: rgba(147,197,253,0.12);
+
+  /* ---------- score farol percentil 0-5 (mapa) ---------- */
+  --mz-score-0: #1e3a8a;  /* azul muito escuro - sem dado / vazio */
+  --mz-score-1: #1d4ed8;  /* azul - baixíssimo */
+  --mz-score-2: #2563eb;  /* azul médio - baixo */
+  --mz-score-3: #f59e0b;  /* âmbar - médio */
+  --mz-score-4: #fb923c;  /* laranja - alto */
+  --mz-score-5: #dc2626;  /* vermelho - muito alto */
+
+  /* ---------- chrome do app ---------- */
+  --mz-kbd-bg:  rgba(255,255,255,0.08);
+  --mz-kbd-fg:  #d4d4d8;
+
+  /* ---------- TENANT: União Brasil ---------- */
+  /* Cores oficiais extraídas do papel timbrado UB */
+  --mz-tenant-primary:        #002A7B;          /* azul UB principal */
+  --mz-tenant-primary-rgb:    0, 42, 123;
+  --mz-tenant-primary-strong: #001E5C;          /* azul UB escuro (header PDF) */
+  --mz-tenant-primary-soft:   rgba(0, 42, 123, 0.18);
+  --mz-tenant-accent:         #FFCC00;          /* amarelo UB */
+  --mz-tenant-accent-rgb:     255, 204, 0;
+  --mz-tenant-accent-strong:  #E6B800;          /* amarelo escurecido pra hover */
+  --mz-tenant-accent-soft:    rgba(255, 204, 0, 0.16);
+  --mz-tenant-name:           "União Brasil";
+  --mz-tenant-numero:         "44";
+
+  /* ---------- accent semântico (deriva do tenant) ---------- */
+  --mz-accent:        #93c5fd;  /* azul claro pra dark mode (legibilidade) */
+  --mz-accent-strong: #60a5fa;
+  --mz-accent-soft:   rgba(147,197,253,0.12);
+
+  /* ---------- raios e sombras ---------- */
+  --mz-r-xs: 4px;
+  --mz-r-sm: 6px;
+  --mz-r-md: 10px;
+  --mz-r-lg: 14px;
+  --mz-r-xl: 20px;
+  --mz-r-pill: 999px;
+
+  --mz-shadow-card:    0 1px 0 rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04);
+  --mz-shadow-pop:     0 8px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08);
+  --mz-shadow-modal:   0 24px 64px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.08);
+  --mz-shadow-inset:   inset 0 1px 0 rgba(255,255,255,0.03);
+
+  /* ---------- spacing scale (4-px base) ---------- */
+  --mz-s-1: 4px;
+  --mz-s-2: 8px;
+  --mz-s-3: 12px;
+  --mz-s-4: 16px;
+  --mz-s-5: 20px;
+  --mz-s-6: 24px;
+  --mz-s-8: 32px;
+  --mz-s-10: 40px;
+  --mz-s-12: 48px;
+  --mz-s-16: 64px;
+  --mz-s-20: 80px;
+
+  /* ---------- typography ---------- */
+  --mz-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --mz-font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --mz-font-display: 'Inter', -apple-system, sans-serif;  /* tight tracking, weight 800-900 */
+
+  /* tipografia escalas (quando 1920×1080) */
+  --mz-t-xs:   11px;  /* metadata, kbd */
+  --mz-t-sm:   12px;  /* sidebar item, chip */
+  --mz-t-base: 13px;  /* corpo padrão V2 */
+  --mz-t-md:   14px;  /* corpo amplo */
+  --mz-t-lg:   16px;  /* sub-heading */
+  --mz-t-xl:   20px;  /* heading de card */
+  --mz-t-2xl:  24px;  /* heading de seção */
+  --mz-t-3xl:  32px;  /* big number médio */
+  --mz-t-4xl:  44px;  /* big number hero */
+  --mz-t-5xl:  56px;  /* OVR no card 4:5 */
+  --mz-t-6xl:  72px;  /* dashboard hero */
+
+  /* line-heights */
+  --mz-lh-tight:  1.1;
+  --mz-lh-snug:   1.25;
+  --mz-lh-normal: 1.45;
+  --mz-lh-relaxed:1.6;
+
+  /* letter-spacing */
+  --mz-track-tight: -0.02em;
+  --mz-track-snug:  -0.01em;
+  --mz-track-wide:   0.02em;
+  --mz-track-wider:  0.06em;
+}
+
+[data-theme="light"] {
+  --mz-bg-page:     #f4f4f5;
+  --mz-bg-page-2:   #fafafa;
+  --mz-bg-card:     #ffffff;
+  --mz-bg-card-2:   rgba(0,0,0,0.02);
+  --mz-bg-sidebar:  #ffffff;
+  --mz-bg-topbar:   #ffffff;
+  --mz-bg-elevated: #ffffff;
+  --mz-bg-overlay:  rgba(9,9,11,0.32);
+
+  --mz-fg:         #18181b;
+  --mz-fg-strong:  #09090b;
+  --mz-fg-muted:   #52525b;
+  --mz-fg-dim:     #71717a;
+  --mz-fg-faint:   #a1a1aa;
+  --mz-fg-ghost:   #d4d4d8;
+  --mz-fg-on-tenant: #ffffff;
+  --mz-fg-on-accent: #0a0a0b;
+
+  --mz-rule:        rgba(0,0,0,0.06);
+  --mz-rule-strong: rgba(0,0,0,0.10);
+  --mz-rule-bold:   rgba(0,0,0,0.16);
+  --mz-hairline:    rgba(0,0,0,0.04);
+
+  --mz-ok:        #059669;
+  --mz-ok-soft:   rgba(5,150,105,0.10);
+  --mz-warn:      #d97706;
+  --mz-warn-soft: rgba(217,119,6,0.10);
+  --mz-danger:    #dc2626;
+  --mz-danger-soft:rgba(220,38,38,0.10);
+  --mz-info:      #1d4ed8;
+  --mz-info-soft: rgba(29,78,216,0.10);
+
+  --mz-accent:        #1d4ed8;
+  --mz-accent-strong: #1e40af;
+  --mz-accent-soft:   rgba(29,78,216,0.10);
+
+  --mz-shadow-card:  0 1px 2px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.05);
+  --mz-shadow-pop:   0 8px 24px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,0,0,0.06);
+  --mz-shadow-modal: 0 24px 64px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.06);
+  --mz-shadow-inset: inset 0 1px 0 rgba(255,255,255,0.4);
+
+  --mz-kbd-bg:  rgba(0,0,0,0.06);
+  --mz-kbd-fg:  #18181b;
+}
+
+/* ============================================================
+   TENANT OVERRIDES — exemplo de outros partidos no futuro
+   ============================================================ */
+
+/* PSD = laranja + azul-marinho */
+[data-tenant="psd"] {
+  --mz-tenant-primary:        #003366;
+  --mz-tenant-primary-rgb:    0, 51, 102;
+  --mz-tenant-primary-strong: #001F3D;
+  --mz-tenant-accent:         #FF6B00;
+  --mz-tenant-accent-rgb:     255, 107, 0;
+}
+
+/* PT = vermelho + estrela */
+[data-tenant="pt"] {
+  --mz-tenant-primary:        #B00020;
+  --mz-tenant-primary-rgb:    176, 0, 32;
+  --mz-tenant-primary-strong: #7F0017;
+  --mz-tenant-accent:         #FFFFFF;
+  --mz-tenant-accent-rgb:     255, 255, 255;
+}
+
+/* Mazzel branco (fallback) = roxo histórico */
+[data-tenant="mazzel"] {
+  --mz-tenant-primary:        #7C3AED;
+  --mz-tenant-primary-rgb:    124, 58, 237;
+  --mz-tenant-primary-strong: #5B21B6;
+  --mz-tenant-accent:         #A78BFA;
+  --mz-tenant-accent-rgb:     167, 139, 250;
+}
+
+/* ============================================================
+   PRIMITIVAS BASE
+   ============================================================ */
+
+* { box-sizing: border-box; }
+html, body {
+  font-family: var(--mz-font-sans);
+  background: var(--mz-bg-page);
+  color: var(--mz-fg);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "cv11","ss01";
+}
+
+.tnum { font-variant-numeric: tabular-nums; font-feature-settings: "tnum","cv11"; }
+.mono { font-family: var(--mz-font-mono); }
+
+/* keyboard hint */
+.kbd {
+  font-family: var(--mz-font-mono);
+  font-size: var(--mz-t-xs);
+  background: var(--mz-kbd-bg);
+  color: var(--mz-kbd-fg);
+  padding: 1px 6px;
+  border-radius: var(--mz-r-xs);
+  border: 1px solid var(--mz-rule);
+}
+
+/* chip semântico */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--mz-r-pill);
+  font-size: var(--mz-t-xs);
+  font-weight: 500;
+  letter-spacing: var(--mz-track-wide);
+  border: 1px solid var(--mz-rule);
+  background: var(--mz-bg-elevated);
+  color: var(--mz-fg-muted);
+  white-space: nowrap;
+}
+.chip.ok      { color: var(--mz-ok);     background: var(--mz-ok-soft);     border-color: rgba(52,211,153,0.18); }
+.chip.warn    { color: var(--mz-warn);   background: var(--mz-warn-soft);   border-color: rgba(251,191,36,0.18); }
+.chip.danger  { color: var(--mz-danger); background: var(--mz-danger-soft); border-color: rgba(248,113,113,0.18); }
+.chip.info    { color: var(--mz-info);   background: var(--mz-info-soft);   border-color: rgba(147,197,253,0.18); }
+.chip.tenant  { color: var(--mz-tenant-accent); background: var(--mz-tenant-primary-soft); border-color: rgba(var(--mz-tenant-accent-rgb), 0.4); }
+
+/* botão primário tenant */
+.btn-tenant {
+  background: var(--mz-tenant-primary);
+  color: var(--mz-fg-on-tenant);
+  border: 1px solid var(--mz-tenant-primary-strong);
+  padding: 8px 14px;
+  border-radius: var(--mz-r-md);
+  font-size: var(--mz-t-base);
+  font-weight: 600;
+  letter-spacing: var(--mz-track-snug);
+  cursor: pointer;
+  transition: filter 120ms ease;
+}
+.btn-tenant:hover { filter: brightness(1.1); }
+.btn-tenant.accent {
+  background: var(--mz-tenant-accent);
+  color: var(--mz-fg-on-accent);
+  border-color: var(--mz-tenant-accent-strong);
+}
+
+/* divisores */
+.hr { height: 1px; background: var(--mz-rule); border: 0; }
+.hr-strong { height: 1px; background: var(--mz-rule-strong); border: 0; }

@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark" data-tenant="ub">
+<head>
+<meta charset="UTF-8">
+<title>Sistema IDs · Convites · UB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../F1-fundacao/tokens.css">
+<script src="../F1-fundacao/theme-bootstrap.js"></script>
+<style>
+html, body { height: 100%; margin: 0; overflow-x: hidden; }
+body { background: var(--mz-bg-page); }
+
+.shell { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+
+.side { background: var(--mz-bg-sidebar); border-right: 1px solid var(--mz-rule); height: 100vh; position: sticky; top: 0; overflow-y: auto; }
+.brand { padding: 16px 18px; border-bottom: 1px solid var(--mz-rule); display: flex; gap: 10px; align-items: center; }
+.brand .logo { width: 32px; height: 32px; background: var(--mz-tenant-primary); border: 1px solid var(--mz-tenant-accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; color: var(--mz-tenant-accent); font-size: 14px; }
+.brand .name { font-size: 13px; font-weight: 800; color: var(--mz-fg-strong); }
+.brand .name span { display: block; font-size: 9px; color: var(--mz-fg-faint); font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; margin-top: 1px; }
+
+.nav-section { padding: 12px 8px; border-bottom: 1px solid var(--mz-rule); }
+.nav-section h3 { font-size: 9.5px; letter-spacing: 0.16em; color: var(--mz-fg-faint); text-transform: uppercase; font-weight: 700; margin: 0 10px 8px; }
+.nav-row { display: flex; gap: 10px; align-items: center; padding: 7px 10px; cursor: pointer; font-size: 12px; color: var(--mz-fg); border-radius: var(--mz-r-sm); }
+.nav-row:hover { background: var(--mz-bg-card); }
+.nav-row.active { background: var(--mz-tenant-primary-soft); border-left: 3px solid var(--mz-tenant-accent); padding-left: 7px; color: var(--mz-fg-strong); font-weight: 700; }
+.nav-row .ico { font-size: 13px; width: 18px; }
+.nav-row .qty { margin-left: auto; font-family: var(--mz-font-mono); font-size: 9.5px; color: var(--mz-fg-faint); }
+.nav-row.warn .qty { background: var(--mz-warn); color: #fff; padding: 1px 5px; border-radius: 3px; font-weight: 800; }
+
+main { padding: 0; }
+.top-bar { padding: 14px 24px; border-bottom: 1px solid var(--mz-rule); background: var(--mz-bg-topbar); display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 5; }
+.crumb { font-size: 11.5px; color: var(--mz-fg-muted); flex: 1; }
+.crumb b { color: var(--mz-fg-strong); font-weight: 600; }
+.crumb span::after { content: '›'; margin: 0 6px; color: var(--mz-rule-strong); }
+.crumb span:last-child::after { display: none; }
+.btn { font-size: 11.5px; font-weight: 600; padding: 7px 12px; border-radius: var(--mz-r-md); border: 1px solid var(--mz-rule); background: var(--mz-bg-card); color: var(--mz-fg); cursor: pointer; }
+.btn.primary { background: var(--mz-tenant-primary); color: #fff; border-color: var(--mz-tenant-primary-strong); }
+.btn.tenant { background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent); border-color: var(--mz-tenant-accent); font-weight: 800; }
+.btn.ghost { background: none; }
+
+.section-title { padding: 24px 24px 4px; }
+.section-title h1 { font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 0.04em; color: var(--mz-fg-strong); margin: 0; }
+.section-title p { font-size: 12.5px; color: var(--mz-fg-muted); margin: 4px 0 0; max-width: 800px; }
+
+/* Stats */
+.stats { padding: 22px 24px 12px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.stat { background: var(--mz-bg-card); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-md); padding: 14px; }
+.stat .lbl { font-size: 9px; letter-spacing: 0.14em; color: var(--mz-fg-faint); text-transform: uppercase; font-weight: 700; }
+.stat .v { font-family: 'Bebas Neue', sans-serif; font-size: 30px; line-height: 1; color: var(--mz-fg-strong); margin-top: 4px; }
+.stat .s { font-size: 10px; color: var(--mz-fg-muted); margin-top: 2px; }
+
+/* main content */
+.content { padding: 14px 24px 32px; display: grid; grid-template-columns: 320px 1fr; gap: 14px; }
+
+/* left nav: tipos de convite */
+.left-nav { background: var(--mz-bg-card); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-lg); padding: 14px; height: fit-content; position: sticky; top: 80px; }
+.left-nav h3 { font-size: 9.5px; letter-spacing: 0.14em; color: var(--mz-fg-faint); text-transform: uppercase; font-weight: 700; margin: 0 0 10px; }
+.invite-type { padding: 10px 12px; border-radius: var(--mz-r-md); cursor: pointer; margin-bottom: 6px; border: 1px solid transparent; }
+.invite-type:hover { background: var(--mz-bg-elevated); }
+.invite-type.on { background: var(--mz-tenant-primary-soft); border-color: var(--mz-tenant-accent); }
+.invite-type .it { display: flex; align-items: center; gap: 8px; }
+.invite-type .it .nm { font-size: 12px; font-weight: 700; color: var(--mz-fg-strong); flex: 1; }
+.invite-type .it .qty { font-family: var(--mz-font-mono); font-size: 10px; color: var(--mz-fg-faint); background: var(--mz-bg-elevated); padding: 1px 6px; border-radius: 3px; }
+.invite-type .desc { font-size: 10.5px; color: var(--mz-fg-muted); margin-top: 4px; line-height: 1.4; }
+.invite-type .scope { font-size: 9px; color: var(--mz-fg-faint); margin-top: 6px; letter-spacing: 0.10em; text-transform: uppercase; font-weight: 700; }
+.invite-type .scope.party { color: var(--mz-tenant-accent); }
+.invite-type .scope.gabinete { color: var(--mz-ok); }
+.invite-type .scope.contractor { color: var(--mz-warn); }
+
+/* right: wizard */
+.wizard { background: var(--mz-bg-card); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-lg); }
+
+.wiz-header { padding: 18px 22px; border-bottom: 1px solid var(--mz-rule); display: flex; align-items: center; gap: 14px; }
+.wiz-header .ico-bg { width: 44px; height: 44px; background: var(--mz-tenant-primary-soft); border-radius: var(--mz-r-md); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+.wiz-header h2 { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.04em; color: var(--mz-fg-strong); margin: 0; }
+.wiz-header h2 + p { font-size: 11.5px; color: var(--mz-fg-muted); margin: 2px 0 0; }
+
+/* steps */
+.steps { display: flex; padding: 0 22px; border-bottom: 1px solid var(--mz-rule); }
+.step { flex: 1; padding: 14px 0 12px; cursor: pointer; border-bottom: 2px solid transparent; display: flex; gap: 8px; align-items: center; }
+.step .num { width: 22px; height: 22px; border-radius: 50%; background: var(--mz-rule); color: var(--mz-fg-faint); display: flex; align-items: center; justify-content: center; font-family: var(--mz-font-mono); font-size: 11px; font-weight: 800; }
+.step.done .num { background: var(--mz-ok); color: #fff; }
+.step.on .num { background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent); }
+.step.on { border-bottom-color: var(--mz-tenant-accent); }
+.step .lbl { font-size: 11.5px; color: var(--mz-fg-muted); font-weight: 600; }
+.step.on .lbl, .step.done .lbl { color: var(--mz-fg-strong); }
+.step .lbl small { display: block; font-size: 9.5px; font-weight: 500; color: var(--mz-fg-faint); margin-top: 1px; }
+
+/* wizard body */
+.wiz-body { padding: 22px; min-height: 460px; }
+.wiz-body h3 { font-size: 9.5px; letter-spacing: 0.14em; color: var(--mz-fg-faint); text-transform: uppercase; font-weight: 700; margin: 0 0 14px; }
+
+.field { margin-bottom: 16px; }
+.field label { display: block; font-size: 10.5px; color: var(--mz-fg-muted); font-weight: 600; margin-bottom: 6px; letter-spacing: 0.06em; text-transform: uppercase; }
+.field input, .field select, .field textarea { width: 100%; padding: 10px 12px; background: var(--mz-bg-elevated); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-md); color: var(--mz-fg-strong); font-size: 12.5px; font-family: 'Inter', sans-serif; }
+.field input:focus, .field select:focus { outline: none; border-color: var(--mz-tenant-accent); }
+.field .hint { font-size: 10.5px; color: var(--mz-fg-faint); margin-top: 4px; }
+
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* role cards */
+.roles-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.role-card { padding: 14px; border: 1px solid var(--mz-rule); border-radius: var(--mz-r-md); cursor: pointer; background: var(--mz-bg-elevated); }
+.role-card:hover { border-color: var(--mz-tenant-accent); }
+.role-card.on { border-color: var(--mz-tenant-accent); background: var(--mz-tenant-primary-soft); }
+.role-card .nm { font-size: 12.5px; font-weight: 700; color: var(--mz-fg-strong); }
+.role-card .desc { font-size: 10.5px; color: var(--mz-fg-muted); margin-top: 4px; line-height: 1.4; }
+.role-card .perms { margin-top: 8px; display: flex; gap: 4px; flex-wrap: wrap; }
+.role-card .perms span { font-size: 8.5px; padding: 1px 5px; background: var(--mz-bg-card); border-radius: 3px; color: var(--mz-fg-muted); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+
+/* permission tree */
+.perm-tree { background: var(--mz-bg-elevated); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-md); padding: 12px; }
+.perm-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px dashed var(--mz-rule); }
+.perm-row:last-child { border-bottom: 0; }
+.perm-row.indent { padding-left: 24px; }
+.perm-row .name { flex: 1; font-size: 12px; color: var(--mz-fg); }
+.perm-row.indent .name { font-size: 11px; color: var(--mz-fg-muted); }
+.perm-row .name b { color: var(--mz-fg-strong); }
+.perm-row .scope-badge { font-size: 9px; padding: 2px 6px; border-radius: 3px; background: var(--mz-bg-card); color: var(--mz-fg-muted); font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+.perm-row .scope-badge.read { background: rgba(59,130,246,0.16); color: #3b82f6; }
+.perm-row .scope-badge.write { background: rgba(34,197,94,0.16); color: var(--mz-ok); }
+.perm-row .scope-badge.admin { background: rgba(220,38,38,0.16); color: var(--mz-err); }
+.perm-row input[type="checkbox"] { accent-color: var(--mz-tenant-accent); }
+
+/* preview / review */
+.review-card { background: var(--mz-bg-elevated); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-md); padding: 16px; margin-bottom: 12px; }
+.review-card .hdr { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed var(--mz-rule); }
+.review-card .av { width: 44px; height: 44px; border-radius: 50%; background: var(--mz-tenant-primary); border: 2px solid var(--mz-tenant-accent); color: var(--mz-tenant-accent); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 18px; }
+.review-card .nm { font-size: 13.5px; font-weight: 800; color: var(--mz-fg-strong); }
+.review-card .nm small { display: block; font-size: 11px; color: var(--mz-fg-muted); font-weight: 500; margin-top: 2px; }
+
+.kv-row { display: grid; grid-template-columns: 140px 1fr; gap: 10px; padding: 7px 0; border-bottom: 1px dashed var(--mz-rule); font-size: 11.5px; }
+.kv-row:last-child { border-bottom: 0; }
+.kv-row .k { color: var(--mz-fg-muted); letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600; font-size: 10.5px; }
+.kv-row .v { color: var(--mz-fg-strong); font-weight: 600; }
+
+.delivery-options { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 10px; }
+.del-opt { padding: 12px; background: var(--mz-bg-elevated); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-md); cursor: pointer; text-align: center; }
+.del-opt.on { border-color: var(--mz-tenant-accent); background: var(--mz-tenant-primary-soft); }
+.del-opt .ico { font-size: 20px; }
+.del-opt .nm { font-size: 11px; font-weight: 700; color: var(--mz-fg-strong); margin-top: 4px; }
+.del-opt .s { font-size: 9.5px; color: var(--mz-fg-muted); margin-top: 2px; }
+
+/* magic link preview */
+.magic-link { background: var(--mz-bg-page); border: 1px dashed var(--mz-rule-strong); border-radius: var(--mz-r-md); padding: 14px; margin-top: 12px; font-family: var(--mz-font-mono); font-size: 11px; color: var(--mz-fg-strong); display: flex; align-items: center; gap: 10px; }
+.magic-link .lk { flex: 1; word-break: break-all; }
+.magic-link .copy-btn { background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent); border: 0; padding: 6px 12px; border-radius: 4px; font-weight: 800; cursor: pointer; font-size: 10px; letter-spacing: 0.10em; text-transform: uppercase; }
+
+.lgpd-box { background: var(--mz-bg-elevated); border: 1px solid var(--mz-rule); border-left: 3px solid var(--mz-tenant-accent); border-radius: var(--mz-r-md); padding: 14px; margin-top: 14px; }
+.lgpd-box h4 { font-size: 11px; color: var(--mz-fg-strong); margin: 0 0 6px; letter-spacing: 0.10em; text-transform: uppercase; font-weight: 800; }
+.lgpd-box p { font-size: 11px; color: var(--mz-fg-muted); margin: 0; line-height: 1.5; }
+.lgpd-box label { display: flex; align-items: flex-start; gap: 8px; margin-top: 10px; cursor: pointer; }
+.lgpd-box label input { margin-top: 2px; }
+.lgpd-box label span { font-size: 11px; color: var(--mz-fg-strong); }
+
+/* wiz footer */
+.wiz-footer { padding: 14px 22px; border-top: 1px solid var(--mz-rule); display: flex; gap: 8px; align-items: center; }
+.wiz-footer .progress { flex: 1; font-size: 11px; color: var(--mz-fg-muted); }
+.wiz-footer .progress b { color: var(--mz-fg-strong); }
+
+.step-pane { display: none; }
+.step-pane.on { display: block; }
+
+/* recent invites table */
+.recent-invites { background: var(--mz-bg-card); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-lg); padding: 18px; margin-top: 14px; }
+.recent-invites h3 { font-size: 9.5px; letter-spacing: 0.14em; color: var(--mz-fg-faint); text-transform: uppercase; font-weight: 700; margin: 0 0 14px; }
+.inv-row { display: grid; grid-template-columns: 30px 1fr 200px 130px 130px 100px 24px; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px dashed var(--mz-rule); }
+.inv-row:last-child { border-bottom: 0; }
+.inv-row .av { width: 30px; height: 30px; border-radius: 50%; background: var(--mz-bg-elevated); border: 1px solid var(--mz-rule); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; color: var(--mz-fg-muted); }
+.inv-row .nm { font-size: 12px; font-weight: 700; color: var(--mz-fg-strong); }
+.inv-row .nm small { display: block; font-size: 10px; color: var(--mz-fg-muted); font-weight: 500; margin-top: 1px; }
+.inv-row .role-cell { font-size: 10.5px; color: var(--mz-fg-muted); }
+.inv-row .role-cell b { color: var(--mz-fg-strong); font-weight: 700; }
+.inv-row .date { font-family: var(--mz-font-mono); font-size: 10px; color: var(--mz-fg-muted); }
+.inv-row .stat-pill { font-size: 9px; padding: 2px 6px; border-radius: 3px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; text-align: center; }
+.inv-row .stat-pill.pend { background: rgba(245,158,11,0.18); color: var(--mz-warn); }
+.inv-row .stat-pill.acc { background: rgba(34,197,94,0.18); color: var(--mz-ok); }
+.inv-row .stat-pill.exp { background: rgba(220,38,38,0.18); color: var(--mz-err); }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="side">
+    <div class="brand">
+      <div class="logo">UB</div>
+      <div class="name">União Brasil<span>Mazzel Eleitoral</span></div>
+    </div>
+    <div class="nav-section">
+      <h3>Estatutário</h3>
+      <div class="nav-row"><span class="ico">🏛</span> Diretórios</div>
+      <div class="nav-row"><span class="ico">👥</span> Filiados <span class="qty">8.4k</span></div>
+      <div class="nav-row"><span class="ico">📑</span> Documentos</div>
+      <div class="nav-row"><span class="ico">💰</span> Tesouraria</div>
+      <div class="nav-row"><span class="ico">🪪</span> Painel Pessoal</div>
+      <div class="nav-row active"><span class="ico">✉</span> IDs · Convites <span class="qty">14</span></div>
+    </div>
+    <div class="nav-section">
+      <h3>Plataforma</h3>
+      <div class="nav-row"><span class="ico">📊</span> Dashboard</div>
+      <div class="nav-row"><span class="ico">🗺</span> Mapa Estratégico</div>
+      <div class="nav-row warn"><span class="ico">🔔</span> Alertas <span class="qty">7</span></div>
+    </div>
+  </aside>
+
+  <main>
+    <div class="top-bar">
+      <div class="crumb"><span>UB · São Paulo · SP</span><span><b>Sistema de IDs e Convites</b></span></div>
+      <button class="btn">📥 Exportar lista</button>
+      <button class="btn">📋 Convites em massa</button>
+      <button class="btn primary">+ Novo Convite</button>
+    </div>
+
+    <div class="section-title">
+      <h1>SISTEMA DE IDs · CONVITES</h1>
+      <p>Onboarding controlado por escopo de organização. Cada convite gera um link mágico válido por 72h, vinculado a um papel com permissões granulares. Cumpre LGPD: a pessoa convidada confirma os dados antes de ativar conta.</p>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="lbl">Convites · 30d</div><div class="v">142</div><div class="s">+24% vs mês anterior</div></div>
+      <div class="stat"><div class="lbl">Aceitos</div><div class="v">128</div><div class="s">90% conversão</div></div>
+      <div class="stat"><div class="lbl">Pendentes</div><div class="v">11</div><div class="s">Aguardando ação</div></div>
+      <div class="stat"><div class="lbl">Expirados</div><div class="v">3</div><div class="s">72h sem aceite</div></div>
+      <div class="stat"><div class="lbl">Tempo médio</div><div class="v">4.2<small>h</small></div><div class="s">Envio → aceite</div></div>
+    </div>
+
+    <div class="content">
+      <!-- LEFT: tipos de convite -->
+      <aside class="left-nav">
+        <h3>Tipo de Convite</h3>
+
+        <div class="invite-type on">
+          <div class="it"><span style="font-size:14px">🪪</span><span class="nm">Filiado</span><span class="qty">8.412</span></div>
+          <div class="desc">Onboarding via QR code, pré-cadastro físico ou link público</div>
+          <div class="scope party">PARTIDO · ABERTO</div>
+        </div>
+
+        <div class="invite-type">
+          <div class="it"><span style="font-size:14px">🏛</span><span class="nm">Membro Diretório</span><span class="qty">42</span></div>
+          <div class="desc">Cargo estatutário · presidente, secretário, tesoureiro, vogais</div>
+          <div class="scope party">PARTIDO · CONTROLADO</div>
+        </div>
+
+        <div class="invite-type">
+          <div class="it"><span style="font-size:14px">⚖</span><span class="nm">Membro Comissão</span><span class="qty">87</span></div>
+          <div class="desc">Comissão Provisória · validade definida em ata</div>
+          <div class="scope party">PARTIDO · CONTROLADO</div>
+        </div>
+
+        <div class="invite-type">
+          <div class="it"><span style="font-size:14px">👨‍💼</span><span class="nm">Pessoal Político</span><span class="qty">156</span></div>
+          <div class="desc">Detentor de mandato · acesso a painel pessoal e gabinete</div>
+          <div class="scope party">PARTIDO · IDENTIFICADO</div>
+        </div>
+
+        <div class="invite-type">
+          <div class="it"><span style="font-size:14px">🪑</span><span class="nm">Equipe Gabinete</span><span class="qty">312</span></div>
+          <div class="desc">Cargo comissionado, estagiário ou voluntário do mandato</div>
+          <div class="scope gabinete">GABINETE · INTERNO</div>
+        </div>
+
+        <div class="invite-type">
+          <div class="it"><span style="font-size:14px">🤝</span><span class="nm">Operador Territorial</span><span class="qty">89</span></div>
+          <div class="desc">Cabos eleitorais, voluntários de campanha, líderes comunitários</div>
+          <div class="scope contractor">CAMPANHA · CONTROLADO</div>
+        </div>
+
+        <div class="invite-type">
+          <div class="it"><span style="font-size:14px">🔧</span><span class="nm">Prestador Serviço</span><span class="qty">14</span></div>
+          <div class="desc">Marketing, jurídico, contabilidade — terceirizado</div>
+          <div class="scope contractor">EXTERNO · LIMITADO</div>
+        </div>
+
+        <div class="invite-type">
+          <div class="it"><span style="font-size:14px">👁</span><span class="nm">Observador Externo</span><span class="qty">6</span></div>
+          <div class="desc">Auditor, MP, jornalista — somente leitura escopo limitado</div>
+          <div class="scope contractor">EXTERNO · LEITURA</div>
+        </div>
+      </aside>
+
+      <!-- RIGHT: WIZARD -->
+      <section>
+        <div class="wizard">
+          <div class="wiz-header">
+            <div class="ico-bg">🪑</div>
+            <div>
+              <h2>NOVO CONVITE · EQUIPE GABINETE</h2>
+              <p>Cargo comissionado, estagiário ou voluntário · validade do mandato vigente</p>
+            </div>
+          </div>
+
+          <div class="steps">
+            <div class="step on" data-step="1">
+              <span class="num">1</span>
+              <span class="lbl">Identificação<small>Quem está sendo convidado</small></span>
+            </div>
+            <div class="step" data-step="2">
+              <span class="num">2</span>
+              <span class="lbl">Papel & Permissões<small>O que ela pode fazer</small></span>
+            </div>
+            <div class="step" data-step="3">
+              <span class="num">3</span>
+              <span class="lbl">Envio & LGPD<small>Como entregar e consentir</small></span>
+            </div>
+          </div>
+
+          <div class="wiz-body">
+
+            <!-- STEP 1 -->
+            <div class="step-pane on" data-pane="1">
+              <h3>Dados da pessoa convidada</h3>
+              <div class="field-row">
+                <div class="field">
+                  <label>Nome completo *</label>
+                  <input value="Bianca Souza Mendes" />
+                </div>
+                <div class="field">
+                  <label>CPF (opcional, recomendado)</label>
+                  <input value="123.456.789-00" placeholder="000.000.000-00" />
+                  <div class="hint">Validação automática contra base TSE para detectar conflitos de filiação</div>
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label>E-mail principal *</label>
+                  <input value="bianca.souza@email.com" type="email" />
+                </div>
+                <div class="field">
+                  <label>WhatsApp *</label>
+                  <input value="(11) 98123-4567" />
+                  <div class="hint">Será usado para envio do link mágico</div>
+                </div>
+              </div>
+
+              <div class="field">
+                <label>Vínculo organizacional</label>
+                <select>
+                  <option>UB · São Paulo · SP — Gabinete Vereador Rafael Rodrigues</option>
+                  <option>UB · São Paulo · SP — Gabinete Vereador Marcos Aurélio</option>
+                  <option>UB · São Paulo · SP — Diretório Municipal</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label>Indicado por</label>
+                <input value="Joana Carvalho · Chefe de Gabinete" />
+                <div class="hint">Audit trail · LGPD requer rastreabilidade da origem do contato</div>
+              </div>
+
+              <div class="lgpd-box">
+                <h4>🔒 Consentimento prévio confirmado?</h4>
+                <p>A pessoa convidada já manifestou interesse e foi informada que receberá link da plataforma Mazzel Eleitoral?</p>
+                <label><input type="checkbox" checked /> <span>Sim, há consentimento verbal/escrito documentado em conversa anterior</span></label>
+              </div>
+            </div>
+
+            <!-- STEP 2 -->
+            <div class="step-pane" data-pane="2">
+              <h3>Selecione o papel principal</h3>
+              <div class="roles-grid">
+                <div class="role-card">
+                  <div class="nm">🪑 Chefe de Gabinete</div>
+                  <div class="desc">Acesso administrativo total ao gabinete, gerencia equipe e folha</div>
+                  <div class="perms">
+                    <span>READ</span><span>WRITE</span><span>ADMIN</span><span>EQUIPE</span>
+                  </div>
+                </div>
+                <div class="role-card on">
+                  <div class="nm">🪑 Assessor Sênior</div>
+                  <div class="desc">Acesso a agenda, comissões, redação de projetos e mandato</div>
+                  <div class="perms">
+                    <span>READ</span><span>WRITE</span><span>AGENDA</span><span>PROJ</span>
+                  </div>
+                </div>
+                <div class="role-card">
+                  <div class="nm">🪑 Assessor Júnior</div>
+                  <div class="desc">Acesso restrito a tarefas atribuídas e canais Permanente</div>
+                  <div class="perms">
+                    <span>READ</span><span>WRITE</span><span>TAREFAS</span>
+                  </div>
+                </div>
+                <div class="role-card">
+                  <div class="nm">🎓 Estagiário</div>
+                  <div class="desc">Acesso supervisionado, sem dados sensíveis, validade 6 meses</div>
+                  <div class="perms">
+                    <span>READ</span><span>SUP</span><span>6M</span>
+                  </div>
+                </div>
+              </div>
+
+              <h3 style="margin-top:24px">Permissões — refinar (opcional)</h3>
+              <div class="perm-tree">
+                <div class="perm-row">
+                  <input type="checkbox" checked />
+                  <div class="name"><b>📅 Agenda</b> — leitura completa</div>
+                  <span class="scope-badge read">Read</span>
+                </div>
+                <div class="perm-row indent">
+                  <input type="checkbox" checked />
+                  <div class="name">Editar próprios eventos</div>
+                  <span class="scope-badge write">Write</span>
+                </div>
+                <div class="perm-row indent">
+                  <input type="checkbox" />
+                  <div class="name">Ver eventos privados/família</div>
+                  <span class="scope-badge admin">Sensível</span>
+                </div>
+
+                <div class="perm-row">
+                  <input type="checkbox" checked />
+                  <div class="name"><b>📝 Projetos legislativos</b> — redação e tramitação</div>
+                  <span class="scope-badge write">Write</span>
+                </div>
+                <div class="perm-row indent">
+                  <input type="checkbox" checked />
+                  <div class="name">Submeter para revisão do Vereador</div>
+                  <span class="scope-badge write">Write</span>
+                </div>
+                <div class="perm-row indent">
+                  <input type="checkbox" />
+                  <div class="name">Protocolar diretamente na Casa</div>
+                  <span class="scope-badge admin">Admin</span>
+                </div>
+
+                <div class="perm-row">
+                  <input type="checkbox" checked />
+                  <div class="name"><b>💬 Chat permanente</b> — todos os canais do gabinete</div>
+                  <span class="scope-badge write">Write</span>
+                </div>
+                <div class="perm-row">
+                  <input type="checkbox" />
+                  <div class="name"><b>🔐 Chat sigiloso</b> — apenas se incluído manualmente em sala</div>
+                  <span class="scope-badge admin">Sensível</span>
+                </div>
+                <div class="perm-row">
+                  <input type="checkbox" />
+                  <div class="name"><b>💰 Tesouraria & Folha</b> — acesso vedado para Assessor Sênior</div>
+                  <span class="scope-badge admin">Bloqueado</span>
+                </div>
+                <div class="perm-row">
+                  <input type="checkbox" />
+                  <div class="name"><b>🗺 Mapa Estratégico — camadas privadas</b></div>
+                  <span class="scope-badge admin">Sensível</span>
+                </div>
+              </div>
+
+              <div class="field-row" style="margin-top:18px">
+                <div class="field">
+                  <label>Validade do convite</label>
+                  <select>
+                    <option>72h (padrão LGPD)</option>
+                    <option>24h (segurança alta)</option>
+                    <option>7 dias (recrutamento)</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>Validade do acesso</label>
+                  <select>
+                    <option selected>Vínculo do mandato (até 31/12/2028)</option>
+                    <option>1 ano · renovação anual</option>
+                    <option>6 meses · estagiário</option>
+                    <option>Indeterminado · até desligamento</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 3 -->
+            <div class="step-pane" data-pane="3">
+              <h3>Revisar & Enviar</h3>
+
+              <div class="review-card">
+                <div class="hdr">
+                  <div class="av">BS</div>
+                  <div>
+                    <div class="nm">Bianca Souza Mendes<small>bianca.souza@email.com · (11) 98123-4567</small></div>
+                  </div>
+                  <span style="margin-left:auto;font-size:9.5px;background:var(--mz-tenant-accent);color:var(--mz-fg-on-accent);padding:4px 8px;border-radius:3px;font-weight:800;letter-spacing:0.10em;text-transform:uppercase">PRONTA</span>
+                </div>
+
+                <div class="kv-row"><span class="k">Vínculo</span><span class="v">UB · São Paulo · SP — Gab. Rafael Rodrigues</span></div>
+                <div class="kv-row"><span class="k">Papel</span><span class="v">🪑 Assessor Sênior</span></div>
+                <div class="kv-row"><span class="k">Permissões</span><span class="v">8 permissões · 0 sensíveis · 0 admin</span></div>
+                <div class="kv-row"><span class="k">Validade convite</span><span class="v">72h após envio (expira 01/05 · 12h)</span></div>
+                <div class="kv-row"><span class="k">Validade acesso</span><span class="v">Vínculo mandato (31/12/2028)</span></div>
+                <div class="kv-row"><span class="k">Indicação</span><span class="v">Joana Carvalho · Chefe Gabinete</span></div>
+                <div class="kv-row"><span class="k">Status TSE</span><span class="v" style="color:var(--mz-ok)">✓ CPF sem conflito de filiação</span></div>
+              </div>
+
+              <h3 style="margin-top:18px">Canal de entrega</h3>
+              <div class="delivery-options">
+                <div class="del-opt on">
+                  <div class="ico">📱</div>
+                  <div class="nm">WhatsApp</div>
+                  <div class="s">Recomendado · taxa 94%</div>
+                </div>
+                <div class="del-opt">
+                  <div class="ico">✉</div>
+                  <div class="nm">E-mail</div>
+                  <div class="s">Backup · 70% taxa</div>
+                </div>
+                <div class="del-opt">
+                  <div class="ico">📋</div>
+                  <div class="nm">Copiar Link</div>
+                  <div class="s">Entrega presencial</div>
+                </div>
+              </div>
+
+              <h3 style="margin-top:18px">Preview do link</h3>
+              <div class="magic-link">
+                <span style="color: var(--mz-tenant-accent);font-weight:800">🔗</span>
+                <span class="lk">https://app.mazzel.eleitoral.br/onboard/<b style="color: var(--mz-tenant-accent)">UB-SP-GAB-RR-9F4Kx2vZ8m</b></span>
+                <button class="copy-btn">Copiar</button>
+              </div>
+              <div style="font-size:10.5px;color:var(--mz-fg-faint);margin-top:6px">Link único, criptografado, vinculado ao CPF informado e ao dispositivo de origem do convidador.</div>
+
+              <div class="lgpd-box" style="border-left-color: var(--mz-warn)">
+                <h4>📋 Termos LGPD · auditoria</h4>
+                <p>Ao enviar este convite, registro automático será gerado contendo: identidade do convidador, IP, dispositivo, timestamp, escopo concedido, base legal de tratamento (Art. 7º LGPD).</p>
+                <label><input type="checkbox" checked /> <span><b>Confirmo</b> que tenho base legal para tratamento dos dados acima e que a pessoa foi informada sobre como contestar o convite</span></label>
+                <label><input type="checkbox" /> <span>Notificar DPO automaticamente (recomendado para escopos com permissões sensíveis)</span></label>
+              </div>
+            </div>
+          </div>
+
+          <div class="wiz-footer">
+            <div class="progress">Passo <b id="curStep">1</b> de 3 · <span id="progLbl">Identificação</span></div>
+            <button class="btn ghost" id="btnBack" disabled>‹ Voltar</button>
+            <button class="btn primary" id="btnNext">Próximo ›</button>
+            <button class="btn tenant" id="btnSend" style="display:none">📤 Enviar Convite</button>
+          </div>
+        </div>
+
+        <!-- Recent invites -->
+        <div class="recent-invites">
+          <h3>Convites Recentes · Gabinete Rafael Rodrigues</h3>
+
+          <div class="inv-row">
+            <div class="av">CT</div>
+            <div class="nm">Carla Tavares<small>carla.tavares@email.com</small></div>
+            <div class="role-cell"><b>Assessor Sênior</b> · Comissões</div>
+            <div class="date">26/04 · 14:32</div>
+            <div class="date">Aceito 26/04 · 18:14</div>
+            <span class="stat-pill acc">Ativo</span>
+            <span style="cursor:pointer;color:var(--mz-fg-faint)">⋮</span>
+          </div>
+          <div class="inv-row">
+            <div class="av">RT</div>
+            <div class="nm">Rodrigo Tavares<small>rodrigo@email.com</small></div>
+            <div class="role-cell"><b>Estagiário Jurídico</b> · 6m</div>
+            <div class="date">26/04 · 10:01</div>
+            <div class="date">Aguardando aceite</div>
+            <span class="stat-pill pend">Pendente</span>
+            <span style="cursor:pointer;color:var(--mz-fg-faint)">⋮</span>
+          </div>
+          <div class="inv-row">
+            <div class="av">PL</div>
+            <div class="nm">Patricia Lima<small>p.lima@advogada.com.br</small></div>
+            <div class="role-cell"><b>Assessor Sênior</b> · Jurídico</div>
+            <div class="date">25/04 · 16:48</div>
+            <div class="date">Aceito 25/04 · 17:22</div>
+            <span class="stat-pill acc">Ativo</span>
+            <span style="cursor:pointer;color:var(--mz-fg-faint)">⋮</span>
+          </div>
+          <div class="inv-row">
+            <div class="av">VS</div>
+            <div class="nm">Vinicius Santos<small>v.santos@email.com</small></div>
+            <div class="role-cell"><b>Assessor Comunitário</b></div>
+            <div class="date">23/04 · 09:15</div>
+            <div class="date">Expirado · 26/04</div>
+            <span class="stat-pill exp">Expirado</span>
+            <span style="cursor:pointer;color:var(--mz-fg-faint)">⋮</span>
+          </div>
+          <div class="inv-row">
+            <div class="av">FA</div>
+            <div class="nm">Fernando Alves<small>f.alves@gmail.com</small></div>
+            <div class="role-cell"><b>Mídia Júnior</b> · Redes</div>
+            <div class="date">22/04 · 11:30</div>
+            <div class="date">Aceito 22/04 · 13:45</div>
+            <span class="stat-pill acc">Ativo</span>
+            <span style="cursor:pointer;color:var(--mz-fg-faint)">⋮</span>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script>
+const stepsEls = document.querySelectorAll('.step');
+const panes = document.querySelectorAll('.step-pane');
+const btnBack = document.getElementById('btnBack');
+const btnNext = document.getElementById('btnNext');
+const btnSend = document.getElementById('btnSend');
+const curStepEl = document.getElementById('curStep');
+const progLbl = document.getElementById('progLbl');
+
+const labels = ['Identificação', 'Papel & Permissões', 'Envio & LGPD'];
+
+let cur = 1;
+function go(s) {
+  cur = Math.max(1, Math.min(3, s));
+  stepsEls.forEach(el => {
+    const n = +el.dataset.step;
+    el.classList.toggle('on', n === cur);
+    el.classList.toggle('done', n < cur);
+  });
+  panes.forEach(p => {
+    p.classList.toggle('on', +p.dataset.pane === cur);
+  });
+  curStepEl.textContent = cur;
+  progLbl.textContent = labels[cur-1];
+  btnBack.disabled = cur === 1;
+  btnNext.style.display = cur === 3 ? 'none' : '';
+  btnSend.style.display = cur === 3 ? '' : 'none';
+}
+btnBack.onclick = () => go(cur - 1);
+btnNext.onclick = () => go(cur + 1);
+stepsEls.forEach(el => el.onclick = () => go(+el.dataset.step));
+
+// invite type switcher
+document.querySelectorAll('.invite-type').forEach(t => {
+  t.onclick = () => {
+    document.querySelectorAll('.invite-type').forEach(x => x.classList.remove('on'));
+    t.classList.add('on');
+  };
+});
+
+// role card switcher
+document.querySelectorAll('.role-card').forEach(t => {
+  t.onclick = () => {
+    document.querySelectorAll('.role-card').forEach(x => x.classList.remove('on'));
+    t.classList.add('on');
+  };
+});
+
+// delivery option
+document.querySelectorAll('.del-opt').forEach(t => {
+  t.onclick = () => {
+    document.querySelectorAll('.del-opt').forEach(x => x.classList.remove('on'));
+    t.classList.add('on');
+  };
+});
+</script>
+</body>
+</html>

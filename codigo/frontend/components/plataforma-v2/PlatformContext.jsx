@@ -40,13 +40,22 @@ export function PlatformProvider({ children }) {
     try {
       prefs = JSON.parse(localStorage.getItem(LS_KEY) || "{}");
     } catch {}
-    // 2. tema global (mz-theme) - usado pelo anti-FOUC root
+    // 2. tema da querystring (?theme=light|dark) - prioridade maxima
+    //    Designer V1.2 (27/04): tema propaga via querystring na navegacao
+    //    entre paginas pra garantir consistencia em links externos.
+    let themeFromQS = null;
+    try {
+      const qs = new URLSearchParams(window.location.search);
+      const t = qs.get("theme");
+      if (t === "light" || t === "dark") themeFromQS = t;
+    } catch {}
+    // 3. tema global (mz-theme) - usado pelo anti-FOUC root
     let themeGlobal = null;
     try {
       const t = localStorage.getItem("mz-theme");
       if (t === "dark" || t === "light") themeGlobal = t;
     } catch {}
-    // 3. role real da sessao
+    // 4. role real da sessao
     let sessionRole = null;
     let userName = null;
     try {
@@ -57,11 +66,25 @@ export function PlatformProvider({ children }) {
         userName = u?.nome || null;
       }
     } catch {}
+
+    const finalTheme = themeFromQS || themeGlobal || prefs.theme || DEFAULT_STATE.theme;
+    const finalTenant = prefs.tenant || DEFAULT_STATE.tenant;
+
+    // Se veio de querystring, persiste pro proximo load
+    if (themeFromQS) {
+      try { localStorage.setItem("mz-theme", themeFromQS); } catch {}
+    }
+
+    // Aplica no <html> imediatamente (data-theme + data-tenant)
+    // data-tenant="uniao-brasil" eh o slug usado pelos tokens em globals-mazzel.css
+    document.documentElement.setAttribute("data-theme", finalTheme);
+    document.documentElement.setAttribute("data-tenant", "uniao-brasil");
+
     setState((s) => ({
       ...s,
       role: prefs.role || sessionRole || s.role,
-      tenant: prefs.tenant || s.tenant,
-      theme: themeGlobal || prefs.theme || s.theme,
+      tenant: finalTenant,
+      theme: finalTheme,
       sessionRole,
       userName: userName || s.userName,
       userInitials: userName ? initialsOf(userName) : s.userInitials,

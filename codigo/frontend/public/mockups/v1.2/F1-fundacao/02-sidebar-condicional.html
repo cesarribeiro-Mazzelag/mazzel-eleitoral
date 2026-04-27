@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark" data-tenant="ub">
+<head>
+<meta charset="UTF-8">
+<title>Sidebar Condicional · 10 Perfis · UB</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<script src="theme-bootstrap.js"></script>
+<style>
+html, body { height: 100%; margin: 0; overflow: hidden; }
+body { display: flex; flex-direction: column; }
+
+/* ============ HEADER (perfil switcher) ============ */
+.profile-bar {
+  flex-shrink: 0;
+  height: 64px;
+  background: var(--mz-bg-topbar);
+  border-bottom: 1px solid var(--mz-rule);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 24px;
+  overflow: hidden;
+}
+.profile-bar h1 {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--mz-fg-strong);
+  margin: 0;
+  white-space: nowrap;
+}
+.profile-bar .helper {
+  font-size: 11px;
+  color: var(--mz-fg-faint);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.profile-pills {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 6px 0;
+  flex: 1;
+  scrollbar-width: thin;
+  scrollbar-color: var(--mz-rule-strong) transparent;
+}
+.profile-pills::-webkit-scrollbar { height: 4px; }
+.profile-pills::-webkit-scrollbar-thumb { background: var(--mz-rule-strong); border-radius: 2px; }
+
+.profile-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  color: var(--mz-fg-muted);
+  border-radius: var(--mz-r-pill);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 120ms;
+}
+.profile-pill:hover {
+  border-color: var(--mz-fg-faint);
+  color: var(--mz-fg);
+}
+.profile-pill.active {
+  background: var(--mz-tenant-primary);
+  border-color: var(--mz-tenant-primary-strong);
+  color: #fff;
+  box-shadow: 0 0 0 1px var(--mz-tenant-accent-soft);
+}
+.profile-pill .num {
+  font-family: var(--mz-font-mono);
+  font-size: 10px;
+  background: rgba(0,0,0,0.3);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+.profile-pill.active .num { background: rgba(255, 204, 0, 0.25); color: #FFCC00; }
+
+/* ============ MAIN GRID (sidebar + frame) ============ */
+.layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 280px 1fr 360px;
+  min-height: 0;
+}
+
+/* ============ SIDEBAR ============ */
+.sidebar {
+  background: var(--mz-bg-sidebar);
+  border-right: 1px solid var(--mz-rule);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sb-brand {
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--mz-rule);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sb-brand img { width: 30px; height: 30px; flex-shrink: 0; }
+.sb-brand .who {
+  flex: 1;
+  min-width: 0;
+}
+.sb-brand .name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--mz-fg-strong);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sb-brand .scope {
+  font-size: 10px;
+  color: var(--mz-tenant-accent);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* user pill (quem está logado) */
+.sb-user {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--mz-rule);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sb-user .avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--mz-tenant-primary), var(--mz-tenant-primary-strong));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0;
+  flex-shrink: 0;
+}
+.sb-user .info { flex: 1; min-width: 0; }
+.sb-user .uname {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mz-fg-strong);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+.sb-user .urole {
+  font-size: 10px;
+  color: var(--mz-fg-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+.sb-user .urole .scope-tag {
+  display: inline-block;
+  padding: 1px 4px;
+  background: var(--mz-tenant-primary-soft);
+  color: var(--mz-tenant-accent);
+  border-radius: 3px;
+  font-weight: 600;
+  margin-left: 4px;
+  letter-spacing: 0.04em;
+}
+
+/* nav body */
+.sb-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+.sb-nav::-webkit-scrollbar { width: 4px; }
+.sb-nav::-webkit-scrollbar-thumb { background: var(--mz-rule-strong); }
+
+.sb-section {
+  padding: 8px 16px 4px;
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  color: var(--mz-fg-faint);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.sb-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 16px;
+  font-size: 13px;
+  color: var(--mz-fg-muted);
+  cursor: pointer;
+  transition: background 80ms;
+  position: relative;
+  border-left: 2px solid transparent;
+}
+.sb-item:hover {
+  background: var(--mz-bg-card-2);
+  color: var(--mz-fg);
+}
+.sb-item.active {
+  color: var(--mz-fg-strong);
+  background: var(--mz-tenant-primary-soft);
+  border-left-color: var(--mz-tenant-accent);
+}
+.sb-item .ic {
+  width: 16px; height: 16px;
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+.sb-item .lbl { flex: 1; }
+.sb-item .badge {
+  font-size: 10px;
+  font-family: var(--mz-font-mono);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-weight: 600;
+  background: var(--mz-bg-elevated);
+  color: var(--mz-fg-muted);
+}
+.sb-item .badge.danger { background: var(--mz-danger-soft); color: var(--mz-danger); }
+.sb-item .badge.warn   { background: var(--mz-warn-soft);   color: var(--mz-warn); }
+.sb-item .badge.tenant { background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent); }
+.sb-item .badge.live   { background: var(--mz-ok-soft); color: var(--mz-ok); }
+.sb-item .badge.live::before {
+  content: "";
+  display: inline-block;
+  width: 5px; height: 5px;
+  background: var(--mz-ok);
+  border-radius: 50%;
+  margin-right: 4px;
+  vertical-align: middle;
+  animation: pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse { 50% { opacity: 0.3; } }
+
+/* footer */
+.sb-foot {
+  border-top: 1px solid var(--mz-rule);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--mz-fg-faint);
+}
+.sb-foot a { color: var(--mz-fg-dim); text-decoration: none; }
+.sb-foot a:hover { color: var(--mz-fg); }
+
+/* ============ FRAME (mockup do que aparece) ============ */
+.frame {
+  background:
+    radial-gradient(800px 400px at 50% -100px, rgba(0, 42, 123, 0.12), transparent),
+    var(--mz-bg-page);
+  overflow: auto;
+  padding: 24px 32px;
+}
+.frame-hint {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  color: var(--mz-fg-faint);
+  margin-bottom: 16px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.frame-hint .arrow { color: var(--mz-tenant-accent); }
+
+.frame-title {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--mz-fg-strong);
+  margin: 0 0 6px;
+}
+.frame-sub {
+  font-size: 13px;
+  color: var(--mz-fg-muted);
+  margin-bottom: 22px;
+  max-width: 720px;
+  line-height: 1.55;
+}
+
+.first-screen {
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  border-radius: var(--mz-r-lg);
+  padding: 18px;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.first-screen .label {
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  color: var(--mz-fg-faint);
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.first-screen .val {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--mz-fg-strong);
+}
+.first-screen .desc {
+  font-size: 12px;
+  color: var(--mz-fg-muted);
+  line-height: 1.55;
+  margin-top: 6px;
+}
+
+/* itens info */
+.frame-info {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.info-card {
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  border-radius: var(--mz-r-md);
+  padding: 12px 14px;
+}
+.info-card .lbl {
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  color: var(--mz-fg-faint);
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.info-card .v {
+  font-size: 13px;
+  color: var(--mz-fg);
+  line-height: 1.55;
+}
+.info-card .v b { color: var(--mz-fg-strong); font-weight: 600; }
+
+/* tabela mock - rules */
+.rules {
+  margin-top: 24px;
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  border-radius: var(--mz-r-lg);
+  overflow: hidden;
+}
+.rules h3 {
+  margin: 0;
+  padding: 12px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--mz-fg-strong);
+  border-bottom: 1px solid var(--mz-rule);
+  background: var(--mz-bg-card-2);
+}
+.rules table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.rules th, .rules td {
+  padding: 8px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--mz-rule);
+  vertical-align: top;
+}
+.rules th {
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  color: var(--mz-fg-faint);
+  text-transform: uppercase;
+  font-weight: 600;
+  background: var(--mz-bg-card-2);
+}
+.rules td:first-child { color: var(--mz-fg-strong); font-weight: 500; }
+.rules td:last-child { color: var(--mz-fg-muted); }
+.rules tr:last-child td { border-bottom: 0; }
+
+/* ============ INSPECTOR (right panel — describes the role) ============ */
+.insp {
+  background: var(--mz-bg-sidebar);
+  border-left: 1px solid var(--mz-rule);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.insp::-webkit-scrollbar { width: 4px; }
+.insp::-webkit-scrollbar-thumb { background: var(--mz-rule-strong); }
+
+.insp-head {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--mz-rule);
+}
+.insp-eyebrow {
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  color: var(--mz-fg-faint);
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.insp-head h2 {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--mz-fg-strong);
+  margin: 0;
+}
+.insp-head .vol {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--mz-fg-muted);
+  line-height: 1.55;
+}
+.insp-head .vol b { color: var(--mz-tenant-accent); }
+
+.insp-body {
+  padding: 16px 20px;
+  flex: 1;
+}
+.insp-body h3 {
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  color: var(--mz-fg-faint);
+  text-transform: uppercase;
+  font-weight: 600;
+  margin: 16px 0 8px;
+}
+.insp-body h3:first-child { margin-top: 0; }
+.insp-body p {
+  font-size: 12px;
+  color: var(--mz-fg);
+  line-height: 1.6;
+  margin: 0 0 12px;
+}
+.insp-body ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 12px;
+}
+.insp-body li {
+  display: flex;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px dashed var(--mz-rule);
+  color: var(--mz-fg-muted);
+}
+.insp-body li:last-child { border-bottom: 0; }
+.insp-body li::before {
+  content: "›";
+  color: var(--mz-tenant-accent);
+  font-weight: 700;
+}
+.insp-body code {
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-family: var(--mz-font-mono);
+  font-size: 11px;
+  color: var(--mz-fg-strong);
+}
+
+/* badges semânticos */
+.tag-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.tag {
+  padding: 3px 8px;
+  border-radius: var(--mz-r-pill);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.tag.cam1 { background: rgba(124,58,237,0.18); color: #c4b5fd; }
+.tag.cam2 { background: var(--mz-tenant-primary-soft); color: var(--mz-tenant-accent); }
+.tag.cam3 { background: var(--mz-ok-soft); color: var(--mz-ok); }
+.tag.cam4 { background: var(--mz-warn-soft); color: var(--mz-warn); }
+
+</style>
+</head>
+<body>
+
+<!-- ============ SWITCHER DE PERFIL ============ -->
+<header class="profile-bar">
+  <h1>Sidebar Condicional</h1>
+  <span class="helper">Cada cargo vê apenas o que tem permissão · Clique em qualquer perfil →</span>
+  <div class="profile-pills" id="pills"></div>
+</header>
+
+<!-- ============ LAYOUT (sidebar + frame + inspector) ============ -->
+<div class="layout">
+
+  <!-- ====== SIDEBAR (substituída via JS) ====== -->
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <!-- ====== FRAME ====== -->
+  <main class="frame" id="frame"></main>
+
+  <!-- ====== INSPECTOR ====== -->
+  <aside class="insp" id="insp"></aside>
+
+</div>
+
+<script>
+/* ============================================================
+   ESPECIFICAÇÃO COMPLETA DOS 10 PERFIS
+   ============================================================
+   Decisões críticas registradas:
+   - "Coordenadores", "Afiliados", "Mandato", "Super" da V2 antiga
+     são absorvidos pelo perfil correspondente (deixam de ser itens universais)
+   - Cabo Eleitoral é o último nível DENTRO de Operações (não tem item próprio)
+   - Filiado fica de fora desta V1 (decisão César 25/04)
+   - Coord Regional/Territorial fica de fora desta V1
+*/
+
+const PROFILES = [
+  /* ============ CAMADA 1 — MAZZEL ============ */
+  {
+    id: 'mazzel-super',
+    pill: 'Super Admin Mazzel',
+    pillNum: '01',
+    camada: 'C1',
+    nome: 'Marcelo (Mazzel)',
+    iniciais: 'MZ',
+    role: 'Super Admin',
+    scope: 'Todos os Tenants',
+    eyebrow: 'Camada 1 · Mazzel (Técnica)',
+    title: 'Super Admin Mazzel',
+    desc: 'Operador da plataforma. Vê todos os tenants (UB, PSD, PT no futuro), monitora saúde do sistema, audita acessos e libera features experimentais.',
+    volume: 'Volume estimado: <b>5 a 10 pessoas</b> internas Mazzel',
+    primeiraTela: 'Console Operacional Mazzel',
+    primeiraDesc: 'KPIs de uptime · tenants ativos · ETLs rodando · custo de infra · usuários totais cross-tenant. Sem dado político — só sistema.',
+    sections: [
+      { sec: 'Operacional', items: [
+        ['Console',         'console',    'home',     'live'],
+        ['Tenants',         'tenants',    'building', '4'],
+        ['Saúde do Sistema','health',     'pulse',    'live'],
+        ['ETLs & Jobs',     'jobs',       'cycle',    null],
+        ['Custos',          'costs',      'wallet',   null],
+      ]},
+      { sec: 'Auditoria', items: [
+        ['Logs de Acesso',   'logs',     'list',    null],
+        ['Auditoria Cross',  'audit',    'shield',  '12k'],
+        ['Cumprimento LGPD', 'lgpd',     'lock',    'ok'],
+      ]},
+      { sec: 'Plataforma', items: [
+        ['Feature Flags',  'flags',  'flag',    null],
+        ['Releases',       'rel',    'rocket',  'v2.4'],
+        ['Suporte',        'sup',    'help',    '7'],
+      ]},
+    ],
+    info: [
+      ['Acesso', 'TODOS os tenants · TODOS os módulos'],
+      ['Pode ver', 'Métricas técnicas de saúde, custos, latências'],
+      ['NÃO pode ver', 'Dados políticos, dossiês, scoring interno do partido'],
+      ['NÃO pode editar', 'Conteúdo de qualquer tenant (read-only nos dados)'],
+    ],
+    abilities: [
+      'Liberar/desligar feature flag por tenant',
+      'Promover release (v2.x → produção)',
+      'Auditar quem acessou o quê em qualquer tenant',
+      'Suspender tenant em caso de inadimplência',
+    ],
+  },
+
+  /* ============ CAMADA 1 — Admin do Partido ============ */
+  {
+    id: 'admin-tenant',
+    pill: 'Admin do Partido',
+    pillNum: '02',
+    camada: 'C1',
+    nome: 'Equipe TI União Brasil',
+    iniciais: 'TI',
+    role: 'Admin de Tenant',
+    scope: 'Tenant: União Brasil',
+    eyebrow: 'Camada 1 · Operacional do Partido',
+    title: 'Admin do Partido (Tenant)',
+    desc: 'Time técnico do União Brasil que opera o tenant. Gerencia usuários, papéis, assinatura DocuSign, integrações TSE e branding interno. Não confunde com Presidente Nacional (esse é decisão política).',
+    volume: 'Volume estimado: <b>3 a 8 pessoas</b> de TI por partido',
+    primeiraTela: 'Painel de Administração',
+    primeiraDesc: 'Quantos usuários ativos · Quantos cargos preenchidos na nominata · Status DocuSign · Saúde das ETLs específicas do tenant.',
+    sections: [
+      { sec: 'Tenant', items: [
+        ['Visão Geral',     'home',    'home',     null],
+        ['White Label',     'brand',   'palette',  null],
+        ['Domínios',        'dom',     'globe',    null],
+      ]},
+      { sec: 'Pessoas', items: [
+        ['Usuários',         'users',  'people',   '2.847'],
+        ['Papéis & RBAC',    'rbac',   'shield',   null],
+        ['Convites Pendentes','inv',   'mail',     '14'],
+        ['Auditoria',        'audit',  'list',     null],
+      ]},
+      { sec: 'Integrações', items: [
+        ['DocuSign',          'ds',     'sign',     'ok'],
+        ['TSE / DivulgaCand', 'tse',    'plug',     'live'],
+        ['DOU',               'dou',    'plug',     null],
+        ['SES (e-mail)',      'ses',    'mail',     null],
+        ['WhatsApp Business', 'wa',     'phone',    'ok'],
+      ]},
+      { sec: 'Conteúdo', items: [
+        ['Templates de Doc.', 'tpl',    'doc',      '23'],
+        ['Logo & Branding',   'logo',   'image',    null],
+        ['Modelos PDF',       'pdf',    'file',     null],
+      ]},
+    ],
+    info: [
+      ['Acesso', 'TODOS os módulos do tenant União Brasil'],
+      ['Pode editar', 'Usuários, papéis, integrações, branding, templates'],
+      ['NÃO pode ver', 'Outros tenants, scoring interno detalhado'],
+      ['NÃO pode designar', 'Cargos políticos (decisão do Pres Nacional)'],
+    ],
+    abilities: [
+      'Convidar/remover usuários do tenant',
+      'Atribuir papel RBAC (Pres Estadual, Tesoureiro, etc)',
+      'Trocar logo, cores, domínio do white-label',
+      'Renovar/revogar conexão DocuSign / TSE',
+      'Auditar todos os logs do tenant',
+    ],
+  },
+
+  /* ============ CAMADA 2 — Pres Nacional ============ */
+  {
+    id: 'pres-nac',
+    pill: 'Pres Nacional',
+    pillNum: '03',
+    camada: 'C2',
+    nome: 'Antônio Rueda',
+    iniciais: 'AR',
+    role: 'Presidente Nacional',
+    scope: 'Brasil · 27 UFs',
+    eyebrow: 'Camada 2 · Política Partidária Nacional',
+    title: 'Presidente Nacional do Partido',
+    desc: 'Cargo eletivo da Comissão Executiva Nacional. Comanda toda a estrutura do partido no país. Cria campanhas para os 27 Pres Estaduais. Vê score consolidado por UF.',
+    volume: 'Volume: <b>1 pessoa</b> por partido · 27 UFs sob comando',
+    primeiraTela: 'Dashboard Executivo Nacional',
+    primeiraDesc: 'Big numbers em delta: filiados Brasil · receita partidária · eleitos vs ciclo passado · ranking entre partidos · Score médio Pres Estaduais.',
+    sections: [
+      { sec: 'Comando', items: [
+        ['Dashboard Nacional','home',     'home',     'live'],
+        ['Mapa Estratégico', 'mapa',     'map',      null],
+        ['Operações',        'ops',      'target',   '14'],
+        ['Radar Político',   'radar',    'radar',    '3'],
+        ['Alertas',          'alert',    'bell',     'danger:7'],
+      ]},
+      { sec: 'Partido', items: [
+        ['Diretórios',       'dir',      'tree',     '5.570'],
+        ['Comissão Nacional','com',      'people',   null],
+        ['Estados (27 UFs)', 'uf',       'flag',     null],
+        ['Filiados',         'fil',      'badge',    '847k'],
+        ['Nominata',         'nom',      'list',     'warn:23%'],
+      ]},
+      { sec: 'Eletivos & Mídia', items: [
+        ['Dossiês',          'dos',      'profile',  '70k'],
+        ['Bancada',          'banc',     'gov',      null],
+        ['Mídia & Clipping', 'mid',      'broadcast',null],
+      ]},
+      { sec: 'Gestão', items: [
+        ['Documentos',       'doc',      'doc',      null],
+        ['Tesouraria',       'tes',      'wallet',   null],
+        ['Estudo',           'est',      'book',     null],
+        ['IA Estratégica',   'ia',       'spark',    null],
+      ]},
+    ],
+    info: [
+      ['Acesso', 'Visão consolidada Brasil · todas as 27 UFs'],
+      ['Pode criar', 'Campanhas para Pres Estaduais (cascata)'],
+      ['Pode ver', 'Score, dossiês, mapas em todos os níveis'],
+      ['NÃO pode editar', 'Operação interna de outro Pres Estadual'],
+    ],
+    abilities: [
+      'Criar campanha "Cobrir 27 UFs" e cascatear pra Estaduais',
+      'Designar Pres Estaduais',
+      'Ver score consolidado de todos os Estaduais',
+      'Aprovar prestação de contas anual',
+      'Liberar verba inter-UFs',
+    ],
+  },
+
+  /* ============ CAMADA 2 — Pres Estadual (MILTON LEITE) ============ */
+  {
+    id: 'pres-est',
+    pill: 'Pres Estadual (Milton)',
+    pillNum: '04',
+    camada: 'C2',
+    nome: 'Milton Leite',
+    iniciais: 'ML',
+    role: 'Presidente Estadual SP',
+    scope: 'São Paulo · 645 municípios',
+    eyebrow: 'Camada 2 · CLIENTE — Aprovador Final',
+    title: 'Presidente Estadual SP — Milton Leite',
+    desc: 'É o cliente que aprova ou recusa o produto. Perfil CEO: direto, foco em resultado. Comanda 645 Pres Municipais. Quer ver "como está, o que mudou, o que decidir agora" em 3 segundos.',
+    volume: 'Volume: <b>27 pessoas</b> (1 por UF) · 645 municípios SP sob comando',
+    primeiraTela: 'Dashboard Executivo Estadual',
+    primeiraDesc: 'KPIs com delta vs semana/mês/eleição passada. Score médio Pres Municipais. Operações com risco de atraso. Mapa estratégico SP em destaque.',
+    sections: [
+      { sec: 'Comando SP', items: [
+        ['Dashboard SP',      'home',     'home',     'live'],
+        ['Mapa Estratégico',  'mapa',     'map',      null],
+        ['Operações',         'ops',      'target',   '23'],
+        ['Radar SP',          'radar',   'radar',    '5'],
+        ['Alertas SP',        'alert',    'bell',     'danger:12'],
+      ]},
+      { sec: 'Estrutura SP', items: [
+        ['Comissão Estadual',  'com',     'people',   null],
+        ['645 Municípios',     'mun',     'tree',     'warn:78%'],
+        ['Filiados SP',        'fil',     'badge',    '124k'],
+        ['Cabos Eleitorais',   'cab',     'walk',     '3.412'],
+      ]},
+      { sec: 'Eletivos SP', items: [
+        ['Dossiês SP',         'dos',     'profile',  null],
+        ['Bancada SP',         'banc',    'gov',      null],
+        ['Tarcísio (gov)',     'gov',     'star',     'tenant:96'],
+      ]},
+      { sec: 'Gestão SP', items: [
+        ['Documentos SP',      'doc',     'doc',      null],
+        ['Tesouraria SP',      'tes',     'wallet',   null],
+        ['Mídia SP',           'mid',     'broadcast',null],
+        ['IA Estratégica',     'ia',      'spark',    null],
+      ]},
+    ],
+    info: [
+      ['Acesso', 'Apenas SP · 645 municípios + Comissão Estadual'],
+      ['Recebe campanhas de', 'Pres Nacional (via cascata)'],
+      ['Cria campanhas para', '645 Pres Municipais'],
+      ['NÃO pode ver', 'SP fora do tenant · outros estados'],
+    ],
+    abilities: [
+      'Designar/substituir Pres Municipais SP',
+      'Criar campanhas territoriais SP (mapa estratégico)',
+      'Ver score de todos 645 municípios em uma tela',
+      'Tomar ação direto do mapa: clicar município → "designar visita"',
+      'Receber alerta quando município entra em risco',
+    ],
+  },
+
+  /* ============ CAMADA 2 — Pres Municipal ============ */
+  {
+    id: 'pres-mun',
+    pill: 'Pres Municipal',
+    pillNum: '05',
+    camada: 'C2',
+    nome: 'Alessandro Rotunno',
+    iniciais: 'AR',
+    role: 'Presidente Municipal',
+    scope: 'Itaquaquecetuba/SP',
+    eyebrow: 'Camada 2 · Política Partidária Municipal',
+    title: 'Presidente Municipal',
+    desc: 'Cabeça da Comissão Executiva Municipal. Cuida de filiação, nominata, base territorial. Recebe campanhas de SP, executa via Sec-Geral, Tesoureiro e Coords.',
+    volume: 'Volume: <b>~5.570 pessoas</b> (1 por município) · 645 só em SP',
+    primeiraTela: 'Painel da Comissão Municipal',
+    primeiraDesc: 'Status nominata · filiações novas no mês · campanhas recebidas · alertas urgentes · próximos eventos partidários.',
+    sections: [
+      { sec: 'Município', items: [
+        ['Painel Municipal',  'home',  'home',    'live'],
+        ['Mapa do Município', 'mapa',  'map',     null],
+        ['Operações',         'ops',   'target',  '6'],
+        ['Alertas',           'alert', 'bell',    'warn:3'],
+      ]},
+      { sec: 'Comissão', items: [
+        ['Nominata Municipal', 'nom',   'list',   'warn:Pendente'],
+        ['Sec-Geral',          'sec',   'people', null],
+        ['Tesoureiro',         'tes',   'wallet', null],
+        ['Membros & Suplentes','memb',  'team',   '12'],
+      ]},
+      { sec: 'Base', items: [
+        ['Filiados',           'fil',   'badge',  '847'],
+        ['Cabos Eleitorais',   'cab',   'walk',   '34'],
+        ['Lideranças',         'lid',   'star',   null],
+      ]},
+      { sec: 'Gestão', items: [
+        ['Documentos',         'doc',   'doc',    null],
+        ['Atas',               'ata',   'pen',    null],
+        ['Tesouraria',         'fin',   'wallet', null],
+      ]},
+    ],
+    info: [
+      ['Acesso', 'Apenas Itaquaquecetuba/SP'],
+      ['Recebe campanhas de', 'Pres Estadual SP'],
+      ['Cria campanhas para', 'Sec-Geral, Tesoureiro, Coordenadores'],
+      ['NÃO pode ver', 'Outros municípios SP · outros estados'],
+    ],
+    abilities: [
+      'Atualizar nominata (com DocuSign)',
+      'Designar Sec-Geral, Tesoureiro, Membros',
+      'Aprovar filiações via abonador',
+      'Designar Coord Regional para campanhas locais',
+    ],
+  },
+
+  /* ============ CAMADA 2 — Tesoureiro ============ */
+  {
+    id: 'tesou',
+    pill: 'Tesoureiro',
+    pillNum: '06',
+    camada: 'C2',
+    nome: 'Cláudia Silva',
+    iniciais: 'CS',
+    role: 'Tesoureira Estadual',
+    scope: 'União Brasil SP',
+    eyebrow: 'Camada 2 · Política Partidária — Tesouraria',
+    title: 'Tesoureiro (qualquer nível)',
+    desc: 'Responsável pelas contas do partido no nível em que atua. Visão protegida — só ele e o presidente do nível veem detalhe. Visão minimalista, focada em prestação de contas.',
+    volume: 'Volume: <b>1 por nível</b> (Nacional + 27 UFs + 5570 municípios)',
+    primeiraTela: 'Painel Financeiro',
+    primeiraDesc: 'Saldo · receitas mês · despesas mês · contas a pagar · prestação TSE · alertas de inconsistência.',
+    sections: [
+      { sec: 'Tesouraria', items: [
+        ['Painel Financeiro', 'home',  'home',   'live'],
+        ['Receitas',          'rec',   'plus',   null],
+        ['Despesas',          'desp',  'minus',  null],
+        ['Contas a Pagar',    'pag',   'wallet', 'warn:14'],
+        ['Conciliação',       'con',   'check',  null],
+      ]},
+      { sec: 'Compliance', items: [
+        ['Prestação TSE',     'tse',   'gov',    'ok'],
+        ['DocuSign Recibos',  'ds',    'sign',   null],
+        ['Auditoria',         'aud',   'shield', null],
+      ]},
+      { sec: 'Documentos', items: [
+        ['Comprovantes',      'comp',  'file',   null],
+        ['Notas Fiscais',     'nf',    'doc',    null],
+        ['Relatórios',        'rel',   'chart',  null],
+      ]},
+      { sec: 'Consulta', items: [
+        ['Filiados (read)',   'fil',   'badge',  null],
+      ]},
+    ],
+    info: [
+      ['Acesso', 'Tesouraria do nível · read-only em filiados'],
+      ['Pode editar', 'Lançamentos, comprovantes, prestações'],
+      ['NÃO pode ver', 'Dossiês, mapa estratégico, operações'],
+      ['Compartilha com', 'Pres do mesmo nível (fica protegido pra outros)'],
+    ],
+    abilities: [
+      'Lançar receita/despesa com comprovante',
+      'Gerar prestação de contas TSE',
+      'Conciliar com extrato bancário',
+      'Disparar DocuSign para recibo de receita',
+    ],
+  },
+
+  /* ============ CAMADA 2 — Sec-Geral ============ */
+  {
+    id: 'secgeral',
+    pill: 'Sec-Geral',
+    pillNum: '07',
+    camada: 'C2',
+    nome: 'Pedro Almeida',
+    iniciais: 'PA',
+    role: 'Secretário-Geral',
+    scope: 'Comissão Estadual SP',
+    eyebrow: 'Camada 2 · Política Partidária — Secretaria',
+    title: 'Secretário-Geral / Adjunto',
+    desc: 'Cabeça administrativa do nível. Cuida da nominata, atas, documentos, agendamento. Ele é quem mantém o partido funcionando burocraticamente.',
+    volume: 'Volume: <b>2 por nível</b> (titular + adjunto)',
+    primeiraTela: 'Painel da Secretaria',
+    primeiraDesc: 'Tarefas administrativas pendentes · atas a aprovar · documentos a assinar · próximas sessões da comissão.',
+    sections: [
+      { sec: 'Secretaria', items: [
+        ['Painel',            'home',  'home',   null],
+        ['Agenda Comissão',   'ag',    'cal',    null],
+        ['Atas',              'ata',   'pen',    'warn:3'],
+        ['Tarefas',           'tar',   'check',  '7'],
+      ]},
+      { sec: 'Nominata', items: [
+        ['Nominata',          'nom',   'list',   'warn:Pendente'],
+        ['Membros',           'memb',  'team',   null],
+        ['Suplentes',         'sup',   'team',   null],
+        ['DocuSign Pendentes','ds',    'sign',   '4'],
+      ]},
+      { sec: 'Documentos', items: [
+        ['Repositório',       'doc',   'doc',    null],
+        ['Resoluções',        'res',   'star',   null],
+        ['Manifestos',        'man',   'flag',   null],
+        ['Templates',         'tpl',   'pen',    null],
+      ]},
+      { sec: 'Filiados (apoio)', items: [
+        ['Filiados',          'fil',   'badge',  null],
+        ['Solicitações',      'sol',   'mail',   null],
+      ]},
+    ],
+    info: [
+      ['Acesso', 'Comissão Executiva do nível · Documentos · Filiados (apoio)'],
+      ['Pode editar', 'Atas, nominata, documentos administrativos'],
+      ['NÃO pode ver', 'Tesouraria detalhada · Mapa estratégico'],
+      ['Tem permissão de', 'Convocar reuniões em nome do Presidente'],
+    ],
+    abilities: [
+      'Editar nominata e disparar DocuSign para assinatura',
+      'Lavrar atas e enviar para aprovação',
+      'Cadastrar/alterar membros da Comissão',
+      'Responder demandas de filiados',
+    ],
+  },
+
+  /* ============ CAMADA 3 — Político Eleito ============ */
+  {
+    id: 'eleito',
+    pill: 'Político Eleito',
+    pillNum: '08',
+    camada: 'C3',
+    nome: 'Senador Jaques Wagner',
+    iniciais: 'JW',
+    role: 'Senador (BA)',
+    scope: 'Mandato pessoal · BA',
+    eyebrow: 'Camada 3 · Eletiva — Político no Mandato',
+    title: 'Político Eleito (com mandato)',
+    desc: 'Tem painel pessoal completo: agente de inteligência política. Vê próprio dossiê, agenda, alianças, base, atividade legislativa. Equipe de gabinete tem acesso compartilhado.',
+    volume: 'Volume: <b>~67.000 pessoas</b> em mandato no Brasil (Sen, Dep Fed/Est, Pref, Vereador)',
+    primeiraTela: 'Portal Pessoal do Político',
+    primeiraDesc: 'Cenário Político · Meu Dossiê (OVR + sub-medidas) · Agenda · Alianças sugeridas · Mídia espontânea · próximas votações.',
+    sections: [
+      { sec: 'Eu', items: [
+        ['Cenário Político',  'home',  'radar',   'live'],
+        ['Meu Dossiê',        'dos',   'profile', 'tenant:95'],
+        ['Minha Agenda',      'ag',    'cal',     null],
+        ['Equipe Gabinete',   'eq',    'team',    '8'],
+      ]},
+      { sec: 'Mandato', items: [
+        ['Atividade Legisl.', 'atv',   'gov',     null],
+        ['Bancada/Votações',  'vot',   'flag',    null],
+        ['Comissões',         'com',   'list',    null],
+        ['Discursos & Mídia', 'mid',   'broadcast',null],
+      ]},
+      { sec: 'Base & Aliados', items: [
+        ['Mapa da Base',      'mapa',  'map',     null],
+        ['Alianças',          'ali',   'link',    null],
+        ['Lideranças BA',     'lid',   'star',    null],
+        ['Operações em mim',  'opem',  'target',  '3'],
+      ]},
+      { sec: 'Inteligência', items: [
+        ['Estudo',            'est',   'book',    null],
+        ['Emendas',           'em',    'wallet',  null],
+        ['Clipping',          'clip',  'broadcast',null],
+        ['IA Pessoal',        'ia',    'spark',   null],
+      ]},
+    ],
+    info: [
+      ['Acesso', 'Painel pessoal · base BA · pares (read-only)'],
+      ['É dono', 'Dossiê pessoal · Agenda · Equipe (Princípio Portabilidade)'],
+      ['Migra com ele', 'Se trocar de partido, dossiê + agenda + base vão junto'],
+      ['Fica no partido', 'Estratégia confidencial UB sobre ele · operações nele'],
+    ],
+    abilities: [
+      'Editar próprio dossiê (curadoria do que é público)',
+      'Adicionar/remover Equipe de Gabinete',
+      'Criar ações na agenda pessoal',
+      'Receber notificação de operações em si',
+      'Ver alianças sugeridas pela IA',
+    ],
+  },
+
+  /* ============ CAMADA 3 — Equipe de Gabinete ============ */
+  {
+    id: 'gabinete',
+    pill: 'Equipe Gabinete',
+    pillNum: '09',
+    camada: 'C3',
+    nome: 'Mariana Costa',
+    iniciais: 'MC',
+    role: 'Chefe de Gabinete · Sen. Wagner',
+    scope: 'Gabinete · subtipo: Chefe',
+    eyebrow: 'Camada 3 · Eletiva — Equipe',
+    title: 'Equipe de Gabinete',
+    desc: 'Compartilha acesso ao painel do político com permissões filtradas pelo subtipo (Chefe, Comunicação, Jurídico, Articulação, Parlamentar, Base). Sidebar muda por subtipo.',
+    volume: 'Volume: <b>~325.000 pessoas</b> (média 5-6 por gabinete × 67k mandatos)',
+    primeiraTela: 'Painel da Equipe (varia por subtipo)',
+    primeiraDesc: 'Subtipo Chefe vê tudo. Subtipo Comunicação vê só agenda + mídia. Subtipo Jurídico vê só processos + alertas. Subtipo Base vê mapa + operações.',
+    sections: [
+      { sec: 'Subtipo: Chefe', items: [
+        ['Painel Geral',      'home',  'home',    null],
+        ['Agenda Político',   'ag',    'cal',     null],
+        ['Equipe',            'eq',    'team',    null],
+        ['Tarefas',           'tar',   'check',   '12'],
+      ]},
+      { sec: 'Mandato', items: [
+        ['Atividade Legisl.', 'atv',   'gov',     null],
+        ['Bancada/Votações',  'vot',   'flag',    null],
+      ]},
+      { sec: 'Comunicação', items: [
+        ['Mídia & Clipping',  'mid',   'broadcast',null],
+        ['Discursos',         'dis',   'mic',     null],
+        ['Redes Sociais',     'soc',   'globe',   null],
+      ]},
+      { sec: 'Articulação', items: [
+        ['Alianças',          'ali',   'link',    null],
+        ['Mapa da Base',      'mapa',  'map',     null],
+        ['Operações em mim',  'op',    'target',  '3'],
+      ]},
+      { sec: 'Jurídico', items: [
+        ['Processos',         'proc',  'shield',  null],
+        ['Alertas Jurídicos', 'aler',  'bell',    null],
+      ]},
+    ],
+    info: [
+      ['Acesso', 'Filtrado por subtipo (Chefe vê tudo · Comm vê só mídia)'],
+      ['É adicionado por', 'Político ou Chefe de Gabinete (acesso compartilhado)'],
+      ['Subtipos canônicos', 'Chefe · Comm · Jurídico · Articulação · Parlamentar · Base'],
+      ['Pode ser também', '"Outro" (texto livre)'],
+    ],
+    abilities: [
+      'Editar agenda do político (se subtipo Chefe ou Articulação)',
+      'Postar mídia em nome (se Comm)',
+      'Cadastrar processos (se Jurídico)',
+      'Ver dossiê próprio do político',
+    ],
+  },
+
+  /* ============ CAMADA 4 — Cabo Eleitoral ============ */
+  {
+    id: 'cabo',
+    pill: 'Cabo Eleitoral (mobile)',
+    pillNum: '10',
+    camada: 'C4',
+    nome: 'José Silva',
+    iniciais: 'JS',
+    role: 'Cabo Eleitoral',
+    scope: 'Itaquera · Quadra 47',
+    eyebrow: 'Camada 4 · Operacional · Mobile-First',
+    title: 'Cabo Eleitoral',
+    desc: 'Tela única mobile-first. NÃO tem sidebar tradicional — tem tabs grandes na base. Designed para "analfabeto funcional digital". Última camada da cascata operacional.',
+    volume: 'Volume: <b>variável</b> (centenas a milhares por candidato em campanha)',
+    primeiraTela: 'Tarefa do Dia',
+    primeiraDesc: '1 ação clara. Botão grande "Começar". GPS + foto + check. Botão SOS para emergência. Sem distração.',
+    sections: [
+      { sec: 'Bottom Tabs (mobile)', items: [
+        ['Tarefa do Dia',     'home',  'check',   'tenant:NOVA'],
+        ['Mapa',              'mapa',  'map',     null],
+        ['Falar',             'chat',  'mic',     'live'],
+        ['Histórico',         'hist',  'clock',   null],
+        ['SOS · Emergência',  'sos',   'alert',   'danger'],
+      ]},
+      { sec: 'Acesso rápido', items: [
+        ['Minhas metas',      'meta',  'star',    null],
+        ['Materiais alocados','mat',   'box',     '500 santinhos'],
+        ['Coordenador',       'coord', 'people',  null],
+      ]},
+    ],
+    info: [
+      ['Acesso', 'Apenas tarefas designadas a ele · GPS · Chat com Coord'],
+      ['Recebe tarefas de', 'Coord Territorial'],
+      ['Designed para', 'Idoso, baixa familiaridade digital'],
+      ['UX inegociável', '1 ação por tela · botões 44+px · linguagem 2ª pessoa'],
+    ],
+    abilities: [
+      'Marcar tarefa como concluída (foto + GPS + nota)',
+      'Falar com Coord via push-to-talk',
+      'Acionar SOS (notifica Coord + Pres Municipal)',
+      'Ver materiais e metas pessoais',
+    ],
+  },
+];
+
+/* ============================================================
+   ÍCONES (sprite SVG inline)
+   ============================================================ */
+const ICONS = {
+  home:   '<path d="M3 12L12 4l9 8M5 10v10h14V10"/>',
+  building:'<path d="M4 21V3h16v18M9 7h2M9 11h2M9 15h2M14 7h2M14 11h2M14 15h2"/>',
+  pulse:  '<path d="M3 12h4l2-7 4 14 2-7h6"/>',
+  cycle:  '<path d="M21 12a9 9 0 0 1-15 6.7M3 12a9 9 0 0 1 15-6.7M21 4v6h-6M3 20v-6h6"/>',
+  wallet: '<path d="M3 7h18v12H3zM3 7l3-4h12l3 4M16 13h2"/>',
+  list:   '<path d="M8 6h12M8 12h12M8 18h12M3 6h.01M3 12h.01M3 18h.01"/>',
+  shield: '<path d="M12 3l8 4v6c0 5-4 8-8 9-4-1-8-4-8-9V7z"/>',
+  lock:   '<path d="M5 11h14v10H5zM7 11V7a5 5 0 0 1 10 0v4"/>',
+  flag:   '<path d="M4 21V3M4 3h13l-2 4 2 4H4"/>',
+  rocket: '<path d="M14 11l-3 3-3-1L5 9l4-4 4 2 4 4-3 3M9 15l-3 3M14 6l4 4"/>',
+  help:   '<circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 0 1 6 0c0 2-3 2-3 4M12 17h.01"/>',
+  globe:  '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+  palette:'<path d="M12 3a9 9 0 0 0 0 18 3 3 0 0 0 0-6h2a4 4 0 0 0 4-4 8 8 0 0 0-6-8z"/><circle cx="7" cy="10" r="1"/><circle cx="9" cy="6" r="1"/><circle cx="14" cy="6" r="1"/><circle cx="17" cy="10" r="1"/>',
+  people: '<circle cx="9" cy="8" r="3"/><path d="M3 21v-1a6 6 0 0 1 12 0v1M16 11a3 3 0 0 0 0-6M21 21v-1a6 6 0 0 0-3-5"/>',
+  team:   '<circle cx="7" cy="9" r="3"/><circle cx="17" cy="9" r="3"/><path d="M2 21v-1a5 5 0 0 1 10 0v1M12 21v-1a5 5 0 0 1 10 0v1"/>',
+  mail:   '<path d="M3 6h18v12H3zM3 6l9 7 9-7"/>',
+  plug:   '<path d="M9 4v6M15 4v6M6 10h12v4a6 6 0 0 1-12 0v-4M12 18v4"/>',
+  phone:  '<path d="M5 4h4l2 5-3 2c1 3 4 6 7 7l2-3 5 2v4a2 2 0 0 1-2 2A18 18 0 0 1 3 6a2 2 0 0 1 2-2"/>',
+  doc:    '<path d="M5 3h10l4 4v14H5zM15 3v4h4M9 13h6M9 17h6M9 9h2"/>',
+  image:  '<path d="M4 4h16v16H4zM4 16l5-5 4 4 3-3 4 4"/><circle cx="9" cy="9" r="2"/>',
+  file:   '<path d="M5 3h10l4 4v14H5zM15 3v4h4"/>',
+  map:    '<path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14"/>',
+  target: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+  radar:  '<circle cx="12" cy="12" r="9"/><path d="M12 12L20 8M12 3v9"/>',
+  bell:   '<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 21h4"/>',
+  tree:   '<path d="M12 3v6M5 9h14M5 9v6h4M19 9v6h-4M12 9v12M5 21h4M15 21h4"/>',
+  badge:  '<circle cx="12" cy="9" r="5"/><path d="M9 13l-2 8 5-3 5 3-2-8"/>',
+  profile:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+  gov:    '<path d="M3 21h18M5 21V11M19 21V11M3 11h18M5 11l7-6 7 6M9 21v-6h6v6"/>',
+  broadcast:'<path d="M5 12a7 7 0 0 1 14 0M3 12a9 9 0 0 1 18 0M8 12h8M12 12v9"/>',
+  spark:  '<path d="M12 3v4M12 17v4M5 12H1M23 12h-4M6 6l3 3M15 15l3 3M6 18l3-3M15 9l3-3"/>',
+  pen:    '<path d="M16 4l4 4-12 12H4v-4z"/>',
+  cal:    '<path d="M3 6h18v15H3zM3 10h18M8 3v6M16 3v6"/>',
+  check:  '<path d="M5 12l5 5L20 6"/>',
+  star:   '<path d="M12 3l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/>',
+  link:   '<path d="M9 14a4 4 0 0 0 6 0l3-3a4 4 0 0 0-6-6l-1 1M15 10a4 4 0 0 0-6 0l-3 3a4 4 0 0 0 6 6l1-1"/>',
+  walk:   '<circle cx="13" cy="4" r="2"/><path d="M9 22l3-7 3 4 4 1M9 14l-3-4 4-3 4 4 3-1"/>',
+  sign:   '<path d="M3 17l4-4 5 5 9-9M14 5l5 5"/>',
+  book:   '<path d="M4 4h16v16H4zM4 4v16M12 4v16"/>',
+  box:    '<path d="M3 7l9-4 9 4-9 4zM3 7v10l9 4M21 7v10l-9 4M3 12l9 4M21 12l-9 4"/>',
+  alert:  '<path d="M12 3l10 18H2zM12 10v6M12 19h.01"/>',
+  mic:    '<rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+  clock:  '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  plus:   '<path d="M12 5v14M5 12h14"/>',
+  minus:  '<path d="M5 12h14"/>',
+  chart:  '<path d="M3 21V3M3 21h18M7 17v-5M11 17v-9M15 17v-3M19 17v-7"/>',
+};
+const sIcon = name => `<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${ICONS[name] || ICONS.home}</svg>`;
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+const $pills    = document.getElementById('pills');
+const $sidebar  = document.getElementById('sidebar');
+const $frame    = document.getElementById('frame');
+const $insp     = document.getElementById('insp');
+
+function renderPills(activeId) {
+  $pills.innerHTML = PROFILES.map(p => `
+    <div class="profile-pill ${p.id===activeId?'active':''}" data-id="${p.id}">
+      <span class="num">${p.pillNum}</span>
+      <span>${p.pill}</span>
+    </div>
+  `).join('');
+  $pills.querySelectorAll('.profile-pill').forEach(el => {
+    el.addEventListener('click', () => render(el.dataset.id));
+  });
+}
+
+function renderSidebar(p) {
+  const sectionsHTML = p.sections.map(s => {
+    const items = s.items.map(([lbl, href, icon, badge], idx) => {
+      let badgeHTML = '';
+      if (badge) {
+        if (badge === 'live') {
+          badgeHTML = `<span class="badge live">live</span>`;
+        } else if (badge.startsWith('danger:')) {
+          badgeHTML = `<span class="badge danger">${badge.split(':')[1]}</span>`;
+        } else if (badge.startsWith('warn:')) {
+          badgeHTML = `<span class="badge warn">${badge.split(':')[1]}</span>`;
+        } else if (badge.startsWith('tenant:')) {
+          badgeHTML = `<span class="badge tenant">${badge.split(':')[1]}</span>`;
+        } else if (badge === 'ok') {
+          badgeHTML = `<span class="badge live">ok</span>`;
+        } else if (badge === 'danger') {
+          badgeHTML = `<span class="badge danger">!</span>`;
+        } else {
+          badgeHTML = `<span class="badge">${badge}</span>`;
+        }
+      }
+      return `
+        <div class="sb-item ${idx===0?'active':''}">
+          ${sIcon(icon)}
+          <span class="lbl">${lbl}</span>
+          ${badgeHTML}
+        </div>
+      `;
+    }).join('');
+    return `<div class="sb-section">${s.sec}</div>${items}`;
+  }).join('');
+
+  $sidebar.innerHTML = `
+    <div class="sb-brand">
+      <img src="assets/logo_icon.svg" alt="UB">
+      <div class="who">
+        <div class="name">União Brasil</div>
+        <div class="scope">${p.scope}</div>
+      </div>
+    </div>
+    <div class="sb-user">
+      <div class="avatar">${p.iniciais}</div>
+      <div class="info">
+        <span class="uname">${p.nome}</span>
+        <span class="urole">${p.role} <span class="scope-tag">${p.camada}</span></span>
+      </div>
+    </div>
+    <nav class="sb-nav">${sectionsHTML}</nav>
+    <div class="sb-foot">
+      <span>v2.4 · Mazzel</span>
+      <a href="#">Sair →</a>
+    </div>
+  `;
+}
+
+function renderFrame(p) {
+  $frame.innerHTML = `
+    <div class="frame-hint">
+      <span>Sidebar ←</span>
+      <span class="arrow">→</span>
+      <span>Tela inicial deste perfil</span>
+      <span class="arrow">→</span>
+      <span>Permissões à direita</span>
+    </div>
+    <h2 class="frame-title">${p.title}</h2>
+    <p class="frame-sub">${p.desc}</p>
+
+    <div class="first-screen">
+      <div>
+        <div class="label">Tela inicial</div>
+        <div class="val">${p.primeiraTela}</div>
+      </div>
+      <div>
+        <div class="desc">${p.primeiraDesc}</div>
+      </div>
+    </div>
+
+    <div class="frame-info">
+      ${p.info.map(([lbl, val]) => `
+        <div class="info-card">
+          <div class="lbl">${lbl}</div>
+          <div class="v">${val}</div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="rules">
+      <h3>O que esse perfil pode fazer</h3>
+      <table>
+        <thead><tr><th style="width: 40px">#</th><th>Capacidade operacional</th></tr></thead>
+        <tbody>
+          ${p.abilities.map((a, i) => `
+            <tr><td>${(i+1).toString().padStart(2,'0')}</td><td>${a}</td></tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function renderInsp(p) {
+  const camadaTags = {
+    C1: 'Camada 1 · Mazzel/Tenant',
+    C2: 'Camada 2 · Política Partidária',
+    C3: 'Camada 3 · Eletiva',
+    C4: 'Camada 4 · Operacional',
+  };
+  const camadaCss = { C1: 'cam1', C2: 'cam2', C3: 'cam3', C4: 'cam4' };
+
+  $insp.innerHTML = `
+    <header class="insp-head">
+      <div class="insp-eyebrow">${p.eyebrow}</div>
+      <h2>${p.pill}</h2>
+      <div class="vol">${p.volume}</div>
+    </header>
+    <div class="insp-body">
+      <div class="tag-row">
+        <span class="tag ${camadaCss[p.camada]}">${camadaTags[p.camada]}</span>
+      </div>
+
+      <h3>Princípio de design</h3>
+      <p>${
+        p.id === 'cabo'
+          ? '<b>Mobile-first absoluto.</b> Sem sidebar tradicional — bottom tabs com 5 botões grandes, ícone+label, mínimo 44px. Linguagem em 2ª pessoa ("Você precisa..."). UI legível ao sol, com alto contraste.'
+          : p.id === 'pres-est'
+          ? '<b>Cliente real do produto.</b> 3 perguntas em 3 segundos: como está? o que mudou? o que decidir? KPIs com delta, ações rápidas no mapa, score consolidado dos subordinados.'
+          : p.id === 'tesou'
+          ? '<b>Visão protegida e minimalista.</b> Só vê o que é financeiro. Não polui com mapa estratégico, dossiês, operações. Read-only em filiados quando precisa cruzar dado.'
+          : '<b>Sidebar derivada de cargo + nível + escopo.</b> Itens agrupados por tarefa (Comando, Estrutura, Gestão), não por feature. Ações executivas em 1-2 cliques, badges semânticos para alertas.'
+      }</p>
+
+      <h3>Composição da sidebar</h3>
+      <ul>
+        ${p.sections.map(s => `<li><b style="color:var(--mz-fg-strong)">${s.sec}</b><br><span style="color:var(--mz-fg-faint)">${s.items.length} itens</span></li>`).join('')}
+      </ul>
+
+      <h3>Identifier técnico</h3>
+      <p>
+        <code>role:${p.id}</code><br>
+        <code>scope:${p.scope.toLowerCase().replace(/[\s/·]+/g,'-')}</code><br>
+        <code>camada:${p.camada}</code>
+      </p>
+
+      <h3>Perfis NÃO inclusos nesta V1</h3>
+      <p style="color: var(--mz-fg-faint); font-size: 11px;">
+        Coord Regional · Coord Territorial · Filiado base · Auditor LGPD · Suplente.
+        Decisão César 25/04: sair em V2 do design.
+      </p>
+    </div>
+  `;
+}
+
+function render(id) {
+  const p = PROFILES.find(x => x.id === id);
+  renderPills(id);
+  renderSidebar(p);
+  renderFrame(p);
+  renderInsp(p);
+}
+
+render('pres-est');  // Milton-CEO como default — é o cliente que aprova
+</script>
+
+</body>
+</html>

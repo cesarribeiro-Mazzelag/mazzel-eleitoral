@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark" data-tenant="ub">
+<head>
+<meta charset="UTF-8">
+<title>Mazzel Eleitoral · Entrega Completa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="F1-fundacao/tokens.css">
+<script src="F1-fundacao/theme-bootstrap.js"></script>
+<style>
+.theme-toggle {
+  position: fixed; top: 18px; right: 18px; z-index: 100;
+  display: flex; align-items: center; gap: 0;
+  background: var(--mz-bg-card); border: 1px solid var(--mz-rule-strong);
+  border-radius: 999px; padding: 3px;
+  box-shadow: var(--mz-shadow-card);
+}
+.theme-toggle button {
+  background: transparent; border: 0; padding: 6px 14px;
+  font-family: var(--mz-font-mono); font-size: 10px; letter-spacing: 0.10em;
+  color: var(--mz-fg-muted); cursor: pointer; border-radius: 999px;
+  text-transform: uppercase; font-weight: 600;
+}
+.theme-toggle button.on {
+  background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent);
+}
+
+html, body { height: 100%; margin: 0; }
+body { background: var(--mz-bg-page); color: var(--mz-fg); font-family: 'Inter', sans-serif; }
+
+.hero { padding: 48px 56px 24px; border-bottom: 1px solid var(--mz-rule); background: linear-gradient(180deg, var(--mz-tenant-primary-soft) 0%, transparent 100%); }
+.hero .top { display: flex; align-items: center; gap: 18px; margin-bottom: 24px; }
+.hero .logo { width: 64px; height: 64px; background: var(--mz-tenant-primary); border: 2px solid var(--mz-tenant-accent); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; color: var(--mz-tenant-accent); font-size: 26px; }
+.hero .top h1 { font-family: 'Bebas Neue', sans-serif; font-size: 56px; letter-spacing: 0.04em; color: var(--mz-fg-strong); margin: 0; line-height: 0.95; }
+.hero .top .meta { font-size: 11.5px; color: var(--mz-fg-muted); letter-spacing: 0.10em; text-transform: uppercase; font-weight: 700; margin-top: 4px; }
+.hero .top .meta b { color: var(--mz-tenant-accent); }
+.hero .lead { font-size: 16px; line-height: 1.55; color: var(--mz-fg); max-width: 880px; }
+.hero .lead b { color: var(--mz-fg-strong); }
+
+.kpis-bar { padding: 24px 56px; border-bottom: 1px solid var(--mz-rule); display: grid; grid-template-columns: repeat(6, 1fr); gap: 18px; background: var(--mz-bg-topbar); }
+.kpi { padding: 14px 0; border-left: 2px solid var(--mz-tenant-accent); padding-left: 16px; }
+.kpi .lbl { font-size: 9.5px; letter-spacing: 0.16em; color: var(--mz-fg-faint); text-transform: uppercase; font-weight: 700; }
+.kpi .v { font-family: 'Bebas Neue', sans-serif; font-size: 36px; line-height: 1; color: var(--mz-fg-strong); margin-top: 4px; }
+.kpi .v small { font-size: 14px; color: var(--mz-fg-muted); font-family: 'Inter', sans-serif; font-weight: 600; }
+.kpi .s { font-size: 10.5px; color: var(--mz-fg-muted); margin-top: 2px; }
+
+.phase { padding: 36px 56px; border-bottom: 1px solid var(--mz-rule); }
+.phase-hdr { display: flex; align-items: baseline; gap: 18px; margin-bottom: 24px; }
+.phase-hdr .num { font-family: 'Bebas Neue', sans-serif; font-size: 64px; line-height: 1; color: var(--mz-tenant-accent); letter-spacing: 0.02em; }
+.phase-hdr h2 { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 0.04em; color: var(--mz-fg-strong); margin: 0; }
+.phase-hdr p { font-size: 12.5px; color: var(--mz-fg-muted); margin: 4px 0 0; max-width: 720px; }
+.phase-hdr .tag { margin-left: auto; font-size: 10px; padding: 6px 12px; border-radius: 4px; background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent); font-weight: 800; letter-spacing: 0.10em; text-transform: uppercase; }
+
+.deck { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+.card { background: var(--mz-bg-card); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-lg); overflow: hidden; cursor: pointer; transition: transform 120ms, border-color 120ms; text-decoration: none; color: inherit; display: flex; flex-direction: column; }
+.card:hover { transform: translateY(-2px); border-color: var(--mz-tenant-accent); }
+
+.card .preview { aspect-ratio: 16/10; background: var(--mz-bg-elevated); border-bottom: 1px solid var(--mz-rule); position: relative; overflow: hidden; }
+.card .preview .mock { position: absolute; inset: 0; padding: 14px; display: flex; flex-direction: column; gap: 6px; }
+.card .preview .mock-row { background: var(--mz-rule); height: 8px; border-radius: 2px; }
+.card .preview .mock-row.title { background: var(--mz-fg-strong); height: 12px; width: 60%; }
+.card .preview .mock-row.accent { background: var(--mz-tenant-accent); }
+.card .preview .mock-row.short { width: 40%; }
+.card .preview .mock-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; margin-top: 6px; flex: 1; }
+.card .preview .mock-grid > div { background: var(--mz-rule); border-radius: 3px; }
+
+.card .body { padding: 16px 18px; flex: 1; display: flex; flex-direction: column; }
+.card .label { font-size: 9.5px; letter-spacing: 0.16em; color: var(--mz-tenant-accent); text-transform: uppercase; font-weight: 800; }
+.card .name { font-size: 16px; font-weight: 800; color: var(--mz-fg-strong); margin-top: 4px; line-height: 1.2; }
+.card .desc { font-size: 11.5px; color: var(--mz-fg-muted); margin-top: 8px; line-height: 1.5; flex: 1; }
+.card .ftr { padding-top: 12px; border-top: 1px dashed var(--mz-rule); margin-top: 12px; display: flex; align-items: center; justify-content: space-between; font-size: 10px; color: var(--mz-fg-faint); letter-spacing: 0.10em; text-transform: uppercase; font-weight: 700; }
+.card .ftr .arrow { color: var(--mz-tenant-accent); font-size: 14px; }
+
+.card.tall .preview { aspect-ratio: 16/9; }
+
+.section-meta { padding: 28px 56px 56px; background: var(--mz-bg-topbar); }
+.section-meta h3 { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.04em; color: var(--mz-fg-strong); margin: 0 0 18px; }
+.method-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.method { padding: 16px 18px; background: var(--mz-bg-card); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-lg); }
+.method .lbl { font-size: 9.5px; letter-spacing: 0.14em; color: var(--mz-tenant-accent); text-transform: uppercase; font-weight: 800; }
+.method h4 { font-size: 14px; color: var(--mz-fg-strong); margin: 4px 0 8px; }
+.method p { font-size: 11.5px; color: var(--mz-fg-muted); margin: 0; line-height: 1.55; }
+
+footer { padding: 32px 56px; border-top: 1px solid var(--mz-rule); display: flex; align-items: center; gap: 24px; font-size: 11px; color: var(--mz-fg-muted); }
+footer b { color: var(--mz-fg-strong); }
+
+/* phase color accents */
+.phase[data-p="F1"] .phase-hdr .num { color: #6366f1; }
+.phase[data-p="F2"] .phase-hdr .num { color: var(--mz-tenant-accent); }
+.phase[data-p="F3"] .phase-hdr .num { color: #22c55e; }
+.phase[data-p="F4"] .phase-hdr .num { color: #f59e0b; }
+
+.card .badge-v2 {
+  position: absolute; top: 10px; right: 10px;
+  background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent);
+  font-family: var(--mz-font-mono); font-size: 9px; font-weight: 800;
+  letter-spacing: 0.10em; padding: 4px 8px; border-radius: 3px;
+  box-shadow: var(--mz-shadow-card); z-index: 2;
+}
+.card .preview { position: relative; }
+
+.release-bar {
+  margin: 0 56px; padding: 16px 20px;
+  background: var(--mz-bg-card); border: 1px solid var(--mz-tenant-accent);
+  border-radius: var(--mz-r-lg);
+  display: grid; grid-template-columns: auto 1fr auto; gap: 18px; align-items: center;
+  margin-top: -28px; margin-bottom: 28px; position: relative; z-index: 1;
+}
+.release-bar .tag-v {
+  font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 0.04em;
+  color: var(--mz-tenant-accent); line-height: 1;
+}
+.release-bar .tag-v small {
+  display: block; font-family: var(--mz-font-mono); font-size: 9.5px;
+  color: var(--mz-fg-faint); letter-spacing: 0.14em; margin-top: 2px;
+  font-weight: 600; text-transform: uppercase;
+}
+.release-bar ul {
+  margin: 0; padding: 0; list-style: none; display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; font-size: 11.5px;
+}
+.release-bar li { color: var(--mz-fg); line-height: 1.45; }
+.release-bar li b { color: var(--mz-tenant-accent); display: block; font-size: 10px; letter-spacing: 0.10em; text-transform: uppercase; margin-bottom: 2px; }
+.release-bar .arrow-v {
+  font-size: 10px; color: var(--mz-fg-muted); letter-spacing: 0.10em;
+  text-transform: uppercase; font-weight: 700;
+}
+</style>
+</head>
+<body>
+
+<div class="theme-toggle" role="group" aria-label="Tema">
+  <button data-theme-btn="dark">◗ DARK</button>
+  <button data-theme-btn="light">◐ LIGHT</button>
+</div>
+
+<script>
+(function () {
+  function paint() {
+    var t = window.MZTheme.get();
+    document.querySelectorAll('[data-theme-btn]').forEach(function (b) {
+      b.classList.toggle('on', b.getAttribute('data-theme-btn') === t);
+    });
+    // propaga ?theme= em todos links internos relativos
+    document.querySelectorAll('a.card[href]').forEach(function (a) {
+      var href = a.getAttribute('href');
+      if (!href || /^https?:|^#|^mailto:/.test(href)) return;
+      var url = href.split('?')[0].split('#')[0];
+      a.setAttribute('href', url + '?theme=' + t);
+    });
+  }
+  document.querySelectorAll('[data-theme-btn]').forEach(function (b) {
+    b.addEventListener('click', function () { window.MZTheme.set(b.dataset.themeBtn); });
+  });
+  window.addEventListener('mz-theme-change', paint);
+  paint();
+})();
+</script>
+
+
+<div class="hero">
+  <div class="top">
+    <div class="logo">UB</div>
+    <div>
+      <h1>MAZZEL ELEITORAL</h1>
+      <div class="meta">PROTÓTIPO HI-FI · TENANT <b>UB · UNIÃO BRASIL</b> · ENTREGA COMPLETA · ABR 2026</div>
+    </div>
+    <div style="margin-left:auto;text-align:right">
+      <div style="font-size:9.5px;letter-spacing:0.16em;color:var(--mz-fg-faint);text-transform:uppercase;font-weight:700">ESCOPO</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--mz-fg-strong);letter-spacing:0.02em">4 FASES · 16 MÓDULOS</div>
+    </div>
+  </div>
+  <p class="lead">
+    Plataforma de inteligência política e gestão estatutária para partidos brasileiros, construída sob a marca UB como <b>tenant primário</b>. Esta entrega consolida <b>4 fases de design hi-fi</b> — da fundação visual ao módulo de governança — em <b>14 protótipos navegáveis</b> usando o mesmo design system e dados mock coerentes entre todas as telas.
+  </p>
+</div>
+
+<div class="release-bar">
+  <div class="tag-v">v1.3<small>Lote 3 · 27 abr</small></div>
+  <ul>
+    <li><b>Saúde das Nominatas ★</b>Score 0–100 por comissão municipal · 7 sub-medidas · 5 abas (hexágono, heatmap SP, ranking, dossiê, alertas anti-fraude) · F4.7</li>
+    <li><b>Módulo Emendas ★</b>5 componentes em 1 tela (mapa, dossiê, sankey, inconsistências, alertas) · caso Santa Bárbara · F3.4</li>
+    <li><b>Tema · Tokens · Mapa Estratégico</b>Light/Dark persistido + 3 modos pré-configurados + Avançado (v1.1)</li>
+  </ul>
+  <div class="arrow-v">2 módulos<br>★ NOVOS L2+L3</div>
+</div>
+
+<div class="kpis-bar">
+  <div class="kpi"><div class="lbl">Telas hi-fi</div><div class="v">16</div><div class="s">Todas navegáveis</div></div>
+  <div class="kpi"><div class="lbl">Variações</div><div class="v">38</div><div class="s">Layouts/cargos/modos/abas</div></div>
+  <div class="kpi"><div class="lbl">Perfis (sidebar)</div><div class="v">10</div><div class="s">Condicional por papel</div></div>
+  <div class="kpi"><div class="lbl">Cargos (dossiê)</div><div class="v">8<small>+1</small></div><div class="s">Pres → Vereador + fallback</div></div>
+  <div class="kpi"><div class="lbl">Tenants suportados</div><div class="v">UB<small>+N</small></div><div class="s">White-label via tokens</div></div>
+  <div class="kpi"><div class="lbl">Linhas de design</div><div class="v">~5<small>k</small></div><div class="s">CSS+HTML+JS inline</div></div>
+</div>
+
+<!-- ============ F1 ============ -->
+<div class="phase" data-p="F1">
+  <div class="phase-hdr">
+    <div class="num">F1</div>
+    <div>
+      <h2>FUNDAÇÃO VISUAL</h2>
+      <p>Design tokens, identidade e shell. Tudo que vem depois consome esta camada via CSS variables — trocar tenant é trocar `data-tenant`.</p>
+    </div>
+    <div class="tag">3 entregas</div>
+  </div>
+
+  <div class="deck">
+    <a class="card" href="F1-fundacao/01-login-ub.html">
+      <div class="preview">
+        <div class="mock" style="background:linear-gradient(135deg, var(--mz-tenant-primary), #001a4d)">
+          <div style="margin:auto;text-align:center;color:var(--mz-tenant-accent)">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:0.04em">UB</div>
+            <div style="font-size:9px;color:#fff;opacity:0.6;letter-spacing:0.16em;text-transform:uppercase;margin-top:4px">Acesso Plataforma</div>
+            <div style="background:var(--mz-tenant-accent);height:6px;width:40px;border-radius:3px;margin:8px auto"></div>
+          </div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="label">F1.1 · Auth</div>
+        <div class="name">Tela de Login UB</div>
+        <div class="desc">Acesso à plataforma com identidade visual UB. CPF/E-mail + 2FA opcional + recuperação. Background com mosaico geométrico azul.</div>
+        <div class="ftr"><span>HTML · 1 tela</span><span class="arrow">→</span></div>
+      </div>
+    </a>
+
+    <a class="card" href="F1-fundacao/02-sidebar-condicional.html">
+      <div class="preview">
+        <div class="mock">
+          <div style="display:flex;gap:6px;height:100%">
+            <div style="flex:1;background:var(--mz-bg-sidebar);border-radius:3px;padding:8px;display:flex;flex-direction:column;gap:4px">
+              <div class="mock-row accent"></div>
+              <div class="mock-row"></div>
+              <div class="mock-row short"></div>
+              <div class="mock-row"></div>
+              <div class="mock-row short"></div>
+              <div class="mock-row"></div>
+            </div>
+            <div style="flex:2.4;background:var(--mz-bg-card);border-radius:3px;padding:8px;display:flex;flex-direction:column;gap:5px">
+              <div class="mock-row title"></div>
+              <div class="mock-grid"><div></div><div></div><div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="label">F1.2 · Shell</div>
+        <div class="name">Sidebar Condicional · 10 Perfis</div>
+        <div class="desc">Navegação que reorganiza a árvore de menu por papel: Presidente Nacional, Estadual, Vereador, Tesoureiro, Cabo, Filiado, Auditor, MP/TSE, Imprensa, Voluntário.</div>
+        <div class="ftr"><span>HTML · Switcher de perfil</span><span class="arrow">→</span></div>
+      </div>
+    </a>
+
+    <a class="card" href="F1-fundacao/tokens.css">
+      <div class="preview">
+        <div class="mock" style="padding:20px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+          <div style="background:var(--mz-tenant-primary);border-radius:4px"></div>
+          <div style="background:var(--mz-tenant-accent);border-radius:4px"></div>
+          <div style="background:var(--mz-fg-strong);border-radius:4px"></div>
+          <div style="background:var(--mz-bg-card);border:1px solid var(--mz-rule);border-radius:4px"></div>
+          <div style="background:var(--mz-ok);border-radius:4px"></div>
+          <div style="background:var(--mz-warn);border-radius:4px"></div>
+          <div style="background:var(--mz-err);border-radius:4px;grid-column:span 3;height:8px"></div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="label">F1.3 · Tokens</div>
+        <div class="name">Design Tokens (CSS)</div>
+        <div class="desc">Sistema completo de tokens: paleta tenant (azul UB · accent amarelo), tipografia Bebas/Inter/JetBrains, espaçamentos, sombras, border-radius e dark theme.</div>
+        <div class="ftr"><span>CSS · 299 linhas · base de tudo</span><span class="arrow">→</span></div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- ============ F2 ============ -->
+<div class="phase" data-p="F2">
+  <div class="phase-hdr">
+    <div class="num">F2</div>
+    <div>
+      <h2>NÚCLEO DO PRODUTO</h2>
+      <p>As 3 peças que materializam o discurso de venda. Dashboard "do Milton", Cartinha 4:5 viralizável e o Dossiê adaptativo por cargo.</p>
+    </div>
+    <div class="tag">3 entregas · 14 variações</div>
+  </div>
+
+  <div class="deck">
+    <a class="card" href="F2-nucleo/01-dashboard-milton-3v.html">
+      <div class="preview">
+        <div class="mock">
+          <div class="mock-row title"></div>
+          <div class="mock-row short"></div>
+          <div class="mock-grid" style="grid-template-columns:1fr 1fr 1fr 1fr"><div></div><div></div><div></div><div></div></div>
+          <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:6px;flex:1">
+            <div style="background:var(--mz-bg-elevated);border-radius:3px;padding:6px;display:flex;align-items:flex-end;gap:3px"><div style="background:var(--mz-tenant-accent);width:8px;height:30%"></div><div style="background:var(--mz-tenant-accent);width:8px;height:60%"></div><div style="background:var(--mz-tenant-accent);width:8px;height:50%"></div><div style="background:var(--mz-tenant-accent);width:8px;height:80%"></div><div style="background:var(--mz-tenant-accent);width:8px;height:45%"></div><div style="background:var(--mz-tenant-accent);width:8px;height:70%"></div></div>
+            <div style="background:var(--mz-bg-elevated);border-radius:3px"></div>
+          </div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="label">F2.1 · Hero do produto</div>
+        <div class="name">Dashboard Executivo "Milton" · 3 variações</div>
+        <div class="desc">A tela que vende o sistema. 3 layouts: Editorial (densidade alta + storytelling), Comando (KPIs gigantes tipo war-room), Briefing (1 coluna lendo como dossiê).</div>
+        <div class="ftr"><span>HTML · 3 variações</span><span class="arrow">→</span></div>
+      </div>
+    </a>
+
+    <a class="card" href="F2-nucleo/02-cartinha-2v.html">
+      <div class="preview">
+        <div class="mock" style="display:flex;gap:6px;justify-content:center;align-items:center">
+          <div style="background:var(--mz-bg-card);border:1px solid var(--mz-rule);border-radius:4px;padding:10px;width:40%;aspect-ratio:4/5;display:flex;flex-direction:column;gap:4px">
+            <div class="mock-row accent"></div>
+            <div class="mock-row title" style="width:80%"></div>
+            <div class="mock-row short"></div>
+            <div style="flex:1;background:var(--mz-bg-elevated);border-radius:3px;margin:4px 0"></div>
+            <div class="mock-row short"></div>
+          </div>
+          <div style="background:var(--mz-tenant-primary);border:1px solid var(--mz-tenant-accent);border-radius:4px;padding:10px;width:40%;aspect-ratio:4/5;display:flex;flex-direction:column;gap:4px">
+            <div style="background:var(--mz-tenant-accent);height:8px;border-radius:2px;width:50%"></div>
+            <div style="background:#fff;height:12px;border-radius:2px;width:80%"></div>
+            <div style="background:#fff;opacity:0.4;height:6px;border-radius:2px"></div>
+            <div style="flex:1;background:rgba(255,255,255,0.1);border-radius:3px;margin:4px 0"></div>
+          </div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="label">F2.2 · Conteúdo viralizável</div>
+        <div class="name">Cartinha 4:5 · 2 variações</div>
+        <div class="desc">Geração assistida de cartinha social-ready. Variação A: editorial branco institucional; Variação B: dark UB com cor-marca dominante.</div>
+        <div class="ftr"><span>HTML · 2 variações 1080×1350</span><span class="arrow">→</span></div>
+      </div>
+    </a>
+
+    <a class="card" href="F2-nucleo/03-dossie-8cargos.html">
+      <div class="preview"><span class="badge-v2">▲ v2</span>
+        <div class="mock">
+          <div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:6px">
+            <div style="background:var(--mz-tenant-accent);height:14px;width:40px;border-radius:7px"></div>
+            <div style="background:var(--mz-rule);height:14px;width:32px;border-radius:7px"></div>
+            <div style="background:var(--mz-rule);height:14px;width:36px;border-radius:7px"></div>
+            <div style="background:var(--mz-rule);height:14px;width:30px;border-radius:7px"></div>
+            <div style="background:var(--mz-rule);height:14px;width:42px;border-radius:7px"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:80px 1fr;gap:6px;flex:1">
+            <div style="background:var(--mz-tenant-primary);border:1px solid var(--mz-tenant-accent);border-radius:50%;aspect-ratio:1;align-self:start"></div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div class="mock-row title"></div>
+              <div class="mock-row short"></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:4px"><div style="background:var(--mz-bg-elevated);border-radius:3px;height:30px"></div><div style="background:var(--mz-bg-elevated);border-radius:3px;height:30px"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="label">F2.3 · Inteligência</div>
+        <div class="name">Dossiê 8 Cargos + Fallback</div>
+        <div class="desc">Layout adaptativo: Pres.Nacional, Pres.Estadual, Pres.Municipal, Senador, Dep.Federal, Dep.Estadual, Prefeito, Vereador. Cada cargo prioriza/oculta seções.</div>
+        <div class="ftr"><span>HTML · 9 layouts</span><span class="arrow">→</span></div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- ============ F3 ============ -->
+<div class="phase" data-p="F3">
+  <div class="phase-hdr">
+    <div class="num">F3</div>
+    <div>
+      <h2>MÓDULOS OPERACIONAIS</h2>
+      <p>Os 4 sistemas que transformam o produto em ferramenta de campo: território, operações, comunicação interna e fiscalização orçamentária sigilosa.</p>
+    </div>
+    <div class="tag">4 entregas · alta complexidade</div>
+  </div>
+
+  <div class="deck">
+    <a class="card" href="F3-modulos/01-mapa-estrategico.html">
+      <div class="preview"><span class="badge-v2">▲ v2</span>
+        <div class="mock" style="background:#0a1428;padding:0;position:relative">
+          <svg viewBox="0 0 200 130" style="width:100%;height:100%" preserveAspectRatio="xMidYMid slice">
+            <path d="M50,30 L150,30 L170,80 L120,110 L60,100 L30,60 Z" fill="#001a4d" stroke="var(--mz-tenant-accent)" stroke-width="0.5"/>
+            <circle cx="100" cy="60" r="4" fill="var(--mz-tenant-accent)"/>
+            <circle cx="80" cy="80" r="3" fill="#22c55e"/>
+            <circle cx="130" cy="50" r="3" fill="#f59e0b"/>
+            <circle cx="60" cy="70" r="2.5" fill="#dc2626"/>
+            <circle cx="120" cy="90" r="2.5" fill="#22c55e"/>
+          </svg>
+        </div>
+      </div>
+      <div class="body">
+        <div class="label">F3.1 · Território</div>
+        <div class="name">Mapa Estratégico</div>
+        <div class="desc">Mapa SVG do Brasil com 5 camadas (Desempenho · Filiação · Operações · Risco · Mídia), tooltip rico ao hover, sidebar contextual de drill-down.</div>
+        <div class="ftr"><span>HTML · 5 camadas</span><span class="arrow">→</span></div>
+      </div>
+    </a>
+
+    <a class="card" href="F3-modulos/02-modulo-operacoes.html">
+      <div class="preview">
+        <div class="mock">
+          <div class="mock-row title"></div>
+          <div class="mock-grid" style="grid-template-columns:1fr 1fr 1fr 1fr"><div></div><div></div><div></div><div></div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:4px;flex:1">
+            <div style="background:var(--mz-bg-elevated);border:1px solid var(--mz-tenant-accent);border-radius:3px;padding:4px"><div class="mock-row accent" style="height:6px;width:40%"></div></div>
+            <div style="background:var(--mz-bg-elevated);border-radius:3px;padding:4px"></div>
+            <div style="background:var(--mz-bg-elevated);border-radius:3px;padding:4px"></div>
+            <div style="background:var(--mz-bg-elevated);border-radius:3px;padding:4px"></div>
+          </div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="label">F3.2 · Execução</div>
+        <div class="name">Módulo Operações</div>
+        <div class="desc">4 modos: Hub (KPIs+grid de ops ativas), Wizard de criação (UF→Mun→Bairro), Op. ativa (gerencia equipe), Relatório final (auditoria).</div>
+        <div class="ftr"><span>HTML · 4 modos · wizard cascata</span><span class="arrow">→</span></div>
+      </div>
+    </a>
+
+    <a class="card" href="F3-modulos/03-chat-evoluido.html">
+      <div class="preview">
+        <div class="mock" style="display:flex;gap:4px">
+          <div style="background:var(--mz-tenant-primary);border-radius:3px;padding:6px;flex:1;display:flex;flex-direction:column;gap:3px">
+            <div style="font-size:8px;color:var(--mz-tenant-accent);font-weight:800">PERM</div>
+            <div style="background:rgba(255,255,255,0.2);height:6px;border-radius:2px"></div>
+            <div style="background:rgba(255,255,255,0.2);height:6px;border-radius:2px;width:70%"></div>
+          </div>
+          <div style="background:#1a0a0a;border:1px dashed #dc2626;border-radius:3px;padding:6px;flex:1;display:flex;flex-direction:column;gap:3px">
+            <div style="font-size:8px;color:#dc2626;font-weight:800">SIG</div>
+            <div style="background:rgba(220,38,38,0.3);height:6px;border-radius:2px"></div>
+            <div style="background:rgba(220,38,38,0.3);height:6px;border-radius:2px;width:60%"></div>
+          </div>
+          <div style="background:#1a1500;border:1px solid #f59e0b;border-radius:3px;padding:6px;flex:1;display:flex;flex-direction:column;gap:3px">
+            <div style="font-size:8px;color:#f59e0b;font-weight:800">SOS</div>
+            <div style="background:rgba(245,158,11,0.3);height:6px;border-radius:2px"></div>
+          </div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="label">F3.3 · Comunicação</div>
+        <div class="name">Chat Evoluído · 3 modos</div>
+        <div class="desc">Permanente (azul · LGPD · histórico ilimitado), Sigiloso (vermelho · auto-destruct + watermark) e SOS Cabo (laranja · pânico georreferenciado).</div>
+        <div class="ftr"><span>HTML · 3 modos visualmente distintos</span><span class="arrow">→</span></div>
+      </div>
+    </a>
+
+    <a class="card" href="F3-modulos/04-modulo-emendas.html">
+      <div class="preview"><span class="badge-v2">★ NOVO</span>
+        <div class="mock" style="padding:0;position:relative;overflow:hidden;background:#0a1428">
+          <!-- mini-mapa SP esquemático com bubbles -->
+          <svg viewBox="0 0 200 110" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%;display:block">
+            <path d="M 20,55 L 50,32 L 95,28 L 130,38 L 165,52 L 175,80 L 150,100 L 90,102 L 45,90 L 22,72 Z" fill="rgba(255,204,0,0.05)" stroke="rgba(255,204,0,0.3)" stroke-width="0.6"/>
+            <!-- bubbles -->
+            <circle cx="115" cy="68" r="9" fill="#16a34a" opacity="0.7"/>
+            <circle cx="100" cy="60" r="6" fill="#16a34a" opacity="0.7"/>
+            <circle cx="93" cy="58" r="11" fill="#dc2626" opacity="0.85"/>
+            <circle cx="93" cy="58" r="15" fill="none" stroke="#dc2626" stroke-width="0.8" opacity="0.5"/>
+            <circle cx="83" cy="46" r="7" fill="#16a34a" opacity="0.7"/>
+            <circle cx="138" cy="68" r="6" fill="#16a34a" opacity="0.7"/>
+            <circle cx="115" cy="92" r="8" fill="#f59e0b" opacity="0.7"/>
+            <circle cx="60" cy="56" r="5" fill="#16a34a" opacity="0.6"/>
+            <!-- score badge canto -->
+            <rect x="6" y="6" width="48" height="14" rx="2" fill="rgba(220,38,38,0.18)" stroke="#dc2626" stroke-width="0.6"/>
+            <text x="11" y="16" font-family="JetBrains Mono, monospace" font-size="8" font-weight="700" fill="#dc2626">SCORE 92</text>
+            <!-- valor -->
+            <text x="194" y="16" text-anchor="end" font-family="Bebas Neue, sans-serif" font-size="11" font-weight="700" fill="rgba(255,204,0,0.9)" letter-spacing="0.5">R$ 547M</text>
+            <text x="194" y="24" text-anchor="end" font-family="Inter, sans-serif" font-size="5" font-weight="600" fill="rgba(255,255,255,0.5)" letter-spacing="0.5">SP · 24 MESES</text>
+          </svg>
+        </div>
+      </div>
+      <div class="body">
+        <div class="label">F3.4 · Sigiloso · Beta</div>
+        <div class="name">Módulo Emendas · 5 componentes</div>
+        <div class="desc">Mapa de Emendas SP, Dossiê de 9 seções (caso Santa Bárbara · score 92), Fluxo Sankey origem→destino, Painel de Inconsistências e Sistema de Alertas em tempo real (push · email · WhatsApp).</div>
+        <div class="ftr"><span>HTML · 5 abas · RBAC restrito</span><span class="arrow">→</span></div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- ============ F4 ============ -->
+<div class="phase" data-p="F4">
+  <div class="phase-hdr">
+    <div class="num">F4</div>
+    <div>
+      <h2>ESTATUTÁRIO & GOVERNANÇA</h2>
+      <p>Os 6 módulos que transformam a plataforma de "ferramenta de campanha" em sistema oficial de gestão partidária — auditável, com base legal e fluxo de assinatura.</p>
+    </div>
+    <div class="tag">7 entregas · governança</div>
+  </div>
+
+  <div class="deck">
+    <a class="card" href="F4-estatutario/01-diretorios-comissoes.html">
+      <div class="preview">
+        <div class="mock">
+          <div class="mock-row title"></div>
+          <div style="display:flex;gap:4px;margin-top:4px;flex:1">
+            <div style="background:var(--mz-bg-elevated);border-radius:3px;flex:1;padding:6px;display:flex;flex-direction:column;gap:3px">
+              <div class="mock-row accent" style="width:50%"></div>
+              <div class="mock-row" style="height:5px"></div>
+              <div class="mock-row" style="height:5px;width:70%"></div>
+              <div class="mock-row" style="height:5px"></div>
+            </div>
+            <div style="background:var(--mz-bg-elevated);border-radius:3px;flex:1;padding:6px;display:flex;flex-direction:column;gap:3px">
+              <div class="mock-row" style="background:#22c55e;width:50%"></div>
+              <div class="mock-row" style="height:5px"></div>
+              <div class="mock-row" style="height:5px;width:60%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="label">F4.1 · Estrutura</div>
+        <div class="name">Diretórios & Comissões</div>
+        <div class="desc">Hierarquia Nacional → Estadual → Municipal. Composição de Diretório vs Comissão Provisória, com mandatos, vacâncias e validade jurídica.</div>
+        <div class="ftr"><span>HTML</span><span class="arrow">→</span></div>
+      </div>
+    </a>
+
+    <a class="card" href="F4-estatutario/02-filiados.html">
+      <div class="preview">
+        <div class="mock">
+          <div class="mock-row title"></div>
+          <div class="mock-grid" style="grid-template-columns:1fr 1fr 1fr"><div></div><div></div><div></div></div>
+          <div style="display:flex;flex-direction:column;gap:3px;margin-top:4px;flex:1">
+            <div style="background:var(--mz-bg-elevated);height:14px;border-radius:2px;display:flex;gap:3px;align-items:center;padding:0 4px"><div style="background:var(--mz-tenant-accent);width:8px;height:8px;border-radius:50%"></div><div style="background:var(--mz-rule);height:5px;border-radius:2px;flex:1"></div></div>
+            <div style="background:var(--mz-bg-elevated);height:14px;border-radius:2px;display:flex;gap:3px;align-items:center;padding:0 4px"><div style="background:var(--mz-rule);width:8px;height:8px;border-radius:50%"></div><div style="background:var(--mz-rule);height:5px;border-radius:2px;flex:1"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="label">F4.2 · Base</div>
+        <div class="name">Filiados · CRM partidário</div>
+        <div class="desc">Tabela completa, busca, filtros por situação, abonador (LGPD), DocuSign para fichas. Onboarding com QR code.</div>
+        <div class="ftr"><span>HTML · CRM completo</span><span class="arrow">→</span></div>
+      </div>
+    </a>
+
+    <a class="card" href="F4-estatutario/03-documentos.html">
+      <div class="preview">
+        <div class="mock">
+          <div class="mock-row title"></div>
+          <div style="display:grid;grid-template-columns:80px 1fr;gap:4px;margin-top:4px;flex:1">
+            <div style="background:var(--mz-bg-elevated);border-radius:3px;padding:4px;display:flex;flex-direction:column;gap:3px">
+              <div class="mock-row accent" style="width:60%;height:5px"></div>
+              <div class="mock-row" style="height:5px"></div>
+              <div class="mock-row" style="height:5px"></div>
+            </div>
+            <div style="background:var(--mz-bg-elevated);border-radius:3px;padding:4px;display:flex;flex-direction:column;gap:3px">
+              <div style="display:flex;gap:3px"><div style="background:var(--mz-tenant-accent);width:14px;height:18px;border-radius:1px"></div><div style="flex:1;display:flex;flex-direction:column;gap:2px"><div class="mock-row title" style="height:6px"></div><div class="mock-row" style="height:5px;width:60%"></div></div></div>
+              <div style="display:flex;gap:3px"><div style="background:var(--mz-rule);width:14px;height:18px;border-radius:1px"></div><div style="flex:1;display:flex;flex-direction:column;gap:2px"><div class="mock-row" style="height:6px;width:80%"></div><div class="mock-row" style="height:5px;width:50%"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="label">F4.3 · Documentação</div>
+        <div class="name">Documentos · Repositório + DocuSign</div>
+        <div class="desc">Repositório com versionamento, status DocuSign (pendente/parcial/assinado), audit trail jurídico completo, OCR e busca textual.</div>
+        <div class="ftr"><span>HTML · Repositório versionado</span><span class="arrow">→</span></div>
+      </div>
+    </a>
+
+    <a class="card" href="F4-estatutario/04-tesouraria.html">
+      <div class="preview">
+        <div class="mock">
+          <div class="mock-row title"></div>
+          <div class="mock-grid" style="grid-template-columns:1fr 1fr 1fr 1fr"><div></div><div></div><div></div><div></div></div>
+          <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:4px;margin-top:4px;flex:1">
+            <div style="background:var(--mz-bg-elevated);border-radius:3px;padding:6px;display:flex;align-items:flex-end;gap:2px">
+              <div style="background:var(--mz-tenant-accent);width:8px;height:40%"></div>
+              <div style="background:var(--mz-tenant-accent);width:8px;height:55%"></div>
+              <div style="background:var(--mz-tenant-accent);width:8px;height:70%"></div>
+              <div style="background:var(--mz-tenant-accent);width:8px;height:35%"></div>
+              <div style="background:var(--mz-tenant-accent);width:8px;height:60%"></div>
+              <div style="background:var(--mz-tenant-accent);width:8px;height:80%"></div>
+            </div>
+            <div style="background:var(--mz-bg-elevated);border-radius:3px"></div>
+          </div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="label">F4.4 · Financeiro</div>
+        <div class="name">Tesouraria</div>
+        <div class="desc">Receitas, despesas, prestação de contas TSE, conciliação bancária, alertas de risco fiscal e dashboard executivo do tesoureiro.</div>
+        <div class="ftr"><span>HTML · TSE compliance</span><span class="arrow">→</span></div>
+      </div>
+    </a>
+
+    <a class="card" href="F4-estatutario/05-painel-pessoal-politico.html">
+      <div class="preview">
+        <div class="mock">
+          <div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:4px">
+            <div style="width:24px;height:24px;background:var(--mz-tenant-primary);border:1px solid var(--mz-tenant-accent);border-radius:50%"></div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:3px">
+              <div class="mock-row title" style="height:6px;width:60%"></div>
+              <div class="mock-row" style="height:5px;width:40%"></div>
+            </div>
+          </div>
+          <div class="mock-grid" style="grid-template-columns:1fr 1fr"><div></div><div></div></div>
+          <div style="background:var(--mz-bg-elevated);border-radius:3px;height:40%;margin-top:4px;display:flex;align-items:flex-end;gap:2px;padding:4px">
+            <div style="background:var(--mz-warn);width:8px;height:30%"></div>
+            <div style="background:var(--mz-tenant-accent);width:8px;height:50%"></div>
+            <div style="background:var(--mz-tenant-accent);width:8px;height:70%"></div>
+            <div style="background:var(--mz-tenant-accent);width:8px;height:90%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="label">F4.5 · Mandato</div>
+        <div class="name">Painel Pessoal Político + Gabinete</div>
+        <div class="desc">3 modos: Vida Política (trajetória + métricas mandato), Equipe Gabinete (28 colaboradores · folha · vagas críticas), Agenda (mês + dia).</div>
+        <div class="ftr"><span>HTML · 3 modos</span><span class="arrow">→</span></div>
+      </div>
+    </a>
+
+    <a class="card" href="F4-estatutario/06-ids-convites.html">
+      <div class="preview">
+        <div class="mock">
+          <div class="mock-row title" style="width:50%"></div>
+          <div style="display:flex;gap:4px;margin-top:4px"><div style="background:var(--mz-tenant-accent);height:6px;width:30%;border-radius:3px"></div><div style="background:var(--mz-rule);height:6px;width:30%;border-radius:3px"></div><div style="background:var(--mz-rule);height:6px;width:30%;border-radius:3px"></div></div>
+          <div style="background:var(--mz-bg-elevated);border-radius:3px;padding:5px;margin-top:4px;flex:1;display:flex;flex-direction:column;gap:3px">
+            <div class="mock-row" style="height:5px"></div>
+            <div class="mock-row" style="height:5px;width:70%"></div>
+            <div style="display:flex;gap:3px;margin-top:2px"><div style="background:var(--mz-tenant-accent);height:8px;width:50%;border-radius:2px"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="label">F4.6 · Acesso</div>
+        <div class="name">Sistema IDs · Convites</div>
+        <div class="desc">Wizard 3 passos (Identificação → Papel & Permissões → Envio & LGPD). 8 tipos de convite, magic link 72h, audit trail e termo de consentimento.</div>
+        <div class="ftr"><span>HTML · Wizard + LGPD</span><span class="arrow">→</span></div>
+      </div>
+    </a>
+
+    <a class="card" href="F4-estatutario/07-saude-nominatas.html">
+      <div class="preview">
+        <div class="mock">
+          <div class="mock-row title" style="width:60%"></div>
+          <div style="display:flex;gap:3px;margin-top:4px;align-items:center;justify-content:center;flex:1">
+            <svg viewBox="0 0 100 100" style="width:60%;height:90%">
+              <polygon points="50,10 85,32 80,72 50,88 20,72 15,32" fill="none" stroke="var(--mz-rule)" stroke-width="0.6" stroke-dasharray="2 2"/>
+              <polygon points="50,30 70,40 65,62 50,72 35,62 30,40" fill="#f87171" fill-opacity="0.25" stroke="#f87171" stroke-width="1.2"/>
+              <circle cx="50" cy="50" r="9" fill="var(--mz-bg-card)" stroke="#f87171" stroke-width="0.8"/>
+              <text x="50" y="53" text-anchor="middle" font-family="Bebas Neue" font-size="9" fill="#f87171">30</text>
+            </svg>
+          </div>
+          <div style="display:flex;gap:3px;margin-top:2px"><div style="background:#22c55e;height:5px;width:33%;border-radius:2px"></div><div style="background:#f59e0b;height:5px;width:33%;border-radius:2px"></div><div style="background:#f87171;height:5px;width:33%;border-radius:2px"></div></div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="label">F4.7 · Saúde · ★ NOVO</div>
+        <div class="name">Saúde das Nominatas</div>
+        <div class="desc">Score por comissão municipal · 7 sub-medidas (paridade, vinculação, conformidade, etc) · 5 abas (hexágono, heatmap SP, ranking, dossiê, alertas anti-fraude com linguagem neutra). Casos: Bauru saudável, Marília atenção, Tatuí crítica.</div>
+        <div class="ftr"><span>HTML · 5 abas · sigiloso</span><span class="arrow">→</span></div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- ============ MÉTODO ============ -->
+<div class="section-meta">
+  <h3>SISTEMA TRANSVERSAL</h3>
+  <div class="method-grid">
+    <div class="method">
+      <div class="lbl">A · Tokens</div>
+      <h4>1 fonte de verdade</h4>
+      <p>Todas as 14 telas consomem `F1-fundacao/tokens.css`. Trocar tenant = trocar `data-tenant` no &lt;html&gt; — UB hoje, qualquer outro partido amanhã.</p>
+    </div>
+    <div class="method">
+      <div class="lbl">B · Tipografia</div>
+      <h4>3 vozes</h4>
+      <p>Bebas Neue (display · números grandes · headlines) + Inter (UI/leitura) + JetBrains Mono (dados/audit). Hierarquia consistente em tudo.</p>
+    </div>
+    <div class="method">
+      <div class="lbl">C · Sidebar</div>
+      <h4>10 perfis condicionais</h4>
+      <p>Mesmo shell, árvore de menu mudando por papel. Vereador vê painel pessoal + gabinete; Auditor MP vê só relatórios; Filiado vê apenas o próprio cadastro.</p>
+    </div>
+    <div class="method">
+      <div class="lbl">D · Dossiê</div>
+      <h4>8 cargos × seções priorizadas</h4>
+      <p>O motor é único. Cada cargo decide quais blocos sobem ao topo, quais ficam ocultos. Pres.Estadual abre com Bancada Federal; Vereador abre com Bairros; Senador com Atuação Bancada.</p>
+    </div>
+    <div class="method">
+      <div class="lbl">E · Chat 3-modos</div>
+      <h4>Identidade visual = base legal</h4>
+      <p>O modo (Permanente azul · Sigiloso vermelho · SOS laranja) muda toda a interface — incluindo o que o usuário pode/deve fazer e o que é registrado em auditoria.</p>
+    </div>
+    <div class="method">
+      <div class="lbl">F · LGPD</div>
+      <h4>Consentimento é UI</h4>
+      <p>Termos LGPD aparecem como caixas estruturais, não rodapés. Cada convite, edição de filiado e ato sigiloso pede confirmação explícita com base legal vinculada.</p>
+    </div>
+    <div class="method">
+      <div class="lbl">G · Mock data</div>
+      <h4>Coerência narrativa</h4>
+      <p>O mesmo "Vereador Rafael Rodrigues" aparece no Dashboard Milton, no Painel Pessoal, no Dossiê e nos Convites. Demos rodam como uma história contínua.</p>
+    </div>
+    <div class="method">
+      <div class="lbl">H · Próximo</div>
+      <h4>Dev handoff</h4>
+      <p>F5 (não nesta entrega): empacotar tokens.css como Tailwind preset + componentes React derivados, exportar specs por tela e criar storybook por módulo.</p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div>
+    <b>Mazzel Eleitoral</b> · Tenant: <b>UB · União Brasil</b> · Entrega: <b>F1+F2+F3+F4 · 15 telas hi-fi</b>
+  </div>
+  <div style="margin-left:auto">
+    Build · Abr 2026 · Design hi-fi navegável · <span style="color:var(--mz-tenant-accent)">tokens.css</span> v1.0
+  </div>
+</footer>
+
+</body>
+</html>

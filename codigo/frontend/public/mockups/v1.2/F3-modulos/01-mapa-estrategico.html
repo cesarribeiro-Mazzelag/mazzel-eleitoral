@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark" data-tenant="ub">
+<head>
+<meta charset="UTF-8">
+<title>Mapa Estratégico · UB</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../F1-fundacao/tokens.css">
+<script src="../F1-fundacao/theme-bootstrap.js"></script>
+<style>
+html, body { height: 100%; margin: 0; overflow: hidden; }
+.app { display: grid; grid-template-columns: 240px 1fr 360px; height: 100vh; }
+
+/* ==================== LEFT: CAMADAS ==================== */
+.layers {
+  background: var(--mz-bg-sidebar);
+  border-right: 1px solid var(--mz-rule);
+  overflow-y: auto;
+  display: flex; flex-direction: column;
+}
+.layers::-webkit-scrollbar { width: 4px; }
+.layers::-webkit-scrollbar-thumb { background: var(--mz-rule-strong); }
+
+.brand {
+  padding: 18px 18px 14px;
+  border-bottom: 1px solid var(--mz-rule);
+  display: flex; align-items: center; gap: 10px;
+}
+.brand .logo {
+  width: 32px; height: 32px;
+  background: var(--mz-tenant-primary);
+  border: 1px solid var(--mz-tenant-accent);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 14px; color: var(--mz-tenant-accent);
+  letter-spacing: 0.04em;
+}
+.brand .name {
+  font-size: 13px; font-weight: 800;
+  color: var(--mz-fg-strong);
+  letter-spacing: -0.01em;
+}
+.brand .name span { display: block; font-size: 9px; color: var(--mz-fg-faint); font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; margin-top: 1px; }
+
+.l-section { padding: 14px 18px; border-bottom: 1px solid var(--mz-rule); }
+.l-section h3 {
+  font-size: 9.5px; letter-spacing: 0.16em;
+  color: var(--mz-fg-faint); text-transform: uppercase;
+  font-weight: 700; margin: 0 0 12px;
+}
+
+.layer-list { display: flex; flex-direction: column; gap: 6px; }
+.layer {
+  display: grid; grid-template-columns: 16px 1fr auto;
+  gap: 10px; padding: 8px 10px;
+  border-radius: var(--mz-r-md);
+  cursor: pointer;
+  transition: background 120ms;
+  align-items: center;
+}
+.layer:hover { background: var(--mz-bg-card); }
+.layer.active {
+  background: var(--mz-tenant-primary-soft);
+  box-shadow: inset 0 0 0 1px var(--mz-tenant-accent-soft);
+}
+.layer .swatch {
+  width: 16px; height: 16px; border-radius: 4px;
+  background: var(--mz-tenant-primary);
+  position: relative;
+}
+.layer .swatch.heat { background: linear-gradient(135deg, #1e3a8a, #f59e0b, #dc2626); }
+.layer .swatch.partido { background: linear-gradient(135deg, #FFCC00 0% 50%, #003399 50% 100%); }
+.layer .swatch.competidor { background: linear-gradient(135deg, #ef4444, #14532d); }
+.layer .swatch.ovr { background: linear-gradient(135deg, #16a34a, #FFCC00, #dc2626); }
+.layer .swatch.emendas { background: linear-gradient(135deg, transparent 40%, var(--mz-tenant-accent) 60%); border: 1px solid var(--mz-tenant-accent); }
+.layer .swatch.cabos { background: var(--mz-bg-elevated); border: 1px solid var(--mz-info); }
+.layer .swatch.cabos::before { content:''; position: absolute; inset: 4px; background: var(--mz-info); border-radius: 50%; }
+.layer .swatch.eventos { background: var(--mz-bg-elevated); border: 1px dashed var(--mz-warn); }
+.layer .swatch.eventos::before { content:'!'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:800; color: var(--mz-warn); }
+
+.layer .name { font-size: 12px; color: var(--mz-fg); font-weight: 500; line-height: 1.3; }
+.layer .name span { display: block; font-size: 10px; color: var(--mz-fg-faint); font-weight: 400; }
+.layer.active .name { color: var(--mz-fg-strong); }
+.layer .check {
+  width: 14px; height: 14px;
+  border-radius: 3px;
+  border: 1px solid var(--mz-rule-strong);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; color: var(--mz-fg-faint);
+}
+.layer.active .check {
+  background: var(--mz-tenant-accent);
+  border-color: var(--mz-tenant-accent);
+  color: var(--mz-fg-on-accent);
+}
+
+.filter-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--mz-r-md);
+  background: var(--mz-bg-card);
+  font-size: 11px; color: var(--mz-fg);
+  cursor: pointer;
+}
+.filter-row:hover { background: var(--mz-bg-card-2); }
+.filter-row .lbl { font-size: 10px; color: var(--mz-fg-faint); letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600; }
+.filter-row b { font-weight: 600; }
+.filter-row .arr { margin-left: auto; color: var(--mz-fg-faint); }
+
+/* ==================== CENTER: MAP ==================== */
+.map-area {
+  position: relative;
+  background:
+    radial-gradient(ellipse 800px 600px at 60% 50%, rgba(0,42,123,0.08), transparent),
+    var(--mz-bg-page);
+  overflow: hidden;
+}
+
+/* topbar */
+.map-top {
+  position: absolute; top: 16px; left: 16px; right: 16px; z-index: 10;
+  display: flex; gap: 12px;
+  align-items: center;
+}
+.map-search {
+  flex: 1;
+  display: flex; align-items: center; gap: 10px;
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  border-radius: var(--mz-r-md);
+  padding: 8px 14px;
+  font-size: 12px; color: var(--mz-fg);
+  max-width: 380px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.map-search svg { width: 14px; height: 14px; color: var(--mz-fg-faint); }
+.map-search input {
+  flex: 1; background: none; border: 0; color: var(--mz-fg); font-size: 12px;
+  outline: none;
+}
+.map-search input::placeholder { color: var(--mz-fg-faint); }
+.map-search kbd {
+  font-family: var(--mz-font-mono); font-size: 9.5px;
+  background: var(--mz-bg-elevated); padding: 2px 6px; border-radius: 3px;
+  color: var(--mz-fg-faint);
+  border: 1px solid var(--mz-rule);
+}
+
+.map-scope {
+  display: flex; gap: 4px;
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  border-radius: var(--mz-r-md);
+  padding: 3px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.scope-btn {
+  font-size: 11px; font-weight: 600;
+  padding: 6px 12px;
+  background: none; border: 0; color: var(--mz-fg-muted);
+  border-radius: 4px; cursor: pointer;
+  transition: all 120ms;
+}
+.scope-btn:hover { color: var(--mz-fg-strong); }
+.scope-btn.active {
+  background: var(--mz-tenant-primary);
+  color: #fff;
+}
+
+.map-time {
+  font-size: 10px; color: var(--mz-fg-faint);
+  letter-spacing: 0.06em; font-weight: 500;
+  display: flex; gap: 12px; align-items: center;
+  margin-left: auto;
+}
+.map-time .live {
+  display: flex; gap: 6px; align-items: center;
+  color: var(--mz-ok);
+}
+.map-time .live .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--mz-ok);
+  box-shadow: 0 0 8px var(--mz-ok);
+  animation: pulse 1.6s ease infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.8); }
+}
+
+/* canvas */
+.map-canvas {
+  position: absolute;
+  inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: 70px 20px 80px;
+}
+.map-canvas svg {
+  width: 100%; height: 100%;
+  max-height: 100%;
+}
+
+/* estados */
+.uf {
+  fill: var(--mz-bg-card-2);
+  stroke: var(--mz-rule-strong);
+  stroke-width: 0.8;
+  cursor: pointer;
+  transition: fill 120ms, stroke 120ms;
+}
+.uf:hover { stroke: var(--mz-tenant-accent); stroke-width: 1.5; }
+
+/* layer 1 — Cobertura UB (escala azul) */
+[data-layer="cobertura"] .uf { fill: var(--cob, var(--mz-bg-card-2)); }
+
+/* layer 2 — Heatmap eleitoral */
+[data-layer="heatmap"] .uf { fill: var(--heat, var(--mz-bg-card-2)); }
+
+/* layer 3 — Vencido vs Vencedor */
+[data-layer="venceu"] .uf { fill: var(--vence, var(--mz-bg-card-2)); }
+
+/* layer 4 — Tier Pres Estadual */
+[data-layer="tier"] .uf { fill: var(--tier-fill, var(--mz-bg-card-2)); }
+
+/* layer 5 — Risco Jurídico (alertas críticos) */
+[data-layer="risco"] .uf { fill: var(--risco, var(--mz-bg-card-2)); }
+
+/* destaque ativo */
+.uf.selected { fill: var(--mz-tenant-accent) !important; stroke: var(--mz-tenant-accent-strong) !important; stroke-width: 2; }
+
+.uf-label {
+  fill: var(--mz-fg-strong);
+  font-size: 9px;
+  font-weight: 700;
+  text-anchor: middle;
+  pointer-events: none;
+  font-family: var(--mz-font-sans);
+  letter-spacing: 0.04em;
+}
+
+/* marcadores (eventos, cabos, lideranças) */
+.marker { transition: transform 120ms; }
+.marker:hover { transform: scale(1.4); }
+.marker.evento {
+  fill: var(--mz-warn);
+  stroke: var(--mz-bg-page);
+  stroke-width: 1.5;
+}
+.marker.lid {
+  fill: var(--mz-tenant-accent);
+  stroke: var(--mz-tenant-primary-strong);
+  stroke-width: 1.5;
+}
+.marker.alerta {
+  fill: var(--mz-danger);
+  stroke: var(--mz-bg-page);
+  stroke-width: 1.5;
+  animation: pulseDanger 1.4s ease infinite;
+}
+@keyframes pulseDanger {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* tooltip */
+.tooltip {
+  position: absolute;
+  z-index: 30;
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule-strong);
+  border-radius: var(--mz-r-lg);
+  padding: 0;
+  width: 280px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 120ms;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.6);
+  backdrop-filter: blur(12px);
+  overflow: hidden;
+}
+.tooltip.visible { opacity: 1; }
+
+.tt-head {
+  padding: 12px 14px;
+  background:
+    linear-gradient(135deg, var(--mz-tenant-primary-soft), transparent),
+    var(--mz-bg-card-2);
+  border-bottom: 1px solid var(--mz-rule);
+  display: flex; align-items: center; gap: 10px;
+}
+.tt-head .badge {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent);
+  padding: 0 8px; border-radius: 4px; line-height: 1.1;
+}
+.tt-head .ttl { flex: 1; }
+.tt-head .ttl b {
+  font-size: 14px; color: var(--mz-fg-strong);
+  font-weight: 700; letter-spacing: -0.01em;
+  display: block;
+}
+.tt-head .ttl span {
+  font-size: 10px; color: var(--mz-fg-faint);
+  letter-spacing: 0.08em; text-transform: uppercase;
+}
+
+.tt-grid {
+  padding: 12px 14px;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.tt-stat .lbl {
+  font-size: 8.5px; letter-spacing: 0.14em;
+  color: var(--mz-fg-faint); text-transform: uppercase;
+  font-weight: 700;
+}
+.tt-stat .v {
+  font-family: var(--mz-font-mono);
+  font-size: 14px; font-weight: 700;
+  color: var(--mz-fg-strong);
+  line-height: 1.2;
+}
+.tt-stat .delta { font-size: 10px; font-variant-numeric: tabular-nums; }
+.tt-stat .delta.up { color: var(--mz-ok); }
+.tt-stat .delta.down { color: var(--mz-danger); }
+
+.tt-bar {
+  height: 4px; background: var(--mz-bg-elevated);
+  border-radius: 2px; overflow: hidden;
+  margin-top: 4px;
+}
+.tt-bar > span {
+  display: block; height: 100%;
+  background: linear-gradient(90deg, var(--mz-tenant-primary), var(--mz-tenant-accent));
+}
+
+.tt-foot {
+  padding: 10px 14px;
+  border-top: 1px solid var(--mz-rule);
+  background: var(--mz-bg-card-2);
+  font-size: 10.5px; color: var(--mz-fg-muted);
+  line-height: 1.5;
+  display: flex; align-items: center; gap: 8px;
+}
+.tt-foot .key {
+  font-family: var(--mz-font-mono);
+  font-size: 9.5px;
+  background: var(--mz-bg-elevated);
+  padding: 1px 5px; border-radius: 3px;
+  color: var(--mz-fg);
+}
+.tt-foot b { color: var(--mz-tenant-accent); }
+
+/* legend bottom */
+.map-legend {
+  position: absolute; bottom: 16px; left: 16px;
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  border-radius: var(--mz-r-md);
+  padding: 10px 14px;
+  backdrop-filter: blur(8px);
+  display: flex; gap: 16px;
+  align-items: center;
+  font-size: 10px; color: var(--mz-fg-muted);
+  z-index: 8;
+}
+.map-legend .item { display: flex; align-items: center; gap: 6px; }
+.map-legend .sw { width: 14px; height: 10px; border-radius: 2px; }
+.map-legend .gradient {
+  width: 100px; height: 8px;
+  background: linear-gradient(90deg, #1e3a8a, #2563eb, #f59e0b, #dc2626);
+  border-radius: 4px;
+}
+.map-legend .gradient-blue {
+  width: 100px; height: 8px;
+  background: linear-gradient(90deg, var(--mz-bg-card-2), #1d4ed8 30%, #3b82f6 60%, #FFCC00);
+  border-radius: 4px;
+}
+.map-legend .scale {
+  display: flex; gap: 80px;
+  font-size: 9px;
+  color: var(--mz-fg-faint);
+  letter-spacing: 0.06em;
+  margin-top: 3px;
+}
+.map-legend b { color: var(--mz-fg); font-size: 11px; font-weight: 700; }
+
+/* zoom controls */
+.zoom-ctrl {
+  position: absolute; bottom: 16px; right: 16px;
+  display: flex; flex-direction: column; gap: 4px;
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  border-radius: var(--mz-r-md);
+  padding: 4px;
+  backdrop-filter: blur(8px);
+  z-index: 8;
+}
+.zoom-ctrl button {
+  width: 32px; height: 32px;
+  background: none; border: 0; color: var(--mz-fg);
+  font-size: 16px; font-weight: 600;
+  cursor: pointer; border-radius: 4px;
+}
+.zoom-ctrl button:hover { background: var(--mz-bg-elevated); }
+
+/* ==================== RIGHT: CONTEXT ==================== */
+.context {
+  background: var(--mz-bg-sidebar);
+  border-left: 1px solid var(--mz-rule);
+  overflow-y: auto;
+  display: flex; flex-direction: column;
+}
+.context::-webkit-scrollbar { width: 4px; }
+.context::-webkit-scrollbar-thumb { background: var(--mz-rule-strong); }
+
+.ctx-head {
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid var(--mz-rule);
+  background:
+    linear-gradient(135deg, rgba(0,42,123,0.18), transparent),
+    var(--mz-bg-sidebar);
+  position: relative;
+}
+.ctx-head .badge {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px;
+  background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent);
+  padding: 0 12px; border-radius: 6px; line-height: 1.1;
+  display: inline-block;
+}
+.ctx-head h1 {
+  font-size: 22px; font-weight: 800;
+  color: var(--mz-fg-strong);
+  letter-spacing: -0.015em;
+  margin: 8px 0 2px;
+}
+.ctx-head .sub {
+  font-size: 11px; color: var(--mz-fg-muted);
+  letter-spacing: 0.04em;
+}
+.ctx-head .sub b { color: var(--mz-fg); font-weight: 600; }
+
+.ctx-actions {
+  display: flex; gap: 6px;
+  margin-top: 14px;
+}
+.ctx-actions button {
+  flex: 1;
+  font-size: 11px; font-weight: 600;
+  padding: 7px 10px;
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  color: var(--mz-fg);
+  border-radius: var(--mz-r-md);
+  cursor: pointer;
+}
+.ctx-actions button.tenant {
+  background: var(--mz-tenant-primary);
+  border-color: var(--mz-tenant-primary-strong);
+  color: #fff;
+}
+.ctx-actions button:hover { border-color: var(--mz-tenant-accent); }
+
+.ctx-section { padding: 16px 22px; border-bottom: 1px solid var(--mz-rule); }
+.ctx-section h3 {
+  font-size: 9.5px; letter-spacing: 0.16em;
+  color: var(--mz-fg-faint); text-transform: uppercase;
+  font-weight: 700; margin: 0 0 12px;
+}
+
+.kpi-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.kpi-card {
+  background: var(--mz-bg-card);
+  border-radius: var(--mz-r-md);
+  padding: 10px 12px;
+}
+.kpi-card .lbl {
+  font-size: 9px; letter-spacing: 0.10em;
+  color: var(--mz-fg-faint); text-transform: uppercase;
+  font-weight: 700;
+}
+.kpi-card .v {
+  font-family: var(--mz-font-mono);
+  font-size: 18px; font-weight: 700;
+  color: var(--mz-fg-strong);
+  line-height: 1.2; margin-top: 2px;
+}
+.kpi-card .delta { font-size: 10px; font-variant-numeric: tabular-nums; }
+.kpi-card .delta.up { color: var(--mz-ok); }
+.kpi-card .delta.down { color: var(--mz-danger); }
+
+.list { display: flex; flex-direction: column; gap: 8px; }
+.list-row {
+  display: grid; grid-template-columns: auto 1fr auto;
+  gap: 10px; padding: 10px;
+  background: var(--mz-bg-card);
+  border-radius: var(--mz-r-md);
+  align-items: center;
+  font-size: 11px;
+  border-left: 3px solid var(--mz-rule);
+}
+.list-row.alta { border-left-color: var(--mz-danger); }
+.list-row.media { border-left-color: var(--mz-warn); }
+.list-row.opo { border-left-color: var(--mz-tenant-accent); }
+.list-row .ico {
+  width: 26px; height: 26px;
+  background: var(--mz-bg-elevated); border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800;
+  color: var(--mz-fg);
+}
+.list-row .ico.alta { background: var(--mz-danger-soft); color: var(--mz-danger); }
+.list-row .ico.media { background: var(--mz-warn-soft); color: var(--mz-warn); }
+.list-row .ico.opo { background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent); }
+.list-row .body b { display: block; color: var(--mz-fg-strong); font-weight: 600; font-size: 12px; }
+.list-row .body span { color: var(--mz-fg-faint); font-size: 10.5px; }
+.list-row .when { font-family: var(--mz-font-mono); font-size: 9.5px; color: var(--mz-fg-faint); white-space: nowrap; }
+
+.empty {
+  padding: 20px;
+  text-align: center;
+  color: var(--mz-fg-faint);
+  font-size: 11px;
+  background: var(--mz-bg-card);
+  border-radius: var(--mz-r-md);
+}
+
+/* mini-cartinha embarcada */
+.mini-cartinha {
+  background: linear-gradient(135deg, var(--mz-tenant-primary), var(--mz-tenant-primary-strong));
+  border: 1px solid var(--mz-tenant-accent);
+  border-radius: var(--mz-r-md);
+  padding: 12px;
+  display: grid; grid-template-columns: 56px 1fr;
+  gap: 12px;
+}
+.mini-cartinha .photo {
+  width: 56px; height: 56px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  color: var(--mz-tenant-accent);
+}
+.mini-cartinha .name {
+  font-size: 13px; font-weight: 700;
+  color: #fff;
+  line-height: 1.15;
+}
+.mini-cartinha .role {
+  font-size: 10px; color: rgba(255,255,255,0.7);
+  letter-spacing: 0.04em; margin-top: 2px;
+}
+.mini-cartinha .stats {
+  display: flex; gap: 10px;
+  margin-top: 6px;
+  font-size: 10px;
+  font-family: var(--mz-font-mono);
+  color: var(--mz-tenant-accent);
+}
+.mini-cartinha .stats b { color: #fff; }
+
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ==================== LEFT ==================== -->
+  <aside class="layers">
+    <div class="brand">
+      <div class="logo">UB</div>
+      <div class="name">Mazzel · UB<span>Mapa Estratégico</span></div>
+    </div>
+
+    <div class="l-section">
+      <h3>Recorte</h3>
+      <div class="filter-row" style="margin-bottom: 6px">
+        <span class="lbl">Tenant</span>
+        <b>União Brasil</b>
+        <span class="arr">▾</span>
+      </div>
+      <div class="filter-row" style="margin-bottom: 6px">
+        <span class="lbl">Período</span>
+        <b>30 dias</b>
+        <span class="arr">▾</span>
+      </div>
+      <div class="filter-row">
+        <span class="lbl">Cargo</span>
+        <b>Todos</b>
+        <span class="arr">▾</span>
+      </div>
+    </div>
+
+    <div class="l-section">
+      <h3>Modo · pergunta executiva</h3>
+      <div class="layer-list" id="modeList"></div>
+    </div>
+
+    <div class="l-section" id="advSection" style="display:none">
+      <h3>Modo avançado · camadas livres</h3>
+      <div style="font-size:10px; color:var(--mz-fg-faint); margin-bottom:10px; line-height:1.5">
+        Combine camadas livremente. Desligue um modo pré-configurado pra usar.
+      </div>
+      <div style="margin-bottom:10px"><b style="font-size:10px; color:var(--mz-fg-muted); letter-spacing:0.1em; text-transform:uppercase">Camada base</b></div>
+      <div class="layer-list" id="baseLayers"></div>
+      <div style="margin:14px 0 8px"><b style="font-size:10px; color:var(--mz-fg-muted); letter-spacing:0.1em; text-transform:uppercase">Adicionais</b></div>
+      <div class="layer-list" id="extraLayers"></div>
+    </div>
+
+    <div class="l-section" style="padding-top:0">
+      <button id="advToggle" style="
+        width:100%; padding:8px 10px;
+        background:transparent; border:1px dashed var(--mz-rule-strong);
+        color:var(--mz-fg-muted); font-size:11px; cursor:pointer;
+        border-radius:var(--mz-r-md); font-family:var(--mz-font-mono);
+        letter-spacing:0.04em;
+      ">⚙  modo avançado</button>
+    </div>
+
+    <div class="l-section" style="margin-top: auto;">
+      <h3>Atalhos</h3>
+      <div class="filter-row" style="margin-bottom: 6px"><span class="lbl">⌘</span><b>K</b><span class="arr" style="margin-left: 6px; font-size: 10px;">busca global</span></div>
+      <div class="filter-row" style="margin-bottom: 6px"><span class="lbl">L</span><b>cycle layers</b></div>
+      <div class="filter-row"><span class="lbl">F</span><b>foco / fit</b></div>
+    </div>
+  </aside>
+
+  <!-- ==================== CENTER ==================== -->
+  <main class="map-area" id="mapArea">
+
+    <div class="map-top">
+      <div class="map-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input placeholder="Buscar UF, município ou político (ex: Wagner, BA, Recife)..." />
+        <kbd>⌘K</kbd>
+      </div>
+      <div class="map-scope">
+        <button class="scope-btn">Brasil</button>
+        <button class="scope-btn active">UF: SP</button>
+        <button class="scope-btn">Município</button>
+        <button class="scope-btn">Bairro</button>
+      </div>
+      <div class="map-time">
+        <span>Atualizado <b style="color:var(--mz-fg)">25/abr 09:14</b></span>
+        <span class="live"><span class="dot"></span>LIVE</span>
+      </div>
+    </div>
+
+    <div class="map-canvas">
+      <svg viewBox="0 0 600 540" id="mapSvg" data-layer="cobertura">
+        <!-- BR map: 27 UFs in stylized hex/rect grid (não geográfico exato; representação esquemática limpa) -->
+        <g id="ufs">
+          <!-- coords usam grid esquemático e textos ficam centralizados -->
+        </g>
+      </svg>
+    </div>
+
+    <!-- TOOLTIP -->
+    <div class="tooltip" id="tt">
+      <div class="tt-head">
+        <span class="badge" id="ttBadge">SP</span>
+        <div class="ttl">
+          <b id="ttName">São Paulo</b>
+          <span id="ttRegion">Sudeste · 645 municípios</span>
+        </div>
+      </div>
+      <div class="tt-grid tnum">
+        <div class="tt-stat">
+          <div class="lbl">Filiados</div>
+          <div class="v" id="ttFil">124.847</div>
+          <div class="delta up" id="ttFilD">+2.103 (30d)</div>
+        </div>
+        <div class="tt-stat">
+          <div class="lbl">Cobertura</div>
+          <div class="v" id="ttCov">78%</div>
+          <div class="tt-bar"><span id="ttCovBar" style="width:78%"></span></div>
+        </div>
+        <div class="tt-stat">
+          <div class="lbl">Score Médio</div>
+          <div class="v" id="ttOvr">71</div>
+          <div class="delta up" id="ttOvrD">+1.2 (7d)</div>
+        </div>
+        <div class="tt-stat">
+          <div class="lbl">Mandatos</div>
+          <div class="v" id="ttMan">147</div>
+          <div class="delta" id="ttManD">12 fed · 135 mun</div>
+        </div>
+      </div>
+      <div class="tt-foot">
+        Pres Estadual: <b id="ttPres">Milton Leite</b> · OVR 78
+        <span class="key" style="margin-left: auto">click</span>
+      </div>
+    </div>
+
+    <!-- LEGEND -->
+    <div class="map-legend" id="legend">
+      <div>
+        <b>Cobertura UB</b>
+        <div class="gradient-blue"></div>
+        <div class="scale"><span>0%</span><span>50%</span><span>100%</span></div>
+      </div>
+      <div class="item"><span class="sw" style="background: var(--mz-warn)"></span>Evento agendado</div>
+      <div class="item"><span class="sw" style="background: var(--mz-tenant-accent)"></span>Liderança forte</div>
+      <div class="item"><span class="sw" style="background: var(--mz-danger)"></span>Alerta crítico</div>
+    </div>
+
+    <!-- ZOOM -->
+    <div class="zoom-ctrl">
+      <button>+</button>
+      <button>−</button>
+      <button title="reset" style="font-size: 10px;">⌖</button>
+    </div>
+
+  </main>
+
+  <!-- ==================== RIGHT ==================== -->
+  <aside class="context" id="context"></aside>
+</div>
+
+<script>
+/* ============================================================
+   DADOS · 27 UFs com layout esquemático estilo "BR limpo"
+   Grid simplificado pra ficar legível em SVG sem dependência externa.
+   Posições calibradas pra dar vibe geográfica sem distorcer demais.
+   ============================================================ */
+const UFS = [
+  // Norte
+  { id: 'AC', nome: 'Acre',         regiao: 'Norte',        x: 60,  y: 240, w: 65, h: 55, mun: 22 },
+  { id: 'AM', nome: 'Amazonas',     regiao: 'Norte',        x: 130, y: 130, w: 145, h: 110, mun: 62 },
+  { id: 'RR', nome: 'Roraima',      regiao: 'Norte',        x: 200, y: 50,  w: 70, h: 75, mun: 15 },
+  { id: 'AP', nome: 'Amapá',        regiao: 'Norte',        x: 320, y: 70,  w: 55, h: 60, mun: 16 },
+  { id: 'PA', nome: 'Pará',         regiao: 'Norte',        x: 280, y: 135, w: 130, h: 110, mun: 144 },
+  { id: 'TO', nome: 'Tocantins',    regiao: 'Norte',        x: 305, y: 250, w: 70, h: 90, mun: 139 },
+  { id: 'RO', nome: 'Rondônia',     regiao: 'Norte',        x: 130, y: 245, w: 80, h: 65, mun: 52 },
+  // Nordeste
+  { id: 'MA', nome: 'Maranhão',     regiao: 'Nordeste',     x: 380, y: 145, w: 80, h: 90, mun: 217 },
+  { id: 'PI', nome: 'Piauí',        regiao: 'Nordeste',     x: 380, y: 240, w: 60, h: 100, mun: 224 },
+  { id: 'CE', nome: 'Ceará',        regiao: 'Nordeste',     x: 445, y: 165, w: 80, h: 80, mun: 184 },
+  { id: 'RN', nome: 'Rio G. Norte', regiao: 'Nordeste',     x: 525, y: 175, w: 55, h: 35, mun: 167 },
+  { id: 'PB', nome: 'Paraíba',      regiao: 'Nordeste',     x: 525, y: 215, w: 55, h: 30, mun: 223 },
+  { id: 'PE', nome: 'Pernambuco',   regiao: 'Nordeste',     x: 460, y: 250, w: 120, h: 30, mun: 185 },
+  { id: 'AL', nome: 'Alagoas',      regiao: 'Nordeste',     x: 525, y: 285, w: 55, h: 25, mun: 102 },
+  { id: 'SE', nome: 'Sergipe',      regiao: 'Nordeste',     x: 525, y: 315, w: 50, h: 25, mun: 75 },
+  { id: 'BA', nome: 'Bahia',        regiao: 'Nordeste',     x: 380, y: 280, w: 140, h: 110, mun: 417 },
+  // Centro-oeste
+  { id: 'MT', nome: 'Mato Grosso',  regiao: 'Centro-oeste', x: 220, y: 245, w: 80, h: 110, mun: 141 },
+  { id: 'MS', nome: 'Mato G. Sul',  regiao: 'Centro-oeste', x: 200, y: 360, w: 90, h: 80, mun: 79 },
+  { id: 'GO', nome: 'Goiás',        regiao: 'Centro-oeste', x: 295, y: 345, w: 80, h: 90, mun: 246 },
+  { id: 'DF', nome: 'DF',           regiao: 'Centro-oeste', x: 320, y: 320, w: 24, h: 22, mun: 1 },
+  // Sudeste
+  { id: 'MG', nome: 'Minas Gerais', regiao: 'Sudeste',      x: 320, y: 395, w: 110, h: 75, mun: 853 },
+  { id: 'ES', nome: 'Esp. Santo',   regiao: 'Sudeste',      x: 435, y: 395, w: 50, h: 50, mun: 78 },
+  { id: 'RJ', nome: 'Rio Janeiro',  regiao: 'Sudeste',      x: 380, y: 475, w: 70, h: 30, mun: 92 },
+  { id: 'SP', nome: 'São Paulo',    regiao: 'Sudeste',      x: 280, y: 470, w: 95, h: 50, mun: 645 },
+  // Sul
+  { id: 'PR', nome: 'Paraná',       regiao: 'Sul',          x: 230, y: 445, w: 80, h: 50, mun: 399 },
+  { id: 'SC', nome: 'Santa Cat.',   regiao: 'Sul',          x: 240, y: 500, w: 70, h: 25, mun: 295 },
+  { id: 'RS', nome: 'Rio G. Sul',   regiao: 'Sul',          x: 175, y: 470, w: 70, h: 55, mun: 497 },
+];
+
+/* dados sintéticos por UF — cobertura, score médio Pres Est, filiados, etc. */
+const DATA = {
+  SP: { cob: 78, score: 78, fil: 124847, mand: 147, votosUB: 38, vencedor: 1, pres: 'Milton Leite', presOvr: 78, alertas: 7, eventos: 12, lid: 28, risco: 'media' },
+  RJ: { cob: 65, score: 71, fil: 78421,  mand: 89,  votosUB: 32, vencedor: 0, pres: 'Pedro Cunha',  presOvr: 71, alertas: 4, eventos: 8,  lid: 18, risco: 'media' },
+  MG: { cob: 71, score: 75, fil: 98330,  mand: 124, votosUB: 41, vencedor: 1, pres: 'Carla Bessa',  presOvr: 75, alertas: 3, eventos: 14, lid: 22, risco: 'baixa' },
+  RS: { cob: 58, score: 68, fil: 67250,  mand: 76,  votosUB: 28, vencedor: 0, pres: 'A. Steffen',   presOvr: 68, alertas: 2, eventos: 5,  lid: 12, risco: 'baixa' },
+  BA: { cob: 82, score: 84, fil: 101480, mand: 138, votosUB: 47, vencedor: 1, pres: 'J. Wagner',    presOvr: 87, alertas: 1, eventos: 18, lid: 31, risco: 'baixa' },
+  CE: { cob: 74, score: 78, fil: 71300,  mand: 88,  votosUB: 36, vencedor: 1, pres: 'P. Bezerra',   presOvr: 78, alertas: 2, eventos: 9,  lid: 19, risco: 'baixa' },
+  PR: { cob: 62, score: 70, fil: 72100,  mand: 94,  votosUB: 31, vencedor: 0, pres: 'L. Albuq.',    presOvr: 70, alertas: 5, eventos: 6,  lid: 15, risco: 'media' },
+  PE: { cob: 68, score: 72, fil: 64800,  mand: 78,  votosUB: 33, vencedor: 1, pres: 'M. Souza',     presOvr: 72, alertas: 3, eventos: 11, lid: 17, risco: 'baixa' },
+  GO: { cob: 60, score: 65, fil: 47210,  mand: 56,  votosUB: 26, vencedor: 0, pres: 'F. Andrade',   presOvr: 65, alertas: 4, eventos: 7,  lid: 11, risco: 'media' },
+  PA: { cob: 55, score: 62, fil: 38900,  mand: 51,  votosUB: 22, vencedor: 0, pres: 'C. Sabino',    presOvr: 84, alertas: 2, eventos: 5,  lid: 9,  risco: 'baixa' },
+  AM: { cob: 41, score: 56, fil: 22340,  mand: 28,  votosUB: 18, vencedor: 0, pres: 'R. Lima',      presOvr: 56, alertas: 6, eventos: 3,  lid: 6,  risco: 'alta' },
+  MA: { cob: 52, score: 64, fil: 41250,  mand: 62,  votosUB: 24, vencedor: 0, pres: 'A. Sales',     presOvr: 64, alertas: 3, eventos: 8,  lid: 12, risco: 'media' },
+  PI: { cob: 47, score: 58, fil: 24310,  mand: 32,  votosUB: 21, vencedor: 0, pres: 'D. Rocha',     presOvr: 58, alertas: 2, eventos: 4,  lid: 7,  risco: 'media' },
+  RN: { cob: 64, score: 70, fil: 28910,  mand: 37,  votosUB: 30, vencedor: 1, pres: 'F. Mineiro',   presOvr: 70, alertas: 1, eventos: 6,  lid: 9,  risco: 'baixa' },
+  PB: { cob: 70, score: 73, fil: 32100,  mand: 41,  votosUB: 35, vencedor: 1, pres: 'E. Júnior',    presOvr: 73, alertas: 2, eventos: 7,  lid: 10, risco: 'baixa' },
+  AL: { cob: 51, score: 60, fil: 18460,  mand: 24,  votosUB: 23, vencedor: 0, pres: 'P. Dantas',    presOvr: 60, alertas: 4, eventos: 3,  lid: 5,  risco: 'media' },
+  SE: { cob: 56, score: 65, fil: 14820,  mand: 19,  votosUB: 27, vencedor: 0, pres: 'A. Mota',      presOvr: 65, alertas: 1, eventos: 4,  lid: 6,  risco: 'baixa' },
+  ES: { cob: 67, score: 71, fil: 31200,  mand: 38,  votosUB: 32, vencedor: 0, pres: 'C. Da Vitória',presOvr: 71, alertas: 2, eventos: 5,  lid: 8,  risco: 'baixa' },
+  MT: { cob: 53, score: 63, fil: 26410,  mand: 31,  votosUB: 25, vencedor: 0, pres: 'V. Pinheiro',  presOvr: 63, alertas: 3, eventos: 4,  lid: 7,  risco: 'media' },
+  MS: { cob: 49, score: 60, fil: 20180,  mand: 25,  votosUB: 22, vencedor: 0, pres: 'C. Alves',     presOvr: 60, alertas: 2, eventos: 3,  lid: 5,  risco: 'media' },
+  DF: { cob: 73, score: 76, fil: 38420,  mand: 21,  votosUB: 38, vencedor: 1, pres: 'P. Roberto',   presOvr: 76, alertas: 5, eventos: 9,  lid: 14, risco: 'media' },
+  TO: { cob: 38, score: 54, fil: 11420,  mand: 18,  votosUB: 17, vencedor: 0, pres: 'L. Negrão',    presOvr: 54, alertas: 3, eventos: 2,  lid: 4,  risco: 'alta' },
+  RO: { cob: 35, score: 51, fil: 9320,   mand: 12,  votosUB: 15, vencedor: 0, pres: 'M. Bertaiolli',presOvr: 51, alertas: 6, eventos: 1,  lid: 3,  risco: 'alta' },
+  AC: { cob: 31, score: 48, fil: 7100,   mand: 9,   votosUB: 13, vencedor: 0, pres: 'V. Furlan',    presOvr: 48, alertas: 4, eventos: 1,  lid: 2,  risco: 'alta' },
+  AP: { cob: 28, score: 45, fil: 6810,   mand: 7,   votosUB: 12, vencedor: 0, pres: 'A. Penha',     presOvr: 45, alertas: 2, eventos: 1,  lid: 2,  risco: 'alta' },
+  RR: { cob: 26, score: 43, fil: 5230,   mand: 6,   votosUB: 11, vencedor: 0, pres: 'P. Hugo',      presOvr: 43, alertas: 3, eventos: 0,  lid: 1,  risco: 'alta' },
+  SC: { cob: 60, score: 67, fil: 51230,  mand: 69,  votosUB: 30, vencedor: 0, pres: 'R. Branco',    presOvr: 67, alertas: 2, eventos: 6,  lid: 11, risco: 'baixa' },
+};
+
+/* mock eventos / lideranças / alertas para markers globais */
+const MARKERS = [
+  { tipo: 'evento', uf: 'SP', dx: 10, dy: 10, label: 'Convenção Estadual' },
+  { tipo: 'evento', uf: 'BA', dx: 60, dy: 30, label: 'Encontro Regional' },
+  { tipo: 'evento', uf: 'MG', dx: 30, dy: 25, label: 'Comício BH' },
+  { tipo: 'lid',    uf: 'SP', dx: -20, dy: -10, label: 'Lid. forte zona oeste' },
+  { tipo: 'lid',    uf: 'BA', dx: 20, dy: 60,  label: 'Salvador metro' },
+  { tipo: 'lid',    uf: 'CE', dx: 30, dy: 30,  label: 'Fortaleza' },
+  { tipo: 'lid',    uf: 'PE', dx: 60, dy: 10,  label: 'Recife' },
+  { tipo: 'alerta', uf: 'AM', dx: 60, dy: 60,  label: 'Conflito jurídico interno' },
+  { tipo: 'alerta', uf: 'AC', dx: 30, dy: 30,  label: 'Ficha-suja Vereador' },
+  { tipo: 'alerta', uf: 'RO', dx: 30, dy: 30,  label: 'Decisão TSE pendente' },
+  { tipo: 'alerta', uf: 'GO', dx: 30, dy: 30,  label: 'Disputa interna' },
+  { tipo: 'alerta', uf: 'PR', dx: 30, dy: 25,  label: 'Migração para PSD' },
+];
+
+/* ============================================================
+   LAYERS
+   ============================================================ */
+const BASE_LAYERS = [
+  { id: 'cobertura', name: 'Cobertura UB',    sub: '% mun. com comissão',     swatch: 'partido' },
+  { id: 'heatmap',   name: 'Heatmap eleitoral', sub: '% votos UB no estado',   swatch: 'heat' },
+  { id: 'venceu',    name: 'Vencido vs Vencedor', sub: 'governadores aliados', swatch: 'competidor' },
+  { id: 'tier',      name: 'Tier · Pres. Est.',   sub: 'OVR do Pres Estadual',  swatch: 'ovr' },
+  { id: 'risco',     name: 'Risco jurídico',      sub: 'alertas vigentes',     swatch: 'heat' },
+];
+
+const EXTRA_LAYERS = [
+  { id: 'eventos', name: 'Eventos agendados',   sub: '+72h · agenda partidária', swatch: 'eventos' },
+  { id: 'lideres', name: 'Lideranças fortes',   sub: 'OVR ≥ 75 nos municípios', swatch: 'cabos' },
+  { id: 'alertas', name: 'Alertas críticos',    sub: 'sentinela · 24h',         swatch: 'eventos' },
+  { id: 'emendas', name: 'Emendas executadas',  sub: 'R$ por estado · empenh.', swatch: 'emendas' },
+];
+
+let activeBase = 'cobertura';
+const activeExtras = new Set();
+let selectedUF = 'SP';
+
+/* ============================================================
+   COR HELPERS
+   ============================================================ */
+function colorCobertura(p) {
+  // 0..100 → azul UB com amarelo no top
+  if (p >= 75) return '#FFCC00';
+  if (p >= 60) return '#1d4ed8';
+  if (p >= 45) return '#1e3a8a';
+  if (p >= 30) return '#172554';
+  return '#0c0c0e';
+}
+function colorHeat(p) {
+  if (p >= 40) return '#dc2626';
+  if (p >= 30) return '#fb923c';
+  if (p >= 20) return '#3b82f6';
+  if (p >= 10) return '#1e3a8a';
+  return '#0c0c0e';
+}
+function colorVenceu(v) {
+  return v ? '#16a34a' : '#7f1d1d';
+}
+function colorTier(o) {
+  if (o >= 90) return '#FFCC00';
+  if (o >= 80) return '#16a34a';
+  if (o >= 70) return '#1d4ed8';
+  if (o >= 60) return '#fb923c';
+  return '#dc2626';
+}
+function colorRisco(r) {
+  return { alta: '#dc2626', media: '#f59e0b', baixa: '#1e3a8a' }[r] || '#0c0c0e';
+}
+
+/* ============================================================
+   RENDER MAP
+   ============================================================ */
+function renderMap() {
+  const g = document.getElementById('ufs');
+  g.innerHTML = UFS.map(u => {
+    const d = DATA[u.id];
+    const cob = d ? colorCobertura(d.cob) : '#0c0c0e';
+    const heat = d ? colorHeat(d.votosUB) : '#0c0c0e';
+    const vence = d ? colorVenceu(d.vencedor) : '#0c0c0e';
+    const tier = d ? colorTier(d.presOvr) : '#0c0c0e';
+    const risco = d ? colorRisco(d.risco) : '#0c0c0e';
+    const labelX = u.x + u.w/2;
+    const labelY = u.y + u.h/2 + 3;
+    const isSelected = u.id === selectedUF ? 'selected' : '';
+    return `
+      <g>
+        <rect class="uf ${isSelected}" data-id="${u.id}"
+              x="${u.x}" y="${u.y}" width="${u.w}" height="${u.h}"
+              rx="3"
+              style="--cob:${cob}; --heat:${heat}; --vence:${vence}; --tier-fill:${tier}; --risco:${risco}"
+              />
+        <text class="uf-label" x="${labelX}" y="${labelY}">${u.id}</text>
+      </g>
+    `;
+  }).join('') + renderMarkers();
+
+  // bind events
+  g.querySelectorAll('.uf').forEach(el => {
+    el.addEventListener('mousemove', e => showTT(el.dataset.id, e));
+    el.addEventListener('mouseleave', hideTT);
+    el.addEventListener('click', () => selectUF(el.dataset.id));
+  });
+}
+
+function renderMarkers() {
+  if (activeExtras.size === 0) return '';
+  let html = '<g class="markers">';
+  MARKERS.forEach(m => {
+    const u = UFS.find(x => x.id === m.uf);
+    if (!u) return;
+    const cx = u.x + (m.dx ?? 10);
+    const cy = u.y + (m.dy ?? 10);
+    if (m.tipo === 'evento' && activeExtras.has('eventos')) {
+      html += `<circle class="marker evento" cx="${cx}" cy="${cy}" r="4"/>`;
+    }
+    if (m.tipo === 'lid' && activeExtras.has('lideres')) {
+      html += `<circle class="marker lid" cx="${cx}" cy="${cy}" r="3.5"/>`;
+    }
+    if (m.tipo === 'alerta' && activeExtras.has('alertas')) {
+      html += `<circle class="marker alerta" cx="${cx}" cy="${cy}" r="4.5"/>`;
+    }
+    if (m.tipo === 'evento' && activeExtras.has('emendas')) {
+      // emendas via dot dourado
+      html += `<rect class="marker" x="${cx-4}" y="${cy-4}" width="8" height="8" fill="${'#FFCC00'}" stroke="${'#000'}" stroke-width="1.2"/>`;
+    }
+  });
+  html += '</g>';
+  return html;
+}
+
+/* ============================================================
+   TOOLTIP
+   ============================================================ */
+const tt = document.getElementById('tt');
+const mapArea = document.getElementById('mapArea');
+function showTT(id, e) {
+  const u = UFS.find(x => x.id === id);
+  const d = DATA[id];
+  if (!u || !d) return;
+  tt.classList.add('visible');
+  document.getElementById('ttBadge').textContent = u.id;
+  document.getElementById('ttName').textContent = u.nome;
+  document.getElementById('ttRegion').textContent = `${u.regiao} · ${u.mun} municípios`;
+  document.getElementById('ttFil').textContent = d.fil.toLocaleString('pt-BR');
+  document.getElementById('ttCov').textContent = d.cob + '%';
+  document.getElementById('ttCovBar').style.width = d.cob + '%';
+  document.getElementById('ttOvr').textContent = d.score;
+  document.getElementById('ttMan').textContent = d.mand;
+  document.getElementById('ttPres').textContent = `${d.pres} · OVR ${d.presOvr}`;
+
+  const r = mapArea.getBoundingClientRect();
+  let x = e.clientX - r.left + 16;
+  let y = e.clientY - r.top + 16;
+  if (x + 290 > r.width) x = e.clientX - r.left - 296;
+  if (y + 240 > r.height) y = e.clientY - r.top - 250;
+  tt.style.left = x + 'px';
+  tt.style.top = y + 'px';
+}
+function hideTT() { tt.classList.remove('visible'); }
+
+/* ============================================================
+   LAYER PANEL
+   ============================================================ */
+function renderLayers() {
+  document.getElementById('baseLayers').innerHTML = BASE_LAYERS.map(l => `
+    <div class="layer ${activeBase === l.id ? 'active' : ''}" data-base="${l.id}">
+      <span class="swatch ${l.swatch}"></span>
+      <div class="name">${l.name}<span>${l.sub}</span></div>
+      <span class="check">${activeBase === l.id ? '✓' : ''}</span>
+    </div>
+  `).join('');
+
+  document.getElementById('extraLayers').innerHTML = EXTRA_LAYERS.map(l => `
+    <div class="layer ${activeExtras.has(l.id) ? 'active' : ''}" data-extra="${l.id}">
+      <span class="swatch ${l.swatch}"></span>
+      <div class="name">${l.name}<span>${l.sub}</span></div>
+      <span class="check">${activeExtras.has(l.id) ? '✓' : ''}</span>
+    </div>
+  `).join('');
+
+  // bind
+  document.querySelectorAll('[data-base]').forEach(el => el.addEventListener('click', () => {
+    activeBase = el.dataset.base;
+    document.getElementById('mapSvg').dataset.layer = activeBase;
+    renderLayers();
+    renderLegend();
+  }));
+  document.querySelectorAll('[data-extra]').forEach(el => el.addEventListener('click', () => {
+    const id = el.dataset.extra;
+    if (activeExtras.has(id)) activeExtras.delete(id);
+    else activeExtras.add(id);
+    renderLayers();
+    renderMap();
+    // update count text
+    const h = document.querySelector('#extraLayers').previousElementSibling;
+    h.textContent = `Camadas adicionais · ${activeExtras.size} de 4 ativas`;
+  }));
+}
+
+function renderLegend() {
+  const lg = document.getElementById('legend');
+  let html = '';
+  if (activeBase === 'cobertura') {
+    html = `<div><b>Cobertura UB</b><div class="gradient-blue"></div><div class="scale"><span>0%</span><span>50%</span><span>100%</span></div></div>`;
+  } else if (activeBase === 'heatmap') {
+    html = `<div><b>% Votos UB</b><div class="gradient"></div><div class="scale"><span>0%</span><span>25%</span><span>50%</span></div></div>`;
+  } else if (activeBase === 'venceu') {
+    html = `<div class="item"><span class="sw" style="background:#16a34a"></span><b>Aliado venceu</b></div><div class="item"><span class="sw" style="background:#7f1d1d"></span><b>Aliado perdeu</b></div>`;
+  } else if (activeBase === 'tier') {
+    html = `<div><b>OVR Pres. Estadual</b><div class="gradient" style="background: linear-gradient(90deg, #dc2626, #fb923c, #1d4ed8, #16a34a, #FFCC00)"></div><div class="scale"><span>≤60</span><span>70</span><span>≥90</span></div></div>`;
+  } else if (activeBase === 'risco') {
+    html = `<div class="item"><span class="sw" style="background:#dc2626"></span><b>Alta</b></div><div class="item"><span class="sw" style="background:#f59e0b"></span><b>Média</b></div><div class="item"><span class="sw" style="background:#1e3a8a"></span><b>Baixa</b></div>`;
+  }
+  // markers extras visíveis
+  if (activeExtras.has('eventos')) html += `<div class="item"><span class="sw" style="background: var(--mz-warn)"></span>Evento</div>`;
+  if (activeExtras.has('lideres')) html += `<div class="item"><span class="sw" style="background: var(--mz-tenant-accent)"></span>Liderança</div>`;
+  if (activeExtras.has('alertas')) html += `<div class="item"><span class="sw" style="background: var(--mz-danger)"></span>Alerta</div>`;
+  if (activeExtras.has('emendas')) html += `<div class="item"><span class="sw" style="background: var(--mz-tenant-accent); border: 1px solid #000"></span>Emendas</div>`;
+  lg.innerHTML = html;
+}
+
+/* ============================================================
+   CONTEXT (right) — atualiza ao selecionar UF
+   ============================================================ */
+function selectUF(id) {
+  selectedUF = id;
+  renderMap();
+  renderContext();
+}
+
+function renderContext() {
+  const u = UFS.find(x => x.id === selectedUF);
+  const d = DATA[selectedUF];
+  const ctx = document.getElementById('context');
+  if (!u || !d) {
+    ctx.innerHTML = `<div class="ctx-section"><div class="empty">Selecione uma UF no mapa</div></div>`;
+    return;
+  }
+
+  ctx.innerHTML = `
+    <div class="ctx-head">
+      <span class="badge">${u.id}</span>
+      <h1>${u.nome}</h1>
+      <div class="sub">${u.regiao} · <b>${u.mun} municípios</b> · ${d.mand} mandatos</div>
+      <div class="ctx-actions">
+        <button class="tenant">Abrir Dossiê do Pres. Est.</button>
+        <button>Ir pro Dashboard</button>
+      </div>
+    </div>
+
+    <div class="ctx-section">
+      <h3>KPIs · Estado</h3>
+      <div class="kpi-grid">
+        <div class="kpi-card"><div class="lbl">Filiados</div><div class="v">${d.fil.toLocaleString('pt-BR')}</div><div class="delta up">+${(d.fil*0.018|0).toLocaleString('pt-BR')} 30d</div></div>
+        <div class="kpi-card"><div class="lbl">Cobertura</div><div class="v">${d.cob}%</div><div class="delta ${d.cob>=70?'up':'down'}">${d.cob>=70?'+':''}meta 80%</div></div>
+        <div class="kpi-card"><div class="lbl">Score Md.</div><div class="v">${d.score}</div><div class="delta up">+1.2 7d</div></div>
+        <div class="kpi-card"><div class="lbl">% Votos UB</div><div class="v">${d.votosUB}%</div><div class="delta ${d.vencedor?'up':'down'}">${d.vencedor?'aliado venceu':'aliado perdeu'}</div></div>
+        <div class="kpi-card"><div class="lbl">Eventos +30d</div><div class="v">${d.eventos}</div><div class="delta">próximos</div></div>
+        <div class="kpi-card"><div class="lbl">Alertas</div><div class="v" style="color:${d.alertas>=5?'var(--mz-danger)':d.alertas>=3?'var(--mz-warn)':'var(--mz-fg-strong)'}">${d.alertas}</div><div class="delta">${d.risco === 'alta' ? 'risco ALTO' : d.risco === 'media' ? 'risco médio' : 'sob controle'}</div></div>
+      </div>
+    </div>
+
+    <div class="ctx-section">
+      <h3>Pres. Estadual · ${u.id}</h3>
+      <div class="mini-cartinha">
+        <div class="photo">${d.pres.split(' ').map(p=>p[0]).slice(0,2).join('')}</div>
+        <div>
+          <div class="name">${d.pres}</div>
+          <div class="role">Pres. Estadual UB · ${u.id}</div>
+          <div class="stats"><span><b>${d.presOvr}</b> OVR</span><span><b>${d.presOvr>=80?'A':d.presOvr>=70?'B':'C'}</b> Tier</span><span><b>${d.lid}</b> lid.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ctx-section">
+      <h3>Sentinela · 24h em ${u.id}</h3>
+      <div class="list">
+        ${d.alertas >= 5 ? `<div class="list-row alta"><div class="ico alta">!</div><div class="body"><b>Alertas críticos · ${d.alertas}</b><span>Risco jurídico ou interno</span></div><span class="when">24h</span></div>` : ''}
+        ${d.eventos >= 8 ? `<div class="list-row opo"><div class="ico opo">★</div><div class="body"><b>${d.eventos} eventos agendados</b><span>+30 dias · agenda partidária</span></div><span class="when">+30d</span></div>` : ''}
+        <div class="list-row media"><div class="ico media">⚡</div><div class="body"><b>${d.lid} lideranças mapeadas</b><span>OVR ≥ 75 · escala territorial</span></div><span class="when">live</span></div>
+        ${d.vencedor ? '' : `<div class="list-row alta"><div class="ico alta">↓</div><div class="body"><b>Aliado UB perdeu eleição executiva</b><span>Strat: recuperação 2028</span></div><span class="when">2022</span></div>`}
+      </div>
+    </div>
+
+    <div class="ctx-section">
+      <h3>Ações Sugeridas</h3>
+      <div class="list">
+        <div class="list-row opo"><div class="ico opo">+</div><div class="body"><b>Criar operação territorial em ${u.id}</b><span>Wizard 6 passos · partido + diretório</span></div><span class="when">›</span></div>
+        <div class="list-row"><div class="ico">≡</div><div class="body"><b>Ranking dos ${u.mun} municípios</b><span>OVR Pres. Municipais ordenado</span></div><span class="when">›</span></div>
+        <div class="list-row"><div class="ico">📋</div><div class="body"><b>Briefing executivo · ${u.id}</b><span>PDF pronto · 12 págs</span></div><span class="when">›</span></div>
+      </div>
+    </div>
+  `;
+}
+
+/* ============================================================
+   3 MODOS PRÉ-CONFIGURADOS · decisão César 27/04
+   ------------------------------------------------------------
+   Não toggles. Cada modo responde a UMA pergunta executiva e
+   já vem com as camadas certas combinadas. Modo Avançado abre
+   pra técnicos (Tesoureiro, Sec-Geral) que querem explorar.
+   ============================================================ */
+const MODES = [
+  {
+    id: 'saude',
+    titulo: 'Saúde Operacional',
+    pergunta: 'Onde o partido está vivo, e onde está morto?',
+    camadas: 'Score Nominatas (cor) + densidade de cabos',
+    base: 'cobertura',
+    extras: ['lideres'],
+    accent: '#34d399',
+  },
+  {
+    id: 'dinheiro',
+    titulo: 'Fluxo de Dinheiro',
+    pergunta: 'Pra onde o dinheiro está indo?',
+    camadas: 'Heat map Emendas (cor) + autores principais',
+    base: 'heatmap',
+    extras: ['eventos'],
+    accent: '#FFCC00',
+  },
+  {
+    id: 'compliance',
+    titulo: 'Compliance',
+    pergunta: 'Onde tenho problema?',
+    camadas: 'Cruzamento: nominata fraca + emendas altas = vermelho',
+    base: 'risco',
+    extras: ['lideres', 'eventos'],
+    accent: '#dc2626',
+    critico: true,
+  },
+];
+
+let activeMode = 'saude';
+let advancedOpen = false;
+
+function renderModes() {
+  const el = document.getElementById('modeList');
+  el.innerHTML = MODES.map(m => `
+    <div class="layer ${activeMode === m.id ? 'active' : ''}" data-mode="${m.id}"
+         style="grid-template-columns: 6px 1fr auto; padding:10px 12px; align-items:flex-start;">
+      <span class="swatch" style="
+        background:${m.accent};
+        width:6px; height:38px; border-radius:3px;
+        ${m.critico ? 'box-shadow: 0 0 8px ' + m.accent + ';' : ''}
+      "></span>
+      <div class="name" style="line-height:1.35">
+        <b style="font-size:12px; color:var(--mz-fg-strong); display:block; margin-bottom:2px">${m.titulo}</b>
+        <span style="font-size:10px; color:var(--mz-fg-muted); display:block; margin-bottom:4px; font-style:italic">"${m.pergunta}"</span>
+        <span style="font-size:9.5px; color:var(--mz-fg-faint); display:block; line-height:1.4">${m.camadas}</span>
+      </div>
+      <span class="check" style="margin-top:2px">${activeMode === m.id ? '●' : '○'}</span>
+    </div>
+  `).join('');
+
+  el.querySelectorAll('[data-mode]').forEach(node => {
+    node.addEventListener('click', () => {
+      activeMode = node.dataset.mode;
+      const m = MODES.find(x => x.id === activeMode);
+      activeBase = m.base;
+      activeExtras = new Set(m.extras);
+      document.getElementById('mapSvg').dataset.layer = activeBase;
+      renderModes();
+      renderLayers();
+      renderMap();
+      renderLegend();
+      // sincroniza count no header avançado
+      const h = document.querySelector('#extraLayers')?.previousElementSibling;
+      if (h) h.textContent = `Adicionais · ${activeExtras.size} de 4 ativas`;
+    });
+  });
+}
+
+document.getElementById('advToggle').addEventListener('click', () => {
+  advancedOpen = !advancedOpen;
+  document.getElementById('advSection').style.display = advancedOpen ? 'block' : 'none';
+  document.getElementById('advToggle').textContent = advancedOpen
+    ? '× fechar modo avançado'
+    : '⚙  modo avançado';
+});
+
+// inicializa com Saúde Operacional aplicado
+(function bootMode() {
+  const m = MODES.find(x => x.id === activeMode);
+  activeBase = m.base;
+  activeExtras = new Set(m.extras);
+})();
+
+renderModes();
+renderLayers();
+renderMap();
+renderContext();
+renderLegend();
+</script>
+</body>
+</html>

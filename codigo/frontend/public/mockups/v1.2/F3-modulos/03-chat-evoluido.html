@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark" data-tenant="ub">
+<head>
+<meta charset="UTF-8">
+<title>Chat · UB</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../F1-fundacao/tokens.css">
+<script src="../F1-fundacao/theme-bootstrap.js"></script>
+<style>
+html, body { height: 100%; margin: 0; overflow: hidden; }
+.app { display: grid; grid-template-columns: 280px 320px 1fr; height: 100vh; }
+
+/* ============== LEFT: MODES ============== */
+.modes-rail {
+  background: var(--mz-bg-sidebar);
+  border-right: 1px solid var(--mz-rule);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.brand {
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--mz-rule);
+  display: flex; align-items: center; gap: 10px;
+}
+.brand .logo {
+  width: 32px; height: 32px;
+  background: var(--mz-tenant-primary);
+  border: 1px solid var(--mz-tenant-accent);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  color: var(--mz-tenant-accent);
+  font-size: 14px;
+}
+.brand .name { font-size: 13px; font-weight: 800; color: var(--mz-fg-strong); }
+.brand .name span { display: block; font-size: 9px; color: var(--mz-fg-faint); font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; margin-top: 1px; }
+
+.mode-pick {
+  padding: 14px;
+  display: flex; flex-direction: column; gap: 6px;
+  border-bottom: 1px solid var(--mz-rule);
+}
+.mode-pick .lbl {
+  font-size: 9.5px; letter-spacing: 0.16em;
+  color: var(--mz-fg-faint); text-transform: uppercase;
+  font-weight: 700; padding: 0 4px 4px;
+}
+.mode-btn {
+  display: grid; grid-template-columns: 32px 1fr auto;
+  gap: 10px; align-items: center;
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  border-radius: var(--mz-r-md);
+  padding: 10px 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 120ms;
+  color: var(--mz-fg);
+}
+.mode-btn:hover { border-color: var(--mz-fg-faint); }
+.mode-btn .ico {
+  width: 32px; height: 32px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  background: var(--mz-bg-elevated);
+  color: var(--mz-fg);
+}
+.mode-btn b { font-size: 12.5px; font-weight: 700; color: var(--mz-fg-strong); display: block; }
+.mode-btn span { font-size: 10.5px; color: var(--mz-fg-muted); }
+.mode-btn .qty {
+  font-family: var(--mz-font-mono); font-size: 9.5px;
+  background: var(--mz-bg-elevated);
+  color: var(--mz-fg-faint);
+  padding: 1px 5px; border-radius: 3px;
+  font-weight: 700;
+}
+
+.mode-btn.permanente.active {
+  background: linear-gradient(135deg, var(--mz-tenant-primary), var(--mz-tenant-primary-strong));
+  border-color: var(--mz-tenant-accent);
+}
+.mode-btn.permanente.active .ico { background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent); }
+.mode-btn.permanente.active b, .mode-btn.permanente.active span { color: #fff; }
+.mode-btn.permanente.active span { color: rgba(255,255,255,0.75); }
+.mode-btn.permanente.active .qty { background: rgba(0,0,0,0.3); color: #FFCC00; }
+
+.mode-btn.sigiloso.active {
+  background: linear-gradient(135deg, #1a0033, #3d0066);
+  border-color: #a855f7;
+  color: #fff;
+}
+.mode-btn.sigiloso.active .ico { background: #7c3aed; color: #fff; }
+.mode-btn.sigiloso.active b { color: #fff; }
+.mode-btn.sigiloso.active span { color: #d8b4fe; }
+.mode-btn.sigiloso.active .qty { background: rgba(0,0,0,0.4); color: #d8b4fe; }
+
+.mode-btn.sos.active {
+  background: linear-gradient(135deg, #7f1d1d, #991b1b);
+  border-color: #fca5a5;
+}
+.mode-btn.sos.active .ico { background: #dc2626; color: #fff; animation: pulseRed 1.4s ease infinite; }
+.mode-btn.sos.active b { color: #fff; }
+.mode-btn.sos.active span { color: #fecaca; }
+.mode-btn.sos.active .qty { background: rgba(0,0,0,0.4); color: #fecaca; }
+@keyframes pulseRed { 0%,100%{box-shadow: 0 0 0 0 #dc2626} 50%{box-shadow: 0 0 0 6px transparent} }
+
+.mode-features {
+  padding: 14px; flex: 1; overflow-y: auto;
+}
+.mode-features h4 {
+  font-size: 9.5px; letter-spacing: 0.16em;
+  color: var(--mz-fg-faint); text-transform: uppercase;
+  font-weight: 700; margin: 0 0 10px;
+}
+.feat-row {
+  display: grid; grid-template-columns: 14px 1fr;
+  gap: 10px; padding: 6px 0;
+  font-size: 11.5px;
+  color: var(--mz-fg);
+  border-bottom: 1px dashed var(--mz-rule);
+}
+.feat-row:last-child { border-bottom: 0; }
+.feat-row .ck {
+  width: 14px; height: 14px;
+  border-radius: 3px;
+  background: var(--mz-bg-elevated);
+  color: var(--mz-fg-faint);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px;
+}
+.feat-row.on .ck { background: var(--mz-ok); color: #fff; }
+.feat-row.crit .ck { background: var(--mz-danger); color: #fff; }
+.feat-row b { color: var(--mz-fg-strong); font-weight: 600; }
+.feat-row span { display: block; color: var(--mz-fg-faint); font-size: 10.5px; }
+
+/* ============== CENTER: CONVERSATIONS LIST ============== */
+.conv-list {
+  background: var(--mz-bg-card);
+  border-right: 1px solid var(--mz-rule);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.cl-head {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--mz-rule);
+  background: var(--mz-bg-card-2);
+}
+.cl-head .ttl {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 8px;
+}
+.cl-head .ttl b {
+  font-size: 14px; font-weight: 800;
+  color: var(--mz-fg-strong);
+  letter-spacing: -0.01em;
+}
+.cl-head .ttl .new {
+  font-size: 10px; font-weight: 700;
+  background: var(--mz-tenant-accent);
+  color: var(--mz-fg-on-accent);
+  border: 0;
+  padding: 4px 10px;
+  border-radius: var(--mz-r-pill);
+  cursor: pointer;
+}
+.cl-head .search {
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  border-radius: var(--mz-r-md);
+  padding: 6px 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.cl-head .search input {
+  flex: 1; background: none; border: 0;
+  font-size: 11.5px; color: var(--mz-fg);
+  outline: none;
+}
+.cl-head .search input::placeholder { color: var(--mz-fg-faint); }
+
+.cl-tabs {
+  display: flex; gap: 2px;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--mz-rule);
+  background: var(--mz-bg-card-2);
+}
+.cl-tab {
+  font-size: 10.5px; font-weight: 600;
+  padding: 5px 10px;
+  background: none; border: 0; color: var(--mz-fg-muted);
+  border-radius: var(--mz-r-sm);
+  cursor: pointer;
+}
+.cl-tab.active { background: var(--mz-bg-elevated); color: var(--mz-fg-strong); }
+
+.cl-scroll { flex: 1; overflow-y: auto; }
+.cl-scroll::-webkit-scrollbar { width: 4px; }
+.cl-scroll::-webkit-scrollbar-thumb { background: var(--mz-rule-strong); }
+
+.conv {
+  display: grid; grid-template-columns: 40px 1fr auto;
+  gap: 10px; padding: 12px 14px;
+  border-bottom: 1px solid var(--mz-rule);
+  cursor: pointer;
+  align-items: start;
+}
+.conv:hover { background: var(--mz-bg-card-2); }
+.conv.active { background: var(--mz-tenant-primary-soft); border-left: 3px solid var(--mz-tenant-accent); padding-left: 11px; }
+.conv .av {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--mz-tenant-primary);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 15px;
+  color: var(--mz-tenant-accent);
+  position: relative;
+}
+.conv .av .badge {
+  position: absolute;
+  bottom: -2px; right: -2px;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--mz-bg-card);
+  font-size: 8px;
+  display: flex; align-items: center; justify-content: center;
+}
+.conv .av .badge.lock { background: #7c3aed; color: #fff; }
+.conv .av .badge.sos { background: #dc2626; color: #fff; }
+.conv .av .badge.online { background: var(--mz-ok); }
+.conv .body { min-width: 0; }
+.conv .body .row1 {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px;
+}
+.conv .body b {
+  font-size: 12.5px; font-weight: 700;
+  color: var(--mz-fg-strong);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.conv .body .when {
+  font-family: var(--mz-font-mono); font-size: 10px;
+  color: var(--mz-fg-faint);
+  flex-shrink: 0;
+}
+.conv .body .preview {
+  font-size: 11.5px; color: var(--mz-fg-muted);
+  margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.conv .body .meta {
+  font-size: 10px; color: var(--mz-fg-faint);
+  margin-top: 3px;
+  display: flex; gap: 8px; align-items: center;
+}
+.conv .body .meta .pill {
+  background: var(--mz-bg-elevated);
+  padding: 1px 5px; border-radius: 3px;
+  font-size: 9px; letter-spacing: 0.06em;
+  font-weight: 700; text-transform: uppercase;
+}
+.conv .body .meta .pill.sigil { background: #7c3aed26; color: #d8b4fe; border: 1px solid #7c3aed44; }
+.conv .body .meta .pill.sos { background: #dc262626; color: #fca5a5; border: 1px solid #dc262644; }
+.conv .body .meta .pill.op { background: var(--mz-tenant-primary-soft); color: var(--mz-tenant-accent); }
+.conv .right { display: flex; flex-direction: column; align-items: end; gap: 4px; }
+.conv .right .unread {
+  background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent);
+  font-family: var(--mz-font-mono);
+  font-size: 9.5px; font-weight: 800;
+  padding: 1px 5px; border-radius: 8px;
+  min-width: 16px; text-align: center;
+}
+.conv .right .unread.sos { background: #dc2626; color: #fff; animation: pulseRed 1.4s ease infinite; }
+
+/* ============== RIGHT: CHAT ============== */
+.chat {
+  display: flex; flex-direction: column;
+  background: var(--mz-bg-page);
+  position: relative;
+  overflow: hidden;
+}
+
+.chat-mode-banner {
+  display: none;
+  position: absolute; top: 0; left: 0; right: 0;
+  z-index: 5;
+  padding: 8px 24px;
+  text-align: center;
+  font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+}
+[data-mode="sigiloso"] .chat-mode-banner.sigil {
+  display: block;
+  background: linear-gradient(90deg, #2d0050, #3d0066, #2d0050);
+  color: #d8b4fe;
+  border-bottom: 1px solid #7c3aed;
+}
+[data-mode="sos"] .chat-mode-banner.sos {
+  display: block;
+  background: linear-gradient(90deg, #7f1d1d, #991b1b, #7f1d1d);
+  color: #fecaca;
+  border-bottom: 1px solid #dc2626;
+}
+
+.chat-header {
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--mz-rule);
+  background: var(--mz-bg-card);
+  display: flex; align-items: center; gap: 14px;
+  margin-top: 0;
+}
+[data-mode="sigiloso"] .chat-header { margin-top: 28px; background: #1a0033; border-bottom-color: #4c1d95; }
+[data-mode="sos"] .chat-header { margin-top: 28px; background: #1a0808; border-bottom-color: #7f1d1d; }
+
+.chat-header .av {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--mz-tenant-primary);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 17px;
+  color: var(--mz-tenant-accent);
+  flex-shrink: 0;
+}
+.chat-header .info { flex: 1; min-width: 0; }
+.chat-header .info b {
+  font-size: 15px; font-weight: 800;
+  color: var(--mz-fg-strong);
+  letter-spacing: -0.01em;
+  display: block;
+}
+[data-mode="sigiloso"] .chat-header .info b,
+[data-mode="sos"] .chat-header .info b { color: #fff; }
+.chat-header .info .sub {
+  font-size: 11px; color: var(--mz-fg-muted);
+  display: flex; gap: 12px; align-items: center;
+  margin-top: 2px;
+}
+.chat-header .info .sub .pill {
+  font-size: 9.5px; font-weight: 700;
+  padding: 2px 6px; border-radius: 3px;
+  background: var(--mz-bg-elevated);
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+[data-mode="sigiloso"] .chat-header .info .sub .pill { background: #4c1d9540; color: #d8b4fe; }
+[data-mode="sos"] .chat-header .info .sub .pill { background: #7f1d1d40; color: #fecaca; }
+
+.chat-actions { display: flex; gap: 6px; }
+.chat-actions button {
+  width: 36px; height: 36px;
+  background: var(--mz-bg-card-2);
+  border: 1px solid var(--mz-rule);
+  color: var(--mz-fg);
+  border-radius: var(--mz-r-md);
+  font-size: 14px;
+  cursor: pointer;
+}
+.chat-actions button:hover { background: var(--mz-bg-elevated); }
+.chat-actions button.danger { background: #7f1d1d40; border-color: #dc2626; color: #fca5a5; }
+
+/* messages area */
+.msgs {
+  flex: 1; overflow-y: auto;
+  padding: 24px;
+  display: flex; flex-direction: column;
+  gap: 16px;
+  position: relative;
+}
+.msgs::-webkit-scrollbar { width: 6px; }
+.msgs::-webkit-scrollbar-thumb { background: var(--mz-rule-strong); }
+
+[data-mode="sigiloso"] .msgs {
+  background:
+    radial-gradient(ellipse 600px 400px at 50% -100px, #4c1d9520, transparent),
+    #110022;
+}
+[data-mode="sigiloso"] .msgs::after {
+  /* watermark */
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    repeating-linear-gradient(45deg, transparent, transparent 60px, rgba(168, 85, 247, 0.03) 60px, rgba(168, 85, 247, 0.03) 61px);
+  pointer-events: none;
+}
+[data-mode="sigiloso"] .msgs::before {
+  content: 'SIGILOSO · M.LEITE · 09:14:23 · 187.X.X.42';
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg);
+  font-family: var(--mz-font-mono);
+  font-size: 24px; font-weight: 700;
+  color: rgba(216, 180, 254, 0.06);
+  letter-spacing: 0.10em;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+[data-mode="sos"] .msgs {
+  background:
+    radial-gradient(ellipse 600px 400px at 50% -100px, #dc262620, transparent),
+    #1a0808;
+}
+
+/* date divider */
+.date-div {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 10px; letter-spacing: 0.14em;
+  color: var(--mz-fg-faint);
+  font-weight: 700;
+  margin: 8px 0 4px;
+  text-transform: uppercase;
+}
+.date-div::before, .date-div::after {
+  content: ''; flex: 1; height: 1px;
+  background: var(--mz-rule);
+}
+
+/* message bubbles */
+.msg {
+  display: grid; grid-template-columns: 32px 1fr;
+  gap: 10px; align-items: start;
+  max-width: 720px;
+}
+.msg.me {
+  grid-template-columns: 1fr 32px;
+  margin-left: auto;
+}
+.msg .av {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--mz-tenant-primary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700;
+  font-family: 'Bebas Neue', sans-serif;
+  color: var(--mz-tenant-accent);
+  flex-shrink: 0;
+}
+.msg .av.system { background: var(--mz-bg-elevated); color: var(--mz-fg-faint); font-size: 13px; }
+.msg .bubble {
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 13px; color: var(--mz-fg);
+  line-height: 1.5;
+}
+.msg.me .bubble {
+  background: var(--mz-tenant-primary);
+  color: #fff;
+  border-color: var(--mz-tenant-primary-strong);
+  text-align: left;
+}
+.msg .bubble .author {
+  font-size: 11px; font-weight: 700;
+  color: var(--mz-tenant-accent);
+  margin-bottom: 4px;
+  display: flex; gap: 8px; align-items: center;
+}
+.msg.me .bubble .author { color: #FFCC00; }
+.msg .bubble .author .when {
+  font-family: var(--mz-font-mono); font-size: 10px;
+  color: var(--mz-fg-faint); font-weight: 500;
+}
+.msg.me .bubble .author .when { color: rgba(255,255,255,0.6); }
+
+[data-mode="sigiloso"] .msg .bubble {
+  background: #1f0040;
+  border-color: #4c1d95;
+  color: #f3e8ff;
+}
+[data-mode="sigiloso"] .msg.me .bubble {
+  background: #6d28d9;
+  border-color: #7c3aed;
+}
+[data-mode="sigiloso"] .msg .bubble .author { color: #d8b4fe; }
+
+[data-mode="sos"] .msg .bubble {
+  background: #2a0606;
+  border-color: #7f1d1d;
+  color: #fecaca;
+}
+[data-mode="sos"] .msg.me .bubble {
+  background: #991b1b;
+  border-color: #dc2626;
+  color: #fff;
+}
+
+/* expiring message in sigiloso */
+.msg-expire {
+  display: flex; gap: 6px; align-items: center;
+  font-size: 9.5px; color: var(--mz-fg-faint);
+  margin-top: 6px;
+  font-family: var(--mz-font-mono);
+}
+[data-mode="sigiloso"] .msg-expire { color: #d8b4fe; }
+.msg-expire .timer {
+  width: 32px; height: 4px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px; overflow: hidden;
+}
+.msg-expire .timer > span {
+  display: block; height: 100%;
+  background: #ef4444;
+  width: 38%;
+}
+.msg-expire.expired { color: var(--mz-danger); }
+.msg-expired-stub {
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px dashed #7f1d1d;
+  padding: 8px 14px;
+  border-radius: 12px;
+  font-size: 11.5px;
+  color: #fca5a5;
+  font-style: italic;
+  display: inline-flex; gap: 8px; align-items: center;
+}
+
+/* message attachment */
+.msg-attach {
+  background: var(--mz-bg-card-2);
+  border: 1px solid var(--mz-rule);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-top: 8px;
+  display: grid; grid-template-columns: 36px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  font-size: 12px;
+}
+.msg-attach .ico {
+  width: 36px; height: 36px;
+  background: var(--mz-tenant-accent);
+  color: var(--mz-fg-on-accent);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 12px;
+}
+.msg-attach b { color: var(--mz-fg-strong); display: block; font-weight: 600; }
+.msg-attach span { color: var(--mz-fg-faint); font-size: 10.5px; }
+
+/* system message */
+.msg-system {
+  background: var(--mz-bg-card-2);
+  border: 1px dashed var(--mz-rule-strong);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 11px;
+  color: var(--mz-fg-muted);
+  margin: 0 auto;
+  display: inline-flex; gap: 8px; align-items: center;
+  width: fit-content;
+}
+
+/* sos card */
+.sos-card {
+  background: linear-gradient(135deg, #7f1d1d, #991b1b);
+  border: 2px solid #dc2626;
+  border-radius: 14px;
+  padding: 16px 20px;
+  color: #fff;
+  max-width: 560px;
+}
+.sos-card .head {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 12px;
+}
+.sos-card .pulse {
+  width: 36px; height: 36px;
+  background: #dc2626;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  animation: pulseRed 1.4s ease infinite;
+}
+.sos-card h3 {
+  margin: 0; font-size: 15px; font-weight: 800;
+  letter-spacing: 0.04em;
+}
+.sos-card h3 span { display: block; font-size: 10px; color: #fecaca; font-weight: 600; letter-spacing: 0.10em; margin-top: 2px; }
+.sos-card .info {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  font-size: 11.5px;
+  margin-bottom: 12px;
+}
+.sos-card .info > div {
+  background: rgba(0,0,0,0.25);
+  padding: 8px 10px;
+  border-radius: 6px;
+}
+.sos-card .info .lbl { font-size: 9px; color: #fca5a5; letter-spacing: 0.10em; text-transform: uppercase; font-weight: 700; }
+.sos-card .info b { color: #fff; font-weight: 700; }
+.sos-card .actions { display: flex; gap: 6px; }
+.sos-card .actions button {
+  flex: 1;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid #fca5a5;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 11px; font-weight: 700;
+  cursor: pointer;
+}
+.sos-card .actions button.primary {
+  background: #fff; color: #7f1d1d;
+  border-color: #fff;
+}
+
+/* composer */
+.composer {
+  border-top: 1px solid var(--mz-rule);
+  padding: 12px 18px;
+  background: var(--mz-bg-card);
+  display: flex; gap: 10px;
+  align-items: end;
+}
+[data-mode="sigiloso"] .composer { background: #1a0033; border-color: #4c1d95; }
+[data-mode="sos"] .composer { background: #1a0808; border-color: #7f1d1d; }
+
+.composer .tools { display: flex; gap: 6px; }
+.composer .tools button {
+  width: 36px; height: 36px;
+  background: var(--mz-bg-card-2);
+  border: 1px solid var(--mz-rule);
+  color: var(--mz-fg);
+  border-radius: var(--mz-r-md);
+  font-size: 14px;
+  cursor: pointer;
+}
+.composer textarea {
+  flex: 1; min-height: 40px; max-height: 160px;
+  background: var(--mz-bg-card-2);
+  border: 1px solid var(--mz-rule);
+  border-radius: var(--mz-r-md);
+  padding: 10px 14px;
+  font-family: var(--mz-font-sans);
+  font-size: 13px;
+  color: var(--mz-fg);
+  outline: none;
+  resize: none;
+}
+[data-mode="sigiloso"] .composer textarea { background: #2d0050; border-color: #4c1d95; color: #f3e8ff; }
+[data-mode="sos"] .composer textarea { background: #2a0606; border-color: #7f1d1d; color: #fff; }
+
+.composer .send {
+  background: var(--mz-tenant-primary);
+  border: 1px solid var(--mz-tenant-primary-strong);
+  color: #fff;
+  padding: 10px 18px;
+  font-size: 12.5px; font-weight: 700;
+  border-radius: var(--mz-r-md);
+  cursor: pointer;
+  display: flex; gap: 6px; align-items: center;
+}
+.composer .send:hover { background: var(--mz-tenant-primary-strong); }
+[data-mode="sigiloso"] .composer .send {
+  background: #7c3aed;
+  border-color: #a855f7;
+}
+[data-mode="sigiloso"] .composer .send::before { content: '🔒 '; }
+[data-mode="sos"] .composer .send {
+  background: #dc2626;
+  border-color: #ef4444;
+}
+[data-mode="sos"] .composer .send::before { content: '🚨 '; }
+
+.composer-meta {
+  font-size: 10px; color: var(--mz-fg-faint);
+  letter-spacing: 0.06em;
+  display: flex; gap: 12px;
+  align-items: center;
+}
+.composer-row-meta {
+  padding: 0 18px 8px;
+  background: var(--mz-bg-card);
+  font-size: 10px;
+  color: var(--mz-fg-faint);
+  letter-spacing: 0.04em;
+  display: flex; gap: 18px;
+  align-items: center;
+}
+[data-mode="sigiloso"] .composer-row-meta { background: #1a0033; color: #d8b4fe; }
+[data-mode="sos"] .composer-row-meta { background: #1a0808; color: #fca5a5; }
+.composer-row-meta b { color: var(--mz-fg); font-weight: 700; }
+[data-mode="sigiloso"] .composer-row-meta b { color: #f3e8ff; }
+[data-mode="sos"] .composer-row-meta b { color: #fff; }
+.composer-row-meta .toggle {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 8px;
+  background: var(--mz-bg-card-2);
+  border-radius: var(--mz-r-pill);
+  cursor: pointer;
+}
+.composer-row-meta .toggle .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--mz-fg-faint);
+}
+.composer-row-meta .toggle.on .dot { background: var(--mz-ok); box-shadow: 0 0 6px var(--mz-ok); }
+[data-mode="sigiloso"] .composer-row-meta .toggle .dot { background: #ef4444; box-shadow: 0 0 6px #ef4444; }
+
+</style>
+</head>
+<body>
+
+<div class="app" id="app" data-mode="permanente">
+
+  <!-- ============== LEFT RAIL: MODOS ============== -->
+  <aside class="modes-rail">
+    <div class="brand">
+      <div class="logo">UB</div>
+      <div class="name">Mazzel · UB<span>Comunicação Interna</span></div>
+    </div>
+
+    <div class="mode-pick">
+      <div class="lbl">Modo de Conversa</div>
+      <button class="mode-btn permanente active" data-set-mode="permanente">
+        <span class="ico">💬</span>
+        <div><b>Permanente</b><span>Histórico auditável · LGPD</span></div>
+        <span class="qty">142</span>
+      </button>
+      <button class="mode-btn sigiloso" data-set-mode="sigiloso">
+        <span class="ico">🔒</span>
+        <div><b>Sigiloso</b><span>E2EE · auto-destrói</span></div>
+        <span class="qty">14</span>
+      </button>
+      <button class="mode-btn sos" data-set-mode="sos">
+        <span class="ico">🚨</span>
+        <div><b>SOS Cabo</b><span>Pânico territorial · 24/7</span></div>
+        <span class="qty">3</span>
+      </button>
+    </div>
+
+    <div class="mode-features" id="features"></div>
+  </aside>
+
+  <!-- ============== CONVERSATIONS ============== -->
+  <section class="conv-list">
+    <div class="cl-head">
+      <div class="ttl">
+        <b id="convTitle">Conversas Permanentes</b>
+        <button class="new">+ Nova</button>
+      </div>
+      <div class="search">
+        <span style="color: var(--mz-fg-faint); font-size: 12px">🔍</span>
+        <input placeholder="Buscar pessoa, grupo, mensagem..." />
+      </div>
+    </div>
+    <div class="cl-tabs">
+      <button class="cl-tab active">Todas</button>
+      <button class="cl-tab">DM</button>
+      <button class="cl-tab">Grupos</button>
+      <button class="cl-tab">Operações</button>
+      <button class="cl-tab">Não-lidas</button>
+    </div>
+    <div class="cl-scroll" id="convScroll"></div>
+  </section>
+
+  <!-- ============== CHAT ============== -->
+  <main class="chat" id="chat">
+
+    <div class="chat-mode-banner sigil">
+      🔒 MODO SIGILOSO · E2EE · Mensagens expiram em 24h · Print bloqueado · Watermark ativo
+    </div>
+    <div class="chat-mode-banner sos">
+      🚨 SOS CABO · ESCALADO ATÉ ENCERRAMENTO · Coord. Operação + Jurídico + Segurança notificados · Localização em tempo real
+    </div>
+
+    <header class="chat-header">
+      <div class="av" id="chHeadAv">JM</div>
+      <div class="info">
+        <b id="chHeadName">João Mendes</b>
+        <div class="sub">
+          <span id="chHeadSub">Cabo · Capão Redondo · OP-2026-014</span>
+          <span class="pill" id="chHeadPill">PERMANENTE</span>
+        </div>
+      </div>
+      <div class="chat-actions">
+        <button title="Buscar">🔍</button>
+        <button title="Anexar">📎</button>
+        <button title="Vídeo">📹</button>
+        <button title="Ligar">📞</button>
+        <button title="Mais">⋯</button>
+      </div>
+    </header>
+
+    <div class="msgs" id="msgs"></div>
+
+    <div class="composer-row-meta" id="compMeta"></div>
+
+    <footer class="composer">
+      <div class="tools">
+        <button title="Anexar">📎</button>
+        <button title="Foto">📷</button>
+        <button title="Áudio">🎤</button>
+      </div>
+      <textarea placeholder="Mensagem para João Mendes..." id="compInput"></textarea>
+      <button class="send" id="sendBtn"><span id="sendLabel">Enviar</span></button>
+    </footer>
+  </main>
+
+</div>
+
+<script>
+/* ============================================================
+   MODE TOGGLE
+   ============================================================ */
+const app = document.getElementById('app');
+
+const FEATURES = {
+  permanente: {
+    title: 'Recursos · Permanente',
+    items: [
+      { on: true, b: 'Histórico ilimitado', s: 'Tudo gravado · auditável' },
+      { on: true, b: 'Pesquisa full-text', s: 'Inclusive anexos OCR' },
+      { on: true, b: 'LGPD-compliant', s: 'Consentimento + retenção' },
+      { on: true, b: 'Auditoria por DPO', s: 'Logs imutáveis · jurídico' },
+      { on: true, b: 'Anexos ilimitados', s: 'Docs, áudio, foto, vídeo' },
+      { on: false, b: 'Auto-destruição', s: 'Indisponível neste modo' },
+      { on: false, b: 'Print bloqueado', s: 'Indisponível neste modo' },
+    ],
+  },
+  sigiloso: {
+    title: 'Recursos · Sigiloso',
+    items: [
+      { on: true, b: 'E2EE · Signal protocol', s: 'Servidor sem chaves' },
+      { on: true, b: 'Auto-destruição 24h', s: 'Mensagem some dos 2 lados' },
+      { on: true, b: 'Print bloqueado', s: 'Tela apaga ao detectar' },
+      { on: true, b: 'Watermark dinâmica', s: 'Username + IP + hora' },
+      { on: true, b: 'Sem encaminhamento', s: 'Sem copiar texto' },
+      { on: true, b: 'Sem backup em nuvem', s: 'Apenas dispositivo' },
+      { on: false, b: 'Pesquisa de mensagens', s: 'Off por design' },
+      { on: false, b: 'Auditoria pelo DPO', s: 'Não acessível' },
+    ],
+  },
+  sos: {
+    title: 'Recursos · SOS Cabo',
+    items: [
+      { crit: true, b: 'Escalada automática', s: 'Coord + Jurídico + Seg' },
+      { crit: true, b: 'Localização em tempo real', s: 'Cabo é geolocalizado' },
+      { crit: true, b: 'Áudio direto · sirene', s: 'Toca em todos os celulares' },
+      { on: true, b: 'Histórico forense', s: 'Gravado para denúncia/BO' },
+      { on: true, b: 'Botão chamar PM', s: 'Disca 190 do app' },
+      { on: true, b: 'Buddy automático', s: '3 cabos próximos notificados' },
+      { on: true, b: 'Trilha de áudio ativa', s: 'Microfone grava p/ contexto' },
+      { on: true, b: 'Encerramento manual', s: 'Só Coord. fecha o caso' },
+    ],
+  },
+};
+
+function renderFeatures(mode) {
+  const data = FEATURES[mode];
+  document.getElementById('features').innerHTML = `
+    <h4>${data.title}</h4>
+    ${data.items.map(i => `
+      <div class="feat-row ${i.on ? 'on' : ''} ${i.crit ? 'crit' : ''}">
+        <div class="ck">${i.crit ? '!' : i.on ? '✓' : '—'}</div>
+        <div><b>${i.b}</b><span>${i.s}</span></div>
+      </div>
+    `).join('')}
+  `;
+}
+
+document.querySelectorAll('[data-set-mode]').forEach(el => el.addEventListener('click', () => {
+  const m = el.dataset.setMode;
+  app.dataset.mode = m;
+  document.querySelectorAll('[data-set-mode]').forEach(b => b.classList.toggle('active', b.dataset.setMode === m));
+  renderFeatures(m);
+  document.getElementById('convTitle').textContent = m === 'sigiloso' ? 'Sigiloso · 14 ativos' : m === 'sos' ? 'SOS Cabo · 3 abertos' : 'Conversas Permanentes';
+  renderConversations(m);
+  // pick first conv default
+  const first = CONVS[m][0];
+  if (first) selectConv(first.id);
+}));
+
+/* ============================================================
+   CONVERSATIONS MOCK
+   ============================================================ */
+const CONVS = {
+  permanente: [
+    { id: 'p1', avatar: 'JM', name: 'João Mendes', sub: 'Cabo · Capão Redondo · OP-2026-014', preview: 'Beleza, mando o relatório das 23 ruas hoje à noite.', when: '09:14', online: true, unread: 0, tag: 'OP-014', active: true },
+    { id: 'p2', avatar: 'OP', name: 'OP-2026-014 · Coord. Geral', sub: 'Grupo · 12 membros · Capilarização SP', preview: 'Rita: Pessoal, reunião amanhã 10h confirmada?', when: '08:42', unread: 4, tag: 'OP-014' },
+    { id: 'p3', avatar: 'RT', name: 'Rita Tavares', sub: 'Líder Operação · OVR 94', preview: 'Recebido. Vou validar com Milton e te respondo.', when: '08:18', unread: 0 },
+    { id: 'p4', avatar: 'TS', name: 'Tesouraria UB', sub: 'Bot · Validações + Confirmações', preview: '✓ Despesa R$ 38.400 (eventos abr) APROVADA — comprovação ok', when: 'ontem', unread: 1 },
+    { id: 'p5', avatar: 'PS', name: 'Paula Silva', sub: 'Cabo · Cidade Ademar', preview: 'Marquei 38 fichas pra entregar amanhã. Foto anexa.', when: 'ontem', unread: 0 },
+    { id: 'p6', avatar: 'DN', name: 'Direção Nacional', sub: 'Grupo · 47 membros · Top brass', preview: 'Milton: Orientação para cabos sobre conduta TSE atualizada.', when: '23/abr', unread: 0, tag: 'OFICIAL' },
+    { id: 'p7', avatar: 'JD', name: 'Jurídico · Dra. Helena', sub: 'Compliance + LGPD', preview: 'Dra. Helena: Analisei o caso RO-001. Parecer no docs.', when: '22/abr', unread: 0 },
+  ],
+  sigiloso: [
+    { id: 's1', avatar: 'ML', name: 'Milton Leite', sub: 'Pres. Estadual SP', preview: '[mensagem expirada]', when: '09:04', unread: 1, tag: 'SIGIL', active: true },
+    { id: 's2', avatar: 'WG', name: 'Wagner BA', sub: 'Pres. Estadual BA · OVR 87', preview: '[criptografada · auto-destrói em 14h]', when: '07:22', unread: 0, tag: 'SIGIL' },
+    { id: 's3', avatar: 'DN', name: 'Núcleo Estratégico', sub: '5 membros · OVR ≥ 85', preview: '[mensagem cifrada]', when: 'ontem', unread: 2, tag: 'SIGIL' },
+    { id: 's4', avatar: 'AD', name: 'Advocacia · Dr. Ramos', sub: 'Operação Confidencial', preview: '[apenas leitura · expira em 6h]', when: '23/abr', unread: 0, tag: 'SIGIL' },
+  ],
+  sos: [
+    { id: 'x1', avatar: 'LR', name: 'Luiz Ribeiro · CABO', sub: '🚨 EM ESCALADA · M\'Boi Mirim · há 12 min', preview: 'SOS aberto · localização ativa · áudio gravando', when: 'AGORA', unread: 1, tag: 'SOS', active: true, sos: true },
+    { id: 'x2', avatar: 'CD', name: 'Carla Diniz · CABO', sub: 'Resolvido há 2h · BA · Periperi', preview: 'Cabo confirmou segurança · caso ENCERRADO pelo Coord.', when: '06:42', unread: 0, tag: 'SOS' },
+    { id: 'x3', avatar: 'AS', name: 'Antonio Santos · CABO', sub: 'Resolvido ontem · CE · Maracanaú', preview: 'Falso alarme · botão acionado por engano · ENCERRADO', when: '24/abr', unread: 0, tag: 'SOS' },
+  ],
+};
+
+function renderConversations(mode) {
+  const list = CONVS[mode];
+  document.getElementById('convScroll').innerHTML = list.map(c => `
+    <div class="conv ${c.active ? 'active' : ''}" data-id="${c.id}">
+      <div class="av">
+        ${c.avatar}
+        ${c.tag === 'SOS' ? '<div class="badge sos">!</div>' : ''}
+        ${c.tag === 'SIGIL' ? '<div class="badge lock">🔒</div>' : ''}
+        ${c.online ? '<div class="badge online"></div>' : ''}
+      </div>
+      <div class="body">
+        <div class="row1">
+          <b>${c.name}</b>
+          <span class="when">${c.when}</span>
+        </div>
+        <div class="preview">${c.preview}</div>
+        <div class="meta">
+          <span>${c.sub}</span>
+          ${c.tag === 'OP-014' ? '<span class="pill op">OP-014</span>' : ''}
+          ${c.tag === 'SIGIL' ? '<span class="pill sigil">E2EE</span>' : ''}
+          ${c.tag === 'SOS' && c.sos ? '<span class="pill sos">ATIVO</span>' : ''}
+          ${c.tag === 'OFICIAL' ? '<span class="pill" style="background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent);">OFICIAL</span>' : ''}
+        </div>
+      </div>
+      <div class="right">
+        ${c.unread > 0 ? `<span class="unread ${c.tag === 'SOS' ? 'sos' : ''}">${c.unread}</span>` : ''}
+      </div>
+    </div>
+  `).join('');
+
+  document.querySelectorAll('.conv').forEach(el => el.addEventListener('click', () => {
+    document.querySelectorAll('.conv').forEach(x => x.classList.remove('active'));
+    el.classList.add('active');
+    selectConv(el.dataset.id);
+  }));
+}
+
+/* ============================================================
+   MESSAGES PER MODE
+   ============================================================ */
+const MSGS = {
+  p1: [ // João Mendes (perm)
+    { type: 'date', val: 'TER · 23 ABR' },
+    { from: 'JM', name: 'João Mendes', when: '14:32', body: 'Bom dia, Coord. Acabei de fechar o levantamento da Vila Andrade — 23 ruas mapeadas, identifiquei 7 lideranças latentes que nunca filiaram.' },
+    { from: 'me', name: 'Você', when: '14:38', body: 'Excelente, João. Pode mandar a planilha?' },
+    { from: 'JM', name: 'João Mendes', when: '14:39', body: 'Mandei agora. Importante: 3 dessas 7 lideranças têm dúvida — pediram pra ouvir Milton diretamente.', attach: { ico: 'XLS', b: 'mapeamento-vila-andrade.xlsx', s: '32 KB · 23 ruas · 7 lid.' } },
+    { type: 'date', val: 'HOJE · 25 ABR' },
+    { type: 'system', val: '✓ Documento aprovado pelo Pres. Mun. · Milton Leite' },
+    { from: 'me', name: 'Você', when: '08:41', body: 'João, Milton confirma agenda dia 28 às 19h em Capão Redondo. Pode organizar local + encontro com as 7 lideranças?' },
+    { from: 'JM', name: 'João Mendes', when: '09:12', body: 'Confirmado. Vou usar o salão da igreja Bom Jesus, cabe 80 pessoas e fica central. Também adiciono mais 4 nomes que apareceram no fim de semana.' },
+    { from: 'JM', name: 'João Mendes', when: '09:14', body: 'Beleza, mando o relatório das 23 ruas hoje à noite.' },
+  ],
+  p2: [ // Grupo Operação
+    { type: 'date', val: 'HOJE · 25 ABR' },
+    { type: 'system', val: '👥 Rita Tavares adicionou Carla Diniz ao grupo' },
+    { from: 'RT', name: 'Rita Tavares · Líder', when: '08:38', body: 'Bom dia, equipe. Pequeno alinhamento: amanhã reunião 10h presencial no Diretório Municipal. Pauta: revisão Fase 4 + repactuação metas.' },
+    { from: 'JM', name: 'João Mendes', when: '08:40', body: 'Confirmado.' },
+    { from: 'PS', name: 'Paula Silva', when: '08:41', body: 'Confirmado.' },
+    { from: 'AF', name: 'André Fonseca', when: '08:42', body: 'Confirmado.' },
+    { from: 'RT', name: 'Rita Tavares · Líder', when: '08:42', body: 'Pessoal, reunião amanhã 10h confirmada?' },
+  ],
+  s1: [ // Sigiloso · Milton (com mensagens expiradas)
+    { type: 'date', val: 'HOJE · 25 ABR' },
+    { type: 'system', val: '🔒 Conversa criptografada · E2EE · Mensagens expiram em 24h · Print BLOQUEADO' },
+    { type: 'expired', val: 'Mensagem auto-destruída · 09:01' },
+    { from: 'ML', name: 'Milton Leite', when: '09:03', body: 'Confidencial: o nome para a chapa de 2026 ainda é o Pedro? Recebi sondagem do PSD oferecendo migração e quero entender nosso plano B.', expire: 0.78 },
+    { from: 'me', name: 'Você', when: '09:04', body: 'Confirmado o Pedro como nome principal. Plano B é Carla, mas ainda não está oficializada — só fala com você por enquanto.', expire: 0.85 },
+    { from: 'ML', name: 'Milton Leite', when: '09:04', body: 'Entendido. Faço a contraposta com PSD ainda hoje e travo a janela.', expire: 0.92 },
+    { type: 'expired', val: 'Mensagem auto-destruída · 09:14' },
+  ],
+  x1: [ // SOS Cabo (Luiz Ribeiro)
+    { type: 'date', val: 'HOJE · 25 ABR' },
+    { type: 'system', val: '🚨 SOS aberto às 09:02 · Cabo Luiz Ribeiro · M\'Boi Mirim · SP' },
+    { type: 'sos-card' },
+    { from: 'LR', name: 'Luiz Ribeiro · CABO', when: '09:03', body: 'Coord, situação tensa aqui. Grupo de 4 caras chegou no comício, falando agressivo. Tô com Carla e Bruno comigo, mas tô desconfortável.' },
+    { from: 'sys', name: 'Sistema', when: '09:03', body: '⚡ Escalada automática iniciada · Coord. Operação + Jurídico Local + Segurança · Notificados via push.', system: true },
+    { from: 'sys', name: 'Sistema', when: '09:04', body: '📍 Localização travada: M\'Boi Mirim · R. Augusto Carlos, 120 · pin enviado pra todos os notificados.', system: true },
+    { from: 'sys', name: 'Sistema', when: '09:04', body: '👥 3 cabos mais próximos identificados: Paulo Silva (180m), Rita Tavares (340m), Maria Souza (520m). Notificados.', system: true },
+    { from: 'me', name: 'Você (Coord.)', when: '09:05', body: 'Luiz, fica calmo. Paulo está chegando em 2 min. Já chamei a PM — código preto. Não saia do local. Mantém o áudio gravando.' },
+    { from: 'LR', name: 'Luiz Ribeiro · CABO', when: '09:06', body: 'Ok. Eles já tão indo embora. Acho que viram o áudio gravando.' },
+    { from: 'sys', name: 'Sistema', when: '09:07', body: '✓ PM acionada · viatura 12 a caminho · ETA 4 min', system: true },
+    { from: 'sys', name: 'Sistema', when: '09:08', body: '✓ Paulo Silva chegou ao local · cabo Luiz confirmou presença', system: true },
+    { from: 'me', name: 'Você (Coord.)', when: '09:14', body: 'Luiz, me confirma agora: tudo bem? Posso pedir encerramento do SOS?' },
+  ],
+};
+
+function selectConv(id) {
+  const m = app.dataset.mode;
+  const conv = CONVS[m].find(c => c.id === id) || CONVS[m][0];
+  document.getElementById('chHeadAv').textContent = conv.avatar;
+  document.getElementById('chHeadName').textContent = conv.name;
+  document.getElementById('chHeadSub').textContent = conv.sub;
+  document.getElementById('chHeadPill').textContent = m.toUpperCase();
+  document.getElementById('compInput').placeholder =
+    m === 'sigiloso' ? `Mensagem cifrada para ${conv.name.split('·')[0]}...` :
+    m === 'sos' ? `Resposta de coord. para ${conv.name.split('·')[0]}...` :
+    `Mensagem para ${conv.name.split('·')[0]}...`;
+  document.getElementById('sendLabel').textContent = m === 'sigiloso' ? 'Cifrar e enviar' : m === 'sos' ? 'Responder' : 'Enviar';
+
+  // composer meta
+  const meta = document.getElementById('compMeta');
+  if (m === 'permanente') {
+    meta.innerHTML = `
+      <span>Modo: <b>Permanente</b> · histórico auditável · LGPD</span>
+      <span>·</span>
+      <span>Anexos OK · sem expiração</span>
+      <span style="margin-left: auto">⌘ Enter para enviar</span>
+    `;
+  } else if (m === 'sigiloso') {
+    meta.innerHTML = `
+      <span>🔒 Cifrado · <b>E2EE Signal</b></span>
+      <span>·</span>
+      <span class="toggle on"><span class="dot"></span>Auto-destrói: <b>24h</b></span>
+      <span class="toggle on"><span class="dot"></span>Print: <b>BLOQUEADO</b></span>
+      <span class="toggle on"><span class="dot"></span>Watermark: <b>ATIVO</b></span>
+      <span style="margin-left: auto">Mensagem expira mesmo se você sair</span>
+    `;
+  } else {
+    meta.innerHTML = `
+      <span>🚨 SOS aberto · <b>Resposta de Coordenação</b></span>
+      <span>·</span>
+      <span>Tudo gravado para forense</span>
+      <span style="margin-left: auto">Para encerrar: botão "Encerrar SOS" no header</span>
+    `;
+  }
+
+  renderMsgs(id, m);
+}
+
+function renderMsgs(id, mode) {
+  const arr = MSGS[id] || [];
+  const html = arr.map(m => {
+    if (m.type === 'date') return `<div class="date-div">${m.val}</div>`;
+    if (m.type === 'system') return `<div class="msg-system">${m.val}</div>`;
+    if (m.type === 'expired') return `<div class="msg" style="grid-template-columns: 32px auto;"><div class="av system">⏱</div><div class="msg-expired-stub">${m.val}</div></div>`;
+    if (m.type === 'sos-card') {
+      return `<div class="sos-card">
+        <div class="head">
+          <div class="pulse">🚨</div>
+          <div>
+            <h3>SOS CABO ATIVO<span>aberto há 12 min · em escalada</span></h3>
+          </div>
+        </div>
+        <div class="info">
+          <div><div class="lbl">Cabo</div><b>Luiz Ribeiro</b></div>
+          <div><div class="lbl">Operação</div><b>OP-2026-014 · M'Boi Mirim</b></div>
+          <div><div class="lbl">Localização</div><b>R. Augusto Carlos, 120</b></div>
+          <div><div class="lbl">Áudio</div><b>🔴 GRAVANDO · 12:14 min</b></div>
+        </div>
+        <div class="actions">
+          <button>📞 Ligar PM (190)</button>
+          <button>📍 Ver mapa</button>
+          <button>🎧 Ouvir áudio</button>
+          <button class="primary">✓ Encerrar SOS</button>
+        </div>
+      </div>`;
+    }
+    if (m.system) {
+      return `<div class="msg" style="grid-template-columns: 32px 1fr;">
+        <div class="av system">⚡</div>
+        <div class="msg-system" style="margin: 0; background: var(--mz-bg-card-2); border-style: solid; border-color: var(--mz-rule); border-radius: 12px; padding: 8px 14px;">${m.body}</div>
+      </div>`;
+    }
+    const isMe = m.from === 'me';
+    return `<div class="msg ${isMe ? 'me' : ''}">
+      ${isMe ? '' : `<div class="av">${m.from}</div>`}
+      <div class="bubble">
+        <div class="author">${m.name}<span class="when">${m.when}</span></div>
+        ${m.body}
+        ${m.attach ? `<div class="msg-attach">
+          <div class="ico">${m.attach.ico}</div>
+          <div><b>${m.attach.b}</b><span>${m.attach.s}</span></div>
+          <button class="btn" style="background: var(--mz-bg-card); border: 1px solid var(--mz-rule); color: var(--mz-fg); padding: 5px 10px; border-radius: 4px; font-size: 10px; cursor: pointer;">↓</button>
+        </div>` : ''}
+        ${m.expire !== undefined ? `<div class="msg-expire"><span>⏱ expira em ${Math.round(24 - m.expire * 24)}h</span><div class="timer"><span style="width: ${m.expire * 100}%"></span></div></div>` : ''}
+      </div>
+      ${isMe ? `<div class="av">VC</div>` : ''}
+    </div>`;
+  }).join('');
+  document.getElementById('msgs').innerHTML = html;
+  // Scroll bottom
+  const ms = document.getElementById('msgs');
+  ms.scrollTop = ms.scrollHeight;
+}
+
+// init
+renderFeatures('permanente');
+renderConversations('permanente');
+selectConv('p1');
+</script>
+
+</body>
+</html>

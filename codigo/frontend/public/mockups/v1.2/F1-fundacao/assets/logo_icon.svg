@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" role="img" aria-label="UB 44">
+  <circle cx="40" cy="40" r="38" fill="#002A7B"></circle>
+  <ellipse cx="40" cy="40" rx="16" ry="38" fill="none" stroke="#FFCC00" stroke-width="2" opacity="0.85"></ellipse>
+  <ellipse cx="40" cy="40" rx="32" ry="38" fill="none" stroke="#FFCC00" stroke-width="1.4" opacity="0.5"></ellipse>
+  <line x1="2" y1="40" x2="78" y2="40" stroke="#FFCC00" stroke-width="2"></line>
+  <line x1="6" y1="22" x2="74" y2="22" stroke="#FFCC00" stroke-width="1.2" opacity="0.6"></line>
+  <line x1="6" y1="58" x2="74" y2="58" stroke="#FFCC00" stroke-width="1.2" opacity="0.6"></line>
+  <text x="40" y="50" text-anchor="middle" font-family="Inter, sans-serif" font-weight="900" font-size="22" fill="#FFCC00" letter-spacing="-0.05em">44</text>
+</svg>

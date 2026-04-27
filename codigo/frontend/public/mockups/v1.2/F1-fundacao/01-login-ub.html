@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark" data-tenant="ub">
+<head>
+<meta charset="UTF-8">
+<title>Mazzel · Login União Brasil</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<script src="theme-bootstrap.js"></script>
+<style>
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+.login-stage {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* ================== LADO ESQUERDO (brand) ================== */
+.brand-side {
+  position: relative;
+  background:
+    radial-gradient(1100px 600px at 18% 10%, rgba(255, 204, 0, 0.18), transparent 60%),
+    radial-gradient(900px 700px at 90% 90%, rgba(0, 42, 123, 0.65), transparent 55%),
+    linear-gradient(135deg, #001E5C 0%, #002A7B 50%, #001340 100%);
+  color: #fff;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 56px 64px;
+}
+
+/* malha geográfica decorativa (5570 municípios — sutil) */
+.brand-mesh {
+  position: absolute;
+  inset: 0;
+  opacity: 0.18;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,204,0,0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,204,0,0.08) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 60%, black 30%, transparent 80%);
+}
+
+/* meridianos dramáticos — referência ao globo UB */
+.brand-orbit {
+  position: absolute;
+  width: 1100px;
+  height: 1100px;
+  right: -380px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  border: 1px solid rgba(255, 204, 0, 0.18);
+  pointer-events: none;
+}
+.brand-orbit::before, .brand-orbit::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+.brand-orbit::before {
+  border: 1px solid rgba(255, 204, 0, 0.10);
+  transform: scale(0.78);
+}
+.brand-orbit::after {
+  border: 1px solid rgba(255, 204, 0, 0.06);
+  transform: scale(0.55);
+}
+
+/* mancha amarela orgânica de fundo */
+.brand-blob {
+  position: absolute;
+  width: 460px;
+  height: 460px;
+  left: -160px;
+  bottom: -180px;
+  background: radial-gradient(circle, rgba(255, 204, 0, 0.32), transparent 60%);
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+.brand-top {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  z-index: 2;
+}
+.brand-top .logo { width: 200px; }
+.brand-top .pipe {
+  width: 1px; height: 28px;
+  background: rgba(255,255,255,0.24);
+}
+.brand-top .partner {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: rgba(255,255,255,0.55);
+  text-transform: uppercase;
+}
+.brand-top .partner b {
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.08em;
+}
+
+.brand-hero {
+  position: relative;
+  z-index: 2;
+  max-width: 540px;
+}
+.brand-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border: 1px solid rgba(255, 204, 0, 0.4);
+  background: rgba(255, 204, 0, 0.08);
+  border-radius: 999px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: #FFCC00;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 28px;
+}
+.brand-eyebrow::before {
+  content: "";
+  width: 6px; height: 6px;
+  background: #FFCC00;
+  border-radius: 50%;
+  box-shadow: 0 0 12px rgba(255, 204, 0, 0.8);
+}
+
+.brand-headline {
+  font-size: 56px;
+  line-height: 1.05;
+  font-weight: 900;
+  letter-spacing: -0.025em;
+  color: #fff;
+  margin: 0 0 24px;
+  text-wrap: balance;
+}
+.brand-headline em {
+  font-style: normal;
+  color: #FFCC00;
+}
+
+.brand-sub {
+  font-size: 17px;
+  line-height: 1.55;
+  color: rgba(255,255,255,0.78);
+  max-width: 480px;
+}
+
+/* fatos numéricos */
+.brand-stats {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(255,255,255,0.10);
+}
+.brand-stat .num {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #FFCC00;
+  font-variant-numeric: tabular-nums;
+  display: block;
+  line-height: 1;
+}
+.brand-stat .lbl {
+  margin-top: 8px;
+  font-size: 11px;
+  letter-spacing: 0.10em;
+  color: rgba(255,255,255,0.55);
+  text-transform: uppercase;
+  font-weight: 500;
+  display: block;
+  line-height: 1.4;
+}
+
+/* ================== LADO DIREITO (form) ================== */
+.form-side {
+  background: var(--mz-bg-page);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  position: relative;
+}
+.form-side::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--mz-tenant-primary), var(--mz-tenant-accent));
+}
+
+.form-card {
+  width: 100%;
+  max-width: 420px;
+}
+
+.form-greeting {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--mz-fg-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+.form-greeting .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--mz-ok);
+  box-shadow: 0 0 10px var(--mz-ok);
+}
+
+h1.form-title {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--mz-fg-strong);
+  margin: 0 0 8px;
+}
+.form-title em {
+  font-style: normal;
+  color: var(--mz-tenant-accent);
+}
+.form-desc {
+  font-size: 13px;
+  color: var(--mz-fg-muted);
+  line-height: 1.55;
+  margin-bottom: 28px;
+}
+
+.form-field {
+  margin-bottom: 14px;
+}
+.form-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--mz-fg-muted);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.form-label a {
+  color: var(--mz-fg-dim);
+  text-decoration: none;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.form-label a:hover { color: var(--mz-tenant-accent); }
+
+.form-input {
+  width: 100%;
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule-strong);
+  color: var(--mz-fg-strong);
+  font-family: var(--mz-font-sans);
+  font-size: 14px;
+  padding: 11px 14px;
+  border-radius: var(--mz-r-md);
+  outline: none;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+.form-input:focus {
+  border-color: var(--mz-tenant-primary);
+  box-shadow: 0 0 0 3px rgba(0, 42, 123, 0.35);
+}
+.form-input::placeholder { color: var(--mz-fg-faint); }
+
+.form-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 16px 0 22px;
+  font-size: 12px;
+}
+.checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--mz-fg-muted);
+  cursor: pointer;
+  user-select: none;
+}
+.checkbox input { display: none; }
+.checkbox-mark {
+  width: 14px; height: 14px;
+  border: 1px solid var(--mz-rule-strong);
+  border-radius: 3px;
+  background: var(--mz-bg-card);
+  position: relative;
+}
+.checkbox input:checked + .checkbox-mark {
+  background: var(--mz-tenant-accent);
+  border-color: var(--mz-tenant-accent);
+}
+.checkbox input:checked + .checkbox-mark::after {
+  content: "";
+  position: absolute;
+  left: 3px; top: 0;
+  width: 4px; height: 8px;
+  border-right: 2px solid var(--mz-fg-on-accent);
+  border-bottom: 2px solid var(--mz-fg-on-accent);
+  transform: rotate(45deg);
+}
+
+.btn-primary {
+  width: 100%;
+  background: var(--mz-tenant-primary);
+  color: #fff;
+  border: 0;
+  padding: 12px;
+  border-radius: var(--mz-r-md);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  cursor: pointer;
+  transition: filter 120ms;
+  position: relative;
+  overflow: hidden;
+}
+.btn-primary::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,204,0,0.15), transparent);
+  transform: translateX(-100%);
+  transition: transform 480ms;
+}
+.btn-primary:hover { filter: brightness(1.12); }
+.btn-primary:hover::before { transform: translateX(100%); }
+
+/* divisor "ou" */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 22px 0;
+  font-size: 11px;
+  color: var(--mz-fg-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+.divider::before, .divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--mz-rule);
+}
+
+/* SSO */
+.sso {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.btn-sso {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule-strong);
+  color: var(--mz-fg);
+  padding: 10px;
+  border-radius: var(--mz-r-md);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 120ms;
+}
+.btn-sso:hover { border-color: var(--mz-fg-muted); }
+.btn-sso svg { width: 16px; height: 16px; }
+
+/* footer */
+.form-footer {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 28px;
+  padding: 0 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: var(--mz-fg-faint);
+  letter-spacing: 0.04em;
+}
+.form-footer a { color: var(--mz-fg-dim); text-decoration: none; }
+.form-footer a:hover { color: var(--mz-fg); }
+.form-footer .pipe { padding: 0 8px; color: var(--mz-fg-ghost); }
+
+/* attribution Mazzel */
+.mazzel-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--mz-fg-faint);
+  letter-spacing: 0.08em;
+}
+.mazzel-mark .mz-glyph {
+  width: 14px; height: 14px;
+  border-radius: 3px;
+  background: linear-gradient(135deg, #7C3AED, #A78BFA);
+}
+
+/* anúncio canto */
+.brand-foot {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+}
+.brand-foot .pulse {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #FFCC00;
+  animation: pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50%      { opacity: 1; transform: scale(1.4); }
+}
+</style>
+</head>
+<body>
+
+<div class="login-stage">
+
+  <!-- ============ BRAND SIDE ============ -->
+  <aside class="brand-side">
+    <div class="brand-mesh"></div>
+    <div class="brand-orbit"></div>
+    <div class="brand-blob"></div>
+
+    <header class="brand-top">
+      <img src="assets/logo_white.svg" alt="União Brasil 44" class="logo">
+      <div class="pipe"></div>
+      <div class="partner">Plataforma <b>MAZZEL</b><br>Eleitoral</div>
+    </header>
+
+    <div class="brand-hero">
+      <div class="brand-eyebrow">Eleições 2026 · Comando partidário</div>
+      <h2 class="brand-headline">
+        O partido que <em>sabe onde está</em>, vence onde precisa.
+      </h2>
+      <p class="brand-sub">
+        Mapa estratégico em tempo real, dossiês de 1 milhão de candidatos e operações organizadas
+        do Diretório Nacional ao último cabo eleitoral.
+      </p>
+    </div>
+
+    <div class="brand-stats tnum">
+      <div class="brand-stat">
+        <span class="num">1,05M</span>
+        <span class="lbl">Candidatos<br>catalogados</span>
+      </div>
+      <div class="brand-stat">
+        <span class="num">5.570</span>
+        <span class="lbl">Municípios<br>cobertos</span>
+      </div>
+      <div class="brand-stat">
+        <span class="num">645</span>
+        <span class="lbl">Comissões<br>SP ativas</span>
+      </div>
+      <div class="brand-stat">
+        <span class="num">100%</span>
+        <span class="lbl">TSE<br>integrado</span>
+      </div>
+    </div>
+
+    <div class="brand-foot">
+      <span class="pulse"></span>
+      <span>Sistema operacional · Última sync: agora</span>
+    </div>
+  </aside>
+
+  <!-- ============ FORM SIDE ============ -->
+  <main class="form-side">
+    <div class="form-card">
+
+      <div class="form-greeting">
+        <span class="dot"></span>
+        <span>Acesso autorizado · UB-44</span>
+      </div>
+
+      <h1 class="form-title">Bem-vindo de volta</h1>
+      <p class="form-desc">
+        Entre com suas credenciais do União Brasil.
+        Cada perfil acessa só o que tem permissão — Diretório, Comissão, Gabinete ou Operação.
+      </p>
+
+      <form>
+        <div class="form-field">
+          <label class="form-label" for="email">CPF ou e-mail institucional</label>
+          <input type="text" id="email" class="form-input" placeholder="000.000.000-00 ou nome@uniaobrasil44.org.br" value="milton.leite@uniaobrasil44.org.br">
+        </div>
+
+        <div class="form-field">
+          <label class="form-label" for="senha">
+            Senha
+            <a href="#">Esqueci minha senha</a>
+          </label>
+          <input type="password" id="senha" class="form-input" placeholder="••••••••" value="•••••••••••••">
+        </div>
+
+        <div class="form-options">
+          <label class="checkbox">
+            <input type="checkbox" checked>
+            <span class="checkbox-mark"></span>
+            <span>Manter conectado neste dispositivo</span>
+          </label>
+          <a href="#" style="color: var(--mz-fg-dim); text-decoration: none; font-size: 12px;">
+            2FA · <span class="kbd">Token</span>
+          </a>
+        </div>
+
+        <button type="button" class="btn-primary">Entrar no Diretório União Brasil →</button>
+      </form>
+
+      <div class="divider">ou continue com</div>
+
+      <div class="sso">
+        <button class="btn-sso">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.35 11.1h-9.17v2.92h5.27c-.23 1.5-1.7 4.4-5.27 4.4-3.18 0-5.77-2.62-5.77-5.85s2.59-5.85 5.77-5.85c1.81 0 3.02.77 3.71 1.43l2.53-2.43c-1.62-1.51-3.72-2.43-6.24-2.43C6.92 3.29 3.05 7.16 3.05 12s3.87 8.71 8.71 8.71c5.03 0 8.36-3.54 8.36-8.51 0-.57-.07-1.01-.16-1.6l-1.61.5z"/></svg>
+          Google Workspace
+        </button>
+        <button class="btn-sso">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.4 24H0V12.6h11.4V24zM24 24H12.6V12.6H24V24zM11.4 11.4H0V0h11.4v11.4zM24 11.4H12.6V0H24v11.4z"/></svg>
+          Microsoft 365
+        </button>
+      </div>
+    </div>
+
+    <footer class="form-footer">
+      <span class="mazzel-mark">
+        <span class="mz-glyph"></span>
+        OPERADO POR MAZZEL · v2.4
+      </span>
+      <div>
+        <a href="#">Política de privacidade</a>
+        <span class="pipe">·</span>
+        <a href="#">Termos</a>
+        <span class="pipe">·</span>
+        <a href="#">Suporte</a>
+      </div>
+    </footer>
+  </main>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark" data-tenant="ub">
+<head>
+<meta charset="UTF-8">
+<title>Tesouraria · UB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../F1-fundacao/tokens.css">
+<script src="../F1-fundacao/theme-bootstrap.js"></script>
+<style>
+html, body { height: 100%; margin: 0; overflow-x: hidden; }
+body { background: var(--mz-bg-page); }
+
+.shell { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+
+/* sidebar */
+.side { background: var(--mz-bg-sidebar); border-right: 1px solid var(--mz-rule); padding: 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+.side::-webkit-scrollbar { width: 4px; } .side::-webkit-scrollbar-thumb { background: var(--mz-rule-strong); }
+.brand { padding: 16px 18px; border-bottom: 1px solid var(--mz-rule); display: flex; gap: 10px; align-items: center; }
+.brand .logo { width: 32px; height: 32px; background: var(--mz-tenant-primary); border: 1px solid var(--mz-tenant-accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; color: var(--mz-tenant-accent); font-size: 14px; }
+.brand .name { font-size: 13px; font-weight: 800; color: var(--mz-fg-strong); }
+.brand .name span { display: block; font-size: 9px; color: var(--mz-fg-faint); font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; margin-top: 1px; }
+
+.nav-section { padding: 14px 8px; border-bottom: 1px solid var(--mz-rule); }
+.nav-section h3 { font-size: 9.5px; letter-spacing: 0.16em; color: var(--mz-fg-faint); text-transform: uppercase; font-weight: 700; margin: 0 10px 8px; }
+.nav-row { display: flex; gap: 10px; align-items: center; padding: 7px 10px; cursor: pointer; font-size: 12px; color: var(--mz-fg); border-radius: var(--mz-r-sm); }
+.nav-row:hover { background: var(--mz-bg-card); }
+.nav-row.active { background: var(--mz-tenant-primary-soft); border-left: 3px solid var(--mz-tenant-accent); padding-left: 7px; color: var(--mz-fg-strong); font-weight: 700; }
+.nav-row .ico { font-size: 13px; width: 18px; }
+.nav-row .qty { margin-left: auto; font-family: var(--mz-font-mono); font-size: 9.5px; color: var(--mz-fg-faint); }
+.nav-row.warn .qty { background: var(--mz-warn); color: #fff; padding: 1px 5px; border-radius: 3px; font-weight: 800; }
+
+.balance-card { padding: 14px 16px; border-bottom: 1px solid var(--mz-rule); }
+.balance-card .lbl { font-size: 9px; letter-spacing: 0.14em; color: var(--mz-fg-faint); text-transform: uppercase; font-weight: 700; }
+.balance-card .v { font-family: 'Bebas Neue', sans-serif; font-size: 32px; line-height: 1; color: var(--mz-fg-strong); margin-top: 4px; letter-spacing: 0.02em; }
+.balance-card .v small { font-size: 14px; color: var(--mz-fg-muted); }
+.balance-card .delta { font-size: 11px; margin-top: 6px; color: var(--mz-ok); font-family: var(--mz-font-mono); }
+
+/* main */
+main { padding: 0; }
+.top-bar { padding: 14px 24px; border-bottom: 1px solid var(--mz-rule); background: var(--mz-bg-topbar); display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 5; }
+.top-bar .crumb { font-size: 11.5px; color: var(--mz-fg-muted); flex: 1; }
+.top-bar .crumb b { color: var(--mz-fg-strong); font-weight: 600; }
+.top-bar .crumb span::after { content: '›'; margin: 0 6px; color: var(--mz-rule-strong); }
+.top-bar .crumb span:last-child::after { display: none; }
+.btn { font-size: 11.5px; font-weight: 600; padding: 7px 12px; border-radius: var(--mz-r-md); border: 1px solid var(--mz-rule); background: var(--mz-bg-card); color: var(--mz-fg); cursor: pointer; }
+.btn.primary { background: var(--mz-tenant-primary); color: #fff; border-color: var(--mz-tenant-primary-strong); }
+.btn.tenant { background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent); border-color: var(--mz-tenant-accent); font-weight: 800; }
+
+.period-bar { padding: 12px 24px; border-bottom: 1px solid var(--mz-rule); display: flex; align-items: center; gap: 14px; font-size: 11.5px; color: var(--mz-fg-muted); }
+.period-toggle { display: flex; background: var(--mz-bg-card); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-sm); }
+.period-toggle button { background: none; border: 0; padding: 5px 10px; font-size: 11px; color: var(--mz-fg-muted); cursor: pointer; }
+.period-toggle button.on { background: var(--mz-tenant-primary); color: #fff; }
+.period-bar .right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+
+/* hero KPIs */
+.hero-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; padding: 22px 24px; border-bottom: 1px solid var(--mz-rule); }
+.kpi { background: var(--mz-bg-card); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-lg); padding: 16px 18px; position: relative; overflow: hidden; }
+.kpi.tenant { background: linear-gradient(135deg, var(--mz-tenant-primary), rgba(0,42,123,0.6)); border-color: var(--mz-tenant-accent); }
+.kpi.tenant .lbl, .kpi.tenant .v, .kpi.tenant .delta, .kpi.tenant .sub { color: #fff; }
+.kpi.warn { background: linear-gradient(135deg, rgba(245,158,11,0.18), var(--mz-bg-card)); border-color: var(--mz-warn); }
+.kpi .lbl { font-size: 10px; letter-spacing: 0.14em; color: var(--mz-fg-faint); text-transform: uppercase; font-weight: 700; }
+.kpi .v { font-family: 'Bebas Neue', sans-serif; font-size: 34px; line-height: 1; color: var(--mz-fg-strong); margin-top: 6px; letter-spacing: 0.02em; }
+.kpi .v small { font-size: 16px; color: var(--mz-fg-muted); }
+.kpi .delta { font-size: 11px; margin-top: 6px; font-family: var(--mz-font-mono); }
+.kpi .delta.up { color: var(--mz-ok); }
+.kpi .delta.down { color: var(--mz-danger); }
+.kpi .sub { font-size: 10.5px; color: var(--mz-fg-muted); margin-top: 4px; }
+.kpi .spark { position: absolute; right: 14px; bottom: 14px; opacity: 0.3; }
+
+/* main grid */
+.grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; padding: 22px 24px; border-bottom: 1px solid var(--mz-rule); }
+.card { background: var(--mz-bg-card); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-lg); }
+.card header { padding: 12px 18px; border-bottom: 1px solid var(--mz-rule); display: flex; align-items: center; gap: 10px; }
+.card header h3 { font-size: 11px; letter-spacing: 0.14em; color: var(--mz-fg-faint); text-transform: uppercase; font-weight: 700; margin: 0; }
+.card header .right { margin-left: auto; display: flex; gap: 6px; }
+.card header .chip { font-size: 10px; padding: 3px 8px; border-radius: var(--mz-r-pill); background: var(--mz-bg-card-2); color: var(--mz-fg-muted); cursor: pointer; }
+.card header .chip.on { background: var(--mz-tenant-primary); color: #fff; }
+.card .body { padding: 18px; }
+
+/* big chart (fluxo de caixa) */
+.cashflow-chart { height: 280px; position: relative; padding: 20px 10px 30px 50px; }
+.cashflow-grid { position: absolute; left: 50px; right: 10px; top: 20px; bottom: 30px; display: flex; flex-direction: column; justify-content: space-between; }
+.cashflow-grid .gline { border-top: 1px dashed var(--mz-rule); position: relative; }
+.cashflow-grid .gline span { position: absolute; left: -50px; top: -7px; font-size: 9.5px; color: var(--mz-fg-faint); font-family: var(--mz-font-mono); }
+.cashflow-bars { position: absolute; left: 50px; right: 10px; top: 20px; bottom: 30px; display: flex; align-items: flex-end; gap: 8px; }
+.cashflow-month { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; position: relative; }
+.cashflow-month .bars { display: flex; gap: 2px; align-items: flex-end; width: 100%; height: 100%; }
+.cashflow-month .bars .b { flex: 1; border-radius: 2px 2px 0 0; }
+.cashflow-month .bars .b.in { background: linear-gradient(180deg, var(--mz-ok), rgba(34,197,94,0.5)); }
+.cashflow-month .bars .b.out { background: linear-gradient(180deg, var(--mz-danger), rgba(239,68,68,0.5)); }
+.cashflow-month .lbl { font-size: 9.5px; color: var(--mz-fg-faint); position: absolute; bottom: -22px; font-family: var(--mz-font-mono); text-transform: uppercase; }
+.cashflow-line { position: absolute; left: 50px; right: 10px; top: 20px; bottom: 30px; pointer-events: none; }
+
+.legend { display: flex; gap: 14px; padding: 0 10px 4px; font-size: 11px; color: var(--mz-fg-muted); align-items: center; }
+.legend .dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; margin-right: 5px; vertical-align: middle; }
+
+/* donut */
+.donut-wrap { display: grid; grid-template-columns: 140px 1fr; gap: 18px; align-items: center; }
+.donut { width: 140px; height: 140px; border-radius: 50%; background: conic-gradient(var(--mz-ok) 0% 38%, var(--mz-info) 38% 64%, var(--mz-tenant-accent) 64% 81%, var(--mz-warn) 81% 92%, var(--mz-danger) 92% 100%); position: relative; display: flex; align-items: center; justify-content: center; }
+.donut::before { content: ''; position: absolute; inset: 18px; border-radius: 50%; background: var(--mz-bg-card); }
+.donut .center { position: relative; text-align: center; }
+.donut .center b { display: block; font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--mz-fg-strong); line-height: 1; }
+.donut .center span { font-size: 9.5px; color: var(--mz-fg-faint); letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; }
+.donut-legend { font-size: 11px; }
+.donut-legend .lr { display: grid; grid-template-columns: 12px 1fr auto; gap: 8px; padding: 4px 0; align-items: center; }
+.donut-legend .lr .d { width: 10px; height: 10px; border-radius: 2px; }
+.donut-legend .lr b { color: var(--mz-fg-strong); font-weight: 600; }
+.donut-legend .lr span { color: var(--mz-fg-muted); font-size: 10px; }
+.donut-legend .lr .pct { font-family: var(--mz-font-mono); font-size: 10.5px; color: var(--mz-fg); font-weight: 700; }
+
+/* transactions */
+.tx-row { display: grid; grid-template-columns: 36px 1fr 100px 110px 130px 80px; gap: 12px; padding: 11px 18px; border-top: 1px solid var(--mz-rule); align-items: center; cursor: pointer; }
+.tx-row:hover { background: var(--mz-bg-card-2); }
+.tx-row .ico { width: 36px; height: 36px; border-radius: 50%; background: var(--mz-ok-soft); color: var(--mz-ok); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; }
+.tx-row.out .ico { background: var(--mz-danger-soft); color: var(--mz-danger); }
+.tx-row b { font-size: 13px; color: var(--mz-fg-strong); display: block; font-weight: 600; }
+.tx-row small { font-size: 10.5px; color: var(--mz-fg-faint); }
+.tx-row .cat { font-size: 10px; padding: 2px 7px; border-radius: 3px; background: var(--mz-bg-elevated); color: var(--mz-fg-muted); font-weight: 700; letter-spacing: 0.04em; }
+.tx-row .when { font-family: var(--mz-font-mono); font-size: 10.5px; color: var(--mz-fg-muted); }
+.tx-row .val { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--mz-ok); font-weight: 700; letter-spacing: 0.02em; text-align: right; }
+.tx-row.out .val { color: var(--mz-danger); }
+.tx-row .stat { font-size: 9.5px; padding: 2px 6px; border-radius: 3px; font-weight: 800; text-align: center; }
+.tx-row .stat.ok { background: var(--mz-ok-soft); color: var(--mz-ok); }
+.tx-row .stat.pend { background: var(--mz-warn-soft); color: var(--mz-warn); }
+.tx-row .stat.tse { background: rgba(0,42,123,0.30); color: var(--mz-tenant-accent); }
+
+/* rubricas / orçamento */
+.rubrica { padding: 10px 18px; border-top: 1px solid var(--mz-rule); }
+.rubrica:first-of-type { border-top: 0; }
+.rubrica .row { display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px; }
+.rubrica b { font-size: 12.5px; color: var(--mz-fg-strong); font-weight: 600; flex: 1; }
+.rubrica .real { font-family: var(--mz-font-mono); font-size: 11px; color: var(--mz-fg); }
+.rubrica .real b { font-weight: 700; }
+.rubrica .pct { font-size: 10.5px; color: var(--mz-fg-faint); font-family: var(--mz-font-mono); min-width: 44px; text-align: right; }
+.rubrica .bar { height: 6px; background: var(--mz-bg-elevated); border-radius: 3px; overflow: hidden; position: relative; }
+.rubrica .bar > span { display: block; height: 100%; background: linear-gradient(90deg, var(--mz-tenant-primary), var(--mz-tenant-accent)); }
+.rubrica .bar.warn > span { background: var(--mz-warn); }
+.rubrica .bar.danger > span { background: var(--mz-danger); }
+.rubrica.over .pct { color: var(--mz-danger); font-weight: 800; }
+
+/* TSE compliance card */
+.tse-strip { padding: 22px 24px; border-bottom: 1px solid var(--mz-rule); display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.tse-card { background: var(--mz-bg-card); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-lg); padding: 14px 16px; display: flex; gap: 12px; align-items: center; }
+.tse-card.ok { border-left: 4px solid var(--mz-ok); }
+.tse-card.warn { border-left: 4px solid var(--mz-warn); }
+.tse-card.danger { border-left: 4px solid var(--mz-danger); }
+.tse-card .ico { width: 38px; height: 38px; border-radius: 8px; background: var(--mz-ok-soft); color: var(--mz-ok); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; flex-shrink: 0; }
+.tse-card.warn .ico { background: var(--mz-warn-soft); color: var(--mz-warn); }
+.tse-card.danger .ico { background: var(--mz-danger-soft); color: var(--mz-danger); }
+.tse-card b { font-size: 12px; color: var(--mz-fg-strong); display: block; font-weight: 700; }
+.tse-card .val { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--mz-fg-strong); line-height: 1; margin-top: 2px; }
+.tse-card .val.warn { color: var(--mz-warn); }
+.tse-card .val.danger { color: var(--mz-danger); }
+.tse-card span { font-size: 10px; color: var(--mz-fg-faint); display: block; margin-top: 2px; }
+
+/* doadores grid */
+.doadores-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 22px 24px; border-bottom: 1px solid var(--mz-rule); }
+.doador-card { background: var(--mz-bg-card); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-lg); padding: 14px 16px; }
+.doador-card .h { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+.doador-card .av { width: 40px; height: 40px; border-radius: 50%; background: var(--mz-tenant-primary); color: var(--mz-tenant-accent); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 14px; flex-shrink: 0; }
+.doador-card b { font-size: 13px; color: var(--mz-fg-strong); display: block; font-weight: 700; line-height: 1.2; }
+.doador-card .h span { font-size: 10.5px; color: var(--mz-fg-faint); }
+.doador-card .total { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--mz-fg-strong); line-height: 1; margin-top: 8px; }
+.doador-card .total small { font-size: 14px; color: var(--mz-fg-muted); }
+.doador-card .meta { display: flex; gap: 14px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--mz-rule); font-size: 10.5px; color: var(--mz-fg-muted); }
+.doador-card .meta b { color: var(--mz-fg); font-weight: 600; }
+.doador-card.pf .h { padding-left: 8px; border-left: 3px solid var(--mz-info); }
+.doador-card.pj .h { padding-left: 8px; border-left: 3px solid var(--mz-tenant-accent); }
+.doador-card.fp .h { padding-left: 8px; border-left: 3px solid var(--mz-ok); }
+
+/* alocação por município */
+.muni-grid { padding: 0 24px 24px; }
+.muni-grid .head { padding: 22px 0 14px; display: flex; align-items: center; gap: 14px; }
+.muni-grid .head h3 { font-size: 13px; color: var(--mz-fg-strong); font-weight: 800; margin: 0; flex: 1; letter-spacing: -0.01em; }
+.muni-list { background: var(--mz-bg-card); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-lg); }
+.muni-row { display: grid; grid-template-columns: 36px 1fr 110px 130px 110px 90px 80px; gap: 12px; padding: 11px 18px; border-top: 1px solid var(--mz-rule); align-items: center; }
+.muni-row:first-child { border-top: 0; }
+.muni-row .av { width: 36px; height: 36px; border-radius: 6px; background: var(--mz-tenant-primary); color: var(--mz-tenant-accent); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 12px; }
+.muni-row b { font-size: 12.5px; color: var(--mz-fg-strong); display: block; font-weight: 600; }
+.muni-row small { font-size: 10.5px; color: var(--mz-fg-faint); }
+.muni-row .v { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--mz-fg-strong); }
+.muni-row .v.tenant { color: var(--mz-tenant-accent); }
+.muni-row .util { display: flex; align-items: center; gap: 8px; }
+.muni-row .util .bar { width: 70px; height: 5px; background: var(--mz-bg-elevated); border-radius: 3px; overflow: hidden; }
+.muni-row .util .bar > span { display: block; height: 100%; background: var(--mz-tenant-accent); }
+.muni-row .util .bar.warn > span { background: var(--mz-warn); }
+.muni-row .util .pc { font-family: var(--mz-font-mono); font-size: 10.5px; color: var(--mz-fg); font-weight: 700; min-width: 32px; }
+
+/* alertas */
+.alerts-area { padding: 22px 24px; }
+.alert-row { display: grid; grid-template-columns: 38px 1fr auto; gap: 14px; padding: 12px 16px; background: var(--mz-bg-card); border: 1px solid var(--mz-rule); border-left: 4px solid var(--mz-warn); border-radius: var(--mz-r-md); margin-bottom: 8px; align-items: center; }
+.alert-row.danger { border-left-color: var(--mz-danger); }
+.alert-row.info { border-left-color: var(--mz-info); }
+.alert-row .ico { width: 38px; height: 38px; border-radius: 8px; background: var(--mz-warn-soft); color: var(--mz-warn); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; }
+.alert-row.danger .ico { background: var(--mz-danger-soft); color: var(--mz-danger); }
+.alert-row.info .ico { background: var(--mz-info-soft); color: var(--mz-info); }
+.alert-row b { font-size: 12.5px; color: var(--mz-fg-strong); font-weight: 700; display: block; }
+.alert-row span { font-size: 11px; color: var(--mz-fg-muted); display: block; margin-top: 2px; }
+
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="side">
+    <div class="brand">
+      <div class="logo">UB</div>
+      <div class="name">Mazzel · UB<span>Tesouraria</span></div>
+    </div>
+
+    <div class="balance-card">
+      <div class="lbl">Saldo Consolidado</div>
+      <div class="v">R$ 4.7<small>M</small></div>
+      <div class="delta">▲ +R$ 612k vs mês anterior</div>
+    </div>
+
+    <div class="nav-section">
+      <h3>Navegação</h3>
+      <div class="nav-row active"><span class="ico">📊</span>Dashboard<span class="qty">—</span></div>
+      <div class="nav-row"><span class="ico">💰</span>Receitas<span class="qty">2.4M</span></div>
+      <div class="nav-row"><span class="ico">💸</span>Despesas<span class="qty">1.8M</span></div>
+      <div class="nav-row"><span class="ico">📋</span>Rubricas<span class="qty">12</span></div>
+      <div class="nav-row warn"><span class="ico">🔁</span>Conciliação<span class="qty">23</span></div>
+      <div class="nav-row"><span class="ico">🏦</span>Contas Bancárias<span class="qty">7</span></div>
+      <div class="nav-row"><span class="ico">👥</span>Doadores<span class="qty">847</span></div>
+      <div class="nav-row"><span class="ico">📤</span>Repasses<span class="qty">147</span></div>
+    </div>
+
+    <div class="nav-section">
+      <h3>Compliance</h3>
+      <div class="nav-row"><span class="ico">⚖️</span>TSE / Prest. Contas<span class="qty">OK</span></div>
+      <div class="nav-row warn"><span class="ico">📅</span>Prazos<span class="qty">3</span></div>
+      <div class="nav-row"><span class="ico">📜</span>Auditorias<span class="qty">14</span></div>
+      <div class="nav-row"><span class="ico">🔐</span>Logs LGPD<span class="qty">—</span></div>
+    </div>
+
+    <div class="nav-section">
+      <h3>Relatórios</h3>
+      <div class="nav-row"><span class="ico">📈</span>Mensal<span class="qty">—</span></div>
+      <div class="nav-row"><span class="ico">📊</span>Trimestral (Q1)<span class="qty">—</span></div>
+      <div class="nav-row"><span class="ico">📑</span>Exercício 2025<span class="qty">—</span></div>
+    </div>
+  </aside>
+
+  <main>
+    <div class="top-bar">
+      <div class="crumb"><span>Tesouraria</span><span><b>Brasil</b></span><span><b>SP</b></span><span><b>Capital · Q1/2026</b></span></div>
+      <button class="btn">📤 Exportar prestação TSE</button>
+      <button class="btn">📥 Importar OFX</button>
+      <button class="btn primary">+ Lançamento</button>
+      <button class="btn tenant">📋 Gerar Relatório Q1</button>
+    </div>
+
+    <div class="period-bar">
+      <span>Período:</span>
+      <div class="period-toggle"><button>7d</button><button>30d</button><button class="on">Q1/2026</button><button>Ano</button><button>Custom</button></div>
+      <span style="margin-left: 14px; color: var(--mz-fg);">jan/26 → mar/26 · <b style="color: var(--mz-fg-strong);">90 dias</b></span>
+      <div class="right">
+        <span>Tenant: <b style="color: var(--mz-fg-strong);">UB · SP capital</b></span>
+        <span>·</span>
+        <span style="color: var(--mz-ok);">● Auto-sync ativo</span>
+        <span>·</span>
+        <span>Última sync: <b style="color: var(--mz-fg-strong);">há 4 min</b></span>
+      </div>
+    </div>
+
+    <!-- HERO KPIs -->
+    <div class="hero-kpis tnum">
+      <div class="kpi tenant">
+        <div class="lbl">Saldo Consolidado</div>
+        <div class="v">R$ 4.7<small>M</small></div>
+        <div class="delta">▲ R$ 612k (+15%) vs Q4/25</div>
+        <div class="sub">7 contas · 4 bancos</div>
+      </div>
+      <div class="kpi">
+        <div class="lbl">Receitas Q1/2026</div>
+        <div class="v">R$ 2.4<small>M</small></div>
+        <div class="delta up">▲ R$ 287k (+13%) YoY</div>
+        <div class="sub">847 lançamentos · 412 doadores</div>
+      </div>
+      <div class="kpi">
+        <div class="lbl">Despesas Q1/2026</div>
+        <div class="v">R$ 1.8<small>M</small></div>
+        <div class="delta down">▲ R$ 142k (+8.5%) YoY</div>
+        <div class="sub">1.247 lançamentos · 12 rubricas</div>
+      </div>
+      <div class="kpi warn">
+        <div class="lbl">A Conciliar</div>
+        <div class="v">R$ 47<small>k</small></div>
+        <div class="delta down">23 lançamentos pendentes</div>
+        <div class="sub">prazo limite: 30/abr (5 dias)</div>
+      </div>
+    </div>
+
+    <!-- TSE compliance strip -->
+    <div class="tse-strip">
+      <div class="tse-card ok">
+        <div class="ico">✓</div>
+        <div>
+          <b>Prest. Contas Q4/2025</b>
+          <div class="val">PROTOCOLADA</div>
+          <span>n° 4127-A · TSE 18/jan/2026</span>
+        </div>
+      </div>
+      <div class="tse-card warn">
+        <div class="ico">!</div>
+        <div>
+          <b>Prest. Contas Q1/2026</b>
+          <div class="val warn">EM PREP.</div>
+          <span>prazo: 30/abr/2026 · 5 dias restantes</span>
+        </div>
+      </div>
+      <div class="tse-card ok">
+        <div class="ico">✓</div>
+        <div>
+          <b>Limite Doação PF</b>
+          <div class="val">62% utilizado</div>
+          <span>R$ 1.4M / R$ 2.3M (10% renda)</span>
+        </div>
+      </div>
+      <div class="tse-card danger">
+        <div class="ico">⚠</div>
+        <div>
+          <b>Doações irregulares</b>
+          <div class="val danger">2 alertas</div>
+          <span>doadores acima do teto · revisar</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cashflow + Donut -->
+    <div class="grid-2">
+      <div class="card">
+        <header><h3>Fluxo de Caixa · Q1/2026</h3>
+          <div class="right">
+            <span class="chip on">Mensal</span><span class="chip">Semanal</span><span class="chip">Diário</span>
+          </div>
+        </header>
+        <div class="body" style="padding: 12px 18px 18px;">
+          <div class="legend"><span><span class="dot" style="background: linear-gradient(180deg, var(--mz-ok), rgba(34,197,94,0.5));"></span>Receitas</span><span><span class="dot" style="background: linear-gradient(180deg, var(--mz-danger), rgba(239,68,68,0.5));"></span>Despesas</span><span style="margin-left: auto; font-family: var(--mz-font-mono); color: var(--mz-fg);">Saldo: <b style="color: var(--mz-ok);">+R$ 612k</b></span></div>
+          <div class="cashflow-chart tnum">
+            <div class="cashflow-grid">
+              <div class="gline"><span>R$ 1M</span></div>
+              <div class="gline"><span>R$ 750k</span></div>
+              <div class="gline"><span>R$ 500k</span></div>
+              <div class="gline"><span>R$ 250k</span></div>
+              <div class="gline"><span>R$ 0</span></div>
+            </div>
+            <div class="cashflow-bars">
+              <div class="cashflow-month"><div class="bars"><div class="b in" style="height: 72%"></div><div class="b out" style="height: 58%"></div></div><span class="lbl">jan</span></div>
+              <div class="cashflow-month"><div class="bars"><div class="b in" style="height: 64%"></div><div class="b out" style="height: 51%"></div></div><span class="lbl">fev</span></div>
+              <div class="cashflow-month"><div class="bars"><div class="b in" style="height: 88%"></div><div class="b out" style="height: 70%"></div></div><span class="lbl">mar</span></div>
+              <div class="cashflow-month"><div class="bars"><div class="b in" style="height: 47%; opacity: 0.5"></div><div class="b out" style="height: 38%; opacity: 0.5"></div></div><span class="lbl">abr*</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <header><h3>Despesas por Rubrica</h3></header>
+        <div class="body">
+          <div class="donut-wrap tnum">
+            <div class="donut">
+              <div class="center"><b>R$ 1.8M</b><span>Total</span></div>
+            </div>
+            <div class="donut-legend">
+              <div class="lr"><span class="d" style="background: var(--mz-ok)"></span><div><b>Operações</b><span>OP-014 + outras</span></div><span class="pct">38%</span></div>
+              <div class="lr"><span class="d" style="background: var(--mz-info)"></span><div><b>Pessoal</b><span>gabinete + equipe</span></div><span class="pct">26%</span></div>
+              <div class="lr"><span class="d" style="background: var(--mz-tenant-accent)"></span><div><b>Comunicação</b><span>mídia + gráfica</span></div><span class="pct">17%</span></div>
+              <div class="lr"><span class="d" style="background: var(--mz-warn)"></span><div><b>Eventos</b><span>convenções + reuniões</span></div><span class="pct">11%</span></div>
+              <div class="lr"><span class="d" style="background: var(--mz-danger)"></span><div><b>Outros</b><span>jurídico + manutenção</span></div><span class="pct">8%</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rubricas detalhadas + Transações -->
+    <div class="grid-2" style="grid-template-columns: 1fr 1.2fr;">
+      <div class="card">
+        <header><h3>Orçamento vs. Realizado · Q1</h3>
+          <div class="right"><span class="chip on">Q1</span><span class="chip">Anual</span></div>
+        </header>
+        <div class="body" style="padding: 0;">
+          <div class="rubrica tnum">
+            <div class="row"><b>Operações de campo</b><span class="real">R$ 685k <small>/ R$ 850k</small></span><span class="pct">81%</span></div>
+            <div class="bar"><span style="width: 81%"></span></div>
+          </div>
+          <div class="rubrica tnum">
+            <div class="row"><b>Pessoal · gabinete</b><span class="real">R$ 468k <small>/ R$ 580k</small></span><span class="pct">81%</span></div>
+            <div class="bar"><span style="width: 81%"></span></div>
+          </div>
+          <div class="rubrica tnum">
+            <div class="row"><b>Comunicação / mídia</b><span class="real">R$ 306k <small>/ R$ 320k</small></span><span class="pct">96%</span></div>
+            <div class="bar warn"><span style="width: 96%"></span></div>
+          </div>
+          <div class="rubrica tnum over">
+            <div class="row"><b>Eventos & convenções</b><span class="real">R$ 218k <small>/ R$ 180k</small></span><span class="pct">121%</span></div>
+            <div class="bar danger"><span style="width: 100%"></span></div>
+          </div>
+          <div class="rubrica tnum">
+            <div class="row"><b>Jurídico</b><span class="real">R$ 87k <small>/ R$ 140k</small></span><span class="pct">62%</span></div>
+            <div class="bar"><span style="width: 62%"></span></div>
+          </div>
+          <div class="rubrica tnum">
+            <div class="row"><b>Tecnologia (plataforma)</b><span class="real">R$ 42k <small>/ R$ 60k</small></span><span class="pct">70%</span></div>
+            <div class="bar"><span style="width: 70%"></span></div>
+          </div>
+          <div class="rubrica tnum">
+            <div class="row"><b>Manutenção sede</b><span class="real">R$ 18k <small>/ R$ 30k</small></span><span class="pct">60%</span></div>
+            <div class="bar"><span style="width: 60%"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <header><h3>Últimas Transações</h3>
+          <div class="right"><span class="chip on">Todas</span><span class="chip">Receitas</span><span class="chip">Despesas</span></div>
+        </header>
+        <div class="body" style="padding: 0;">
+          <div class="tx-row">
+            <div class="ico">↑</div>
+            <div><b>Doação PF · Carlos Bittencourt Lopes</b><small>CPF 478.***.***-35 · TED Itaú</small></div>
+            <span class="cat">DOAÇÃO PF</span>
+            <span class="when">25/abr · 09:14</span>
+            <span class="val">+R$ 8.500</span>
+            <span class="stat ok">CONFIRMADO</span>
+          </div>
+          <div class="tx-row out">
+            <div class="ico">↓</div>
+            <div><b>Pagto · Gráfica Imprema (kits OP-014)</b><small>NF 4827 · 24.000 unid</small></div>
+            <span class="cat">COMUNIC.</span>
+            <span class="when">24/abr · 16:42</span>
+            <span class="val">−R$ 47.200</span>
+            <span class="stat ok">PAGO</span>
+          </div>
+          <div class="tx-row">
+            <div class="ico">↑</div>
+            <div><b>Doação PJ · Construtora Aurora Ltda.</b><small>CNPJ 12.***.***/0001-44 · PIX</small></div>
+            <span class="cat">DOAÇÃO PJ</span>
+            <span class="when">23/abr · 11:08</span>
+            <span class="val">+R$ 35.000</span>
+            <span class="stat tse">TSE OK</span>
+          </div>
+          <div class="tx-row out">
+            <div class="ico">↓</div>
+            <div><b>Folha pessoal · gabinete (mar/26)</b><small>14 servidores · CLT + comissionados</small></div>
+            <span class="cat">PESSOAL</span>
+            <span class="when">22/abr · 10:00</span>
+            <span class="val">−R$ 156k</span>
+            <span class="stat ok">PAGO</span>
+          </div>
+          <div class="tx-row">
+            <div class="ico">↑</div>
+            <div><b>Repasse Fundo Partidário · Direção Nac.</b><small>cota mensal SP capital</small></div>
+            <span class="cat">FUNDO PART.</span>
+            <span class="when">20/abr · 14:30</span>
+            <span class="val">+R$ 412k</span>
+            <span class="stat tse">TSE OK</span>
+          </div>
+          <div class="tx-row out">
+            <div class="ico">↓</div>
+            <div><b>Locação sala extra · convenção 10/mai</b><small>Espaço Augusta · 8h evento</small></div>
+            <span class="cat">EVENTOS</span>
+            <span class="when">19/abr · 09:48</span>
+            <span class="val">−R$ 24.000</span>
+            <span class="stat pend">A CONCILIAR</span>
+          </div>
+          <div class="tx-row">
+            <div class="ico">↑</div>
+            <div><b>Doação PF · Roberto Marinho Junior</b><small>CPF 712.***.***-86 · TED Bradesco</small></div>
+            <span class="cat">DOAÇÃO PF</span>
+            <span class="when">18/abr · 17:14</span>
+            <span class="val">+R$ 12.000</span>
+            <span class="stat ok">CONFIRMADO</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Doadores -->
+    <div class="muni-grid">
+      <div class="head"><h3>Top Doadores · Q1/2026</h3>
+        <span style="font-size: 11px; color: var(--mz-fg-muted);">847 doadores · ticket médio R$ 2.834</span>
+        <button class="btn">Ver todos →</button>
+      </div>
+    </div>
+    <div class="doadores-grid tnum" style="padding-top: 0;">
+      <div class="doador-card pj">
+        <div class="h"><div class="av">CA</div><div><b>Construtora Aurora Ltda.</b><span>CNPJ 12.***.***/0001-44 · São Paulo</span></div></div>
+        <div class="total">R$ 87<small>k</small></div>
+        <div class="meta"><span>Doações: <b>3</b></span><span>Última: <b>23/abr</b></span><span style="margin-left: auto; color: var(--mz-ok);">✓ TSE OK</span></div>
+      </div>
+      <div class="doador-card pj">
+        <div class="h"><div class="av">SF</div><div><b>SóFort Indústria S.A.</b><span>CNPJ 23.***.***/0001-78 · Campinas</span></div></div>
+        <div class="total">R$ 65<small>k</small></div>
+        <div class="meta"><span>Doações: <b>2</b></span><span>Última: <b>14/mar</b></span><span style="margin-left: auto; color: var(--mz-ok);">✓ TSE OK</span></div>
+      </div>
+      <div class="doador-card pf">
+        <div class="h"><div class="av">JK</div><div><b>Júlio Kowalski Lopes</b><span>CPF 156.***.***-22 · empresário</span></div></div>
+        <div class="total">R$ 42<small>k</small></div>
+        <div class="meta"><span>Doações: <b>4</b></span><span>Última: <b>18/abr</b></span><span style="margin-left: auto; color: var(--mz-warn);">⚠ revisar limite</span></div>
+      </div>
+      <div class="doador-card fp">
+        <div class="h"><div class="av">FP</div><div><b>Fundo Partidário · Nacional</b><span>repasse mensal · cota SP capital</span></div></div>
+        <div class="total">R$ 1.2<small>M</small></div>
+        <div class="meta"><span>Repasses: <b>3</b></span><span>Próx: <b>20/mai</b></span><span style="margin-left: auto; color: var(--mz-ok);">✓ regular</span></div>
+      </div>
+      <div class="doador-card pf">
+        <div class="h"><div class="av">CB</div><div><b>Carlos Bittencourt Lopes</b><span>CPF 478.***.***-35 · contador</span></div></div>
+        <div class="total">R$ 28<small>k</small></div>
+        <div class="meta"><span>Doações: <b>5</b></span><span>Última: <b>25/abr</b></span><span style="margin-left: auto; color: var(--mz-ok);">✓ TSE OK</span></div>
+      </div>
+      <div class="doador-card pj">
+        <div class="h"><div class="av">+</div><div><b>+ 842 outros doadores</b><span>847 totais · ticket médio R$ 2.834</span></div></div>
+        <div class="total">R$ 998<small>k</small></div>
+        <div class="meta"><span>87% PF · 13% PJ</span><span style="margin-left: auto;">ver lista completa →</span></div>
+      </div>
+    </div>
+
+    <!-- Alocação por município -->
+    <div class="muni-grid">
+      <div class="head"><h3>Alocação por Município · SP</h3>
+        <span style="font-size: 11px; color: var(--mz-fg-muted);">645 diretórios · R$ 1.8M repassado Q1</span>
+        <button class="btn">Ver todos →</button>
+      </div>
+      <div class="muni-list tnum">
+        <div class="muni-row">
+          <div class="av">SP</div>
+          <div><b>São Paulo (capital)</b><small>Mun. · 124k filiados · OP-2026-014</small></div>
+          <span><b style="color: var(--mz-fg-strong);">Orçado</b><br><span style="font-family: var(--mz-font-mono); font-size: 11px;">R$ 850k</span></span>
+          <span><b style="color: var(--mz-fg-strong);">Realizado</b><br><span style="font-family: var(--mz-font-mono); font-size: 11px; color: var(--mz-warn);">R$ 685k</span></span>
+          <span class="util"><div class="bar warn"><span style="width: 81%"></span></div><span class="pc">81%</span></span>
+          <span class="v tenant">R$ 165k</span>
+          <span style="font-size: 9.5px; color: var(--mz-fg-faint); font-family: var(--mz-font-mono);">disponível</span>
+        </div>
+        <div class="muni-row">
+          <div class="av">GR</div>
+          <div><b>Guarulhos</b><small>Mun. · 38k filiados</small></div>
+          <span><span style="font-family: var(--mz-font-mono); font-size: 11px;">R$ 280k</span></span>
+          <span><span style="font-family: var(--mz-font-mono); font-size: 11px;">R$ 184k</span></span>
+          <span class="util"><div class="bar"><span style="width: 66%"></span></div><span class="pc">66%</span></span>
+          <span class="v">R$ 96k</span>
+          <span style="font-size: 9.5px; color: var(--mz-fg-faint); font-family: var(--mz-font-mono);">disponível</span>
+        </div>
+        <div class="muni-row">
+          <div class="av">CP</div>
+          <div><b>Campinas</b><small>Mun. · 27k filiados</small></div>
+          <span><span style="font-family: var(--mz-font-mono); font-size: 11px;">R$ 220k</span></span>
+          <span><span style="font-family: var(--mz-font-mono); font-size: 11px;">R$ 142k</span></span>
+          <span class="util"><div class="bar"><span style="width: 65%"></span></div><span class="pc">65%</span></span>
+          <span class="v">R$ 78k</span>
+          <span style="font-size: 9.5px; color: var(--mz-fg-faint); font-family: var(--mz-font-mono);">disponível</span>
+        </div>
+        <div class="muni-row">
+          <div class="av">OS</div>
+          <div><b>Osasco</b><small>Mun. · 18k filiados · ⚠ repasse atrasado</small></div>
+          <span><span style="font-family: var(--mz-font-mono); font-size: 11px;">R$ 140k</span></span>
+          <span><span style="font-family: var(--mz-font-mono); font-size: 11px; color: var(--mz-danger);">R$ 28k</span></span>
+          <span class="util"><div class="bar warn"><span style="width: 20%"></span></div><span class="pc">20%</span></span>
+          <span class="v" style="color: var(--mz-warn)">R$ 112k</span>
+          <span style="font-size: 9.5px; color: var(--mz-fg-faint); font-family: var(--mz-font-mono);">a repassar</span>
+        </div>
+        <div class="muni-row">
+          <div class="av">+</div>
+          <div><b>+ 641 outros municípios</b><small>SP · agregado</small></div>
+          <span><span style="font-family: var(--mz-font-mono); font-size: 11px;">R$ 1.84M</span></span>
+          <span><span style="font-family: var(--mz-font-mono); font-size: 11px;">R$ 1.21M</span></span>
+          <span class="util"><div class="bar"><span style="width: 66%"></span></div><span class="pc">66%</span></span>
+          <span class="v">R$ 627k</span>
+          <span style="font-size: 9.5px; color: var(--mz-fg-faint); font-family: var(--mz-font-mono);">disponível</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alertas -->
+    <div class="alerts-area">
+      <h3 style="font-size: 13px; color: var(--mz-fg-strong); font-weight: 800; margin: 0 0 14px; letter-spacing: -0.01em;">Alertas Financeiros · Q1/2026</h3>
+      <div class="alert-row danger">
+        <div class="ico">⚠</div>
+        <div><b>2 doadores acima do teto de doação PF</b><span>Júlio Kowalski Lopes (R$ 42k · 11.2% renda) e mais 1. Revisar antes da prestação Q1 (30/abr).</span></div>
+        <button class="btn primary">Revisar agora</button>
+      </div>
+      <div class="alert-row">
+        <div class="ico">!</div>
+        <div><b>Eventos & convenções: 121% do orçado</b><span>Estouro de R$ 38k em rubrica. Aprovar suplementação ou realocar de Jurídico (saldo R$ 53k disponível).</span></div>
+        <button class="btn">Realocar</button>
+      </div>
+      <div class="alert-row">
+        <div class="ico">!</div>
+        <div><b>Repasse a Osasco atrasado · 80% do orçado pendente</b><span>R$ 112k a repassar · prazo estatutário 25/abr (vencido). Acionado pelo presidente municipal Osasco.</span></div>
+        <button class="btn">Liberar TED</button>
+      </div>
+      <div class="alert-row info">
+        <div class="ico">i</div>
+        <div><b>Prestação Contas Q1/2026 · TSE</b><span>Prazo 30/abr (5 dias). 23 lançamentos a conciliar antes de protocolar. Auto-rascunho gerado por IA.</span></div>
+        <button class="btn primary">Abrir rascunho</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+</body>
+</html>

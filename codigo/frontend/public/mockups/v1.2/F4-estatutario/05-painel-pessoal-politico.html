@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark" data-tenant="ub">
+<head>
+<meta charset="UTF-8">
+<title>Painel Pessoal Político · UB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../F1-fundacao/tokens.css">
+<script src="../F1-fundacao/theme-bootstrap.js"></script>
+<style>
+html, body { height: 100%; margin: 0; overflow-x: hidden; }
+body { background: var(--mz-bg-page); }
+
+.shell { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+
+/* sidebar */
+.side { background: var(--mz-bg-sidebar); border-right: 1px solid var(--mz-rule); height: 100vh; position: sticky; top: 0; overflow-y: auto; }
+.side::-webkit-scrollbar { width: 4px; } .side::-webkit-scrollbar-thumb { background: var(--mz-rule-strong); }
+.brand { padding: 16px 18px; border-bottom: 1px solid var(--mz-rule); display: flex; gap: 10px; align-items: center; }
+.brand .logo { width: 32px; height: 32px; background: var(--mz-tenant-primary); border: 1px solid var(--mz-tenant-accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; color: var(--mz-tenant-accent); font-size: 14px; }
+.brand .name { font-size: 13px; font-weight: 800; color: var(--mz-fg-strong); }
+.brand .name span { display: block; font-size: 9px; color: var(--mz-fg-faint); font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; margin-top: 1px; }
+
+.persona-card { padding: 16px; border-bottom: 1px solid var(--mz-rule); }
+.persona-card .ph { width: 56px; height: 56px; border-radius: 50%; background: var(--mz-tenant-primary); border: 2px solid var(--mz-tenant-accent); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; color: var(--mz-tenant-accent); font-size: 22px; margin-bottom: 10px; }
+.persona-card .nm { font-size: 13px; font-weight: 800; color: var(--mz-fg-strong); }
+.persona-card .role { font-size: 10px; color: var(--mz-fg-faint); letter-spacing: 0.10em; text-transform: uppercase; margin-top: 2px; }
+.persona-card .pill { display: inline-block; margin-top: 8px; font-size: 9.5px; font-weight: 800; letter-spacing: 0.10em; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent); }
+
+.nav-section { padding: 12px 8px; border-bottom: 1px solid var(--mz-rule); }
+.nav-section h3 { font-size: 9.5px; letter-spacing: 0.16em; color: var(--mz-fg-faint); text-transform: uppercase; font-weight: 700; margin: 0 10px 8px; }
+.nav-row { display: flex; gap: 10px; align-items: center; padding: 7px 10px; cursor: pointer; font-size: 12px; color: var(--mz-fg); border-radius: var(--mz-r-sm); }
+.nav-row:hover { background: var(--mz-bg-card); }
+.nav-row.active { background: var(--mz-tenant-primary-soft); border-left: 3px solid var(--mz-tenant-accent); padding-left: 7px; color: var(--mz-fg-strong); font-weight: 700; }
+.nav-row .ico { font-size: 13px; width: 18px; }
+.nav-row .qty { margin-left: auto; font-family: var(--mz-font-mono); font-size: 9.5px; color: var(--mz-fg-faint); }
+.nav-row.warn .qty { background: var(--mz-warn); color: #fff; padding: 1px 5px; border-radius: 3px; font-weight: 800; }
+
+/* main */
+main { padding: 0; }
+.top-bar { padding: 14px 24px; border-bottom: 1px solid var(--mz-rule); background: var(--mz-bg-topbar); display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 5; }
+.crumb { font-size: 11.5px; color: var(--mz-fg-muted); flex: 1; }
+.crumb b { color: var(--mz-fg-strong); font-weight: 600; }
+.crumb span::after { content: '›'; margin: 0 6px; color: var(--mz-rule-strong); }
+.crumb span:last-child::after { display: none; }
+.btn { font-size: 11.5px; font-weight: 600; padding: 7px 12px; border-radius: var(--mz-r-md); border: 1px solid var(--mz-rule); background: var(--mz-bg-card); color: var(--mz-fg); cursor: pointer; }
+.btn.primary { background: var(--mz-tenant-primary); color: #fff; border-color: var(--mz-tenant-primary-strong); }
+.btn.tenant { background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent); border-color: var(--mz-tenant-accent); font-weight: 800; }
+.btn.ghost { background: none; }
+
+/* mode tabs */
+.mode-tabs { padding: 0 24px; background: var(--mz-bg-topbar); border-bottom: 1px solid var(--mz-rule); display: flex; gap: 0; }
+.mode-tabs button { background: none; border: 0; padding: 14px 18px; font-size: 12px; color: var(--mz-fg-muted); cursor: pointer; border-bottom: 2px solid transparent; font-weight: 600; display: flex; gap: 8px; align-items: center; }
+.mode-tabs button.on { color: var(--mz-fg-strong); border-bottom-color: var(--mz-tenant-accent); }
+.mode-tabs button .num { width: 18px; height: 18px; background: var(--mz-rule); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-family: var(--mz-font-mono); font-size: 9.5px; }
+.mode-tabs button.on .num { background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent); }
+
+.section-title { padding: 24px 24px 4px; }
+.section-title h1 { font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 0.04em; color: var(--mz-fg-strong); margin: 0; }
+.section-title p { font-size: 12.5px; color: var(--mz-fg-muted); margin: 4px 0 0; max-width: 720px; }
+
+/* MY POLITICAL LIFE  - mode 1 */
+.my-grid { padding: 22px 24px; display: grid; grid-template-columns: 320px 1fr 320px; gap: 14px; }
+.col-card { background: var(--mz-bg-card); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-lg); padding: 18px; }
+.col-card h3 { font-size: 9.5px; letter-spacing: 0.14em; color: var(--mz-fg-faint); text-transform: uppercase; font-weight: 700; margin: 0 0 14px; display: flex; align-items: center; gap: 8px; }
+.col-card h3::before { content: ''; width: 4px; height: 12px; background: var(--mz-tenant-accent); }
+
+/* mandate timeline */
+.mandate-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px dashed var(--mz-rule); }
+.mandate-row:last-child { border-bottom: 0; }
+.mandate-row .yr { font-family: var(--mz-font-mono); font-size: 10px; color: var(--mz-fg-faint); width: 50px; }
+.mandate-row .body { flex: 1; }
+.mandate-row .body .t { font-size: 12px; font-weight: 700; color: var(--mz-fg-strong); }
+.mandate-row .body .s { font-size: 10.5px; color: var(--mz-fg-muted); margin-top: 2px; }
+.mandate-row .badge { font-size: 9px; font-weight: 800; letter-spacing: 0.10em; text-transform: uppercase; padding: 3px 7px; border-radius: 3px; background: var(--mz-tenant-primary-soft); color: var(--mz-tenant-accent); }
+.mandate-row .badge.now { background: var(--mz-ok); color: #fff; }
+
+/* metrics grid */
+.metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.metric { background: var(--mz-bg-elevated); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-md); padding: 12px; }
+.metric .lbl { font-size: 9px; letter-spacing: 0.14em; color: var(--mz-fg-faint); text-transform: uppercase; font-weight: 700; }
+.metric .v { font-family: 'Bebas Neue', sans-serif; font-size: 28px; line-height: 1; color: var(--mz-fg-strong); margin-top: 4px; }
+.metric .v small { font-size: 11px; color: var(--mz-fg-muted); font-family: 'Inter', sans-serif; font-weight: 600; }
+.metric .delta { font-size: 10px; margin-top: 4px; font-family: var(--mz-font-mono); color: var(--mz-ok); }
+
+/* center: trajectory chart */
+.traj { background: var(--mz-bg-card); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-lg); padding: 20px; min-height: 320px; }
+.traj h3 { font-size: 9.5px; letter-spacing: 0.14em; color: var(--mz-fg-faint); text-transform: uppercase; font-weight: 700; margin: 0 0 4px; }
+.traj .sub { font-size: 11px; color: var(--mz-fg-muted); margin-bottom: 18px; }
+
+.traj-svg { width: 100%; height: 220px; }
+
+.legend { display: flex; gap: 16px; margin-top: 12px; font-size: 10.5px; }
+.legend span { display: flex; align-items: center; gap: 6px; color: var(--mz-fg-muted); }
+.legend i { width: 10px; height: 2px; }
+
+/* upcoming */
+.up-row { display: flex; gap: 10px; align-items: flex-start; padding: 10px 0; border-bottom: 1px dashed var(--mz-rule); }
+.up-row:last-child { border-bottom: 0; }
+.up-row .d { background: var(--mz-tenant-primary); color: #fff; border-radius: 4px; padding: 4px 6px; text-align: center; min-width: 38px; }
+.up-row .d .day { font-family: 'Bebas Neue', sans-serif; font-size: 18px; line-height: 1; color: var(--mz-tenant-accent); }
+.up-row .d .mo { font-size: 8.5px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; }
+.up-row .body .t { font-size: 12px; font-weight: 700; color: var(--mz-fg-strong); }
+.up-row .body .s { font-size: 10.5px; color: var(--mz-fg-muted); margin-top: 2px; }
+
+/* GABINETE - mode 2 */
+.gab-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 20px 24px; }
+.gab-stats .stat { background: var(--mz-bg-card); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-md); padding: 14px; }
+.gab-stats .stat .lbl { font-size: 9px; letter-spacing: 0.14em; color: var(--mz-fg-faint); text-transform: uppercase; font-weight: 700; }
+.gab-stats .stat .v { font-family: 'Bebas Neue', sans-serif; font-size: 30px; line-height: 1; color: var(--mz-fg-strong); margin-top: 4px; }
+.gab-stats .stat .s { font-size: 10px; color: var(--mz-fg-muted); margin-top: 2px; }
+.gab-stats .stat.warn { border-color: var(--mz-warn); }
+.gab-stats .stat.warn .v { color: var(--mz-warn); }
+
+.gab-grid { padding: 14px 24px 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+.org-block { background: var(--mz-bg-card); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-lg); padding: 18px; }
+.org-block .hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.org-block h3 { font-size: 9.5px; letter-spacing: 0.14em; color: var(--mz-fg-faint); text-transform: uppercase; font-weight: 700; margin: 0; }
+.org-block .badge { font-size: 9px; padding: 3px 7px; border-radius: 3px; background: var(--mz-rule); color: var(--mz-fg-muted); font-weight: 800; }
+
+.team-row { display: grid; grid-template-columns: 36px 1fr 90px 90px 28px; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px dashed var(--mz-rule); }
+.team-row:last-child { border-bottom: 0; }
+.team-row .av { width: 36px; height: 36px; border-radius: 50%; background: var(--mz-bg-elevated); border: 1px solid var(--mz-rule); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: var(--mz-fg-muted); }
+.team-row .nm { font-size: 12px; font-weight: 700; color: var(--mz-fg-strong); }
+.team-row .nm small { display: block; font-size: 10px; color: var(--mz-fg-muted); font-weight: 500; margin-top: 2px; }
+.team-row .role { font-size: 10.5px; color: var(--mz-fg-muted); }
+.team-row .role.cef { color: var(--mz-tenant-accent); font-weight: 700; }
+.team-row .role.com { color: var(--mz-fg-strong); font-weight: 600; }
+.team-row .stat-pill { font-size: 9px; padding: 2px 6px; border-radius: 3px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; text-align: center; }
+.team-row .stat-pill.ok { background: rgba(34,197,94,0.16); color: var(--mz-ok); }
+.team-row .stat-pill.warn { background: rgba(245,158,11,0.16); color: var(--mz-warn); }
+.team-row .stat-pill.crit { background: rgba(220,38,38,0.18); color: var(--mz-err); }
+.team-row .menu { font-size: 14px; color: var(--mz-fg-faint); cursor: pointer; }
+
+/* CARGOS COMISSAO bar */
+.cc-bar { display: flex; height: 28px; border-radius: 4px; overflow: hidden; margin-bottom: 8px; border: 1px solid var(--mz-rule); }
+.cc-bar > span { display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; color: #fff; }
+.cc-bar .occupied { background: var(--mz-tenant-primary); }
+.cc-bar .vacant { background: var(--mz-rule); color: var(--mz-fg-muted); }
+.cc-bar .blocked { background: var(--mz-err); }
+
+.payroll-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed var(--mz-rule); font-size: 11.5px; }
+.payroll-row:last-child { border-bottom: 0; padding-top: 10px; font-weight: 800; color: var(--mz-fg-strong); }
+.payroll-row .amt { font-family: var(--mz-font-mono); }
+
+/* AGENDA - mode 3 */
+.agenda-grid { padding: 22px 24px; display: grid; grid-template-columns: 1fr 320px; gap: 14px; }
+.cal { background: var(--mz-bg-card); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-lg); padding: 18px; }
+.cal h3 { font-size: 9.5px; letter-spacing: 0.14em; color: var(--mz-fg-faint); text-transform: uppercase; font-weight: 700; margin: 0 0 14px; }
+.cal .week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal .dh { font-size: 9.5px; letter-spacing: 0.10em; text-transform: uppercase; color: var(--mz-fg-faint); text-align: center; padding: 6px 0; font-weight: 700; }
+.cal .day-cell { background: var(--mz-bg-elevated); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-sm); min-height: 90px; padding: 6px; position: relative; cursor: pointer; }
+.cal .day-cell:hover { border-color: var(--mz-tenant-accent); }
+.cal .day-cell.today { border-color: var(--mz-tenant-accent); background: var(--mz-tenant-primary-soft); }
+.cal .day-cell .num { font-size: 11px; font-weight: 700; color: var(--mz-fg-muted); }
+.cal .day-cell.today .num { color: var(--mz-fg-strong); }
+.cal .day-cell.muted { opacity: 0.35; }
+.cal .ev { font-size: 9px; padding: 2px 4px; border-radius: 3px; margin-top: 3px; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cal .ev.event { background: var(--mz-tenant-primary); color: var(--mz-tenant-accent); border-left: 2px solid var(--mz-tenant-accent); }
+.cal .ev.cor { background: rgba(34,197,94,0.18); color: var(--mz-ok); }
+.cal .ev.travel { background: rgba(245,158,11,0.18); color: var(--mz-warn); }
+
+.agenda-side .col-card { padding: 16px; }
+.timeline-event { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px dashed var(--mz-rule); }
+.timeline-event:last-child { border-bottom: 0; }
+.timeline-event .hr { font-family: var(--mz-font-mono); font-size: 10px; color: var(--mz-fg-faint); width: 38px; }
+.timeline-event .body { flex: 1; }
+.timeline-event .t { font-size: 12px; font-weight: 700; color: var(--mz-fg-strong); }
+.timeline-event .s { font-size: 10.5px; color: var(--mz-fg-muted); margin-top: 2px; }
+.timeline-event .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--mz-tenant-accent); margin-top: 4px; flex-shrink: 0; }
+
+/* hidden by default */
+.mode-pane { display: none; }
+.mode-pane.on { display: block; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="side">
+    <div class="brand">
+      <div class="logo">UB</div>
+      <div class="name">União Brasil<span>Mazzel Eleitoral</span></div>
+    </div>
+
+    <div class="persona-card">
+      <div class="ph">RR</div>
+      <div class="nm">Rafael Rodrigues</div>
+      <div class="role">Vereador · 3º Mandato</div>
+      <span class="pill">Líder Bancada</span>
+    </div>
+
+    <div class="nav-section">
+      <h3>Painel Pessoal</h3>
+      <div class="nav-row active"><span class="ico">📊</span> Visão Geral</div>
+      <div class="nav-row"><span class="ico">👥</span> Gabinete <span class="qty">28</span></div>
+      <div class="nav-row"><span class="ico">📅</span> Agenda <span class="qty">12</span></div>
+      <div class="nav-row warn"><span class="ico">📋</span> Compromissos <span class="qty">3</span></div>
+      <div class="nav-row"><span class="ico">💼</span> Mandato Atual</div>
+      <div class="nav-row"><span class="ico">📈</span> Histórico Eleitoral</div>
+    </div>
+    <div class="nav-section">
+      <h3>Cidade</h3>
+      <div class="nav-row"><span class="ico">🏛</span> Diretório UB</div>
+      <div class="nav-row"><span class="ico">🗺</span> Mapa Estratégico</div>
+      <div class="nav-row"><span class="ico">📨</span> Cartinha</div>
+    </div>
+  </aside>
+
+  <main>
+    <div class="top-bar">
+      <div class="crumb"><span>Mazzel Eleitoral</span><span><b>UB · São Paulo · SP</b></span><span>Painel Pessoal</span></div>
+      <button class="btn">⚙ Configurar</button>
+      <button class="btn primary">+ Novo Compromisso</button>
+    </div>
+
+    <div class="mode-tabs">
+      <button class="on" data-mode="my"><span class="num">1</span> Minha Vida Política</button>
+      <button data-mode="gab"><span class="num">2</span> Equipe Gabinete</button>
+      <button data-mode="ag"><span class="num">3</span> Agenda Pessoal</button>
+    </div>
+
+    <!-- MODE 1: MY POLITICAL LIFE -->
+    <div class="mode-pane on" data-pane="my">
+      <div class="section-title">
+        <h1>RAFAEL RODRIGUES</h1>
+        <p>3º mandato como Vereador · Líder de Bancada UB · São Paulo. Painel privado consolidando trajetória política, performance no mandato atual e indicadores pessoais. Os dados aqui visíveis NÃO são compartilhados com o partido sem autorização explícita.</p>
+      </div>
+
+      <div class="my-grid">
+        <!-- LEFT: Trajetória / Mandatos -->
+        <div class="col-card">
+          <h3>Trajetória Política</h3>
+          <div class="mandate-row">
+            <div class="yr">2025-28</div>
+            <div class="body"><div class="t">Vereador · 3º Mandato</div><div class="s">SP · 18.420 votos · UB</div></div>
+            <span class="badge now">ATIVO</span>
+          </div>
+          <div class="mandate-row">
+            <div class="yr">2021-24</div>
+            <div class="body"><div class="t">Vereador · 2º Mandato</div><div class="s">SP · 14.890 votos · UB</div></div>
+            <span class="badge">FINALIZADO</span>
+          </div>
+          <div class="mandate-row">
+            <div class="yr">2017-20</div>
+            <div class="body"><div class="t">Vereador · 1º Mandato</div><div class="s">SP · 9.110 votos · DEM</div></div>
+            <span class="badge">FINALIZADO</span>
+          </div>
+          <div class="mandate-row">
+            <div class="yr">2014</div>
+            <div class="body"><div class="t">Candidato Dep. Estadual</div><div class="s">SP · 32.110 votos · NÃO ELEITO</div></div>
+            <span class="badge">DERROTA</span>
+          </div>
+
+          <h3 style="margin-top:24px">Métricas Mandato Atual</h3>
+          <div class="metrics-grid">
+            <div class="metric">
+              <div class="lbl">Projetos</div>
+              <div class="v">47</div>
+              <div class="delta">+12 em 2026</div>
+            </div>
+            <div class="metric">
+              <div class="lbl">Aprovados</div>
+              <div class="v">31</div>
+              <div class="delta">66% taxa</div>
+            </div>
+            <div class="metric">
+              <div class="lbl">Emendas</div>
+              <div class="v">R$ 8.4<small>M</small></div>
+              <div class="delta">94% executadas</div>
+            </div>
+            <div class="metric">
+              <div class="lbl">Presença</div>
+              <div class="v">98<small>%</small></div>
+              <div class="delta">Top 5 vereadores</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CENTER: Trajetória SVG -->
+        <div class="col-card">
+          <h3>Performance Eleitoral</h3>
+          <div class="sub">Evolução de votos · 4 disputas eleitorais</div>
+
+          <svg class="traj-svg" viewBox="0 0 600 220" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="grad-traj" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="var(--mz-tenant-accent)" stop-opacity="0.4"/>
+                <stop offset="100%" stop-color="var(--mz-tenant-accent)" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <!-- grid -->
+            <line x1="0" y1="180" x2="600" y2="180" stroke="var(--mz-rule)" stroke-width="1"/>
+            <line x1="0" y1="120" x2="600" y2="120" stroke="var(--mz-rule)" stroke-width="1" stroke-dasharray="2 4"/>
+            <line x1="0" y1="60" x2="600" y2="60" stroke="var(--mz-rule)" stroke-width="1" stroke-dasharray="2 4"/>
+
+            <text x="0" y="184" font-size="9" fill="var(--mz-fg-faint)">0</text>
+            <text x="0" y="124" font-size="9" fill="var(--mz-fg-faint)">15k</text>
+            <text x="0" y="64" font-size="9" fill="var(--mz-fg-faint)">30k</text>
+
+            <!-- area -->
+            <polygon points="60,140 220,90 380,80 540,40 540,180 60,180" fill="url(#grad-traj)"/>
+            <!-- line -->
+            <polyline points="60,140 220,90 380,80 540,40" fill="none" stroke="var(--mz-tenant-accent)" stroke-width="2.5"/>
+
+            <!-- points -->
+            <circle cx="60" cy="140" r="6" fill="var(--mz-bg-card)" stroke="var(--mz-warn)" stroke-width="2"/>
+            <circle cx="220" cy="90" r="6" fill="var(--mz-bg-card)" stroke="var(--mz-tenant-accent)" stroke-width="2"/>
+            <circle cx="380" cy="80" r="6" fill="var(--mz-bg-card)" stroke="var(--mz-tenant-accent)" stroke-width="2"/>
+            <circle cx="540" cy="40" r="8" fill="var(--mz-tenant-accent)" stroke="var(--mz-bg-card)" stroke-width="3"/>
+
+            <!-- labels -->
+            <text x="60" y="208" font-size="10" fill="var(--mz-fg-muted)" text-anchor="middle">2014</text>
+            <text x="220" y="208" font-size="10" fill="var(--mz-fg-muted)" text-anchor="middle">2016</text>
+            <text x="380" y="208" font-size="10" fill="var(--mz-fg-muted)" text-anchor="middle">2020</text>
+            <text x="540" y="208" font-size="10" fill="var(--mz-fg-strong)" text-anchor="middle" font-weight="800">2024</text>
+
+            <text x="60" y="130" font-size="10" fill="var(--mz-warn)" text-anchor="middle">32k</text>
+            <text x="220" y="80" font-size="10" fill="var(--mz-fg-strong)" text-anchor="middle">9.1k</text>
+            <text x="380" y="70" font-size="10" fill="var(--mz-fg-strong)" text-anchor="middle">14.9k</text>
+            <text x="540" y="30" font-size="11" fill="var(--mz-tenant-accent)" text-anchor="middle" font-weight="800">18.4k</text>
+          </svg>
+
+          <div class="legend">
+            <span><i style="background: var(--mz-tenant-accent);"></i> Votos recebidos</span>
+            <span><i style="background: var(--mz-warn);"></i> Não eleito</span>
+          </div>
+
+          <h3 style="margin-top:22px">Indicadores Privados</h3>
+          <div class="metrics-grid">
+            <div class="metric">
+              <div class="lbl">Aprovação Pesquisa</div>
+              <div class="v">71<small>%</small></div>
+              <div class="delta">+4pp último mês</div>
+            </div>
+            <div class="metric">
+              <div class="lbl">Mídia Próxima</div>
+              <div class="v">+18<small>pts</small></div>
+              <div class="delta">vs média bancada</div>
+            </div>
+            <div class="metric">
+              <div class="lbl">Capital Político</div>
+              <div class="v">8.4<small>/10</small></div>
+              <div class="delta">Análise IA</div>
+            </div>
+            <div class="metric">
+              <div class="lbl">Risco LGPD</div>
+              <div class="v">BAIXO</div>
+              <div class="delta" style="color: var(--mz-ok)">0 alertas</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Próximos compromissos / agenda -->
+        <div class="col-card">
+          <h3>Próximos · 7 Dias</h3>
+          <div class="up-row">
+            <div class="d"><div class="day">28</div><div class="mo">ABR</div></div>
+            <div class="body">
+              <div class="t">Sessão Plenária</div>
+              <div class="s">Câmara Municipal · 14h00 · Pauta orçamento</div>
+            </div>
+          </div>
+          <div class="up-row">
+            <div class="d"><div class="day">29</div><div class="mo">ABR</div></div>
+            <div class="body">
+              <div class="t">Comissão Saúde</div>
+              <div class="s">Sala 12 · 09h00 · Relatoria PL 234/26</div>
+            </div>
+          </div>
+          <div class="up-row">
+            <div class="d"><div class="day">30</div><div class="mo">ABR</div></div>
+            <div class="body">
+              <div class="t">Visita Bairro Capão Redondo</div>
+              <div class="s">Posto Saúde · 16h00 · Operação Caminhada</div>
+            </div>
+          </div>
+          <div class="up-row">
+            <div class="d"><div class="day">02</div><div class="mo">MAI</div></div>
+            <div class="body">
+              <div class="t">Reunião Líder Bancada</div>
+              <div class="s">Diretório UB · 11h00 · Estratégia 2026</div>
+            </div>
+          </div>
+          <div class="up-row">
+            <div class="d"><div class="day">04</div><div class="mo">MAI</div></div>
+            <div class="body">
+              <div class="t">Entrevista Folha SP</div>
+              <div class="s">Gabinete · 10h00 · Pauta saúde mental</div>
+            </div>
+          </div>
+
+          <h3 style="margin-top:22px">Reputação · Tempo Real</h3>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;justify-content:space-between;font-size:11px">
+              <span style="color:var(--mz-fg-muted)">Sentimento mídia (7d)</span>
+              <span style="color:var(--mz-ok);font-weight:700">+ 0.62</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:11px">
+              <span style="color:var(--mz-fg-muted)">Menções redes</span>
+              <span style="color:var(--mz-fg-strong);font-family:var(--mz-font-mono)">3.4k</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:11px">
+              <span style="color:var(--mz-fg-muted)">Crises detectadas</span>
+              <span style="color:var(--mz-ok);font-weight:700">0</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:11px">
+              <span style="color:var(--mz-fg-muted)">Influência rede UB</span>
+              <span style="color:var(--mz-fg-strong);font-family:var(--mz-font-mono)">#3 / 87</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODE 2: GABINETE -->
+    <div class="mode-pane" data-pane="gab">
+      <div class="section-title">
+        <h1>EQUIPE DE GABINETE</h1>
+        <p>Gestão da estrutura de pessoal vinculada ao mandato. Inclui cargos comissionados, terceirizados, estagiários e voluntários. Folha sincronizada com SIAPE/sistema da Casa Legislativa quando disponível.</p>
+      </div>
+
+      <div class="gab-stats">
+        <div class="stat">
+          <div class="lbl">Total Equipe</div>
+          <div class="v">28</div>
+          <div class="s">21 cargos comissionados · 7 voluntários</div>
+        </div>
+        <div class="stat">
+          <div class="lbl">Folha Mensal</div>
+          <div class="v">R$ 184k</div>
+          <div class="s">94% do teto da Casa</div>
+        </div>
+        <div class="stat warn">
+          <div class="lbl">Vagas Críticas</div>
+          <div class="v">3</div>
+          <div class="s">Chefe imprensa · Jurídico · Estagiário</div>
+        </div>
+        <div class="stat">
+          <div class="lbl">Tempo Médio Casa</div>
+          <div class="v">3.8<small>anos</small></div>
+          <div class="s">Equipe estável</div>
+        </div>
+        <div class="stat">
+          <div class="lbl">Turnover Anual</div>
+          <div class="v">8<small>%</small></div>
+          <div class="s">Abaixo da média</div>
+        </div>
+      </div>
+
+      <div class="gab-grid">
+        <!-- ORGANOGRAMA -->
+        <div class="org-block">
+          <div class="hdr">
+            <h3>Estrutura Hierárquica</h3>
+            <span class="badge">7 setores</span>
+          </div>
+
+          <div class="team-row">
+            <div class="av" style="background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent)">JC</div>
+            <div class="nm">Joana Carvalho<small>10 anos · Confiança máxima</small></div>
+            <div class="role cef">CHEFE GABINETE</div>
+            <span class="stat-pill ok">Ativo</span>
+            <span class="menu">⋮</span>
+          </div>
+          <div class="team-row">
+            <div class="av">PM</div>
+            <div class="nm">Pedro Magalhães<small>5 anos · Articulação política</small></div>
+            <div class="role com">Assessor Político-Sr</div>
+            <span class="stat-pill ok">Ativo</span>
+            <span class="menu">⋮</span>
+          </div>
+          <div class="team-row">
+            <div class="av">RA</div>
+            <div class="nm">Renata Almeida<small>3 anos · Comissões e plenário</small></div>
+            <div class="role com">Assessor Legislativo</div>
+            <span class="stat-pill ok">Ativo</span>
+            <span class="menu">⋮</span>
+          </div>
+          <div class="team-row">
+            <div class="av" style="border:1px dashed var(--mz-warn);background:transparent;color:var(--mz-warn)">?</div>
+            <div class="nm" style="color:var(--mz-warn)">VAGA · CHEFE IMPRENSA<small>Vacância: 21 dias</small></div>
+            <div class="role">Comunicação</div>
+            <span class="stat-pill crit">Vago</span>
+            <span class="menu">⋮</span>
+          </div>
+          <div class="team-row">
+            <div class="av">FS</div>
+            <div class="nm">Fernanda Silva<small>2 anos · Redes e produção</small></div>
+            <div class="role com">Mídia Sênior</div>
+            <span class="stat-pill ok">Ativo</span>
+            <span class="menu">⋮</span>
+          </div>
+          <div class="team-row">
+            <div class="av">LO</div>
+            <div class="nm">Lucas Oliveira<small>1 ano · Demandas constituintes</small></div>
+            <div class="role com">Assessor Comunitário</div>
+            <span class="stat-pill ok">Ativo</span>
+            <span class="menu">⋮</span>
+          </div>
+          <div class="team-row">
+            <div class="av">AC</div>
+            <div class="nm">Ana Cardoso<small>4 anos · Agenda e protocolo</small></div>
+            <div class="role com">Secretária Executiva</div>
+            <span class="stat-pill warn">Atestado</span>
+            <span class="menu">⋮</span>
+          </div>
+          <div class="team-row">
+            <div class="av">MR</div>
+            <div class="nm">Marcos Ribeiro<small>6 meses · Estagiário Direito</small></div>
+            <div class="role com">Estagiário Jurídico</div>
+            <span class="stat-pill ok">Ativo</span>
+            <span class="menu">⋮</span>
+          </div>
+
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--mz-rule);text-align:center">
+            <button class="btn ghost" style="font-size:11px">+ ver mais 20 colaboradores</button>
+          </div>
+        </div>
+
+        <!-- DETAILS / FOLHA -->
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div class="org-block">
+            <div class="hdr">
+              <h3>Ocupação Cargos Comissionados</h3>
+              <span class="badge">21/24</span>
+            </div>
+            <div class="cc-bar">
+              <span class="occupied" style="flex:21">21 ocupados</span>
+              <span class="vacant" style="flex:2">2 vagos</span>
+              <span class="blocked" style="flex:1">1 bloqueado</span>
+            </div>
+            <div style="display:flex;gap:18px;font-size:10.5px;color:var(--mz-fg-muted);margin-top:10px">
+              <span><b style="color:var(--mz-fg-strong)">21</b> ocupados (87.5%)</span>
+              <span><b style="color:var(--mz-warn)">2</b> em recrutamento</span>
+              <span><b style="color:var(--mz-err)">1</b> bloqueado · MP</span>
+            </div>
+            <div style="margin-top:12px;padding:10px;background:var(--mz-bg-elevated);border-radius:6px;font-size:11px;color:var(--mz-fg-muted);border-left:3px solid var(--mz-warn)">
+              <b style="color:var(--mz-warn)">⚠ Bloqueio judicial</b> — Cargo de Assessor Especial bloqueado por decisão MP-SP nº 2026-0421. Aguardando manifestação até 15/05.
+            </div>
+          </div>
+
+          <div class="org-block">
+            <div class="hdr">
+              <h3>Folha Salarial · Abril 2026</h3>
+              <span class="badge">94% teto</span>
+            </div>
+            <div class="payroll-row"><span>Cargos Comissionados (21)</span><span class="amt">R$ 142.840</span></div>
+            <div class="payroll-row"><span>Estagiários (4)</span><span class="amt">R$ 8.400</span></div>
+            <div class="payroll-row"><span>Encargos · INSS · FGTS</span><span class="amt">R$ 28.760</span></div>
+            <div class="payroll-row"><span>Verba Indenizatória</span><span class="amt">R$ 4.200</span></div>
+            <div class="payroll-row"><span>Total</span><span class="amt">R$ 184.200</span></div>
+          </div>
+
+          <div class="org-block">
+            <div class="hdr">
+              <h3>Sinais de Alerta</h3>
+              <span class="badge" style="background: var(--mz-warn); color: #fff">3 ativos</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="padding:10px;background:var(--mz-bg-elevated);border-radius:6px;border-left:3px solid var(--mz-warn)">
+                <div style="font-size:11.5px;font-weight:700;color:var(--mz-fg-strong)">Folha 94% do teto</div>
+                <div style="font-size:10.5px;color:var(--mz-fg-muted);margin-top:2px">Sem margem para nova contratação. Avaliar substituição interna.</div>
+              </div>
+              <div style="padding:10px;background:var(--mz-bg-elevated);border-radius:6px;border-left:3px solid var(--mz-err)">
+                <div style="font-size:11.5px;font-weight:700;color:var(--mz-fg-strong)">Vacância chefe imprensa há 21 dias</div>
+                <div style="font-size:10.5px;color:var(--mz-fg-muted);margin-top:2px">Período crítico · pré-eleitoral. Indicação urgente.</div>
+              </div>
+              <div style="padding:10px;background:var(--mz-bg-elevated);border-radius:6px;border-left:3px solid var(--mz-warn)">
+                <div style="font-size:11.5px;font-weight:700;color:var(--mz-fg-strong)">Aniversário 5 anos · Pedro Magalhães</div>
+                <div style="font-size:10.5px;color:var(--mz-fg-muted);margin-top:2px">Reconhecimento + revisão salarial pendente.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODE 3: AGENDA -->
+    <div class="mode-pane" data-pane="ag">
+      <div class="section-title">
+        <h1>AGENDA PESSOAL</h1>
+        <p>Compromissos públicos e privados, sincronizados com a Casa Legislativa, comissões e operações territoriais. Eventos privados são marcados com cadeado e não compartilhados.</p>
+      </div>
+
+      <div class="agenda-grid">
+        <div class="cal">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+            <h3 style="margin:0">Abril 2026</h3>
+            <div style="display:flex;gap:6px">
+              <button class="btn ghost" style="padding:4px 10px">‹</button>
+              <button class="btn ghost" style="padding:4px 10px">Hoje</button>
+              <button class="btn ghost" style="padding:4px 10px">›</button>
+            </div>
+          </div>
+          <div class="week">
+            <div class="dh">DOM</div><div class="dh">SEG</div><div class="dh">TER</div><div class="dh">QUA</div><div class="dh">QUI</div><div class="dh">SEX</div><div class="dh">SAB</div>
+
+            <div class="day-cell muted"><div class="num">29</div></div>
+            <div class="day-cell muted"><div class="num">30</div></div>
+            <div class="day-cell muted"><div class="num">31</div></div>
+            <div class="day-cell"><div class="num">01</div><div class="ev event">Sessão</div></div>
+            <div class="day-cell"><div class="num">02</div></div>
+            <div class="day-cell"><div class="num">03</div><div class="ev cor">Família</div></div>
+            <div class="day-cell"><div class="num">04</div></div>
+
+            <div class="day-cell"><div class="num">05</div></div>
+            <div class="day-cell"><div class="num">06</div><div class="ev event">Comissão</div><div class="ev event">Sessão</div></div>
+            <div class="day-cell"><div class="num">07</div><div class="ev event">Audiência</div></div>
+            <div class="day-cell"><div class="num">08</div><div class="ev event">Sessão</div></div>
+            <div class="day-cell"><div class="num">09</div></div>
+            <div class="day-cell"><div class="num">10</div><div class="ev travel">Brasília</div></div>
+            <div class="day-cell"><div class="num">11</div></div>
+
+            <div class="day-cell"><div class="num">12</div></div>
+            <div class="day-cell"><div class="num">13</div><div class="ev event">Sessão</div></div>
+            <div class="day-cell"><div class="num">14</div></div>
+            <div class="day-cell"><div class="num">15</div><div class="ev event">Sessão</div><div class="ev cor">Op.Caminhada</div></div>
+            <div class="day-cell"><div class="num">16</div></div>
+            <div class="day-cell"><div class="num">17</div></div>
+            <div class="day-cell"><div class="num">18</div><div class="ev event">Convenção UB</div></div>
+
+            <div class="day-cell"><div class="num">19</div></div>
+            <div class="day-cell"><div class="num">20</div><div class="ev event">Sessão</div></div>
+            <div class="day-cell"><div class="num">21</div></div>
+            <div class="day-cell"><div class="num">22</div><div class="ev event">Sessão</div></div>
+            <div class="day-cell"><div class="num">23</div></div>
+            <div class="day-cell"><div class="num">24</div><div class="ev cor">Família</div></div>
+            <div class="day-cell"><div class="num">25</div></div>
+
+            <div class="day-cell"><div class="num">26</div></div>
+            <div class="day-cell"><div class="num">27</div><div class="ev event">Líder</div></div>
+            <div class="day-cell today"><div class="num">28</div><div class="ev event">Sessão</div><div class="ev event">Comissão</div><div class="ev cor">Visita</div></div>
+            <div class="day-cell"><div class="num">29</div><div class="ev event">Comissão Saúde</div></div>
+            <div class="day-cell"><div class="num">30</div><div class="ev cor">Op.Caminhada</div></div>
+            <div class="day-cell muted"><div class="num">01</div></div>
+            <div class="day-cell muted"><div class="num">02</div></div>
+          </div>
+
+          <div style="display:flex;gap:18px;margin-top:14px;padding-top:14px;border-top:1px solid var(--mz-rule);font-size:10.5px;color:var(--mz-fg-muted)">
+            <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;background:var(--mz-tenant-primary);border-left:2px solid var(--mz-tenant-accent)"></span> Mandato/Casa</span>
+            <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;background:rgba(34,197,94,0.4)"></span> Operação/Visita</span>
+            <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;background:rgba(245,158,11,0.4)"></span> Viagem</span>
+            <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;background:var(--mz-rule);border:1px dashed var(--mz-rule-strong)"></span> Privado/Família</span>
+          </div>
+        </div>
+
+        <div class="agenda-side">
+          <div class="col-card">
+            <h3>Hoje · 28 ABR</h3>
+            <div class="timeline-event">
+              <div class="hr">08:30</div>
+              <div class="dot"></div>
+              <div class="body">
+                <div class="t">Briefing Diário</div>
+                <div class="s">Joana Carvalho · Gabinete</div>
+              </div>
+            </div>
+            <div class="timeline-event">
+              <div class="hr">09:00</div>
+              <div class="dot"></div>
+              <div class="body">
+                <div class="t">Comissão Saúde</div>
+                <div class="s">Sala 12 · Relatoria PL 234</div>
+              </div>
+            </div>
+            <div class="timeline-event">
+              <div class="hr">11:30</div>
+              <div class="dot"></div>
+              <div class="body">
+                <div class="t">Reunião imprensa</div>
+                <div class="s">Folha SP · pauta saúde mental</div>
+              </div>
+            </div>
+            <div class="timeline-event">
+              <div class="hr">14:00</div>
+              <div class="dot"></div>
+              <div class="body">
+                <div class="t">Sessão Plenária</div>
+                <div class="s">Câmara · Pauta orçamento</div>
+              </div>
+            </div>
+            <div class="timeline-event">
+              <div class="hr">16:00</div>
+              <div class="dot" style="background: var(--mz-ok)"></div>
+              <div class="body">
+                <div class="t">Visita Capão Redondo</div>
+                <div class="s">Posto Saúde · Op.Caminhada</div>
+              </div>
+            </div>
+            <div class="timeline-event">
+              <div class="hr">19:00</div>
+              <div class="dot" style="background: var(--mz-rule-strong);border:1px dashed var(--mz-fg-faint)"></div>
+              <div class="body">
+                <div class="t">🔒 Privado</div>
+                <div class="s">Compromisso pessoal · não compartilhado</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-card" style="margin-top:14px">
+            <h3>Conflitos · 7 Dias</h3>
+            <div style="padding:10px;background:var(--mz-bg-elevated);border-radius:6px;border-left:3px solid var(--mz-warn);font-size:11px">
+              <b style="color:var(--mz-warn)">⚠ 02/05 · 11h</b><br>
+              <span style="color:var(--mz-fg-muted)">Reunião líder bancada conflita com convite Café com Eleitor (Lucas Oliveira)</span>
+              <div style="margin-top:6px;display:flex;gap:6px">
+                <button class="btn ghost" style="padding:3px 8px;font-size:10px">Manter líder</button>
+                <button class="btn ghost" style="padding:3px 8px;font-size:10px">Delegar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+document.querySelectorAll('.mode-tabs button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mode-tabs button').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    const mode = btn.dataset.mode;
+    document.querySelectorAll('.mode-pane').forEach(p => {
+      p.classList.toggle('on', p.dataset.pane === mode);
+    });
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark" data-tenant="ub">
+<head>
+<meta charset="UTF-8">
+<title>Dossiê · 8 Cargos · UB</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../F1-fundacao/tokens.css">
+<script src="../F1-fundacao/theme-bootstrap.js"></script>
+<style>
+html, body { height: 100%; margin: 0; overflow: hidden; }
+.app { display: flex; flex-direction: column; height: 100vh; }
+
+/* ============ TOP BAR DE CARGO ============ */
+.role-bar {
+  height: 64px; flex-shrink: 0;
+  background: var(--mz-bg-topbar);
+  border-bottom: 1px solid var(--mz-rule);
+  display: flex; align-items: center; gap: 20px;
+  padding: 0 24px; overflow: hidden;
+}
+.role-bar h1 {
+  font-size: 13px; font-weight: 700;
+  color: var(--mz-fg-strong);
+  letter-spacing: 0.04em; margin: 0;
+  white-space: nowrap;
+}
+.role-bar .helper {
+  font-size: 11px; color: var(--mz-fg-faint);
+  white-space: nowrap;
+}
+.role-pills { display: flex; gap: 6px; overflow-x: auto; padding: 6px 0; flex: 1; scrollbar-width: thin; scrollbar-color: var(--mz-rule-strong) transparent; }
+.role-pills::-webkit-scrollbar { height: 4px; }
+.role-pills::-webkit-scrollbar-thumb { background: var(--mz-rule-strong); border-radius: 2px; }
+.role-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 12px;
+  background: var(--mz-bg-card); border: 1px solid var(--mz-rule);
+  color: var(--mz-fg-muted);
+  border-radius: var(--mz-r-pill);
+  font-size: 12px; font-weight: 500;
+  white-space: nowrap; cursor: pointer; transition: all 120ms;
+}
+.role-pill:hover { border-color: var(--mz-fg-faint); color: var(--mz-fg); }
+.role-pill.active {
+  background: var(--mz-tenant-primary);
+  border-color: var(--mz-tenant-primary-strong);
+  color: #fff;
+  box-shadow: 0 0 0 1px var(--mz-tenant-accent-soft);
+}
+.role-pill .num {
+  font-family: var(--mz-font-mono); font-size: 10px;
+  background: rgba(0,0,0,0.3); padding: 1px 5px; border-radius: 3px;
+}
+.role-pill.active .num { background: rgba(255, 204, 0, 0.25); color: #FFCC00; }
+
+/* ============ MAIN GRID ============ */
+.layout {
+  flex: 1; display: grid;
+  grid-template-columns: 1fr 320px;
+  min-height: 0;
+}
+
+/* ============ DOSSIÊ ============ */
+.dossie {
+  overflow-y: auto;
+  background:
+    radial-gradient(1000px 400px at 30% -100px, rgba(0, 42, 123, 0.10), transparent),
+    var(--mz-bg-page);
+}
+.dossie::-webkit-scrollbar { width: 6px; }
+.dossie::-webkit-scrollbar-thumb { background: var(--mz-rule-strong); }
+
+/* ============ HEADER do POLÍTICO ============ */
+.hero {
+  padding: 28px 32px 24px;
+  border-bottom: 1px solid var(--mz-rule);
+  display: grid;
+  grid-template-columns: 96px 1fr auto;
+  gap: 24px;
+  align-items: center;
+  position: relative;
+}
+.hero::before {
+  content: '';
+  position: absolute; bottom: 0; left: 32px; right: 32px; height: 3px;
+  background: linear-gradient(90deg, var(--mz-tenant-primary), var(--mz-tenant-accent));
+  border-radius: 2px;
+}
+.hero .photo {
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--mz-tenant-primary), var(--mz-tenant-primary-strong));
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 44px;
+  color: var(--mz-tenant-accent);
+  letter-spacing: 0.04em;
+  box-shadow: inset 0 4px 12px rgba(0,0,0,0.3), 0 0 0 3px var(--mz-tenant-accent-soft);
+}
+.hero .info .eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--mz-tenant-accent);
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.hero .info h1 {
+  font-size: 36px; font-weight: 800;
+  letter-spacing: -0.025em; color: var(--mz-fg-strong);
+  margin: 0; line-height: 1.05;
+}
+.hero .info .meta {
+  display: flex; gap: 14px; align-items: center;
+  margin-top: 8px;
+  font-size: 12px; color: var(--mz-fg-muted);
+}
+.hero .info .meta b { color: var(--mz-fg); font-weight: 600; }
+.hero .info .meta .dot { width: 3px; height: 3px; background: var(--mz-fg-faint); border-radius: 50%; }
+
+.hero .ovr {
+  display: flex; gap: 16px; align-items: center;
+}
+.hero .ovr .big {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 78px; font-weight: 700;
+  color: var(--mz-tenant-accent);
+  line-height: 1; letter-spacing: 0.02em;
+  text-shadow: 0 0 20px rgba(255, 204, 0, 0.25);
+}
+.hero .ovr .lbl {
+  font-size: 9px; letter-spacing: 0.20em;
+  color: var(--mz-fg-faint); font-weight: 700;
+  text-transform: uppercase; margin-top: 4px;
+}
+.hero .ovr .tier-pill {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  background: var(--mz-tenant-accent);
+  color: var(--mz-fg-on-accent);
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 8px;
+  letter-spacing: 0.04em;
+}
+
+/* ============ SECTION ANCHORS ============ */
+.toc {
+  position: sticky; top: 0; z-index: 5;
+  display: flex; gap: 4px; overflow-x: auto;
+  background: var(--mz-bg-page);
+  border-bottom: 1px solid var(--mz-rule);
+  padding: 10px 32px;
+  scrollbar-width: none;
+}
+.toc::-webkit-scrollbar { display: none; }
+.toc-item {
+  font-size: 11px; font-weight: 600;
+  color: var(--mz-fg-muted);
+  padding: 6px 10px; border-radius: var(--mz-r-md);
+  white-space: nowrap; cursor: pointer;
+  transition: all 120ms;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.toc-item:hover { background: var(--mz-bg-card); color: var(--mz-fg); }
+.toc-item.priority {
+  background: var(--mz-tenant-primary-soft);
+  color: var(--mz-tenant-accent);
+}
+.toc-item.hidden { display: none; }
+.toc-item .pri-dot {
+  width: 5px; height: 5px;
+  background: var(--mz-tenant-accent);
+  border-radius: 50%;
+}
+
+/* ============ SECTIONS ============ */
+.dossie-body { padding: 24px 32px 48px; display: flex; flex-direction: column; gap: 24px; }
+.section {
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  border-radius: var(--mz-r-lg);
+  overflow: hidden;
+  transition: opacity 200ms;
+}
+.section.hidden { display: none; }
+.section.priority {
+  border-color: var(--mz-tenant-accent-soft);
+  box-shadow: 0 0 0 1px var(--mz-tenant-accent-soft) inset;
+}
+.section.placeholder { opacity: 0.55; }
+.section header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--mz-rule);
+  display: flex; align-items: center; gap: 12px;
+  background: var(--mz-bg-card-2);
+}
+.section header .num {
+  font-family: var(--mz-font-mono);
+  font-size: 10px; font-weight: 700;
+  color: var(--mz-tenant-accent);
+  letter-spacing: 0.10em;
+}
+.section header h2 {
+  font-size: 14px; font-weight: 700;
+  color: var(--mz-fg-strong);
+  margin: 0; letter-spacing: 0.02em;
+}
+.section header .meta {
+  margin-left: auto;
+  font-size: 10px; color: var(--mz-fg-faint);
+  letter-spacing: 0.06em; font-weight: 500;
+}
+.section header .priority-tag {
+  font-size: 9px;
+  background: var(--mz-tenant-accent);
+  color: var(--mz-fg-on-accent);
+  padding: 2px 6px; border-radius: var(--mz-r-pill);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+.section header .placeholder-tag {
+  font-size: 9px;
+  background: var(--mz-warn-soft);
+  color: var(--mz-warn);
+  padding: 2px 6px; border-radius: var(--mz-r-pill);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+.section .body { padding: 18px; }
+
+/* === PLACEHOLDER (em construção) === */
+.placeholder-body {
+  text-align: center;
+  padding: 32px 18px;
+  color: var(--mz-fg-faint);
+  font-size: 12px;
+  background:
+    repeating-linear-gradient(45deg, transparent 0 8px, var(--mz-bg-card-2) 8px 9px);
+  border-radius: var(--mz-r-md);
+}
+.placeholder-body b { display: block; font-size: 13px; color: var(--mz-fg-muted); margin-bottom: 4px; }
+
+/* === sub-medidas === */
+.submed-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.submed {
+  background: var(--mz-bg-card-2);
+  border-radius: var(--mz-r-md);
+  padding: 12px;
+}
+.submed .lbl {
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  color: var(--mz-fg-faint);
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.submed .v {
+  font-family: var(--mz-font-mono);
+  font-size: 22px; font-weight: 800;
+  color: var(--mz-fg-strong); letter-spacing: -0.03em;
+  margin-top: 2px; line-height: 1;
+}
+.submed .delta { font-size: 10px; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.submed .delta.up { color: var(--mz-ok); }
+.submed .delta.down { color: var(--mz-danger); }
+.submed .bar {
+  height: 4px; background: var(--mz-bg-elevated); border-radius: 2px;
+  margin-top: 6px; overflow: hidden;
+}
+.submed .bar > span {
+  display: block; height: 100%;
+  background: linear-gradient(90deg, var(--mz-tenant-primary), var(--mz-tenant-accent));
+}
+
+/* === tabela genérica === */
+.t {
+  width: 100%; border-collapse: collapse;
+  font-size: 12px;
+}
+.t th, .t td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--mz-rule);
+}
+.t th {
+  font-size: 9.5px; font-weight: 700;
+  color: var(--mz-fg-faint);
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+}
+.t td { color: var(--mz-fg-muted); }
+.t td b { color: var(--mz-fg); font-weight: 600; }
+.t tr:last-child td { border-bottom: 0; }
+
+.tabular-num, .tnum { font-variant-numeric: tabular-nums; }
+
+/* === MapaEleitoral.tsx EM MODO PREVIEW (placeholder geográfico Globo G1) === */
+.minimap {
+  background:
+    linear-gradient(180deg, rgba(0,42,123,0.06), rgba(0,42,123,0.02)),
+    var(--mz-bg-card-2);
+  border-radius: var(--mz-r-md);
+  padding: 14px;
+  display: grid; grid-template-columns: 1.5fr 1fr; gap: 14px;
+  align-items: center;
+}
+.minimap .geo {
+  position: relative;
+  border-radius: var(--mz-r-sm);
+  overflow: hidden;
+  background:
+    radial-gradient(120% 120% at 50% 110%, rgba(0,42,123,0.18), transparent 60%),
+    #07070a;
+  border: 1px solid var(--mz-rule);
+}
+.minimap .geo svg { display:block; width:100%; height:100%; }
+.minimap .geo .marker-tag {
+  position: absolute; top: 6px; left: 8px;
+  font-family: var(--mz-font-mono);
+  font-size: 9px; letter-spacing: 0.06em;
+  color: var(--mz-fg-faint);
+  background: rgba(9,9,11,0.85);
+  padding: 3px 6px; border-radius: 3px;
+  border: 1px solid var(--mz-rule);
+  text-transform: uppercase;
+}
+.minimap .geo .ctx-tag {
+  position: absolute; bottom: 6px; right: 8px;
+  font-family: var(--mz-font-mono);
+  font-size: 9px;
+  color: var(--mz-fg-muted);
+  background: rgba(9,9,11,0.7);
+  padding: 3px 6px; border-radius: 3px;
+}
+.minimap .geo .scale {
+  position: absolute; bottom: 6px; left: 8px;
+  display: flex; gap: 2px; align-items: center;
+}
+.minimap .geo .scale span {
+  width: 10px; height: 5px; display: block;
+}
+.minimap .geo .scale .lbl {
+  font-family: var(--mz-font-mono);
+  font-size: 8px; color: var(--mz-fg-faint);
+  margin: 0 4px;
+}
+/* legado removido — não usar mais grid quadriculado */
+.minimap .grid {
+  display: grid;
+  grid-template-columns: repeat(15, 1fr);
+  gap: 1px;
+  height: 90px;
+}
+.minimap .grid div { border-radius: 1px; }
+.minimap .legend { font-size: 10px; color: var(--mz-fg-muted); line-height: 1.6; }
+.minimap .legend b { color: var(--mz-fg-strong); display: block; margin-bottom: 4px; font-size: 11px; }
+
+/* === alertas (jurídicos) === */
+.alert-list { display: flex; flex-direction: column; gap: 8px; }
+.alert-item {
+  display: grid; grid-template-columns: 4px 1fr auto; gap: 12px;
+  padding: 10px 14px;
+  background: var(--mz-bg-card-2);
+  border-radius: var(--mz-r-md);
+  align-items: start;
+}
+.alert-item .strip { width: 4px; height: 100%; min-height: 28px; border-radius: 2px; }
+.alert-item.alta .strip { background: var(--mz-danger); }
+.alert-item.media .strip { background: var(--mz-warn); }
+.alert-item.baixa .strip { background: var(--mz-info); }
+.alert-item .body b { display: block; color: var(--mz-fg-strong); font-size: 12px; }
+.alert-item .body span { color: var(--mz-fg-muted); font-size: 11px; }
+.alert-item .when { font-size: 10px; color: var(--mz-fg-faint); font-family: var(--mz-font-mono); }
+
+/* === atividade legislativa === */
+.legis-row {
+  display: grid; grid-template-columns: 60px 1fr auto auto;
+  gap: 12px; padding: 8px 0;
+  border-bottom: 1px solid var(--mz-rule);
+  align-items: center;
+  font-size: 12px;
+}
+.legis-row:last-child { border-bottom: 0; }
+.legis-row .id {
+  font-family: var(--mz-font-mono); font-size: 11px; font-weight: 600;
+  color: var(--mz-tenant-accent);
+}
+.legis-row .titulo b { color: var(--mz-fg-strong); display: block; font-weight: 600; }
+.legis-row .titulo span { color: var(--mz-fg-faint); font-size: 11px; }
+.legis-row .vote {
+  font-size: 10px; padding: 2px 6px; border-radius: var(--mz-r-pill);
+  font-weight: 700; letter-spacing: 0.04em;
+}
+.legis-row .vote.sim { background: var(--mz-ok-soft); color: var(--mz-ok); }
+.legis-row .vote.nao { background: var(--mz-danger-soft); color: var(--mz-danger); }
+.legis-row .vote.abst { background: var(--mz-bg-elevated); color: var(--mz-fg-muted); }
+.legis-row .when { font-family: var(--mz-font-mono); font-size: 10px; color: var(--mz-fg-faint); }
+
+/* === trajetória timeline === */
+.tl { position: relative; padding-left: 20px; }
+.tl::before {
+  content: ''; position: absolute; left: 5px; top: 8px; bottom: 8px;
+  width: 2px; background: var(--mz-rule);
+}
+.tl-row { position: relative; padding-bottom: 14px; padding-left: 12px; }
+.tl-row:last-child { padding-bottom: 0; }
+.tl-row::before {
+  content: ''; position: absolute; left: -15px; top: 4px;
+  width: 12px; height: 12px;
+  background: var(--mz-tenant-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px var(--mz-bg-card);
+}
+.tl-row.dim::before { background: var(--mz-fg-faint); }
+.tl-row .y { font-family: var(--mz-font-mono); font-size: 10px; color: var(--mz-tenant-accent); font-weight: 700; }
+.tl-row .what { color: var(--mz-fg-strong); font-weight: 600; font-size: 13px; margin-top: 2px; }
+.tl-row .desc { color: var(--mz-fg-muted); font-size: 11px; line-height: 1.55; margin-top: 2px; }
+
+/* === financeiro split === */
+.fin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.fin-card {
+  background: var(--mz-bg-card-2);
+  border-radius: var(--mz-r-md);
+  padding: 14px;
+}
+.fin-card .lbl { font-size: 9.5px; color: var(--mz-fg-faint); letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; }
+.fin-card .v { font-size: 22px; font-weight: 800; color: var(--mz-fg-strong); margin-top: 4px; font-variant-numeric: tabular-nums; line-height: 1; }
+.fin-card .sub { font-size: 11px; color: var(--mz-fg-muted); margin-top: 6px; }
+
+/* === atos administrativos (prefeito) === */
+.atos { display: flex; flex-direction: column; gap: 10px; }
+.ato {
+  display: grid; grid-template-columns: 80px 1fr auto;
+  gap: 12px; padding: 10px;
+  background: var(--mz-bg-card-2); border-radius: var(--mz-r-md);
+  align-items: center;
+}
+.ato .num { font-family: var(--mz-font-mono); font-size: 11px; color: var(--mz-tenant-accent); font-weight: 700; }
+.ato .titulo b { color: var(--mz-fg-strong); display: block; font-weight: 600; font-size: 12px; }
+.ato .titulo span { color: var(--mz-fg-faint); font-size: 11px; }
+.ato .when { font-size: 10px; color: var(--mz-fg-faint); }
+
+/* === proposições por área (vereador) === */
+.proposicoes-stack {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+}
+.prop-card {
+  background: var(--mz-bg-card-2);
+  border-radius: var(--mz-r-md);
+  padding: 14px;
+  border-left: 3px solid var(--mz-tenant-accent);
+}
+.prop-card .area { font-size: 9.5px; letter-spacing: 0.14em; color: var(--mz-fg-faint); text-transform: uppercase; font-weight: 700; }
+.prop-card .qty { font-family: var(--mz-font-mono); font-size: 26px; font-weight: 800; color: var(--mz-fg-strong); margin: 4px 0 2px; line-height: 1; }
+.prop-card .examples { font-size: 11px; color: var(--mz-fg-muted); line-height: 1.45; }
+
+/* === IA estratégica painel === */
+.ia-box {
+  background:
+    linear-gradient(135deg, rgba(0,42,123,0.20), transparent),
+    var(--mz-bg-card-2);
+  border: 1px solid var(--mz-tenant-primary-soft);
+  border-radius: var(--mz-r-md);
+  padding: 16px;
+  display: grid; grid-template-columns: auto 1fr; gap: 14px;
+}
+.ia-box .ia-icon {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, var(--mz-tenant-primary), var(--mz-tenant-accent));
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.ia-box .ia-msg { font-size: 12px; color: var(--mz-fg); line-height: 1.6; }
+.ia-box .ia-msg b { color: var(--mz-tenant-accent); }
+.ia-box .ia-msg .src { display: block; font-size: 10px; color: var(--mz-fg-faint); margin-top: 6px; letter-spacing: 0.04em; }
+
+/* ============ INSPECTOR (right panel) ============ */
+.insp {
+  background: var(--mz-bg-sidebar);
+  border-left: 1px solid var(--mz-rule);
+  overflow-y: auto;
+  padding: 0;
+}
+.insp::-webkit-scrollbar { width: 4px; }
+.insp::-webkit-scrollbar-thumb { background: var(--mz-rule-strong); }
+.insp section { padding: 16px 20px; border-bottom: 1px solid var(--mz-rule); }
+.insp h3 {
+  font-size: 9.5px; letter-spacing: 0.16em;
+  color: var(--mz-fg-faint); text-transform: uppercase;
+  font-weight: 700; margin: 0 0 10px;
+}
+.insp h2 {
+  font-size: 17px; font-weight: 800;
+  color: var(--mz-fg-strong); margin: 0;
+  letter-spacing: -0.015em;
+}
+.insp .eyebrow {
+  font-size: 10px; letter-spacing: 0.10em;
+  color: var(--mz-tenant-accent); text-transform: uppercase;
+  font-weight: 700; margin-bottom: 4px;
+}
+.insp p {
+  font-size: 12px; color: var(--mz-fg);
+  line-height: 1.6; margin: 0 0 10px;
+}
+.insp .pr-list { display: flex; flex-direction: column; gap: 5px; font-size: 11px; }
+.insp .pr-row {
+  display: grid; grid-template-columns: 16px 1fr;
+  gap: 8px;
+  padding: 5px 0;
+  border-bottom: 1px dashed var(--mz-rule);
+  color: var(--mz-fg);
+}
+.insp .pr-row:last-child { border-bottom: 0; }
+.insp .pr-num {
+  font-family: var(--mz-font-mono); font-size: 9.5px;
+  color: var(--mz-tenant-accent); font-weight: 700;
+}
+.insp .pr-row.priority b { color: var(--mz-tenant-accent); }
+.insp .pr-row.hidden b { color: var(--mz-fg-faint); text-decoration: line-through; }
+.insp .pr-row.placeholder b { color: var(--mz-warn); }
+
+.insp code {
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  padding: 1px 5px; border-radius: 3px;
+  font-family: var(--mz-font-mono); font-size: 11px;
+  color: var(--mz-fg-strong);
+}
+
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ====== SWITCHER DE CARGO ====== -->
+  <header class="role-bar">
+    <h1>Dossiê · Layout por Cargo</h1>
+    <span class="helper">Cada cargo prioriza/oculta seções diferentes · clique nos cargos →</span>
+    <div class="role-pills" id="rolePills"></div>
+  </header>
+
+  <!-- ====== LAYOUT ====== -->
+  <div class="layout">
+    <main class="dossie" id="dossie"></main>
+    <aside class="insp" id="insp"></aside>
+  </div>
+</div>
+
+<!-- =================================================
+     ESPECIFICAÇÃO DOS 8 CARGOS
+     ================================================= -->
+<script>
+/* Seções canônicas (TODAS sempre existem na engine; o cargo só liga/desliga/prioriza) */
+const SECTIONS = [
+  { id: 'cenario',  num: '01', title: 'Cenário Político',     icon: 'radar' },
+  { id: 'mapa',     num: '02', title: 'Mapa Eleitoral',       icon: 'map' },
+  { id: 'trajeto',  num: '03', title: 'Trajetória',           icon: 'cycle' },
+  { id: 'leg',      num: '04', title: 'Atividade Legislativa',icon: 'gov' },
+  { id: 'comiss',   num: '05', title: 'Comissões',            icon: 'team' },
+  { id: 'votos',    num: '06', title: 'Pesquisas & Votações', icon: 'check' },
+  { id: 'atos',     num: '07', title: 'Atos Executivos',      icon: 'pen' },
+  { id: 'aliancas', num: '08', title: 'Alianças',             icon: 'link' },
+  { id: 'midia',    num: '09', title: 'Mídia & Clipping',     icon: 'broadcast' },
+  { id: 'jur',      num: '10', title: 'Alertas Jurídicos',    icon: 'shield' },
+  { id: 'fin',      num: '11', title: 'Financeiro',           icon: 'wallet' },
+  { id: 'emendas',  num: '12', title: 'Emendas',              icon: 'star' },
+  { id: 'partido',  num: '13', title: 'Atuação Partidária',   icon: 'flag' },
+  { id: 'base',     num: '14', title: 'Base Territorial',     icon: 'people' },
+  { id: 'ia',       num: '15', title: 'IA Estratégica',       icon: 'spark' },
+];
+
+/* Cargos · cada um define priority/hidden/placeholder.
+   Default = mostrado mas não priorizado.
+   Princípio: priorizar seções que importam pra esse cargo;
+   ocultar seções que não fazem sentido (ex: Senador não tem "Atos Executivos");
+   placeholder quando dado costuma faltar. */
+const ROLES = [
+  /* 1 · GOVERNADOR (Tarcísio) */
+  {
+    id: 'gov', pillNum: '01', pill: 'Governador',
+    nome: 'Tarcísio de Freitas', iniciais: 'TF',
+    role: 'Governador · São Paulo',
+    metas: ['1º mandato', 'Republicanos', 'eleito 2022 · 55,3% 2º turno'],
+    ovr: 96, tier: 'S',
+    eyebrow: 'Cargo Executivo · Estadual',
+    desc: 'Foco em Atos Executivos (decretos, programas) e Mapa Eleitoral consolidado SP. Atividade Legislativa é apenas vetos/sanções (mostrada como leve).',
+    priority: ['atos', 'mapa', 'cenario', 'aliancas', 'midia'],
+    hidden: ['leg', 'comiss'], // vetos & sanções viram parte de atos
+    placeholder: ['emendas'],
+  },
+  /* 2 · SENADOR (Wagner) */
+  {
+    id: 'sen', pillNum: '02', pill: 'Senador',
+    nome: 'Jaques Wagner', iniciais: 'JW',
+    role: 'Senador · Bahia',
+    metas: ['3º mandato', 'PT', 'eleito 2018 · 4,8M votos'],
+    ovr: 87, tier: 'A',
+    eyebrow: 'Cargo Eletivo · Federal · Senado',
+    desc: 'Foco em Atividade Legislativa, Comissões, Alianças. Atos Executivos não se aplica. Base Territorial é estado inteiro (BA).',
+    priority: ['leg', 'comiss', 'votos', 'aliancas', 'mapa'],
+    hidden: ['atos'],
+    placeholder: [],
+  },
+  /* 3 · DEP FEDERAL */
+  {
+    id: 'depfed', pillNum: '03', pill: 'Dep. Federal',
+    nome: 'Carla Morando', iniciais: 'CM',
+    role: 'Dep. Federal · São Paulo',
+    metas: ['2º mandato', 'PSDB', 'eleita 2022 · 187k votos'],
+    ovr: 81, tier: 'A',
+    eyebrow: 'Cargo Eletivo · Federal · Câmara',
+    desc: 'Câmara: legislativo + comissões + emendas individuais. Mapa Eleitoral mostra distritos onde teve mais votos.',
+    priority: ['leg', 'comiss', 'emendas', 'mapa', 'midia'],
+    hidden: ['atos'],
+    placeholder: [],
+  },
+  /* 4 · DEP ESTADUAL */
+  {
+    id: 'depest', pillNum: '04', pill: 'Dep. Estadual',
+    nome: 'Cel. Telhada', iniciais: 'CT',
+    role: 'Dep. Estadual · São Paulo',
+    metas: ['1º mandato', 'PP', 'eleito 2022 · 154k votos'],
+    ovr: 79, tier: 'B',
+    eyebrow: 'Cargo Eletivo · Estadual · ALESP',
+    desc: 'Foco em ALESP: legislativo estadual, comissões, emendas estaduais. Sem federal stuff.',
+    priority: ['leg', 'comiss', 'emendas', 'mapa', 'base'],
+    hidden: ['atos'],
+    placeholder: [],
+  },
+  /* 5 · PREFEITO */
+  {
+    id: 'pref', pillNum: '05', pill: 'Prefeito',
+    nome: 'Bruno Covas Filho', iniciais: 'BC',
+    role: 'Prefeito · São Paulo · Capital',
+    metas: ['1º mandato', 'UB', 'eleito 2024 · 47% 1º turno'],
+    ovr: 94, tier: 'S',
+    eyebrow: 'Cargo Executivo · Municipal',
+    desc: 'Atos Executivos municipais + base territorial detalhada. Mapa Eleitoral por bairro (não por município).',
+    priority: ['atos', 'mapa', 'base', 'partido', 'midia'],
+    hidden: ['leg', 'comiss'],
+    placeholder: ['fin'],
+  },
+  /* 6 · VEREADOR */
+  {
+    id: 'ver', pillNum: '06', pill: 'Vereador',
+    nome: 'Alessandro Rotunno', iniciais: 'AR',
+    role: 'Vereador · Itaquaquecetuba',
+    metas: ['1º mandato', 'UB', 'eleito 2024 · 4.302 votos'],
+    ovr: 65, tier: 'C',
+    eyebrow: 'Cargo Eletivo · Municipal',
+    desc: 'Câmara Municipal: proposições por área temática + base hiperlocal (bairro). Pesquisas oficiais raramente existem.',
+    priority: ['leg', 'base', 'mapa', 'partido', 'midia'],
+    hidden: ['atos', 'emendas'],
+    placeholder: ['votos'],
+  },
+  /* 7 · NÃO ELEITO (cabeça partido — Milton) */
+  {
+    id: 'nao', pillNum: '07', pill: 'Não Eleito (Partido)',
+    nome: 'Milton Leite', iniciais: 'ML',
+    role: 'Pres. Estadual · UB · São Paulo',
+    metas: ['Vereador 7×', 'UB', 'cargo partidário · não-eletivo'],
+    ovr: 78, tier: 'B',
+    eyebrow: 'Camada 2 · Política Partidária',
+    desc: 'Sem mandato vigente. Foco em trajetória, atuação partidária e influência. Mostra Cartinha mas com "ex-mandato" como atributo principal.',
+    priority: ['trajeto', 'partido', 'aliancas', 'cenario', 'midia'],
+    hidden: ['leg', 'comiss', 'votos', 'atos', 'emendas'],
+    placeholder: [],
+  },
+  /* 8 · MINISTRO */
+  {
+    id: 'min', pillNum: '08', pill: 'Ministro',
+    nome: 'Celso Sabino', iniciais: 'CS',
+    role: 'Ministro do Turismo · UB',
+    metas: ['no cargo desde 2023', 'UB', 'ex-Dep Federal PA'],
+    ovr: 84, tier: 'A',
+    eyebrow: 'Cargo Executivo · Federal',
+    desc: 'Híbrido: tem mandato federal (suspenso pelo cargo) + comanda pasta. Foca em atos administrativos da pasta + trajetória.',
+    priority: ['atos', 'trajeto', 'midia', 'aliancas', 'partido'],
+    hidden: ['leg', 'comiss', 'votos', 'emendas'],
+    placeholder: [],
+  },
+  /* FALLBACK (em construção total) */
+  {
+    id: 'fall', pillNum: '⚠', pill: 'Fallback (sem dado)',
+    nome: 'Filiado Não Catalogado', iniciais: '··',
+    role: 'Vereador · Município de Pequeno Porte',
+    metas: ['dado não disponível', 'UB', '—'],
+    ovr: null, tier: '—',
+    eyebrow: 'Em Construção',
+    desc: 'Político sem dado catalogado. Toda a interface se transforma em placeholders sóbrios — nunca mostra "0", nunca inventa dado.',
+    priority: [],
+    hidden: [],
+    placeholder: SECTIONS.map(s => s.id),
+  },
+];
+
+/* ============================================================
+   CONTEÚDO MOCK por cargo
+   ============================================================ */
+const CONTENT = {
+  /* ====== Cenário Político (todos exceto fallback) ====== */
+  cenario: () => `
+    <div class="ia-box">
+      <div class="ia-icon">⚡</div>
+      <div class="ia-msg">
+        <b>Cenário 7d:</b> assinatura do contrato de Educação SP elevou exposição em <b>+18%</b>.
+        Aprovação cruzou 70% nas faixas C/D. Risco emergente: PSD anunciou pré-candidato em Campinas (impacto baixo no curto, monitoramento ativo).
+        <span class="src">IA · processou 1.247 fontes · DOU + clipping + redes</span>
+      </div>
+    </div>`,
+
+  /* ====== Mapa eleitoral — placeholder geográfico do MapaEleitoral.tsx ====== */
+  mapa: (role) => {
+    const ctx = MAP_CTX[role.id] || MAP_CTX._default;
+    return `<div class="minimap">
+      <div class="geo" id="mp-${role.id}">
+        <span class="marker-tag">🗺  MapaEleitoral.tsx · preview</span>
+        <span class="ctx-tag">${ctx.ctx}</span>
+        <div class="scale">
+          <span class="lbl">menos</span>
+          <span style="background:#1e3a8a"></span>
+          <span style="background:#1d4ed8"></span>
+          <span style="background:#2563eb"></span>
+          <span style="background:#f59e0b"></span>
+          <span style="background:#fb923c"></span>
+          <span style="background:#dc2626"></span>
+          <span class="lbl">mais</span>
+        </div>
+      </div>
+      <div class="legend"><b>${ctx.title}</b>${ctx.sub}<br>Cargo: ${ctx.cargo} · ciclo: 2022<br><span style="color:var(--mz-fg-faint)">Componente real (3.196 linhas) substitui aqui em produção</span></div>
+    </div>`;
+  },
+
+  /* ====== Trajetória (mais relevante pra Não-Eleito) ====== */
+  trajeto: (role) => {
+    if (role.id === 'nao') {
+      return `<div class="tl">
+        <div class="tl-row"><div class="y">2024 — hoje</div><div class="what">Pres. Estadual UB · São Paulo</div><div class="desc">Cargo partidário · comanda 645 Pres Municipais SP · não-eletivo</div></div>
+        <div class="tl-row"><div class="y">2017 — 2024</div><div class="what">Vereador 7× · São Paulo Capital</div><div class="desc">Recorde: vereador mais votado da capital em 2020 (76.367 votos)</div></div>
+        <div class="tl-row dim"><div class="y">2013</div><div class="what">Migra do PT do B para o DEM</div><div class="desc">Decisão estratégica · ganhou peso na bancada</div></div>
+        <div class="tl-row dim"><div class="y">2000</div><div class="what">Primeiro mandato · Vereador SP (PT do B)</div><div class="desc">Eleito com 18.450 votos</div></div>
+      </div>`;
+    }
+    return `<div class="tl">
+      <div class="tl-row"><div class="y">2022 — hoje</div><div class="what">Mandato atual</div><div class="desc">${role.role}</div></div>
+      <div class="tl-row dim"><div class="y">2018</div><div class="what">Mandato anterior</div><div class="desc">Reeleito (1º suplente em 2022 antes de assumir)</div></div>
+      <div class="tl-row dim"><div class="y">2014</div><div class="what">Ingresso na vida pública</div><div class="desc">Primeiro cargo eletivo</div></div>
+    </div>`;
+  },
+
+  /* ====== Atividade Legislativa ====== */
+  leg: (role) => {
+    if (role.id === 'ver') {
+      return `<div class="proposicoes-stack">
+        <div class="prop-card"><div class="area">Saúde</div><div class="qty tnum">14</div><div class="examples">UBS, posto de vacinação, agentes</div></div>
+        <div class="prop-card"><div class="area">Educação</div><div class="qty tnum">9</div><div class="examples">CEI, transporte escolar</div></div>
+        <div class="prop-card"><div class="area">Segurança</div><div class="qty tnum">7</div><div class="examples">Câmeras, guarda municipal</div></div>
+        <div class="prop-card"><div class="area">Mobilidade</div><div class="qty tnum">5</div><div class="examples">Asfalto, sinalização, ciclofaixa</div></div>
+        <div class="prop-card"><div class="area">Tributário</div><div class="qty tnum">3</div><div class="examples">IPTU, ISS pequenos comerciantes</div></div>
+        <div class="prop-card"><div class="area">Outros</div><div class="qty tnum">11</div><div class="examples">Homenagens, datas comemorativas</div></div>
+      </div>`;
+    }
+    return `<div>
+      <div class="legis-row"><span class="id">PL 2024/847</span><div class="titulo"><b>Reforma Tributária — destaque</b><span>Ementa: Suprime parágrafo 2º do Art. 195</span></div><span class="vote sim">SIM</span><span class="when">12/04</span></div>
+      <div class="legis-row"><span class="id">PEC 14/24</span><div class="titulo"><b>Limite de gastos públicos</b><span>Aprovada em 2 turnos · Senado</span></div><span class="vote sim">SIM</span><span class="when">08/04</span></div>
+      <div class="legis-row"><span class="id">PL 1.847</span><div class="titulo"><b>Marco Civil de IA</b><span>Câmara · 2ª discussão</span></div><span class="vote sim">SIM</span><span class="when">02/04</span></div>
+      <div class="legis-row"><span class="id">MPV 1.214</span><div class="titulo"><b>Crédito Consignado privado</b><span>Conversão em lei</span></div><span class="vote nao">NÃO</span><span class="when">28/03</span></div>
+      <div class="legis-row"><span class="id">PRC 14/24</span><div class="titulo"><b>Comissão de Inquérito · Crise Yanomami</b><span>Instalação</span></div><span class="vote abst">ABST</span><span class="when">22/03</span></div>
+      <div class="legis-row"><span class="id">PL 4.330</span><div class="titulo"><b>Terceirização — emenda</b><span>Plenário</span></div><span class="vote sim">SIM</span><span class="when">15/03</span></div>
+    </div>`;
+  },
+
+  /* ====== Comissões ====== */
+  comiss: (role) => `<div>
+    <div class="legis-row"><span class="id">CCJ</span><div class="titulo"><b>Comissão Constituição & Justiça</b><span>Membro titular · ${role.id==='sen' ? 'Senado' : 'Câmara'}</span></div><span class="vote sim">Titular</span><span class="when">2024</span></div>
+    <div class="legis-row"><span class="id">CFT</span><div class="titulo"><b>Finanças & Tributação</b><span>Membro suplente</span></div><span class="vote abst">Suplente</span><span class="when">2024</span></div>
+    <div class="legis-row"><span class="id">CRA</span><div class="titulo"><b>Agricultura & Reforma Agrária</b><span>Vice-presidente</span></div><span class="vote sim">Vice-Pres</span><span class="when">2023</span></div>
+    <div class="legis-row"><span class="id">CDH</span><div class="titulo"><b>Direitos Humanos</b><span>Membro titular</span></div><span class="vote sim">Titular</span><span class="when">2023</span></div>
+  </div>`,
+
+  /* ====== Pesquisas / Votações ====== */
+  votos: (role) => {
+    if (role.placeholder.includes('votos')) {
+      return `<div class="placeholder-body"><b>Pesquisas oficiais não disponíveis</b>para municípios de pequeno porte. Considerar pesquisas privadas + intent de voto via redes.</div>`;
+    }
+    return `<div class="submed-grid tnum">
+      <div class="submed"><div class="lbl">Aprovação</div><div class="v">62%</div><div class="delta up">+3pp 30d</div><div class="bar"><span style="width:62%"></span></div></div>
+      <div class="submed"><div class="lbl">Rejeição</div><div class="v">21%</div><div class="delta down">+1pp 30d</div><div class="bar"><span style="width:21%; background:var(--mz-danger)"></span></div></div>
+      <div class="submed"><div class="lbl">Conhece-mt</div><div class="v">78%</div><div class="delta up">+0.4pp</div><div class="bar"><span style="width:78%"></span></div></div>
+      <div class="submed"><div class="lbl">Intenção</div><div class="v">41%</div><div class="delta up">+2pp</div><div class="bar"><span style="width:41%"></span></div></div>
+    </div>`;
+  },
+
+  /* ====== Atos Executivos (gov, pref, min) ====== */
+  atos: () => `<div class="atos">
+    <div class="ato"><div class="num">DEC 68.241</div><div class="titulo"><b>Programa Cidade Inteligente · 2026-2028</b><span>Investimento: R$ 1,2 bi · 32 cidades</span></div><div class="when">22/04</div></div>
+    <div class="ato"><div class="num">DEC 68.193</div><div class="titulo"><b>Reforma do ICMS estadual</b><span>Vigência: 01/06/2026</span></div><div class="when">14/04</div></div>
+    <div class="ato"><div class="num">PORT 414</div><div class="titulo"><b>Comissão Estadual de Educação Digital</b><span>Sec. Educação · 12 membros</span></div><div class="when">08/04</div></div>
+    <div class="ato"><div class="num">DEC 68.107</div><div class="titulo"><b>Plano Estadual de Mobilidade</b><span>Investimento: R$ 480M · 5 anos</span></div><div class="when">28/03</div></div>
+    <div class="ato"><div class="num">VETO 03</div><div class="titulo"><b>Veto parcial · PL 14/2026 (segurança)</b><span>Razões: vícios formais</span></div><div class="when">22/03</div></div>
+  </div>`,
+
+  /* ====== Alianças ====== */
+  aliancas: () => `<div>
+    <div class="alert-list">
+      <div class="alert-item baixa"><span class="strip"></span><div class="body"><b>Eduardo Suplicy (PT)</b><span>Aliança formal · CMSP · pauta de habitação</span></div><span class="when">2024</span></div>
+      <div class="alert-item baixa"><span class="strip"></span><div class="body"><b>Ricardo Nunes (MDB)</b><span>Apoio mútuo na Câmara Municipal</span></div><span class="when">2023</span></div>
+      <div class="alert-item media"><span class="strip"></span><div class="body"><b>Tarcísio (Republicanos)</b><span>Aliança informal · não confirmada · risco baixo</span></div><span class="when">monitorado</span></div>
+      <div class="alert-item baixa"><span class="strip"></span><div class="body"><b>Bancada UB Capital</b><span>Voto-bloco em 87% das votações relevantes</span></div><span class="when">consolidado</span></div>
+    </div>
+  </div>`,
+
+  /* ====== Mídia ====== */
+  midia: () => `<div class="ia-box">
+    <div class="ia-icon">📡</div>
+    <div class="ia-msg">
+      Mencionado em <b>1.247 reportagens</b> nos últimos 30 dias · sentimento médio <b>+0.62</b> (positivo).
+      Picos: assinatura do contrato Educação SP (847 menções em 24h) · entrevista TV Globo (412 menções).
+      <span class="src">Clipping automatizado · 2.341 veículos monitorados</span>
+    </div>
+  </div>`,
+
+  /* ====== Alertas Jurídicos ====== */
+  jur: () => `<div class="alert-list">
+    <div class="alert-item baixa"><span class="strip"></span><div class="body"><b>Sem alertas jurídicos vigentes</b><span>Última verificação: 25/04/2026 · TSE · STF · TRE</span></div><span class="when">hoje</span></div>
+  </div>`,
+
+  /* ====== Financeiro ====== */
+  fin: (role) => {
+    if (role.placeholder.includes('fin')) {
+      return `<div class="placeholder-body"><b>Prestação de contas TSE em curadoria</b>Última eleição: 2024 · Aguardando publicação consolidada</div>`;
+    }
+    return `<div class="fin-grid tnum">
+      <div class="fin-card"><div class="lbl">Receita 2024</div><div class="v">R$ 4,8M</div><div class="sub">122 doadores PJ · 487 PF</div></div>
+      <div class="fin-card"><div class="lbl">Despesa 2024</div><div class="v">R$ 4,7M</div><div class="sub">62% mídia · 18% pessoal · 20% outros</div></div>
+      <div class="fin-card"><div class="lbl">Saldo TSE</div><div class="v">R$ 142k</div><div class="sub">prestação aprovada · sem ressalvas</div></div>
+      <div class="fin-card"><div class="lbl">Compliance</div><div class="v" style="color:var(--mz-ok);font-size:18px">OK</div><div class="sub">Receita · Despesa · Doadores · Origem</div></div>
+    </div>`;
+  },
+
+  /* ====== Emendas ====== */
+  emendas: (role) => {
+    if (role.placeholder.includes('emendas')) {
+      return `<div class="placeholder-body"><b>Dados de emendas em curadoria</b>Cargo Executivo Estadual · emendas governamentais não-individuais</div>`;
+    }
+    return `<div class="submed-grid tnum">
+      <div class="submed"><div class="lbl">Total 2025</div><div class="v">R$ 84M</div><div class="delta">individuais + bancada</div></div>
+      <div class="submed"><div class="lbl">Empenhadas</div><div class="v">62%</div><div class="delta up">+18pp YoY</div><div class="bar"><span style="width:62%"></span></div></div>
+      <div class="submed"><div class="lbl">Pagas</div><div class="v">38%</div><div class="delta up">+11pp</div><div class="bar"><span style="width:38%"></span></div></div>
+      <div class="submed"><div class="lbl">Para SP</div><div class="v">71%</div><div class="delta">prioridade base</div><div class="bar"><span style="width:71%"></span></div></div>
+    </div>`;
+  },
+
+  /* ====== Atuação Partidária (forte para Não-Eleito e Vereador) ====== */
+  partido: () => `<div>
+    <div class="alert-list">
+      <div class="alert-item baixa"><span class="strip"></span><div class="body"><b>Comando direto · 645 Pres. Municipais SP</b><span>Score médio dos comandados: 71/100</span></div><span class="when">cargo</span></div>
+      <div class="alert-item baixa"><span class="strip"></span><div class="body"><b>Convenção UB SP · 2025</b><span>Discurso de abertura · trending tópico nacional</span></div><span class="when">11/03</span></div>
+      <div class="alert-item baixa"><span class="strip"></span><div class="body"><b>Aliança formalizada com PSDB SP</b><span>Trabalho conjunto em 23 municípios</span></div><span class="when">02/2025</span></div>
+    </div>
+  </div>`,
+
+  /* ====== Base Territorial ====== */
+  base: () => `<div class="submed-grid tnum">
+    <div class="submed"><div class="lbl">Bairros core</div><div class="v">14</div><div class="delta">>50% votos local</div></div>
+    <div class="submed"><div class="lbl">Quadras ativas</div><div class="v">847</div><div class="delta up">+47 (sem)</div></div>
+    <div class="submed"><div class="lbl">Cabos vinculados</div><div class="v">34</div><div class="delta up">+5 (mês)</div></div>
+    <div class="submed"><div class="lbl">Lideranças</div><div class="v">128</div><div class="delta">cadastradas</div></div>
+  </div>`,
+
+  /* ====== IA Estratégica ====== */
+  ia: () => `<div class="ia-box">
+    <div class="ia-icon">⚡</div>
+    <div class="ia-msg">
+      <b>Recomendação:</b> intensificar presença em Vila Mariana e Itaim (zonas onde o competidor PSD cresceu +12pp em 30d).
+      <b>Janela de oportunidade:</b> próximas 4 semanas — debate da PEC 14 puxa atenção pra agenda fiscal.
+      <span class="src">IA · cruzou: clipping + radar + base + comportamento competidor</span>
+    </div>
+  </div>`,
+};
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+const $rolePills = document.getElementById('rolePills');
+const $dossie = document.getElementById('dossie');
+const $insp = document.getElementById('insp');
+
+function renderPills(activeId) {
+  $rolePills.innerHTML = ROLES.map(r => `
+    <div class="role-pill ${r.id === activeId ? 'active' : ''}" data-id="${r.id}">
+      <span class="num">${r.pillNum}</span>
+      <span>${r.pill}</span>
+    </div>
+  `).join('');
+  $rolePills.querySelectorAll('.role-pill').forEach(el => el.addEventListener('click', () => render(el.dataset.id)));
+}
+
+function renderDossie(role) {
+  // Header + TOC + Sections
+  $dossie.innerHTML = `
+    <div class="hero">
+      <div class="photo">${role.iniciais}</div>
+      <div class="info">
+        <div class="eyebrow">${role.eyebrow}</div>
+        <h1>${role.nome}</h1>
+        <div class="meta">${role.metas.map((m, i) => `${i>0 ? '<span class="dot"></span>':''}<span>${m}</span>`).join('')}</div>
+      </div>
+      <div class="ovr">
+        <div>
+          <div class="big">${role.ovr ?? '··'}</div>
+          <div class="lbl">${role.ovr ? 'OVR' : 'EM CONSTRUÇÃO'}</div>
+        </div>
+        <div class="tier-pill">${role.tier}</div>
+      </div>
+    </div>
+
+    <nav class="toc">
+      ${SECTIONS.map(s => {
+        const isPriority = role.priority.includes(s.id);
+        const isHidden = role.hidden.includes(s.id);
+        const isPlaceholder = role.placeholder.includes(s.id);
+        const cls = [
+          isPriority ? 'priority' : '',
+          isHidden ? 'hidden' : '',
+        ].filter(Boolean).join(' ');
+        return `<a class="toc-item ${cls}" href="#sec-${s.id}">
+          ${isPriority ? '<span class="pri-dot"></span>':''}
+          ${s.title}
+        </a>`;
+      }).join('')}
+    </nav>
+
+    <div class="dossie-body">
+      ${SECTIONS.filter(s => !role.hidden.includes(s.id)).map(s => {
+        const isPriority = role.priority.includes(s.id);
+        const isPlaceholder = role.placeholder.includes(s.id) || role.id === 'fall';
+        const tagHTML = isPriority ? '<span class="priority-tag">PRIORIDADE</span>' :
+                       isPlaceholder ? '<span class="placeholder-tag">EM CONSTRUÇÃO</span>' : '';
+
+        let body;
+        if (role.id === 'fall') {
+          body = `<div class="placeholder-body"><b>Dado em curadoria</b>Aguardando enriquecimento via TSE/DOU/clipping</div>`;
+        } else if (isPlaceholder) {
+          const placeholderFn = CONTENT[s.id];
+          // se a seção tem placeholder explícito definido, usar; senão genérico
+          body = placeholderFn && (s.id === 'fin' || s.id === 'emendas' || s.id === 'votos')
+            ? placeholderFn(role)
+            : `<div class="placeholder-body"><b>Dado em curadoria</b>Esta seção será preenchida assim que a fonte oficial publicar</div>`;
+        } else {
+          const fn = CONTENT[s.id];
+          body = fn ? fn(role) : `<div class="placeholder-body">Conteúdo desta seção pendente</div>`;
+        }
+
+        return `<section class="section ${isPriority?'priority':''} ${isPlaceholder?'placeholder':''}" id="sec-${s.id}">
+          <header>
+            <span class="num">${s.num}</span>
+            <h2>${s.title}</h2>
+            ${tagHTML}
+            <span class="meta">${isPriority ? 'Foco do cargo' : isPlaceholder ? 'Aguardando dado' : 'Padrão'}</span>
+          </header>
+          <div class="body">${body}</div>
+        </section>`;
+      }).join('')}
+    </div>
+  `;
+
+  // Render minimaps
+  if (CONTENT.mapa && document.getElementById(`mp-${role.id}`)) {
+    renderMinimap(`mp-${role.id}`, role);
+  }
+}
+
+/* ============================================================
+   MAPA ELEITORAL · PREVIEW GEOGRÁFICO
+   --------------------------------------------------------------
+   Substitui o grid quadriculado abstrato pelo placeholder do
+   MapaEleitoral.tsx real (componente de 3.196 linhas, MapLibre
+   GL JS, drill-down 5 níveis, foto-on-hover, tooltip X9, micro-
+   bairros SP via HERE+OSM, escala farol percentil 0-5).
+
+   Aqui renderiza polígonos esquemáticos de UF/Capital com
+   gradiente Globo G1 (azul escuro → azul → âmbar → laranja →
+   vermelho) para validar o LAYOUT ao redor. O Claude Code
+   pluga o componente real no lugar quando integrar com a rota
+   /mazzel-preview/mapa.
+   ============================================================ */
+
+const MAP_CTX = {
+  gov:  { ctx: 'UF: SP · 645 mun.',           title: 'Performance por município', sub: '645 municípios · São Paulo',         cargo: 'Governador', shape: 'sp' },
+  sen:  { ctx: 'UF: BA · 417 mun.',           title: 'Performance por município', sub: '417 municípios · Bahia',             cargo: 'Senador',    shape: 'ba' },
+  depf: { ctx: 'UF: SP · zonas eleitorais',   title: 'Distritos com mais votos',  sub: 'Distribuição estadual SP',           cargo: 'Dep. Federal',  shape: 'sp' },
+  depe: { ctx: 'UF: SP · ALESP',              title: 'Distritos ALESP',           sub: 'Distribuição estadual SP',           cargo: 'Dep. Estadual', shape: 'sp' },
+  pref: { ctx: 'Mun: São Paulo · 32 distritos', title: 'Performance por bairro',   sub: '96 distritos · capital SP',          cargo: 'Prefeito',   shape: 'capital' },
+  ver:  { ctx: 'Mun: Itaquaquecetuba · 14 bairros', title: 'Performance por bairro', sub: 'Itaquaquecetuba (mun. interior)',  cargo: 'Vereador',   shape: 'mun' },
+  nao:  { ctx: 'UF: SP · perspectiva partido', title: 'Cobertura territorial UB',  sub: '645 municípios · presença UB',       cargo: 'Pres. Estadual', shape: 'sp' },
+  cand: { ctx: 'UF: SP · disputado',          title: 'Densidade eleitoral',       sub: 'Distribuição de votos potencial',    cargo: 'Candidato',  shape: 'sp' },
+  _default: { ctx: 'Brasil · 5.570 mun.',     title: 'Performance nacional',      sub: 'Visão Brasil completo',              cargo: '—',          shape: 'br' },
+};
+
+// Polígonos esquemáticos (path SVG simplificado) para 4 contextos.
+// O propósito é validar o LAYOUT — o componente real renderiza
+// polígonos vetoriais reais via MapLibre.
+const MAP_SHAPES = {
+  br: [
+    // Brasil esquemático em 6 macrorregiões
+    { d: 'M40,30 L90,20 L140,30 L160,55 L130,70 L60,75 L30,55 Z', label: 'N',  hot: 0.25 },
+    { d: 'M140,30 L200,30 L220,60 L180,80 L160,55 Z',             label: 'NE', hot: 0.35 },
+    { d: 'M60,75 L130,70 L160,55 L180,80 L150,110 L80,110 Z',     label: 'CO', hot: 0.55 },
+    { d: 'M80,110 L150,110 L165,135 L100,140 Z',                  label: 'SE', hot: 0.85 },
+    { d: 'M100,140 L165,135 L150,170 L90,170 Z',                  label: 'S',  hot: 0.65 },
+  ],
+  sp: [
+    // SP esquemático em sub-regiões (capital + interior + litoral)
+    { d: 'M30,80  L70,60  L110,55 L150,65 L160,90  L120,110 L60,110 Z', label: 'Oeste',   hot: 0.55 },
+    { d: 'M110,55 L150,65 L195,55 L220,75 L200,95  L160,90  Z',         label: 'Norte',   hot: 0.62 },
+    { d: 'M160,90 L200,95 L230,115 L210,140 L160,140 L130,115 Z',       label: 'Capital', hot: 0.92 },
+    { d: 'M60,110 L120,110 L130,115 L160,140 L120,160 L80,150  Z',      label: 'Sul',     hot: 0.45 },
+    { d: 'M210,140 L240,150 L235,175 L195,170 L160,140 Z',              label: 'Litoral', hot: 0.72 },
+  ],
+  ba: [
+    // BA esquemático
+    { d: 'M30,40  L80,25  L120,40 L130,70  L80,85   L40,75 Z', label: 'Oeste',  hot: 0.42 },
+    { d: 'M120,40 L170,30 L210,55 L200,85  L150,90  L130,70 Z', label: 'Norte',  hot: 0.55 },
+    { d: 'M40,75  L80,85  L130,70 L150,90  L130,130 L70,125 Z', label: 'Centro', hot: 0.78 },
+    { d: 'M130,130 L150,90 L200,85 L230,120 L210,160 L160,170 L130,150 Z', label: 'Sul',    hot: 0.88 },
+    { d: 'M210,160 L235,165 L240,180 L210,180 Z',               label: 'Litoral',hot: 0.95 },
+  ],
+  capital: [
+    // capital esquemática em zonas (norte/sul/leste/oeste/centro)
+    { d: 'M50,40  L120,30 L180,45 L195,75 L130,80 L60,75 Z',   label: 'Norte',  hot: 0.55 },
+    { d: 'M195,75 L230,90 L230,135 L195,140 L160,110 Z',       label: 'Leste',  hot: 0.42 },
+    { d: 'M60,75  L130,80 L160,110 L150,150 L90,160 L40,130 Z',label: 'Centro', hot: 0.92 },
+    { d: 'M150,150 L195,140 L230,135 L240,170 L200,180 L160,180 Z', label: 'Sul',hot: 0.78 },
+    { d: 'M40,130 L90,160 L150,150 L160,180 L100,180 L30,160 Z',label: 'Oeste',  hot: 0.62 },
+  ],
+  mun: [
+    // município de interior em bairros (esquemático)
+    { d: 'M40,50  L90,40  L140,55 L130,90  L70,90   L40,75 Z',  label: 'Centro', hot: 0.88 },
+    { d: 'M140,55 L200,45 L240,70 L220,100 L170,95  L130,90 Z', label: 'Norte',  hot: 0.55 },
+    { d: 'M40,75  L70,90  L130,90 L120,140 L70,150  L30,130 Z', label: 'Oeste',  hot: 0.42 },
+    { d: 'M130,90 L170,95 L220,100 L210,140 L150,150 L120,140 Z',label: 'Leste', hot: 0.65 },
+    { d: 'M120,140 L150,150 L210,140 L195,180 L130,180 L80,170 Z',label:'Sul',   hot: 0.78 },
+  ],
+};
+
+const HEAT_PALETTE = ['#1e3a8a','#1d4ed8','#2563eb','#f59e0b','#fb923c','#dc2626'];
+function heatColor(v) {
+  // v 0-1 → índice na escala farol percentil
+  const idx = Math.min(HEAT_PALETTE.length - 1, Math.floor(v * HEAT_PALETTE.length));
+  return HEAT_PALETTE[idx];
+}
+
+function renderMinimap(id, role) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const ctx = MAP_CTX[role.id] || MAP_CTX._default;
+  const shape = MAP_SHAPES[ctx.shape] || MAP_SHAPES.br;
+
+  const polys = shape.map(p => `
+    <path d="${p.d}"
+          fill="${heatColor(p.hot)}"
+          fill-opacity="${0.45 + p.hot * 0.45}"
+          stroke="#0a0a0b"
+          stroke-width="0.8"/>
+  `).join('');
+
+  // labels só nos polígonos com hot ≥ 0.6 pra não poluir
+  const labels = shape.filter(p => p.hot >= 0.55).map(p => {
+    // extrai centroide aproximado a partir do bounding-box do path d
+    const nums = p.d.match(/-?\d+(?:\.\d+)?/g).map(Number);
+    let xs = [], ys = [];
+    for (let i = 0; i < nums.length; i += 2) { xs.push(nums[i]); ys.push(nums[i+1]); }
+    const cx = (Math.min(...xs) + Math.max(...xs)) / 2;
+    const cy = (Math.min(...ys) + Math.max(...ys)) / 2;
+    return `<text x="${cx}" y="${cy}" text-anchor="middle"
+                  font-family="Inter, sans-serif" font-size="7" font-weight="700"
+                  fill="rgba(255,255,255,0.85)" letter-spacing="0.04em">${p.label.toUpperCase()}</text>`;
+  }).join('');
+
+  // grade leve de fundo pra dar sensação cartográfica
+  const graticule = `
+    <g stroke="rgba(255,255,255,0.04)" stroke-width="0.4">
+      <line x1="0" y1="50"  x2="280" y2="50"/>
+      <line x1="0" y1="100" x2="280" y2="100"/>
+      <line x1="0" y1="150" x2="280" y2="150"/>
+      <line x1="60"  y1="0" x2="60"  y2="200"/>
+      <line x1="140" y1="0" x2="140" y2="200"/>
+      <line x1="220" y1="0" x2="220" y2="200"/>
+    </g>`;
+
+  // mantém os tags existentes (marker-tag, ctx-tag, scale) já renderizados
+  // pelo template — só insere o SVG.
+  const svg = `
+    <svg viewBox="0 0 280 200" preserveAspectRatio="xMidYMid meet"
+         style="position:absolute; inset:0; width:100%; height:100%;">
+      ${graticule}
+      ${polys}
+      ${labels}
+    </svg>`;
+
+  // injeta o SVG mantendo os 3 tags absolutos
+  el.insertAdjacentHTML('afterbegin', svg);
+}
+
+function renderInsp(role) {
+  const visibleSections = SECTIONS.filter(s => !role.hidden.includes(s.id));
+  const totalSections = SECTIONS.length;
+  const priorityCount = role.priority.length;
+  const hiddenCount = role.hidden.length;
+  const placeholderCount = role.placeholder.length;
+
+  $insp.innerHTML = `
+    <section>
+      <div class="eyebrow">${role.eyebrow}</div>
+      <h2>${role.pill}</h2>
+      <p style="color:var(--mz-fg-muted); font-size:11px; margin-top:8px">${role.desc}</p>
+    </section>
+
+    <section>
+      <h3>Composição do Layout</h3>
+      <div class="pr-list">
+        ${SECTIONS.map((s, i) => {
+          const isPriority = role.priority.includes(s.id);
+          const isHidden = role.hidden.includes(s.id);
+          const isPlaceholder = role.placeholder.includes(s.id);
+          const cls = isHidden ? 'hidden' : isPriority ? 'priority' : isPlaceholder ? 'placeholder' : '';
+          const status = isHidden ? '🚫' : isPriority ? '★' : isPlaceholder ? '◯' : '·';
+          return `<div class="pr-row ${cls}">
+            <span class="pr-num">${s.num}</span>
+            <div><b>${status} ${s.title}</b></div>
+          </div>`;
+        }).join('')}
+      </div>
+    </section>
+
+    <section>
+      <h3>Resumo</h3>
+      <div class="pr-list">
+        <div class="pr-row"><span class="pr-num">★</span><div><b style="color:var(--mz-tenant-accent)">${priorityCount}</b> seções priorizadas</div></div>
+        <div class="pr-row"><span class="pr-num">◯</span><div><b style="color:var(--mz-warn)">${placeholderCount}</b> em construção (fallback)</div></div>
+        <div class="pr-row"><span class="pr-num">🚫</span><div><b style="color:var(--mz-fg-faint)">${hiddenCount}</b> ocultas (não se aplica)</div></div>
+        <div class="pr-row"><span class="pr-num">·</span><div><b>${visibleSections.length - priorityCount - placeholderCount}</b> em modo padrão</div></div>
+      </div>
+    </section>
+
+    <section>
+      <h3>Engine Técnica</h3>
+      <p style="font-size:11px;color:var(--mz-fg-muted)">
+        Componente único <code>&lt;Dossie role={...} /&gt;</code> renderiza
+        todas as ${totalSections} seções, mas a config do cargo pode marcar cada
+        seção como <code>priority</code>, <code>hidden</code> ou <code>placeholder</code>.
+      </p>
+      <p style="font-size:11px;color:var(--mz-fg-muted)">
+        Princípio César 25/04: <b style="color:var(--mz-tenant-accent)">nunca mostrar 0</b>.
+        Quando dado falta, mostrar em construção sóbrio (sem inventar score).
+      </p>
+    </section>
+  `;
+}
+
+function render(id) {
+  const role = ROLES.find(r => r.id === id);
+  renderPills(id);
+  renderDossie(role);
+  renderInsp(role);
+  $dossie.scrollTop = 0;
+}
+
+render('sen'); // Senador Wagner como default — bom exemplo
+</script>
+
+</body>
+</html>

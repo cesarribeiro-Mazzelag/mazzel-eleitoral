@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark" data-tenant="ub">
+<head>
+<meta charset="UTF-8">
+<title>Filiados · UB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../F1-fundacao/tokens.css">
+<script src="../F1-fundacao/theme-bootstrap.js"></script>
+<style>
+html, body { height: 100%; margin: 0; overflow: hidden; }
+.app { display: grid; grid-template-columns: 240px 1fr 420px; height: 100vh; }
+
+/* LEFT */
+.side { background: var(--mz-bg-sidebar); border-right: 1px solid var(--mz-rule); display: flex; flex-direction: column; overflow-y: auto; }
+.side::-webkit-scrollbar { width: 4px; } .side::-webkit-scrollbar-thumb { background: var(--mz-rule-strong); }
+.brand { padding: 16px 18px; border-bottom: 1px solid var(--mz-rule); display: flex; gap: 10px; align-items: center; }
+.brand .logo { width: 32px; height: 32px; background: var(--mz-tenant-primary); border: 1px solid var(--mz-tenant-accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; color: var(--mz-tenant-accent); font-size: 14px; }
+.brand .name { font-size: 13px; font-weight: 800; color: var(--mz-fg-strong); }
+.brand .name span { display: block; font-size: 9px; color: var(--mz-fg-faint); font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; margin-top: 1px; }
+
+.kpi-stack { padding: 14px 16px; border-bottom: 1px solid var(--mz-rule); display: flex; flex-direction: column; gap: 12px; }
+.kpi { background: var(--mz-bg-card); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-md); padding: 10px 12px; }
+.kpi .lbl { font-size: 9px; letter-spacing: 0.14em; color: var(--mz-fg-faint); text-transform: uppercase; font-weight: 700; }
+.kpi .v { font-family: 'Bebas Neue', sans-serif; font-size: 28px; line-height: 1; color: var(--mz-fg-strong); margin-top: 4px; letter-spacing: 0.02em; }
+.kpi .delta { font-size: 10px; margin-top: 4px; font-family: var(--mz-font-mono); }
+.kpi .delta.up { color: var(--mz-ok); }
+.kpi .delta.down { color: var(--mz-danger); }
+
+.filters { padding: 14px 16px; border-bottom: 1px solid var(--mz-rule); }
+.filters h3 { font-size: 9.5px; letter-spacing: 0.16em; color: var(--mz-fg-faint); text-transform: uppercase; font-weight: 700; margin: 0 0 10px; }
+.fgroup { margin-bottom: 12px; }
+.fgroup label { display: block; font-size: 10px; color: var(--mz-fg-faint); margin-bottom: 4px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 700; }
+.fgroup select, .fgroup input { width: 100%; background: var(--mz-bg-card); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-sm); padding: 6px 9px; font-size: 11.5px; color: var(--mz-fg); outline: none; }
+.fgroup .chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.fchip { font-size: 10px; padding: 3px 8px; border-radius: var(--mz-r-pill); background: var(--mz-bg-card); border: 1px solid var(--mz-rule); color: var(--mz-fg-muted); cursor: pointer; }
+.fchip.on { background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent); border-color: var(--mz-tenant-accent); font-weight: 700; }
+
+/* CENTER */
+main { overflow: hidden; display: flex; flex-direction: column; background: var(--mz-bg-page); }
+.top-bar { padding: 12px 22px; border-bottom: 1px solid var(--mz-rule); background: var(--mz-bg-topbar); display: flex; align-items: center; gap: 14px; }
+.search { flex: 1; max-width: 480px; position: relative; }
+.search input { width: 100%; background: var(--mz-bg-card); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-md); padding: 9px 36px 9px 36px; font-size: 12px; color: var(--mz-fg); outline: none; }
+.search::before { content: '🔍'; position: absolute; left: 12px; top: 9px; font-size: 12px; }
+.search .kbd { position: absolute; right: 8px; top: 7px; font-family: var(--mz-font-mono); font-size: 10px; background: var(--mz-bg-elevated); padding: 2px 6px; border-radius: 3px; color: var(--mz-fg-faint); }
+.toolbar-right { display: flex; gap: 6px; }
+.btn { font-size: 11.5px; font-weight: 600; padding: 7px 12px; border-radius: var(--mz-r-md); border: 1px solid var(--mz-rule); background: var(--mz-bg-card); color: var(--mz-fg); cursor: pointer; }
+.btn.primary { background: var(--mz-tenant-primary); color: #fff; border-color: var(--mz-tenant-primary-strong); }
+.btn.tenant { background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent); border-color: var(--mz-tenant-accent); font-weight: 800; }
+
+.tabs-bar { padding: 0 22px; border-bottom: 1px solid var(--mz-rule); background: var(--mz-bg-topbar); display: flex; gap: 0; }
+.tab { font-size: 11.5px; font-weight: 600; padding: 12px 14px; background: none; border: 0; color: var(--mz-fg-muted); cursor: pointer; border-bottom: 2px solid transparent; display: flex; gap: 6px; align-items: center; }
+.tab.active { color: var(--mz-fg-strong); border-color: var(--mz-tenant-accent); }
+.tab .num { font-family: var(--mz-font-mono); font-size: 9.5px; background: var(--mz-bg-card); padding: 1px 5px; border-radius: 3px; color: var(--mz-fg-faint); }
+.tab.active .num { background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent); }
+
+.list-area { flex: 1; overflow-y: auto; }
+.list-area::-webkit-scrollbar { width: 6px; } .list-area::-webkit-scrollbar-thumb { background: var(--mz-rule-strong); }
+.list-head { display: grid; grid-template-columns: 28px 1fr 100px 110px 120px 140px 80px; gap: 10px; padding: 10px 22px; font-size: 9.5px; letter-spacing: 0.14em; color: var(--mz-fg-faint); text-transform: uppercase; font-weight: 700; border-bottom: 1px solid var(--mz-rule); position: sticky; top: 0; background: var(--mz-bg-page); z-index: 2; }
+.list-row { display: grid; grid-template-columns: 28px 1fr 100px 110px 120px 140px 80px; gap: 10px; padding: 12px 22px; border-bottom: 1px solid var(--mz-rule); align-items: center; cursor: pointer; }
+.list-row:hover { background: var(--mz-bg-card); }
+.list-row.selected { background: var(--mz-tenant-primary-soft); border-left: 3px solid var(--mz-tenant-accent); padding-left: 19px; }
+.list-row .check { width: 16px; height: 16px; border: 1.5px solid var(--mz-rule-strong); border-radius: 3px; display: inline-block; }
+.list-row.selected .check { background: var(--mz-tenant-accent); border-color: var(--mz-tenant-accent); }
+.list-row .person { display: flex; gap: 10px; align-items: center; }
+.list-row .av { width: 36px; height: 36px; border-radius: 50%; background: var(--mz-tenant-primary); color: var(--mz-tenant-accent); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 13px; flex-shrink: 0; }
+.list-row .person b { font-size: 13px; color: var(--mz-fg-strong); display: block; font-weight: 600; line-height: 1.2; }
+.list-row .person small { font-size: 10.5px; color: var(--mz-fg-faint); font-family: var(--mz-font-mono); }
+.list-row .cell { font-size: 11.5px; color: var(--mz-fg); }
+.list-row .cell b { color: var(--mz-fg-strong); font-weight: 600; }
+.list-row .cell small { display: block; color: var(--mz-fg-faint); font-size: 10px; font-family: var(--mz-font-mono); }
+.stat { font-size: 9.5px; padding: 3px 7px; border-radius: 3px; font-weight: 800; letter-spacing: 0.04em; }
+.stat.regular { background: var(--mz-ok-soft); color: var(--mz-ok); }
+.stat.pendente { background: var(--mz-warn-soft); color: var(--mz-warn); }
+.stat.sigiloso { background: rgba(168, 85, 247, 0.18); color: #c084fc; }
+.stat.exp { background: var(--mz-danger-soft); color: var(--mz-danger); }
+.stat.novo { background: var(--mz-info-soft); color: var(--mz-info); }
+.list-row .actions { display: flex; gap: 4px; opacity: 0; }
+.list-row:hover .actions, .list-row.selected .actions { opacity: 1; }
+.list-row .actions button { width: 24px; height: 24px; border: 0; background: var(--mz-bg-card); border-radius: 4px; color: var(--mz-fg-muted); cursor: pointer; font-size: 11px; }
+
+.bulk-bar { display: none; padding: 10px 22px; background: var(--mz-tenant-primary); border-bottom: 1px solid var(--mz-tenant-primary-strong); align-items: center; gap: 14px; color: #fff; font-size: 12px; font-weight: 600; }
+.bulk-bar.visible { display: flex; }
+.bulk-bar button { background: rgba(255,255,255,0.15); border: 0; color: #fff; padding: 5px 10px; border-radius: var(--mz-r-sm); font-size: 11px; cursor: pointer; font-weight: 700; }
+
+/* RIGHT */
+.side-r { background: var(--mz-bg-sidebar); border-left: 1px solid var(--mz-rule); overflow-y: auto; }
+.side-r::-webkit-scrollbar { width: 4px; } .side-r::-webkit-scrollbar-thumb { background: var(--mz-rule-strong); }
+.profile-h { padding: 22px 20px; border-bottom: 1px solid var(--mz-rule); background: linear-gradient(135deg, rgba(0,42,123,0.18), transparent); }
+.profile-h .row1 { display: flex; gap: 14px; align-items: center; }
+.profile-h .av-l { width: 64px; height: 64px; border-radius: 50%; background: var(--mz-tenant-primary); color: var(--mz-tenant-accent); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 22px; }
+.profile-h h2 { margin: 0; font-size: 17px; color: var(--mz-fg-strong); font-weight: 800; line-height: 1.15; }
+.profile-h .meta { font-size: 11px; color: var(--mz-fg-muted); margin-top: 4px; }
+.profile-h .pills { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 12px; }
+.profile-h .pills .pill { font-size: 10px; padding: 3px 8px; border-radius: var(--mz-r-pill); background: var(--mz-bg-card); border: 1px solid var(--mz-rule); color: var(--mz-fg-muted); }
+.profile-h .pills .pill.ok { background: var(--mz-ok-soft); color: var(--mz-ok); border-color: transparent; font-weight: 700; }
+.profile-h .pills .pill.warn { background: var(--mz-warn-soft); color: var(--mz-warn); border-color: transparent; font-weight: 700; }
+
+.r-section { padding: 16px 20px; border-bottom: 1px solid var(--mz-rule); }
+.r-section h4 { font-size: 9.5px; letter-spacing: 0.16em; color: var(--mz-fg-faint); text-transform: uppercase; font-weight: 700; margin: 0 0 12px; display: flex; align-items: center; }
+.r-section h4 .qty { margin-left: auto; font-family: var(--mz-font-mono); background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent); padding: 1px 5px; border-radius: 3px; font-size: 9.5px; font-weight: 800; }
+
+.kv { display: grid; grid-template-columns: 96px 1fr; gap: 6px 12px; font-size: 11.5px; }
+.kv dt { color: var(--mz-fg-faint); }
+.kv dd { margin: 0; color: var(--mz-fg-strong); font-weight: 600; }
+.kv dd small { display: block; color: var(--mz-fg-faint); font-weight: 400; font-family: var(--mz-font-mono); font-size: 10px; }
+
+/* abonador timeline */
+.abonador { background: var(--mz-bg-card); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-md); padding: 12px; }
+.abon-row { display: grid; grid-template-columns: 28px 1fr auto; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--mz-rule); align-items: center; font-size: 11.5px; }
+.abon-row:last-child { border: 0; padding-bottom: 0; }
+.abon-row:first-child { padding-top: 0; }
+.abon-row .a-av { width: 28px; height: 28px; border-radius: 50%; background: var(--mz-tenant-primary); color: var(--mz-tenant-accent); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 11px; }
+.abon-row b { color: var(--mz-fg-strong); font-weight: 600; }
+.abon-row span { color: var(--mz-fg-faint); font-size: 10px; }
+.abon-meta { font-family: var(--mz-font-mono); font-size: 9.5px; color: var(--mz-fg-faint); }
+
+/* docusign */
+.ds-card { background: linear-gradient(135deg, rgba(0,42,123,0.20), var(--mz-bg-card)); border: 1px solid var(--mz-tenant-accent); border-radius: var(--mz-r-md); padding: 14px; }
+.ds-card .h { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.ds-card .h .ico { width: 32px; height: 32px; background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-weight: 800; font-size: 11px; }
+.ds-card .h b { font-size: 12.5px; color: var(--mz-fg-strong); display: block; font-weight: 700; }
+.ds-card .h span { font-size: 10px; color: var(--mz-fg-faint); }
+.ds-step { display: grid; grid-template-columns: 22px 1fr auto; gap: 10px; padding: 7px 0; border-top: 1px solid var(--mz-rule); font-size: 11.5px; align-items: center; }
+.ds-step:first-of-type { border-top: 0; }
+.ds-step .n { width: 22px; height: 22px; border-radius: 50%; background: var(--mz-bg-elevated); color: var(--mz-fg-faint); display: flex; align-items: center; justify-content: center; font-family: var(--mz-font-mono); font-size: 10px; font-weight: 700; }
+.ds-step.done .n { background: var(--mz-ok); color: #fff; }
+.ds-step.cur .n { background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent); }
+.ds-step b { color: var(--mz-fg-strong); display: block; font-weight: 600; }
+.ds-step span { color: var(--mz-fg-faint); font-size: 10px; font-family: var(--mz-font-mono); }
+.ds-step .stt { font-size: 9.5px; padding: 2px 6px; border-radius: 3px; font-weight: 800; }
+.ds-step.done .stt { background: var(--mz-ok-soft); color: var(--mz-ok); }
+.ds-step.cur .stt { background: var(--mz-warn-soft); color: var(--mz-warn); }
+
+.audit-row { display: grid; grid-template-columns: 12px 1fr; gap: 10px; padding: 6px 0; font-size: 11px; align-items: start; }
+.audit-row::before { content: '●'; color: var(--mz-tenant-accent); font-size: 8px; line-height: 1.4; }
+.audit-row b { color: var(--mz-fg); font-weight: 600; }
+.audit-row .when { font-family: var(--mz-font-mono); color: var(--mz-fg-faint); font-size: 10px; }
+
+.action-stack { display: flex; flex-direction: column; gap: 6px; }
+.action-stack .btn { text-align: left; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="side">
+    <div class="brand">
+      <div class="logo">UB</div>
+      <div class="name">Mazzel · UB<span>Filiados</span></div>
+    </div>
+
+    <div class="kpi-stack">
+      <div class="kpi"><div class="lbl">Filiados ativos · BR</div><div class="v">3.247.184</div><div class="delta up">▲ 12.4k este mês</div></div>
+      <div class="kpi"><div class="lbl">SP capital</div><div class="v">124.812</div><div class="delta up">▲ 1.247 (30d)</div></div>
+      <div class="kpi"><div class="lbl">DocuSign pendentes</div><div class="v" style="color: var(--mz-warn)">847</div><div class="delta down">▼ 32 vs sem. passada</div></div>
+      <div class="kpi"><div class="lbl">A regularizar TSE</div><div class="v" style="color: var(--mz-danger)">214</div><div class="delta">prazo 30 dias</div></div>
+    </div>
+
+    <div class="filters">
+      <h3>Filtros</h3>
+      <div class="fgroup">
+        <label>UF</label>
+        <select><option>São Paulo (124.812)</option><option>Rio de Janeiro</option><option>Minas Gerais</option><option>Bahia</option></select>
+      </div>
+      <div class="fgroup">
+        <label>Município</label>
+        <select><option>São Paulo (capital)</option><option>Guarulhos</option><option>Campinas</option></select>
+      </div>
+      <div class="fgroup">
+        <label>Status</label>
+        <div class="chips">
+          <span class="fchip on">Regular (118k)</span>
+          <span class="fchip on">Pendente (847)</span>
+          <span class="fchip">Sigiloso (12)</span>
+          <span class="fchip">Vencido (214)</span>
+        </div>
+      </div>
+      <div class="fgroup">
+        <label>Tags</label>
+        <div class="chips">
+          <span class="fchip on">Cabo eleitoral (1.847)</span>
+          <span class="fchip">Liderança (423)</span>
+          <span class="fchip">Mandatário (147)</span>
+          <span class="fchip">Doador (892)</span>
+          <span class="fchip">Voluntário (3.124)</span>
+        </div>
+      </div>
+      <div class="fgroup">
+        <label>Filiado desde</label>
+        <select><option>Qualquer data</option><option>Últimos 30 dias</option><option>Este ano</option><option>2024-2026</option></select>
+      </div>
+      <div class="fgroup">
+        <label>Abonador</label>
+        <select><option>Qualquer</option><option>Cabo eleitoral</option><option>Liderança comunitária</option><option>Mandatário</option></select>
+      </div>
+    </div>
+  </aside>
+
+  <main>
+    <div class="top-bar">
+      <div class="search"><input value="cabo eleitoral · zona leste · São Paulo" /><span class="kbd">⌘K</span></div>
+      <div class="toolbar-right">
+        <button class="btn">📥 Importar CSV</button>
+        <button class="btn">📤 Exportar (124.812)</button>
+        <button class="btn primary">+ Novo Filiado</button>
+        <button class="btn tenant">+ Convite c/ Abonador</button>
+      </div>
+    </div>
+
+    <div class="tabs-bar">
+      <button class="tab active">Todos <span class="num">124.812</span></button>
+      <button class="tab">Pendentes DocuSign <span class="num">847</span></button>
+      <button class="tab">Em abono <span class="num">312</span></button>
+      <button class="tab">Sigilosos <span class="num">12</span></button>
+      <button class="tab">A renovar <span class="num">214</span></button>
+      <button class="tab">Auditoria <span class="num">5</span></button>
+    </div>
+
+    <div class="bulk-bar visible">
+      <span>3 filiados selecionados</span>
+      <button>📤 Enviar p/ DocuSign em lote</button>
+      <button>🏷️ Aplicar tag</button>
+      <button>📂 Mover para grupo</button>
+      <button>🗑️ Arquivar</button>
+      <button style="margin-left: auto; background: rgba(255,255,255,0.10);">Limpar seleção</button>
+    </div>
+
+    <div class="list-head">
+      <span></span>
+      <span>Filiado</span>
+      <span>Status</span>
+      <span>Filiado desde</span>
+      <span>Abonador</span>
+      <span>Localização</span>
+      <span></span>
+    </div>
+
+    <div class="list-area">
+      <div class="list-row selected">
+        <span class="check"></span>
+        <div class="person"><div class="av">JM</div><div><b>João Mendes da Silva</b><small>CPF 187.***.***-42 · 47a</small></div></div>
+        <span class="cell"><span class="stat regular">REGULAR</span></span>
+        <span class="cell"><b>14/03/2018</b><small>8 anos</small></span>
+        <span class="cell"><b>Rita Tavares</b><small>liderança</small></span>
+        <span class="cell"><b>Itaquera · ZL</b><small>SP capital</small></span>
+        <div class="actions"><button>✉</button><button>📞</button><button>⋯</button></div>
+      </div>
+
+      <div class="list-row selected">
+        <span class="check"></span>
+        <div class="person"><div class="av">LF</div><div><b>Luiz Fernando Dias</b><small>CPF 412.***.***-08 · 39a</small></div></div>
+        <span class="cell"><span class="stat regular">CABO</span></span>
+        <span class="cell"><b>22/06/2020</b><small>5 anos</small></span>
+        <span class="cell"><b>João Mendes</b><small>cabo</small></span>
+        <span class="cell"><b>Cidade Tiradentes</b><small>SP capital</small></span>
+        <div class="actions"><button>✉</button><button>📞</button><button>⋯</button></div>
+      </div>
+
+      <div class="list-row selected">
+        <span class="check"></span>
+        <div class="person"><div class="av">PR</div><div><b>Paula Rocha Albuquerque</b><small>CPF 089.***.***-71 · 32a</small></div></div>
+        <span class="cell"><span class="stat pendente">DOCUSIGN</span></span>
+        <span class="cell"><b>23/04/2026</b><small>3 dias</small></span>
+        <span class="cell"><b>Rita Tavares</b><small>liderança</small></span>
+        <span class="cell"><b>São Mateus · ZL</b><small>SP capital</small></span>
+        <div class="actions"><button>✉</button><button>📞</button><button>⋯</button></div>
+      </div>
+
+      <div class="list-row">
+        <span class="check"></span>
+        <div class="person"><div class="av">AS</div><div><b>Antonio Souza Pereira</b><small>CPF 341.***.***-59 · 56a</small></div></div>
+        <span class="cell"><span class="stat regular">REGULAR</span></span>
+        <span class="cell"><b>04/02/2014</b><small>12 anos</small></span>
+        <span class="cell">—<small>filiação direta</small></span>
+        <span class="cell"><b>Mooca · Centro</b><small>SP capital</small></span>
+        <div class="actions"><button>✉</button><button>📞</button><button>⋯</button></div>
+      </div>
+
+      <div class="list-row">
+        <span class="check"></span>
+        <div class="person"><div class="av">MV</div><div><b>Marcia Vieira Castro</b><small>CPF 567.***.***-13 · 44a</small></div></div>
+        <span class="cell"><span class="stat novo">NOVO</span></span>
+        <span class="cell"><b>25/04/2026</b><small>1 dia</small></span>
+        <span class="cell"><b>Carla Vieira</b><small>vice-pres mun</small></span>
+        <span class="cell"><b>Pinheiros · ZO</b><small>SP capital</small></span>
+        <div class="actions"><button>✉</button><button>📞</button><button>⋯</button></div>
+      </div>
+
+      <div class="list-row">
+        <span class="check"></span>
+        <div class="person"><div class="av">RM</div><div><b>Roberto Marinho Junior</b><small>CPF 712.***.***-86 · 61a</small></div></div>
+        <span class="cell"><span class="stat sigiloso">🔒 SIGILOSO</span></span>
+        <span class="cell"><b>—</b><small>oculto</small></span>
+        <span class="cell"><b>Milton Leite</b><small>pres mun</small></span>
+        <span class="cell"><b>—</b><small>protegido</small></span>
+        <div class="actions"><button>✉</button><button>📞</button><button>⋯</button></div>
+      </div>
+
+      <div class="list-row">
+        <span class="check"></span>
+        <div class="person"><div class="av">EC</div><div><b>Eliana Costa Mendonça</b><small>CPF 234.***.***-44 · 51a</small></div></div>
+        <span class="cell"><span class="stat exp">VENCIDO</span></span>
+        <span class="cell"><b>14/03/2010</b><small>16 anos</small></span>
+        <span class="cell">—</span>
+        <span class="cell"><b>Cidade Líder</b><small>SP capital</small></span>
+        <div class="actions"><button>✉</button><button>📞</button><button>⋯</button></div>
+      </div>
+
+      <div class="list-row">
+        <span class="check"></span>
+        <div class="person"><div class="av">DG</div><div><b>Daniel Gomes Tavares</b><small>CPF 098.***.***-22 · 28a</small></div></div>
+        <span class="cell"><span class="stat regular">CABO</span></span>
+        <span class="cell"><b>11/09/2022</b><small>3 anos</small></span>
+        <span class="cell"><b>Luiz Fernando Dias</b><small>cabo</small></span>
+        <span class="cell"><b>Cidade Tiradentes</b><small>SP capital</small></span>
+        <div class="actions"><button>✉</button><button>📞</button><button>⋯</button></div>
+      </div>
+
+      <div class="list-row">
+        <span class="check"></span>
+        <div class="person"><div class="av">SF</div><div><b>Sandra Ferreira Lima</b><small>CPF 156.***.***-91 · 38a</small></div></div>
+        <span class="cell"><span class="stat pendente">DOCUSIGN</span></span>
+        <span class="cell"><b>20/04/2026</b><small>6 dias</small></span>
+        <span class="cell"><b>João Mendes</b><small>cabo</small></span>
+        <span class="cell"><b>Itaim Paulista</b><small>SP capital</small></span>
+        <div class="actions"><button>✉</button><button>📞</button><button>⋯</button></div>
+      </div>
+
+      <div class="list-row">
+        <span class="check"></span>
+        <div class="person"><div class="av">CB</div><div><b>Carlos Bittencourt Lopes</b><small>CPF 478.***.***-35 · 49a</small></div></div>
+        <span class="cell"><span class="stat regular">DOADOR</span></span>
+        <span class="cell"><b>02/05/2016</b><small>9 anos</small></span>
+        <span class="cell"><b>Milton Leite</b><small>pres mun</small></span>
+        <span class="cell"><b>Vila Mariana · ZS</b><small>SP capital</small></span>
+        <div class="actions"><button>✉</button><button>📞</button><button>⋯</button></div>
+      </div>
+
+      <div class="list-row">
+        <span class="check"></span>
+        <div class="person"><div class="av">VR</div><div><b>Vitória Reis dos Santos</b><small>CPF 823.***.***-67 · 23a</small></div></div>
+        <span class="cell"><span class="stat regular">JOVEM</span></span>
+        <span class="cell"><b>18/03/2024</b><small>2 anos</small></span>
+        <span class="cell"><b>Carla Vieira</b><small>vice-pres mun</small></span>
+        <span class="cell"><b>Butantã · ZO</b><small>SP capital</small></span>
+        <div class="actions"><button>✉</button><button>📞</button><button>⋯</button></div>
+      </div>
+
+      <div class="list-row">
+        <span class="check"></span>
+        <div class="person"><div class="av">JN</div><div><b>Jonas Nascimento Barros</b><small>CPF 691.***.***-04 · 41a</small></div></div>
+        <span class="cell"><span class="stat regular">LIDER.</span></span>
+        <span class="cell"><b>09/11/2019</b><small>6 anos</small></span>
+        <span class="cell">—<small>filiação direta</small></span>
+        <span class="cell"><b>Capão Redondo · ZS</b><small>SP capital</small></span>
+        <div class="actions"><button>✉</button><button>📞</button><button>⋯</button></div>
+      </div>
+    </div>
+  </main>
+
+  <aside class="side-r">
+    <div class="profile-h">
+      <div class="row1">
+        <div class="av-l">JM</div>
+        <div>
+          <h2>João Mendes da Silva</h2>
+          <div class="meta">Cabo eleitoral · OP-2026-014 · Zona Leste</div>
+        </div>
+      </div>
+      <div class="pills">
+        <span class="pill ok">✓ TSE Regular</span>
+        <span class="pill ok">✓ DocuSign assinado</span>
+        <span class="pill">8 anos de filiação</span>
+        <span class="pill">Quadrante 14-A</span>
+        <span class="pill warn">⚠ 23 visitas pendentes</span>
+      </div>
+    </div>
+
+    <div class="r-section">
+      <h4>Dados Cadastrais</h4>
+      <dl class="kv">
+        <dt>CPF</dt><dd>187.***.***-42<small>validado em 14/03/2018</small></dd>
+        <dt>Nascimento</dt><dd>22/08/1978 (47 anos)</dd>
+        <dt>Telefone</dt><dd>(11) 9****-2284<small>WhatsApp ativo</small></dd>
+        <dt>Email</dt><dd>j.mendes****@gmail.com</dd>
+        <dt>Endereço</dt><dd>Itaquera · ZL<small>quadrante 14-A · SP capital</small></dd>
+        <dt>Ocupação</dt><dd>Comerciante (mercearia)</dd>
+        <dt>Estado civil</dt><dd>Casado · 2 filhos</dd>
+      </dl>
+    </div>
+
+    <div class="r-section">
+      <h4>Cadeia de Abono <span class="qty">3 níveis</span></h4>
+      <div class="abonador">
+        <div class="abon-row">
+          <div class="a-av">ML</div>
+          <div><b>Milton Leite</b><span>Pres. Mun. · raiz da árvore</span></div>
+          <span class="abon-meta">N0</span>
+        </div>
+        <div class="abon-row">
+          <div class="a-av">RT</div>
+          <div><b>Rita Tavares</b><span>Liderança comunitária ZL · abonou direto</span></div>
+          <span class="abon-meta">N1</span>
+        </div>
+        <div class="abon-row">
+          <div class="a-av" style="background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent);">JM</div>
+          <div><b>João Mendes (vc)</b><span>Cabo · abonado por Rita em 14/03/2018</span></div>
+          <span class="abon-meta">N2</span>
+        </div>
+        <div class="abon-row">
+          <div class="a-av">+12</div>
+          <div><b>+ 12 abonados por João</b><span>cabos e filiados sob sua árvore</span></div>
+          <span class="abon-meta">N3+</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="r-section">
+      <h4>Status DocuSign</h4>
+      <div class="ds-card">
+        <div class="h">
+          <div class="ico">DS</div>
+          <div><b>Termo de Filiação UB v2024.r3</b><span>envelope #DS-2018-04719</span></div>
+        </div>
+        <div class="ds-step done"><div class="n">✓</div><div><b>Envio do termo</b><span>14/03/2018 · 09:14</span></div><span class="stt">FEITO</span></div>
+        <div class="ds-step done"><div class="n">✓</div><div><b>Verificação CPF/Receita</b><span>14/03/2018 · 09:18</span></div><span class="stt">VALIDADO</span></div>
+        <div class="ds-step done"><div class="n">✓</div><div><b>Assinatura do filiado</b><span>14/03/2018 · 11:42 · IP 187.X.X.42</span></div><span class="stt">ASSINADO</span></div>
+        <div class="ds-step done"><div class="n">✓</div><div><b>Contra-assinatura abonador</b><span>Rita Tavares · 14/03/2018 · 14:08</span></div><span class="stt">ASSINADO</span></div>
+        <div class="ds-step done"><div class="n">✓</div><div><b>Protocolo TSE</b><span>26/03/2018 · lote 4127-A</span></div><span class="stt">REGISTRADO</span></div>
+        <div class="ds-step done"><div class="n">✓</div><div><b>Termo arquivado</b><span>repositório DocuSign · imutável</span></div><span class="stt">VIGENTE</span></div>
+      </div>
+    </div>
+
+    <div class="r-section">
+      <h4>Tags & Operações <span class="qty">5</span></h4>
+      <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+        <span class="fchip on" style="font-size: 11px;">cabo eleitoral</span>
+        <span class="fchip on" style="font-size: 11px;">OP-2026-014</span>
+        <span class="fchip on" style="font-size: 11px;">quadrante 14-A</span>
+        <span class="fchip on" style="font-size: 11px;">comerciante</span>
+        <span class="fchip on" style="font-size: 11px;">whatsapp ativo</span>
+        <span class="fchip" style="font-size: 11px;">+ tag</span>
+      </div>
+    </div>
+
+    <div class="r-section">
+      <h4>Auditoria · últimos 30 dias <span class="qty">8</span></h4>
+      <div class="audit-row"><div><b>Reportou rota OP-014 dia 1</b><div class="when">25/abr/2026 09:14</div></div></div>
+      <div class="audit-row"><div><b>Recebeu material gráfico (kit 14-A)</b><div class="when">22/abr/2026 11:30</div></div></div>
+      <div class="audit-row"><div><b>Validação biométrica · campo</b><div class="when">18/abr/2026 14:22</div></div></div>
+      <div class="audit-row"><div><b>Adicionado a OP-2026-014 por Rita Tavares</b><div class="when">04/abr/2026 10:05</div></div></div>
+      <div class="audit-row"><div><b>Atualização de telefone (LGPD log)</b><div class="when">28/mar/2026 16:48</div></div></div>
+    </div>
+
+    <div class="r-section">
+      <h4>Ações</h4>
+      <div class="action-stack">
+        <button class="btn">💬 Iniciar chat (DM)</button>
+        <button class="btn">📞 Ligar via gabinete</button>
+        <button class="btn">📋 Ver dossiê de cabo</button>
+        <button class="btn">📤 Reenviar termo (DocuSign)</button>
+        <button class="btn">🏷️ Editar tags</button>
+        <button class="btn">⚖️ Designar como abonador</button>
+        <button class="btn primary">+ Adicionar a operação</button>
+      </div>
+    </div>
+
+    <div class="r-section" style="background: var(--mz-bg-card-2);">
+      <h4>LGPD · Acesso a este registro</h4>
+      <div class="audit-row"><div><b>Vc (você) leu agora</b><div class="when">25/abr/2026 09:14:23 · IP 187.X.X.42</div></div></div>
+      <div class="audit-row"><div><b>Rita Tavares leu</b><div class="when">22/abr/2026 18:30</div></div></div>
+      <div class="audit-row"><div><b>Sistema · validação TSE periódica</b><div class="when">14/abr/2026 03:00 (cron)</div></div></div>
+      <div style="font-size: 10px; color: var(--mz-fg-faint); margin-top: 8px; line-height: 1.5;">Todo acesso é auditado conforme LGPD art. 37. Logs imutáveis · retenção 5 anos.</div>
+    </div>
+  </aside>
+</div>
+</body>
+</html>

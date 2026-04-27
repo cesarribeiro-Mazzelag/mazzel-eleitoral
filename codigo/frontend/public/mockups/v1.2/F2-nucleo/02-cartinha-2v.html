@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark" data-tenant="ub">
+<head>
+<meta charset="UTF-8">
+<title>Cartinha 4:5 · 2 Variações · UB</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../F1-fundacao/tokens.css">
+<script src="../F1-fundacao/theme-bootstrap.js"></script>
+<style>
+html, body { margin: 0; min-height: 100vh; }
+body {
+  background:
+    radial-gradient(1200px 600px at 50% -200px, rgba(0, 42, 123, 0.18), transparent),
+    var(--mz-bg-page);
+  padding: 32px 40px 60px;
+  color: var(--mz-fg);
+}
+
+/* ============ HEADER ============ */
+.page-head {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  margin-bottom: 28px; gap: 32px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--mz-rule);
+}
+.page-head h1 {
+  font-size: 28px; font-weight: 800;
+  letter-spacing: -0.02em; color: var(--mz-fg-strong);
+  margin: 0 0 4px;
+}
+.page-head .sub {
+  font-size: 13px; color: var(--mz-fg-muted);
+  max-width: 720px; line-height: 1.55;
+}
+.page-head .sub b { color: var(--mz-tenant-accent); }
+.page-head .meta {
+  display: flex; gap: 12px;
+  font-size: 11px; color: var(--mz-fg-faint);
+  letter-spacing: 0.06em; text-transform: uppercase;
+  font-weight: 600; flex-shrink: 0;
+}
+.page-head .meta b { color: var(--mz-fg-strong); }
+
+/* ============ SECTION ============ */
+section { margin-bottom: 56px; }
+.sec-head {
+  display: flex; align-items: baseline; gap: 16px;
+  margin-bottom: 4px;
+}
+.sec-head .num {
+  font-family: var(--mz-font-mono);
+  font-size: 11px; font-weight: 700;
+  color: var(--mz-tenant-accent);
+  letter-spacing: 0.10em;
+}
+.sec-head h2 {
+  font-size: 22px; font-weight: 800;
+  letter-spacing: -0.015em; color: var(--mz-fg-strong);
+  margin: 0;
+}
+.sec-head .badge {
+  font-size: 10px; font-weight: 700;
+  padding: 3px 8px; border-radius: var(--mz-r-pill);
+  background: var(--mz-tenant-primary-soft);
+  color: var(--mz-tenant-accent);
+  letter-spacing: 0.04em;
+}
+.sec-sub {
+  font-size: 13px; color: var(--mz-fg-muted);
+  max-width: 820px; line-height: 1.6;
+  margin: 0 0 22px;
+  padding-left: 32px;
+  border-left: 2px solid var(--mz-rule);
+}
+.sec-sub b { color: var(--mz-fg); font-weight: 600; }
+
+/* ============ STAGE ============ */
+.stage {
+  display: grid;
+  grid-template-columns: repeat(4, 320px);
+  gap: 20px;
+  justify-content: start;
+  padding: 20px 0;
+}
+
+/* =================================================================
+   CARTINHA 4:5 · BASE (proporção e formato comum)
+   ================================================================= */
+.card {
+  width: 320px;
+  height: 400px; /* 4:5 = 320 × 400 */
+  border-radius: 18px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 240ms cubic-bezier(.2,.8,.3,1), box-shadow 240ms;
+}
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 40px rgba(0,0,0,0.45);
+}
+.card-label {
+  display: block;
+  margin-top: 10px;
+  font-size: 11px; color: var(--mz-fg-faint);
+  letter-spacing: 0.06em; text-transform: uppercase;
+  font-weight: 600;
+  text-align: center;
+}
+.card-label b { color: var(--mz-fg-strong); display: block; font-size: 12px; letter-spacing: 0.02em; text-transform: none; margin-bottom: 2px; }
+
+/* =================================================================
+   VARIAÇÃO A · UB OFICIAL — Cinema, fundo escuro UB, premium
+   Inspirado em figurinhas Panini de elite + ID UB azul#003399
+   ================================================================= */
+.A {
+  background:
+    radial-gradient(80% 80% at 50% 0%, #002a7b 0%, #001540 60%, #000820 100%);
+  border: 2px solid #FFCC00;
+  box-shadow:
+    0 0 0 2px rgba(0,0,0,0.6),
+    0 12px 28px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 204, 0, 0.5);
+}
+.A::before {
+  /* shine top */
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(120% 60% at 50% -10%, rgba(255, 204, 0, 0.18), transparent 60%),
+    repeating-linear-gradient(135deg, rgba(255,255,255,0.03) 0 2px, transparent 2px 6px);
+  pointer-events: none;
+}
+.A::after {
+  /* halftone amarelo no canto */
+  content: '';
+  position: absolute;
+  bottom: -20px; right: -20px;
+  width: 160px; height: 160px;
+  background-image: radial-gradient(circle, rgba(255, 204, 0, 0.5) 1.5px, transparent 1.6px);
+  background-size: 8px 8px;
+  opacity: 0.30;
+  pointer-events: none;
+}
+
+/* topo: tier + escudo + cargo */
+.A .top {
+  position: absolute; top: 0; left: 0; right: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px;
+  z-index: 3;
+}
+.A .tier {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 38px; font-weight: 700;
+  color: #FFCC00;
+  line-height: 1; letter-spacing: 0.04em;
+  text-shadow:
+    0 0 14px rgba(255,204,0,0.6),
+    0 2px 0 rgba(0,0,0,0.4);
+  display: flex; align-items: baseline; gap: 4px;
+}
+.A .tier .ovr-num { font-size: 30px; }
+.A .tier .ovr-lbl { font-size: 9px; color: rgba(255,204,0,0.7); letter-spacing: 0.18em; font-family: var(--mz-font-sans); font-weight: 700; align-self: flex-start; margin-top: 6px; }
+.A .escudo {
+  width: 38px; height: 38px;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(180deg, #FFCC00, #f0a500);
+  border-radius: 6px;
+  box-shadow: 0 0 12px rgba(255, 204, 0, 0.35);
+}
+.A .escudo svg { width: 22px; height: 22px; }
+
+.A .cargo-tag {
+  position: absolute;
+  top: 60px; left: 16px;
+  z-index: 3;
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #FFCC00;
+  padding: 3px 8px;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,204,0,0.4);
+  border-radius: var(--mz-r-pill);
+}
+
+/* foto */
+.A .photo {
+  position: absolute;
+  inset: 78px 16px 132px 16px;
+  border-radius: 12px;
+  overflow: hidden;
+  z-index: 2;
+}
+.A .photo .silhouette {
+  width: 100%; height: 100%;
+  background:
+    radial-gradient(ellipse 60% 70% at 50% 30%, rgba(255,255,255,0.06), transparent 70%),
+    linear-gradient(180deg, #1a3a8a 0%, #0a1f5a 100%);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.A .photo .ini {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 90px;
+  color: #FFCC00;
+  text-shadow: 0 4px 24px rgba(0,0,0,0.6), 0 0 30px rgba(255,204,0,0.3);
+  letter-spacing: 0.04em;
+  line-height: 1;
+  opacity: 0.85;
+}
+.A .photo::after {
+  /* gradient fade pro nome embaixo */
+  content: '';
+  position: absolute; left: 0; right: 0; bottom: 0; height: 60%;
+  background: linear-gradient(180deg, transparent, rgba(0,8,32,0.95));
+  pointer-events: none;
+}
+
+/* nome + meta */
+.A .name-block {
+  position: absolute;
+  left: 16px; right: 16px;
+  bottom: 90px;
+  z-index: 3;
+}
+.A .name {
+  font-size: 22px; font-weight: 800;
+  letter-spacing: -0.01em; color: #fff;
+  line-height: 1.05;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+.A .meta-row {
+  display: flex; gap: 8px; margin-top: 6px;
+  font-size: 10px; color: rgba(255,255,255,0.7);
+  letter-spacing: 0.04em;
+}
+.A .meta-row b { color: #FFCC00; font-weight: 700; }
+
+/* sub-medidas (4 stats) */
+.A .stats {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  z-index: 3;
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 10px 16px 12px;
+  border-top: 1px solid rgba(255, 204, 0, 0.25);
+}
+.A .stat { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.A .stat .lbl {
+  font-size: 8px; font-weight: 700;
+  color: rgba(255,204,0,0.85);
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+}
+.A .stat .v {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 17px; font-weight: 800;
+  color: #fff;
+  line-height: 1;
+}
+
+/* tier ribbon (S/A/B/C lateral) */
+.A .ribbon {
+  position: absolute;
+  top: 12px; right: -2px;
+  z-index: 4;
+  display: none;
+}
+
+/* =================================================================
+   VARIAÇÃO B · MINIMAL — Estilo NBA Top Shot, foco em dado, tipo grande
+   Card claro com banda lateral colorida por tier
+   ================================================================= */
+.B {
+  background: #fafafa;
+  border: 1px solid #e2e2e2;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  color: #111;
+}
+.B::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 6px;
+  background: var(--tier-color, #003399);
+}
+
+/* topo */
+.B .b-top {
+  padding: 16px 18px 12px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.B .b-tier-block {
+  display: flex; align-items: baseline; gap: 6px;
+}
+.B .b-tier-letter {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px; font-weight: 700;
+  color: var(--tier-color, #003399);
+  line-height: 1; letter-spacing: 0.05em;
+}
+.B .b-ovr {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 38px; font-weight: 800;
+  color: #111; letter-spacing: -0.04em;
+  line-height: 1;
+}
+.B .b-ovr-lbl {
+  font-size: 9px; font-weight: 700;
+  color: #888; letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-top: 4px;
+  display: block;
+}
+.B .b-escudo {
+  width: 36px; height: 36px;
+  background: #003399;
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+}
+.B .b-escudo svg { width: 22px; height: 22px; }
+
+/* foto + nome */
+.B .b-mid {
+  padding: 4px 18px 14px 24px;
+  display: flex; gap: 14px; align-items: center;
+}
+.B .b-photo {
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--tier-color, #003399), #001540);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.3);
+}
+.B .b-photo .ini {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 44px;
+  color: #FFCC00;
+  letter-spacing: 0.04em;
+}
+.B .b-name-block { flex: 1; min-width: 0; }
+.B .b-name {
+  font-size: 19px; font-weight: 800;
+  letter-spacing: -0.015em; color: #111;
+  line-height: 1.1;
+  text-wrap: pretty;
+}
+.B .b-cargo {
+  font-size: 10px;
+  color: #666;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-top: 4px;
+}
+.B .b-meta {
+  font-size: 11px;
+  color: #444;
+  margin-top: 6px;
+  display: flex; gap: 6px; align-items: center;
+}
+.B .b-meta b { color: #003399; font-weight: 700; }
+.B .b-meta .dot { width: 3px; height: 3px; background: #888; border-radius: 50%; }
+
+/* stats (4 sub-medidas) */
+.B .b-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid #e2e2e2;
+  background: #fff;
+  padding: 12px 18px 14px 24px;
+  gap: 1px;
+}
+.B .b-stat { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; }
+.B .b-stat .lbl {
+  font-size: 8.5px; font-weight: 700;
+  color: #888; letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.B .b-stat .v {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px; font-weight: 700;
+  color: #111;
+  line-height: 1.2;
+}
+.B .b-stat .v.up { color: #16a34a; }
+.B .b-stat .v.down { color: #dc2626; }
+.B .b-stat .bar {
+  width: 100%; height: 3px;
+  background: #e2e2e2;
+  border-radius: 1.5px;
+  margin-top: 4px;
+  overflow: hidden;
+}
+.B .b-stat .bar > span {
+  display: block; height: 100%;
+  background: var(--tier-color, #003399);
+}
+
+/* footer (delta + assinatura) */
+.B .b-foot {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--tier-color, #003399), #FFCC00);
+}
+
+/* =================================================================
+   COMPARATIVO LADO A LADO
+   ================================================================= */
+.compare {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+.compare-cell {
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  border-radius: var(--mz-r-md);
+  padding: 14px;
+  font-size: 11px;
+  color: var(--mz-fg-muted);
+  line-height: 1.55;
+}
+.compare-cell h4 {
+  font-size: 10.5px;
+  letter-spacing: 0.10em;
+  color: var(--mz-tenant-accent);
+  text-transform: uppercase;
+  margin: 0 0 8px;
+  font-weight: 700;
+}
+.compare-cell ul {
+  list-style: none; padding: 0; margin: 0;
+}
+.compare-cell li {
+  padding: 4px 0;
+  border-bottom: 1px dashed var(--mz-rule);
+  display: flex; gap: 6px;
+}
+.compare-cell li:last-child { border-bottom: 0; }
+.compare-cell li::before { content: '·'; color: var(--mz-tenant-accent); font-weight: 700; }
+.compare-cell li b { color: var(--mz-fg-strong); }
+
+/* tier tokens */
+.tier-S { --tier-color: #FFCC00; }
+.tier-A { --tier-color: #16a34a; }
+.tier-B { --tier-color: #003399; }
+.tier-C { --tier-color: #f59e0b; }
+.tier-D { --tier-color: #dc2626; }
+
+/* uso real grid */
+.usage {
+  background: var(--mz-bg-card);
+  border: 1px solid var(--mz-rule);
+  border-radius: var(--mz-r-lg);
+  padding: 24px 28px;
+}
+.usage h3 {
+  font-size: 13px; font-weight: 700;
+  color: var(--mz-fg-strong);
+  margin: 0 0 4px;
+  letter-spacing: 0.02em;
+}
+.usage p {
+  font-size: 12px; color: var(--mz-fg-muted);
+  margin: 0 0 18px;
+  line-height: 1.55;
+}
+.usage-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+}
+.usage-grid .card {
+  width: 100%; height: auto;
+  aspect-ratio: 4/5;
+}
+
+</style>
+</head>
+<body>
+
+<header class="page-head">
+  <div>
+    <h1>Cartinha 4:5 · Card-de-Político</h1>
+    <p class="sub">
+      Componente viral do produto · vira screenshot, vira meme, vira "compartilhe seu OVR".
+      <b>Proporção 4:5</b> (320×400px) por compatibilidade com Instagram/Stories.
+      <b>Decisão César 25/04:</b> não inventar score; quando dado falta, mostra "em construção" — nunca "0".
+    </p>
+  </div>
+  <div class="meta">
+    <span><b>2</b> variações</span>
+    <span><b>4</b> tiers (S · A · B · C)</span>
+    <span><b>4:5</b> ratio</span>
+    <span><b>320×400</b>px</span>
+  </div>
+</header>
+
+<!-- ====================== VARIAÇÃO A ====================== -->
+<section>
+  <div class="sec-head">
+    <span class="num">VARIAÇÃO · A</span>
+    <h2>UB Oficial — Cinematográfica</h2>
+    <span class="badge">Recomendada para Mídia</span>
+  </div>
+  <p class="sec-sub">
+    <b>Linguagem:</b> escudo, cores oficiais UB (#003399 + #FFCC00), texto em <b>Bebas Neue</b> e tipo grande.
+    Usar quando o card sai do produto: pra imprensa, redes sociais oficiais, álbum de figurinhas dos eleitos do partido, telões em convenção.
+    <b>Não use</b> dentro do dossiê — fica visualmente competitivo demais com o painel.
+  </p>
+
+  <div class="stage">
+    <!-- A.1 — Tier S (Tarcísio) -->
+    <div>
+      <div class="card A">
+        <div class="top">
+          <div class="tier">
+            <span class="ovr-num">96</span>
+            <span class="ovr-lbl">OVR</span>
+          </div>
+          <div class="escudo">
+            <svg viewBox="0 0 24 24" fill="#003399"><path d="M12 2L4 5v6.5C4 16.2 7.4 20.5 12 22c4.6-1.5 8-5.8 8-10.5V5l-8-3z"/><text x="12" y="15" text-anchor="middle" font-size="9" font-weight="900" fill="#FFCC00" font-family="Inter">UB</text></svg>
+          </div>
+        </div>
+        <span class="cargo-tag">Governador · SP</span>
+        <div class="photo"><div class="silhouette"><span class="ini">TF</span></div></div>
+        <div class="name-block">
+          <div class="name">Tarcísio<br>de Freitas</div>
+          <div class="meta-row"><b>SP</b><span>·</span><span>Republicanos</span><span>·</span><span>1º mandato</span></div>
+        </div>
+        <div class="stats">
+          <div class="stat"><span class="lbl">Lid</span><span class="v">96</span></div>
+          <div class="stat"><span class="lbl">Mid</span><span class="v">94</span></div>
+          <div class="stat"><span class="lbl">Bas</span><span class="v">98</span></div>
+          <div class="stat"><span class="lbl">Cap</span><span class="v">95</span></div>
+        </div>
+      </div>
+      <span class="card-label"><b>A.1 · Tier S</b>elite/governador</span>
+    </div>
+
+    <!-- A.2 — Tier A (Wagner) -->
+    <div>
+      <div class="card A">
+        <div class="top">
+          <div class="tier">
+            <span class="ovr-num">87</span>
+            <span class="ovr-lbl">OVR</span>
+          </div>
+          <div class="escudo">
+            <svg viewBox="0 0 24 24" fill="#003399"><path d="M12 2L4 5v6.5C4 16.2 7.4 20.5 12 22c4.6-1.5 8-5.8 8-10.5V5l-8-3z"/><text x="12" y="15" text-anchor="middle" font-size="9" font-weight="900" fill="#FFCC00" font-family="Inter">UB</text></svg>
+          </div>
+        </div>
+        <span class="cargo-tag">Senador · BA</span>
+        <div class="photo"><div class="silhouette"><span class="ini">JW</span></div></div>
+        <div class="name-block">
+          <div class="name">Jaques<br>Wagner</div>
+          <div class="meta-row"><b>BA</b><span>·</span><span>PT</span><span>·</span><span>3º mandato</span></div>
+        </div>
+        <div class="stats">
+          <div class="stat"><span class="lbl">Lid</span><span class="v">88</span></div>
+          <div class="stat"><span class="lbl">Mid</span><span class="v">82</span></div>
+          <div class="stat"><span class="lbl">Bas</span><span class="v">90</span></div>
+          <div class="stat"><span class="lbl">Cap</span><span class="v">86</span></div>
+        </div>
+      </div>
+      <span class="card-label"><b>A.2 · Tier A</b>senador veterano</span>
+    </div>
+
+    <!-- A.3 — Tier B (Pres Estadual) -->
+    <div>
+      <div class="card A">
+        <div class="top">
+          <div class="tier">
+            <span class="ovr-num">78</span>
+            <span class="ovr-lbl">OVR</span>
+          </div>
+          <div class="escudo">
+            <svg viewBox="0 0 24 24" fill="#003399"><path d="M12 2L4 5v6.5C4 16.2 7.4 20.5 12 22c4.6-1.5 8-5.8 8-10.5V5l-8-3z"/><text x="12" y="15" text-anchor="middle" font-size="9" font-weight="900" fill="#FFCC00" font-family="Inter">UB</text></svg>
+          </div>
+        </div>
+        <span class="cargo-tag">Pres Estadual · SP</span>
+        <div class="photo"><div class="silhouette"><span class="ini">ML</span></div></div>
+        <div class="name-block">
+          <div class="name">Milton<br>Leite</div>
+          <div class="meta-row"><b>SP</b><span>·</span><span>UB</span><span>·</span><span>Vereador 7×</span></div>
+        </div>
+        <div class="stats">
+          <div class="stat"><span class="lbl">Lid</span><span class="v">82</span></div>
+          <div class="stat"><span class="lbl">Mid</span><span class="v">71</span></div>
+          <div class="stat"><span class="lbl">Bas</span><span class="v">84</span></div>
+          <div class="stat"><span class="lbl">Cap</span><span class="v">76</span></div>
+        </div>
+      </div>
+      <span class="card-label"><b>A.3 · Tier B</b>cargo partidário</span>
+    </div>
+
+    <!-- A.4 — Tier C (em construção) -->
+    <div>
+      <div class="card A" style="opacity: 0.92">
+        <div class="top">
+          <div class="tier" style="color: rgba(255,204,0,0.4)">
+            <span class="ovr-num" style="font-size: 22px; letter-spacing: -0.02em">—</span>
+            <span class="ovr-lbl">EM CONSTRUÇÃO</span>
+          </div>
+          <div class="escudo">
+            <svg viewBox="0 0 24 24" fill="#003399"><path d="M12 2L4 5v6.5C4 16.2 7.4 20.5 12 22c4.6-1.5 8-5.8 8-10.5V5l-8-3z"/><text x="12" y="15" text-anchor="middle" font-size="9" font-weight="900" fill="#FFCC00" font-family="Inter">UB</text></svg>
+          </div>
+        </div>
+        <span class="cargo-tag">Vereador · Itaquaquecetuba</span>
+        <div class="photo"><div class="silhouette"><span class="ini" style="opacity: 0.4">AR</span></div></div>
+        <div class="name-block">
+          <div class="name">Alessandro<br>Rotunno</div>
+          <div class="meta-row"><b>SP</b><span>·</span><span>UB</span><span>·</span><span>1º mandato</span></div>
+        </div>
+        <div class="stats">
+          <div class="stat"><span class="lbl">Lid</span><span class="v" style="color:rgba(255,255,255,0.35)">··</span></div>
+          <div class="stat"><span class="lbl">Mid</span><span class="v" style="color:rgba(255,255,255,0.35)">··</span></div>
+          <div class="stat"><span class="lbl">Bas</span><span class="v" style="color:rgba(255,255,255,0.35)">··</span></div>
+          <div class="stat"><span class="lbl">Cap</span><span class="v" style="color:rgba(255,255,255,0.35)">··</span></div>
+        </div>
+      </div>
+      <span class="card-label"><b>A.4 · em construção</b>fallback (decisão César)</span>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== VARIAÇÃO B ====================== -->
+<section>
+  <div class="sec-head">
+    <span class="num">VARIAÇÃO · B</span>
+    <h2>Minimal — Densidade Operacional</h2>
+    <span class="badge">Recomendada Dentro do Produto</span>
+  </div>
+  <p class="sec-sub">
+    <b>Linguagem:</b> fundo claro, tipo grande, banda lateral colorida pelo tier (S/A/B/C/D).
+    Usar dentro de listas, ranking, dossiê comparado, briefings impressos.
+    <b>Compatível com modo claro</b>; legível em densidade alta;
+    cabe 6 por linha sem competir com o resto da UI.
+  </p>
+
+  <div class="stage">
+    <!-- B.1 — Tier S -->
+    <div>
+      <div class="card B tier-S">
+        <div class="b-top">
+          <div class="b-tier-block">
+            <span class="b-tier-letter">S</span>
+            <div>
+              <div class="b-ovr">96</div>
+              <span class="b-ovr-lbl">OVR</span>
+            </div>
+          </div>
+          <div class="b-escudo">
+            <svg viewBox="0 0 24 24"><path d="M12 2L4 5v6.5C4 16.2 7.4 20.5 12 22c4.6-1.5 8-5.8 8-10.5V5l-8-3z" fill="#FFCC00"/><text x="12" y="15" text-anchor="middle" font-size="9" font-weight="900" fill="#003399" font-family="Inter">UB</text></svg>
+          </div>
+        </div>
+        <div class="b-mid">
+          <div class="b-photo"><span class="ini">TF</span></div>
+          <div class="b-name-block">
+            <div class="b-name">Tarcísio<br>de Freitas</div>
+            <div class="b-cargo">Governador · SP</div>
+            <div class="b-meta"><b>+2.1</b> 7d <span class="dot"></span> 12,8M votos</div>
+          </div>
+        </div>
+        <div class="b-stats">
+          <div class="b-stat"><span class="lbl">Lid</span><span class="v">96</span><span class="bar"><span style="width:96%"></span></span></div>
+          <div class="b-stat"><span class="lbl">Mid</span><span class="v">94</span><span class="bar"><span style="width:94%"></span></span></div>
+          <div class="b-stat"><span class="lbl">Bas</span><span class="v">98</span><span class="bar"><span style="width:98%"></span></span></div>
+          <div class="b-stat"><span class="lbl">Cap</span><span class="v">95</span><span class="bar"><span style="width:95%"></span></span></div>
+        </div>
+        <div class="b-foot"></div>
+      </div>
+      <span class="card-label"><b>B.1 · Tier S</b>amarelo UB</span>
+    </div>
+
+    <!-- B.2 — Tier A -->
+    <div>
+      <div class="card B tier-A">
+        <div class="b-top">
+          <div class="b-tier-block">
+            <span class="b-tier-letter">A</span>
+            <div>
+              <div class="b-ovr">87</div>
+              <span class="b-ovr-lbl">OVR</span>
+            </div>
+          </div>
+          <div class="b-escudo">
+            <svg viewBox="0 0 24 24"><path d="M12 2L4 5v6.5C4 16.2 7.4 20.5 12 22c4.6-1.5 8-5.8 8-10.5V5l-8-3z" fill="#FFCC00"/><text x="12" y="15" text-anchor="middle" font-size="9" font-weight="900" fill="#003399" font-family="Inter">UB</text></svg>
+          </div>
+        </div>
+        <div class="b-mid">
+          <div class="b-photo"><span class="ini">JW</span></div>
+          <div class="b-name-block">
+            <div class="b-name">Jaques<br>Wagner</div>
+            <div class="b-cargo">Senador · BA</div>
+            <div class="b-meta"><b>+0.8</b> 7d <span class="dot"></span> 3º mandato</div>
+          </div>
+        </div>
+        <div class="b-stats">
+          <div class="b-stat"><span class="lbl">Lid</span><span class="v">88</span><span class="bar"><span style="width:88%"></span></span></div>
+          <div class="b-stat"><span class="lbl">Mid</span><span class="v">82</span><span class="bar"><span style="width:82%"></span></span></div>
+          <div class="b-stat"><span class="lbl">Bas</span><span class="v">90</span><span class="bar"><span style="width:90%"></span></span></div>
+          <div class="b-stat"><span class="lbl">Cap</span><span class="v">86</span><span class="bar"><span style="width:86%"></span></span></div>
+        </div>
+        <div class="b-foot"></div>
+      </div>
+      <span class="card-label"><b>B.2 · Tier A</b>verde</span>
+    </div>
+
+    <!-- B.3 — Tier B -->
+    <div>
+      <div class="card B tier-B">
+        <div class="b-top">
+          <div class="b-tier-block">
+            <span class="b-tier-letter">B</span>
+            <div>
+              <div class="b-ovr">78</div>
+              <span class="b-ovr-lbl">OVR</span>
+            </div>
+          </div>
+          <div class="b-escudo">
+            <svg viewBox="0 0 24 24"><path d="M12 2L4 5v6.5C4 16.2 7.4 20.5 12 22c4.6-1.5 8-5.8 8-10.5V5l-8-3z" fill="#FFCC00"/><text x="12" y="15" text-anchor="middle" font-size="9" font-weight="900" fill="#003399" font-family="Inter">UB</text></svg>
+          </div>
+        </div>
+        <div class="b-mid">
+          <div class="b-photo"><span class="ini">ML</span></div>
+          <div class="b-name-block">
+            <div class="b-name">Milton<br>Leite</div>
+            <div class="b-cargo">Pres Estadual · SP</div>
+            <div class="b-meta"><b>−0.3</b> 7d <span class="dot"></span> Vereador 7×</div>
+          </div>
+        </div>
+        <div class="b-stats">
+          <div class="b-stat"><span class="lbl">Lid</span><span class="v">82</span><span class="bar"><span style="width:82%"></span></span></div>
+          <div class="b-stat"><span class="lbl">Mid</span><span class="v">71</span><span class="bar"><span style="width:71%"></span></span></div>
+          <div class="b-stat"><span class="lbl">Bas</span><span class="v">84</span><span class="bar"><span style="width:84%"></span></span></div>
+          <div class="b-stat"><span class="lbl">Cap</span><span class="v">76</span><span class="bar"><span style="width:76%"></span></span></div>
+        </div>
+        <div class="b-foot"></div>
+      </div>
+      <span class="card-label"><b>B.3 · Tier B</b>azul UB · cargo partidário</span>
+    </div>
+
+    <!-- B.4 — em construção -->
+    <div>
+      <div class="card B tier-C" style="opacity: 0.92">
+        <div class="b-top">
+          <div class="b-tier-block">
+            <span class="b-tier-letter" style="opacity: 0.3">—</span>
+            <div>
+              <div class="b-ovr" style="color:#999">··</div>
+              <span class="b-ovr-lbl" style="color:#aaa">EM CONSTRUÇÃO</span>
+            </div>
+          </div>
+          <div class="b-escudo" style="opacity: 0.5">
+            <svg viewBox="0 0 24 24"><path d="M12 2L4 5v6.5C4 16.2 7.4 20.5 12 22c4.6-1.5 8-5.8 8-10.5V5l-8-3z" fill="#FFCC00"/></svg>
+          </div>
+        </div>
+        <div class="b-mid">
+          <div class="b-photo" style="background: #ddd; box-shadow: none">
+            <span class="ini" style="color: #999">AR</span>
+          </div>
+          <div class="b-name-block">
+            <div class="b-name">Alessandro<br>Rotunno</div>
+            <div class="b-cargo">Vereador · Itaquaquecetuba</div>
+            <div class="b-meta" style="color: #888"><b style="color:#888">Score em curadoria</b></div>
+          </div>
+        </div>
+        <div class="b-stats">
+          <div class="b-stat"><span class="lbl">Lid</span><span class="v" style="color:#bbb">··</span><span class="bar"><span style="width:0%"></span></span></div>
+          <div class="b-stat"><span class="lbl">Mid</span><span class="v" style="color:#bbb">··</span><span class="bar"><span style="width:0%"></span></span></div>
+          <div class="b-stat"><span class="lbl">Bas</span><span class="v" style="color:#bbb">··</span><span class="bar"><span style="width:0%"></span></span></div>
+          <div class="b-stat"><span class="lbl">Cap</span><span class="v" style="color:#bbb">··</span><span class="bar"><span style="width:0%"></span></span></div>
+        </div>
+        <div class="b-foot" style="background: linear-gradient(90deg,#ccc,#eee)"></div>
+      </div>
+      <span class="card-label"><b>B.4 · em construção</b>fallback (decisão César)</span>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== USO REAL: Bancada SP ====================== -->
+<section>
+  <div class="sec-head">
+    <span class="num">USO · 01</span>
+    <h2>Bancada SP em Mosaico</h2>
+    <span class="badge">Aplicação dentro do produto</span>
+  </div>
+  <p class="sec-sub">
+    Como Variação B aparece dentro do produto: lista de eleitos da bancada estadual SP, em densidade alta, ordenada por OVR.
+    Click → abre Dossiê.
+  </p>
+
+  <div class="usage">
+    <h3 style="margin-bottom: 18px">Bancada União Brasil · São Paulo · 12 eleitos</h3>
+    <div class="usage-grid"></div>
+  </div>
+</section>
+
+<!-- ====================== COMPARATIVO ====================== -->
+<section>
+  <div class="sec-head">
+    <span class="num">COMPARAR</span>
+    <h2>Quando usar cada uma</h2>
+  </div>
+  <div class="compare">
+    <div class="compare-cell">
+      <h4>Variação A · Cinema</h4>
+      <ul>
+        <li><b>Mídia & Marketing</b> — convenção, redes sociais, telão</li>
+        <li><b>Cards de elite</b> — Senadores, Govs, Top OVR</li>
+        <li><b>1 por tela</b> — herói, shareable</li>
+        <li>Fundo escuro UB + amarelo dourado</li>
+        <li>Tipo Bebas Neue (impacto)</li>
+      </ul>
+    </div>
+    <div class="compare-cell">
+      <h4>Variação B · Minimal</h4>
+      <ul>
+        <li><b>Dentro do produto</b> — listas, ranking, dossiê</li>
+        <li><b>Densidade alta</b> — 6+ por linha</li>
+        <li><b>Briefings impressos</b> — papel timbrado</li>
+        <li>Fundo claro · banda colorida por tier</li>
+        <li>Compatível com modo claro</li>
+      </ul>
+    </div>
+    <div class="compare-cell">
+      <h4>Tiers (ambas)</h4>
+      <ul>
+        <li><b>S</b> — ≥90 OVR (amarelo UB)</li>
+        <li><b>A</b> — 80–89 (verde)</li>
+        <li><b>B</b> — 70–79 (azul UB)</li>
+        <li><b>C</b> — 60–69 (laranja)</li>
+        <li><b>D</b> — &lt;60 (vermelho · alerta)</li>
+      </ul>
+    </div>
+    <div class="compare-cell">
+      <h4>Em construção (decisão 25/04)</h4>
+      <ul>
+        <li>Quando dado falta: <b>nunca mostrar 0</b></li>
+        <li>Mostrar reticências <code style="background:#000;padding:1px 4px;border-radius:2px">··</code></li>
+        <li>Label "<b>EM CONSTRUÇÃO</b>" no lugar do OVR</li>
+        <li>Card opacity 0.92, escudo dimmed</li>
+        <li>Não bloqueia clique — abre dossiê com banner</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<script>
+// gerar mosaico de bancada SP (12 cards Variação B compactos)
+const bancadaData = [
+  ['Tarcísio de Freitas', 'Gov · SP', 'TF', 96, 'S', '+2.1'],
+  ['Jaques Wagner', 'Sen · BA', 'JW', 87, 'A', '+0.8'],
+  ['Eduardo Suplicy', 'Vereador · SP', 'ES', 85, 'A', '+0.3'],
+  ['Carla Morando', 'Dep Fed · SP', 'CM', 81, 'A', '−0.4'],
+  ['Coronel Telhada', 'Dep Est · SP', 'CT', 79, 'B', '+1.2'],
+  ['Milton Leite', 'Pres Est · SP', 'ML', 78, 'B', '−0.3'],
+  ['Bruno Covas Filho', 'Pres Mun · Capital', 'BC', 76, 'B', '+2.1'],
+  ['Roberto Lima', 'Pres Mun · Campinas', 'RL', 73, 'B', '+0.8'],
+  ['Priscila Gama', 'Pres Mun · Santos', 'PG', 71, 'B', '+1.4'],
+  ['Carlos Mendes', 'Vereador · S.B.Campo', 'CM', 65, 'C', '−1.1'],
+  ['Alessandro Rotunno', 'Vereador · Itaquá', 'AR', null, '—', '··'],
+  ['Felipe Macedo', 'Pres Mun · Guarulhos', 'FM', null, '—', '··'],
+];
+
+const grid = document.querySelector('.usage-grid');
+grid.innerHTML = bancadaData.map(([nome, cargo, ini, ovr, tier, delta]) => {
+  const isPlaceholder = ovr === null;
+  const tierClass = isPlaceholder ? 'tier-C' : `tier-${tier}`;
+  const ovrDisp = isPlaceholder ? '<span style="color:#999">··</span>' : ovr;
+  const ovrLbl = isPlaceholder ? 'EM CONSTRUÇÃO' : 'OVR';
+  const tierLetter = isPlaceholder ? '<span style="opacity:0.3">—</span>' : tier;
+  const deltaColor = delta.startsWith('+') ? '#16a34a' : delta.startsWith('−') ? '#dc2626' : '#888';
+
+  return `
+    <div class="card B ${tierClass}" ${isPlaceholder ? 'style="opacity:0.92"' : ''}>
+      <div class="b-top">
+        <div class="b-tier-block">
+          <span class="b-tier-letter">${tierLetter}</span>
+          <div>
+            <div class="b-ovr"${isPlaceholder ? ' style="color:#999"' : ''}>${ovrDisp}</div>
+            <span class="b-ovr-lbl"${isPlaceholder ? ' style="color:#aaa"' : ''}>${ovrLbl}</span>
+          </div>
+        </div>
+        <div class="b-escudo"${isPlaceholder ? ' style="opacity:0.5"' : ''}>
+          <svg viewBox="0 0 24 24"><path d="M12 2L4 5v6.5C4 16.2 7.4 20.5 12 22c4.6-1.5 8-5.8 8-10.5V5l-8-3z" fill="#FFCC00"/><text x="12" y="15" text-anchor="middle" font-size="9" font-weight="900" fill="#003399" font-family="Inter">UB</text></svg>
+        </div>
+      </div>
+      <div class="b-mid" style="padding: 0 14px 10px 18px">
+        <div class="b-photo" style="width:64px;height:64px;${isPlaceholder ? 'background:#ddd;box-shadow:none' : ''}">
+          <span class="ini" style="font-size:30px;${isPlaceholder ? 'color:#999' : ''}">${ini}</span>
+        </div>
+        <div class="b-name-block">
+          <div class="b-name" style="font-size:14px">${nome}</div>
+          <div class="b-cargo">${cargo}</div>
+          <div class="b-meta" style="font-size:10px"><b style="color:${deltaColor}">${delta}</b> 7d</div>
+        </div>
+      </div>
+      <div class="b-foot"></div>
+    </div>
+  `;
+}).join('');
+</script>
+
+</body>
+</html>

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark" data-tenant="ub">
+<head>
+<meta charset="UTF-8">
+<title>Diretórios & Comissões · UB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../F1-fundacao/tokens.css">
+<script src="../F1-fundacao/theme-bootstrap.js"></script>
+<style>
+html, body { height: 100%; margin: 0; overflow: hidden; }
+.app { display: grid; grid-template-columns: 280px 1fr 380px; height: 100vh; }
+
+/* LEFT: árvore */
+.tree { background: var(--mz-bg-sidebar); border-right: 1px solid var(--mz-rule); overflow-y: auto; display: flex; flex-direction: column; }
+.tree::-webkit-scrollbar { width: 4px; } .tree::-webkit-scrollbar-thumb { background: var(--mz-rule-strong); }
+.brand { padding: 16px 18px; border-bottom: 1px solid var(--mz-rule); display: flex; align-items: center; gap: 10px; }
+.brand .logo { width: 32px; height: 32px; background: var(--mz-tenant-primary); border: 1px solid var(--mz-tenant-accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; color: var(--mz-tenant-accent); font-size: 14px; }
+.brand .name { font-size: 13px; font-weight: 800; color: var(--mz-fg-strong); }
+.brand .name span { display: block; font-size: 9px; color: var(--mz-fg-faint); font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; margin-top: 1px; }
+
+.tree-search { padding: 12px 16px; border-bottom: 1px solid var(--mz-rule); }
+.tree-search input { width: 100%; background: var(--mz-bg-card); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-md); padding: 7px 12px; font-size: 12px; color: var(--mz-fg); outline: none; }
+.tree-section { padding: 14px 8px; flex: 1; }
+.tree-section h3 { font-size: 9.5px; letter-spacing: 0.16em; color: var(--mz-fg-faint); text-transform: uppercase; font-weight: 700; margin: 0 0 8px; padding: 0 10px; }
+.tree-row { display: grid; grid-template-columns: 12px 22px 1fr auto; gap: 6px; padding: 5px 10px; cursor: pointer; align-items: center; font-size: 12px; color: var(--mz-fg); border-radius: var(--mz-r-sm); }
+.tree-row:hover { background: var(--mz-bg-card); }
+.tree-row.active { background: var(--mz-tenant-primary-soft); border-left: 3px solid var(--mz-tenant-accent); padding-left: 7px; }
+.tree-row .arr { color: var(--mz-fg-faint); font-size: 9px; }
+.tree-row .ico { width: 22px; height: 22px; border-radius: 4px; background: var(--mz-bg-elevated); display: flex; align-items: center; justify-content: center; font-size: 10px; font-family: 'Bebas Neue', sans-serif; color: var(--mz-fg-faint); letter-spacing: 0.04em; }
+.tree-row.lvl-nac .ico { background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent); }
+.tree-row.lvl-est .ico { background: var(--mz-tenant-primary); color: var(--mz-tenant-accent); }
+.tree-row.lvl-mun .ico { background: var(--mz-bg-card-2); }
+.tree-row b { font-weight: 600; color: var(--mz-fg-strong); }
+.tree-row .ext { color: var(--mz-fg-faint); font-size: 10px; font-family: var(--mz-font-mono); }
+.tree-children { margin-left: 18px; }
+.tree-row.warn::after { content: '!'; position: absolute; right: 14px; color: var(--mz-warn); font-weight: 800; font-size: 10px; }
+.tree-row { position: relative; }
+
+/* CENTER */
+main { overflow-y: auto; background: var(--mz-bg-page); padding: 0 0 60px; }
+main::-webkit-scrollbar { width: 6px; } main::-webkit-scrollbar-thumb { background: var(--mz-rule-strong); }
+.top-bar { padding: 14px 24px; border-bottom: 1px solid var(--mz-rule); background: var(--mz-bg-topbar); display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 5; }
+.top-bar .crumb { font-size: 11px; color: var(--mz-fg-muted); display: flex; gap: 6px; align-items: center; }
+.top-bar .crumb b { color: var(--mz-fg-strong); font-weight: 600; }
+.top-bar .crumb span::after { content: '›'; margin: 0 6px; color: var(--mz-rule-strong); }
+.top-bar .crumb span:last-child::after { display: none; }
+.tabs { margin-left: auto; display: flex; gap: 2px; }
+.tab { font-size: 12px; font-weight: 600; padding: 6px 12px; background: none; border: 0; color: var(--mz-fg-muted); border-radius: var(--mz-r-md); cursor: pointer; }
+.tab.active { background: var(--mz-tenant-primary); color: #fff; }
+.tab:hover:not(.active) { background: var(--mz-bg-card); color: var(--mz-fg); }
+
+.hero { padding: 24px; display: grid; grid-template-columns: auto 1fr auto; gap: 22px; align-items: start; border-bottom: 1px solid var(--mz-rule); background: linear-gradient(135deg, rgba(0,42,123,0.16), transparent), var(--mz-bg-page); }
+.hero .badge { width: 88px; height: 88px; background: var(--mz-tenant-primary); border: 2px solid var(--mz-tenant-accent); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: var(--mz-tenant-accent); }
+.hero h1 { font-size: 28px; font-weight: 800; color: var(--mz-fg-strong); margin: 0 0 4px; letter-spacing: -0.02em; }
+.hero .meta { font-size: 12px; color: var(--mz-fg-muted); display: flex; gap: 14px; flex-wrap: wrap; }
+.hero .meta b { color: var(--mz-fg); font-weight: 600; }
+.hero .meta .pill { background: var(--mz-bg-card); padding: 3px 10px; border-radius: var(--mz-r-pill); border: 1px solid var(--mz-rule); }
+.hero .meta .pill.ok { background: var(--mz-ok-soft); color: var(--mz-ok); border-color: transparent; font-weight: 700; }
+.hero .stats { display: flex; gap: 10px; margin-top: 14px; }
+.hero .stats .s { background: var(--mz-bg-card); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-md); padding: 10px 14px; min-width: 100px; }
+.hero .stats .s .lbl { font-size: 9px; letter-spacing: 0.14em; color: var(--mz-fg-faint); text-transform: uppercase; font-weight: 700; }
+.hero .stats .s .v { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: var(--mz-fg-strong); line-height: 1; margin-top: 2px; letter-spacing: 0.02em; }
+.hero .actions { display: flex; flex-direction: column; gap: 6px; }
+.btn { font-size: 12px; font-weight: 600; padding: 8px 14px; border-radius: var(--mz-r-md); border: 1px solid var(--mz-rule); background: var(--mz-bg-card); color: var(--mz-fg); cursor: pointer; }
+.btn.primary { background: var(--mz-tenant-primary); border-color: var(--mz-tenant-primary-strong); color: #fff; }
+.btn.tenant { background: var(--mz-tenant-accent); border-color: var(--mz-tenant-accent); color: var(--mz-fg-on-accent); font-weight: 800; }
+
+/* sections */
+.section { padding: 22px 24px; border-bottom: 1px solid var(--mz-rule); }
+.section h2 { font-size: 11px; letter-spacing: 0.16em; color: var(--mz-fg-faint); text-transform: uppercase; font-weight: 700; margin: 0 0 14px; display: flex; align-items: center; gap: 12px; }
+.section h2 .count { font-family: var(--mz-font-mono); font-size: 10px; background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent); padding: 1px 6px; border-radius: 3px; font-weight: 800; }
+.section h2 .right { margin-left: auto; display: flex; gap: 6px; }
+.section h2 .right .chip { font-size: 10px; padding: 3px 8px; border-radius: var(--mz-r-pill); background: var(--mz-bg-card); color: var(--mz-fg-muted); cursor: pointer; }
+.section h2 .right .chip.on { background: var(--mz-tenant-primary); color: #fff; }
+
+.comissao-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.comissao { background: var(--mz-bg-card); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-lg); overflow: hidden; }
+.comissao header { padding: 12px 16px; background: var(--mz-bg-card-2); border-bottom: 1px solid var(--mz-rule); display: flex; align-items: center; gap: 10px; }
+.comissao header .icon { width: 28px; height: 28px; background: var(--mz-tenant-primary); color: var(--mz-tenant-accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-family: 'Bebas Neue', sans-serif; }
+.comissao header b { font-size: 13px; color: var(--mz-fg-strong); flex: 1; font-weight: 700; }
+.comissao header .qty { font-family: var(--mz-font-mono); font-size: 10px; color: var(--mz-fg-faint); }
+.comissao .members { padding: 8px 14px 14px; }
+.member { display: grid; grid-template-columns: 32px 1fr auto; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--mz-rule); align-items: center; font-size: 11.5px; }
+.member:last-child { border-bottom: 0; }
+.member .av { width: 32px; height: 32px; border-radius: 50%; background: var(--mz-tenant-primary); color: var(--mz-tenant-accent); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 12px; }
+.member b { color: var(--mz-fg-strong); display: block; font-weight: 600; }
+.member span { color: var(--mz-fg-faint); font-size: 10.5px; }
+.member .role { font-size: 9.5px; padding: 2px 7px; border-radius: 3px; background: var(--mz-bg-elevated); color: var(--mz-fg-muted); letter-spacing: 0.06em; text-transform: uppercase; font-weight: 700; }
+.member .role.pres { background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent); }
+.member .role.vice { background: var(--mz-tenant-primary); color: var(--mz-tenant-accent); }
+.member .role.tes { background: var(--mz-warn-soft); color: var(--mz-warn); }
+.member .role.sec { background: var(--mz-info-soft); color: var(--mz-info); }
+.member .role.vac { background: var(--mz-danger-soft); color: var(--mz-danger); }
+
+/* doc grid */
+.doc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.doc { background: var(--mz-bg-card); border: 1px solid var(--mz-rule); border-radius: var(--mz-r-md); padding: 14px; cursor: pointer; transition: all 120ms; }
+.doc:hover { border-color: var(--mz-tenant-accent); }
+.doc .h { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.doc .h .ico { width: 36px; height: 44px; background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; flex-shrink: 0; }
+.doc .h b { font-size: 12.5px; color: var(--mz-fg-strong); display: block; font-weight: 600; line-height: 1.25; }
+.doc .h span { font-size: 10px; color: var(--mz-fg-faint); }
+.doc .row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 10.5px; color: var(--mz-fg-muted); border-top: 1px dashed var(--mz-rule); margin-top: 4px; padding-top: 6px; }
+.doc .row b { color: var(--mz-fg); font-weight: 600; }
+.doc .stat { font-size: 9.5px; padding: 2px 6px; border-radius: 3px; font-weight: 700; }
+.doc .stat.assinado { background: var(--mz-ok-soft); color: var(--mz-ok); }
+.doc .stat.pend { background: var(--mz-warn-soft); color: var(--mz-warn); }
+.doc .stat.exp { background: var(--mz-danger-soft); color: var(--mz-danger); }
+
+/* timeline */
+.timeline { position: relative; padding-left: 28px; }
+.timeline::before { content: ''; position: absolute; left: 9px; top: 6px; bottom: 0; width: 2px; background: var(--mz-rule); }
+.tl-row { position: relative; padding: 8px 0 14px; font-size: 12px; }
+.tl-row::before { content: ''; position: absolute; left: -23px; top: 12px; width: 12px; height: 12px; border-radius: 50%; background: var(--mz-tenant-accent); border: 2px solid var(--mz-bg-page); }
+.tl-row.warn::before { background: var(--mz-warn); }
+.tl-row.danger::before { background: var(--mz-danger); }
+.tl-row b { color: var(--mz-fg-strong); font-weight: 700; }
+.tl-row .when { font-family: var(--mz-font-mono); font-size: 10px; color: var(--mz-fg-faint); display: block; }
+.tl-row p { margin: 2px 0 0; color: var(--mz-fg-muted); }
+
+/* RIGHT */
+.right { background: var(--mz-bg-sidebar); border-left: 1px solid var(--mz-rule); overflow-y: auto; }
+.right::-webkit-scrollbar { width: 4px; } .right::-webkit-scrollbar-thumb { background: var(--mz-rule-strong); }
+.r-section { padding: 16px 18px; border-bottom: 1px solid var(--mz-rule); }
+.r-section h4 { font-size: 9.5px; letter-spacing: 0.16em; color: var(--mz-fg-faint); text-transform: uppercase; font-weight: 700; margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
+.r-section h4 .qty { font-family: var(--mz-font-mono); background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent); padding: 1px 5px; border-radius: 3px; font-size: 9.5px; }
+.health { display: flex; flex-direction: column; gap: 8px; }
+.health-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; font-size: 11.5px; }
+.health-row b { color: var(--mz-fg-strong); font-weight: 600; }
+.health-row span { font-family: var(--mz-font-mono); font-size: 10px; }
+.health-row .bar { grid-column: 1 / -1; height: 4px; background: var(--mz-bg-elevated); border-radius: 2px; overflow: hidden; margin-top: 2px; }
+.health-row .bar > span { display: block; height: 100%; background: linear-gradient(90deg, var(--mz-tenant-primary), var(--mz-tenant-accent)); }
+.health-row .bar.warn > span { background: var(--mz-warn); }
+.health-row .bar.danger > span { background: var(--mz-danger); }
+
+.alert-row { display: grid; grid-template-columns: 28px 1fr; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--mz-rule); font-size: 11.5px; align-items: start; }
+.alert-row:last-child { border-bottom: 0; }
+.alert-row .ico { width: 28px; height: 28px; border-radius: 6px; background: var(--mz-warn-soft); color: var(--mz-warn); display: flex; align-items: center; justify-content: center; font-weight: 800; }
+.alert-row.danger .ico { background: var(--mz-danger-soft); color: var(--mz-danger); }
+.alert-row b { color: var(--mz-fg-strong); display: block; font-weight: 600; }
+.alert-row span { color: var(--mz-fg-faint); font-size: 10.5px; }
+
+.action-list { display: flex; flex-direction: column; gap: 6px; }
+.action-list .btn { text-align: left; }
+
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="tree">
+    <div class="brand">
+      <div class="logo">UB</div>
+      <div class="name">Mazzel · UB<span>Diretórios & Comissões</span></div>
+    </div>
+    <div class="tree-search"><input placeholder="Buscar diretório, UF ou município..."/></div>
+    <div class="tree-section">
+      <h3>Hierarquia Estatutária</h3>
+      <div class="tree-row lvl-nac"><span class="arr">▾</span><div class="ico">N</div><div><b>UB · Direção Nacional</b></div><span class="ext">RAIZ</span></div>
+      <div class="tree-children">
+        <div class="tree-row lvl-est"><span class="arr">▾</span><div class="ico">SP</div><div><b>São Paulo</b></div><span class="ext">645</span></div>
+        <div class="tree-children">
+          <div class="tree-row active lvl-mun"><span class="arr">▸</span><div class="ico">SP</div><div><b>São Paulo (capital)</b></div><span class="ext">96</span></div>
+          <div class="tree-row lvl-mun"><span class="arr">▸</span><div class="ico">GR</div><div><b>Guarulhos</b></div><span class="ext">61</span></div>
+          <div class="tree-row lvl-mun"><span class="arr">▸</span><div class="ico">CP</div><div><b>Campinas</b></div><span class="ext">52</span></div>
+          <div class="tree-row lvl-mun warn"><span class="arr">▸</span><div class="ico">OS</div><div><b>Osasco</b></div><span class="ext">38</span></div>
+        </div>
+        <div class="tree-row lvl-est"><span class="arr">▸</span><div class="ico">RJ</div><div><b>Rio de Janeiro</b></div><span class="ext">312</span></div>
+        <div class="tree-row lvl-est"><span class="arr">▸</span><div class="ico">MG</div><div><b>Minas Gerais</b></div><span class="ext">418</span></div>
+        <div class="tree-row lvl-est warn"><span class="arr">▸</span><div class="ico">BA</div><div><b>Bahia</b></div><span class="ext">387</span></div>
+        <div class="tree-row lvl-est"><span class="arr">▸</span><div class="ico">CE</div><div><b>Ceará</b></div><span class="ext">147</span></div>
+        <div class="tree-row lvl-est"><span class="arr">▸</span><div class="ico">PE</div><div><b>Pernambuco</b></div><span class="ext">152</span></div>
+        <div class="tree-row lvl-est"><span class="arr">▸</span><div class="ico">RS</div><div><b>Rio G. do Sul</b></div><span class="ext">324</span></div>
+        <div class="tree-row lvl-est warn"><span class="arr">▸</span><div class="ico">RO</div><div><b>Rondônia</b></div><span class="ext">28</span></div>
+        <div class="tree-row lvl-est"><span class="arr">▸</span><div class="ico">DF</div><div><b>Distrito Federal</b></div><span class="ext">1</span></div>
+      </div>
+    </div>
+  </aside>
+
+  <main>
+    <div class="top-bar">
+      <div class="crumb">
+        <span>Estatutário</span><span><b>Brasil</b></span><span><b>SP</b></span><span><b>São Paulo (capital)</b></span>
+      </div>
+      <div class="tabs">
+        <button class="tab active">Diretório</button>
+        <button class="tab">Comissões</button>
+        <button class="tab">Atas</button>
+        <button class="tab">Atos & Resoluções</button>
+        <button class="tab">Histórico</button>
+      </div>
+    </div>
+
+    <div class="hero">
+      <div class="badge">SP</div>
+      <div>
+        <h1>Diretório Municipal · São Paulo Capital</h1>
+        <div class="meta">
+          <span class="pill ok">✓ Estatuto vigente</span>
+          <span class="pill">Mandato: <b>2024 — 2028</b></span>
+          <span class="pill">Pres: <b>Milton Leite</b></span>
+          <span class="pill">CNPJ: <b>12.345.678/0001-90</b></span>
+          <span class="pill">TSE: <b>regular · sem pendências</b></span>
+        </div>
+        <div class="stats tnum">
+          <div class="s"><div class="lbl">Membros eleitos</div><div class="v">96</div></div>
+          <div class="s"><div class="lbl">Comissões ativas</div><div class="v">14</div></div>
+          <div class="s"><div class="lbl">Suplentes</div><div class="v">28</div></div>
+          <div class="s"><div class="lbl">Filiados ativos</div><div class="v">124k</div></div>
+          <div class="s"><div class="lbl">Mandatários</div><div class="v">147</div></div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn tenant">+ Convocar Reunião</button>
+        <button class="btn primary">+ Nova Comissão</button>
+        <button class="btn">📋 Exportar PDF</button>
+        <button class="btn">📜 Ver Estatuto</button>
+      </div>
+    </div>
+
+    <section class="section">
+      <h2>Mesa Diretora · Pres. Municipal <span class="count">7 cargos</span>
+        <div class="right">
+          <span class="chip on">Vigente</span><span class="chip">Histórico</span>
+        </div>
+      </h2>
+      <div class="comissao-grid">
+        <div class="comissao">
+          <header><div class="icon">M</div><b>Mesa Diretora</b><span class="qty">7 / 7 ocupados</span></header>
+          <div class="members">
+            <div class="member"><div class="av">ML</div><div><b>Milton Leite</b><span>Vereador SP · OVR 78 · DEM/UB desde 1996</span></div><span class="role pres">Pres.</span></div>
+            <div class="member"><div class="av">CV</div><div><b>Carla Vieira</b><span>Vice · ex-Subprefeita Pinheiros</span></div><span class="role vice">Vice</span></div>
+            <div class="member"><div class="av">RA</div><div><b>Rogério Almeida</b><span>Tesoureiro · contador CRC-SP</span></div><span class="role tes">Tes.</span></div>
+            <div class="member"><div class="av">PS</div><div><b>Patrícia Souza</b><span>Sec. Geral · advogada · OAB-SP</span></div><span class="role sec">Sec.</span></div>
+            <div class="member"><div class="av">JD</div><div><b>João Dias</b><span>Sec. Adjunto · OVR 71</span></div><span class="role">Adj.</span></div>
+            <div class="member"><div class="av">MR</div><div><b>Marina Rocha</b><span>Vogal · zona leste</span></div><span class="role">Vogal</span></div>
+            <div class="member"><div class="av">EF</div><div><b>Eduardo Ferraz</b><span>Vogal · zona sul</span></div><span class="role">Vogal</span></div>
+          </div>
+        </div>
+
+        <div class="comissao">
+          <header><div class="icon">E</div><b>Comissão Executiva</b><span class="qty">11 / 11 ocupados</span></header>
+          <div class="members">
+            <div class="member"><div class="av">ML</div><div><b>Milton Leite</b><span>Pres. Mun. · ex-officio</span></div><span class="role pres">Coord.</span></div>
+            <div class="member"><div class="av">RT</div><div><b>Rita Tavares</b><span>Coord. Operações · OP-2026-014</span></div><span class="role">Op.</span></div>
+            <div class="member"><div class="av">CV</div><div><b>Carla Vieira</b><span>Liderança Política</span></div><span class="role">Pol.</span></div>
+            <div class="member"><div class="av">FB</div><div><b>Fernando Brito</b><span>Comunicação · ex-DCJ</span></div><span class="role">Com.</span></div>
+            <div class="member"><div class="av">PS</div><div><b>Patrícia Souza</b><span>Jurídico</span></div><span class="role">Jur.</span></div>
+            <div class="member"><div class="av">+6</div><div><b>+ 6 outros membros</b><span>ver lista completa</span></div><span class="role">▸</span></div>
+          </div>
+        </div>
+
+        <div class="comissao">
+          <header><div class="icon">F</div><b>Conselho Fiscal</b><span class="qty">3 / 3 ocupados</span></header>
+          <div class="members">
+            <div class="member"><div class="av">RA</div><div><b>Rogério Almeida</b><span>Coordenador · contador</span></div><span class="role tes">Coord.</span></div>
+            <div class="member"><div class="av">LM</div><div><b>Luiza Martins</b><span>Auditora · CFA</span></div><span class="role">Aud.</span></div>
+            <div class="member"><div class="av">CB</div><div><b>Carlos Bueno</b><span>Suplente convocado</span></div><span class="role">Sup.</span></div>
+          </div>
+        </div>
+
+        <div class="comissao">
+          <header><div class="icon">É</div><b>Comissão de Ética</b><span class="qty">4 / 5 ocupados</span></header>
+          <div class="members">
+            <div class="member"><div class="av">PS</div><div><b>Patrícia Souza</b><span>Pres. · OAB-SP 187432</span></div><span class="role pres">Pres.</span></div>
+            <div class="member"><div class="av">JR</div><div><b>Juliana Ramos</b><span>Membro · LGPD</span></div><span class="role">Mem.</span></div>
+            <div class="member"><div class="av">AC</div><div><b>Andre Costa</b><span>Membro · advogado</span></div><span class="role">Mem.</span></div>
+            <div class="member"><div class="av">HM</div><div><b>Helena Mota</b><span>Membro</span></div><span class="role">Mem.</span></div>
+            <div class="member"><div class="av">?</div><div><b>Vaga em aberto</b><span>1 cadeira · convocar suplente</span></div><span class="role vac">Vaga</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Comissões Setoriais <span class="count">10 ativas</span>
+        <div class="right"><span class="chip on">Permanentes</span><span class="chip">Especiais</span><span class="chip">Encerradas</span></div>
+      </h2>
+      <div class="comissao-grid">
+        <div class="comissao"><header><div class="icon">JV</div><b>Juventude UB-SP</b><span class="qty">9 mem · ativa</span></header><div class="members"><div class="member"><div class="av">VR</div><div><b>Vitória Reis</b><span>23 anos · USP · ativista</span></div><span class="role pres">Pres.</span></div><div class="member"><div class="av">+8</div><div><b>+ 8 jovens lideranças</b><span>≤30 anos · OVR médio 64</span></div><span class="role">▸</span></div></div></div>
+        <div class="comissao"><header><div class="icon">MU</div><b>Mulheres UB-SP</b><span class="qty">12 mem · ativa</span></header><div class="members"><div class="member"><div class="av">CV</div><div><b>Carla Vieira</b><span>Pres. · ex-Subprefeita</span></div><span class="role pres">Pres.</span></div><div class="member"><div class="av">+11</div><div><b>+ 11 lideranças</b><span>cota estatutária 30%</span></div><span class="role">▸</span></div></div></div>
+        <div class="comissao"><header><div class="icon">AF</div><b>Afro-UB SP</b><span class="qty">8 mem · ativa</span></header><div class="members"><div class="member"><div class="av">JN</div><div><b>Jonas Nascimento</b><span>Pres. · ativista CONEN</span></div><span class="role pres">Pres.</span></div></div></div>
+        <div class="comissao"><header><div class="icon">CR</div><b>Comissão Eleitoral 2026</b><span class="qty">7 mem · prazo até dez/26</span></header><div class="members"><div class="member"><div class="av">PS</div><div><b>Patrícia Souza</b><span>Pres. · jurídico eleitoral</span></div><span class="role pres">Pres.</span></div><div class="member"><div class="av">+6</div><div><b>+ 6 membros</b><span>composição mista</span></div><span class="role">▸</span></div></div></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Documentos Estatutários · vigentes <span class="count">9 docs</span>
+        <div class="right"><span class="chip on">Vigentes</span><span class="chip">Histórico</span><span class="chip">Aguardando assinatura</span></div>
+      </h2>
+      <div class="doc-grid">
+        <div class="doc"><div class="h"><div class="ico">PDF</div><div><b>Estatuto UB Nacional v3.2</b><span>aprovado 12/03/2024</span></div></div><div class="row"><span>Páginas</span><b>147</b></div><div class="row"><span>Status</span><span class="stat assinado">VIGENTE</span></div></div>
+        <div class="doc"><div class="h"><div class="ico">PDF</div><div><b>Ata Convenção Mun. SP 2024</b><span>21/jul/2024 · 96 votos</span></div></div><div class="row"><span>Páginas</span><b>32</b></div><div class="row"><span>Status</span><span class="stat assinado">REGISTRADA</span></div></div>
+        <div class="doc"><div class="h"><div class="ico">PDF</div><div><b>Resolução 04/2026 · Comissões</b><span>vigência: 2026—2028</span></div></div><div class="row"><span>Páginas</span><b>14</b></div><div class="row"><span>Status</span><span class="stat assinado">VIGENTE</span></div></div>
+        <div class="doc"><div class="h"><div class="ico">DOC</div><div><b>Reg. Interno Comissão Ética</b><span>aguardando 2 assinaturas</span></div></div><div class="row"><span>Pendências</span><b>2 / 5</b></div><div class="row"><span>Status</span><span class="stat pend">DOCUSIGN PEND.</span></div></div>
+        <div class="doc"><div class="h"><div class="ico">PDF</div><div><b>Ata Reunião Executiva 04/2026</b><span>18/abr/2026 · 9 presentes</span></div></div><div class="row"><span>Páginas</span><b>8</b></div><div class="row"><span>Status</span><span class="stat assinado">ASSINADA</span></div></div>
+        <div class="doc"><div class="h"><div class="ico">DOC</div><div><b>Memorando OP-014 · alocação</b><span>orçamento R$ 850k aprovado</span></div></div><div class="row"><span>Origem</span><b>Operações</b></div><div class="row"><span>Status</span><span class="stat assinado">PROTOCOLADO</span></div></div>
+        <div class="doc"><div class="h"><div class="ico">PDF</div><div><b>Termo de Filiação · template</b><span>v2024 com cláusula LGPD</span></div></div><div class="row"><span>Versão</span><b>2024.r3</b></div><div class="row"><span>Status</span><span class="stat assinado">VIGENTE</span></div></div>
+        <div class="doc"><div class="h"><div class="ico">PDF</div><div><b>Procuração TSE · Pres. Mun.</b><span>vencendo 30/jun/2026</span></div></div><div class="row"><span>Vence em</span><b style="color: var(--mz-warn)">65 dias</b></div><div class="row"><span>Status</span><span class="stat exp">RENOVAR</span></div></div>
+        <div class="doc"><div class="h"><div class="ico">DOC</div><div><b>Ata Vacância · Comissão Ética</b><span>renúncia · necessita reposição</span></div></div><div class="row"><span>Cargo</span><b>1 vaga</b></div><div class="row"><span>Status</span><span class="stat pend">REPOR</span></div></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Atos Recentes & Histórico <span class="count">12 últimos</span></h2>
+      <div class="timeline">
+        <div class="tl-row"><span class="when">25/abr/2026 · 09:14</span><b>Reunião Executiva 05/2026 marcada</b><p>Pauta: revisão Fase 4 OP-2026-014 + Tesouraria Q2 + comissão eleitoral. Local: Diretório Mun. · 26/abr 10h.</p></div>
+        <div class="tl-row warn"><span class="when">22/abr/2026 · 14:30</span><b>Vacância em Comissão de Ética</b><p>Renúncia formal de Mariana Lopes (motivos pessoais). Ata protocolada. <b>Convocar suplente em 30 dias</b> conforme Estatuto art. 47.</p></div>
+        <div class="tl-row"><span class="when">18/abr/2026</span><b>Resolução 04/2026 publicada</b><p>Define composição das 14 comissões para mandato 2026-2028. Aprovada unanimemente em reunião 03/2026.</p></div>
+        <div class="tl-row"><span class="when">12/abr/2026</span><b>Mesa Diretora homologada pelo TSE</b><p>Composição 2024-2028 ratificada. Sem ressalvas. Próxima validação: jul/2026 (semestral).</p></div>
+        <div class="tl-row"><span class="when">04/abr/2026</span><b>Comissão Eleitoral 2026 instituída</b><p>7 membros · prazo até dez/2026 · prepara processo interno de pré-candidaturas.</p></div>
+        <div class="tl-row danger"><span class="when">28/mar/2026</span><b>Procuração TSE vencendo em 65 dias</b><p>Renovação automática agendada · gerar nova via DocuSign até 25/jun.</p></div>
+      </div>
+    </section>
+  </main>
+
+  <aside class="right">
+    <div class="r-section">
+      <h4>Saúde Estatutária</h4>
+      <div class="health">
+        <div class="health-row"><b>Composição Mesa Diretora</b><span>7 / 7</span><div class="bar"><span style="width: 100%"></span></div></div>
+        <div class="health-row"><b>Composição Comissões</b><span>54 / 56</span><div class="bar"><span style="width: 96%"></span></div></div>
+        <div class="health-row"><b>Comissão Ética · cota</b><span style="color: var(--mz-warn)">4 / 5</span><div class="bar warn"><span style="width: 80%"></span></div></div>
+        <div class="health-row"><b>Atas em dia</b><span>11 / 12</span><div class="bar"><span style="width: 92%"></span></div></div>
+        <div class="health-row"><b>Quórum últimas 5 reuniões</b><span style="color: var(--mz-ok)">média 87%</span><div class="bar"><span style="width: 87%"></span></div></div>
+        <div class="health-row"><b>Cota mulheres</b><span style="color: var(--mz-ok)">38%</span><div class="bar"><span style="width: 76%"></span></div></div>
+        <div class="health-row"><b>Documentos vigentes</b><span>9 / 11</span><div class="bar warn"><span style="width: 82%"></span></div></div>
+      </div>
+    </div>
+
+    <div class="r-section">
+      <h4>Alertas <span class="qty" style="background: var(--mz-warn)">3</span></h4>
+      <div class="alert-row"><div class="ico">!</div><div><b>Vaga em Comissão de Ética</b><span>Convocar suplente · prazo 22/mai (30d)</span></div></div>
+      <div class="alert-row"><div class="ico">!</div><div><b>Procuração TSE vencendo</b><span>65 dias · gerar nova via DocuSign</span></div></div>
+      <div class="alert-row"><div class="ico">i</div><div><b>Reg. Interno Ética</b><span>2 assinaturas pendentes em DocuSign</span></div></div>
+    </div>
+
+    <div class="r-section">
+      <h4>Próximas Reuniões <span class="qty">3</span></h4>
+      <div class="alert-row"><div class="ico" style="background: var(--mz-tenant-accent); color: var(--mz-fg-on-accent)">26</div><div><b>Reunião Executiva 05/2026</b><span>26/abr · 10h · Diretório Mun. · 11 convocados</span></div></div>
+      <div class="alert-row"><div class="ico" style="background: var(--mz-info-soft); color: var(--mz-info)">30</div><div><b>Reunião Conselho Fiscal</b><span>30/abr · 14h · validação Q1</span></div></div>
+      <div class="alert-row"><div class="ico" style="background: var(--mz-tenant-primary); color: var(--mz-tenant-accent)">10</div><div><b>Convenção Mun. Extraord.</b><span>10/mai · pauta única: chapa 2026</span></div></div>
+    </div>
+
+    <div class="r-section">
+      <h4>Ações Rápidas</h4>
+      <div class="action-list">
+        <button class="btn">📋 Convocar reunião extraordinária</button>
+        <button class="btn">⚖️ Convocar suplente vacância</button>
+        <button class="btn">📜 Gerar ata pré-formatada</button>
+        <button class="btn">🔁 Renovar procuração TSE</button>
+        <button class="btn">📤 Exportar relatório estatutário</button>
+        <button class="btn primary">+ Nova comissão especial</button>
+      </div>
+    </div>
+
+    <div class="r-section">
+      <h4>Conformidade TSE/LGPD</h4>
+      <div class="health">
+        <div class="health-row"><b>TSE · regularidade</b><span style="color: var(--mz-ok); font-weight: 800;">REGULAR</span></div>
+        <div class="health-row"><b>CNPJ · Receita</b><span style="color: var(--mz-ok); font-weight: 800;">ATIVA</span></div>
+        <div class="health-row"><b>LGPD · DPO designado</b><span style="color: var(--mz-ok); font-weight: 800;">SIM</span></div>
+        <div class="health-row"><b>Última auditoria</b><span style="color: var(--mz-fg)">14/mar/2026</span></div>
+      </div>
+    </div>
+  </aside>
+</div>
+</body>
+</html>
