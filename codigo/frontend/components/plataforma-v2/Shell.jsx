@@ -66,7 +66,7 @@ function ShellInner({ children, alertCount }) {
   const breadcrumbs = useMemo(() => {
     const t = TENANTS[tenant] || TENANTS.uniao;
     const m = MODULES.find((x) => x.id === activeModule);
-    return [t.nome, m ? m.label : "Dashboard"];
+    return [t.productName || t.nome, m ? m.label : "Dashboard"];
   }, [tenant, activeModule]);
 
   return (

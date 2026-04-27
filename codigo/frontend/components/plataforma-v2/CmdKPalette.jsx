@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Icon } from "./Icon";
 import { UF_LIST, RADAR_CANDIDATOS } from "./data";
-import { visibleModules } from "./rbac";
+import { sidebarItemsFor } from "./sidebars";
 
 export function CmdKPalette({ open, onClose, role }) {
   const router = useRouter();
@@ -21,7 +21,7 @@ export function CmdKPalette({ open, onClose, role }) {
   };
 
   const items = useMemo(() => {
-    const modules = visibleModules(role).map((m) => ({
+    const modules = sidebarItemsFor(role).map((m) => ({
       kind: "Módulo", label: m.label, icon: m.icon, action: () => navigate(m.href),
     }));
     const candidatos = RADAR_CANDIDATOS.slice(0, 12).map((c) => ({

@@ -775,3 +775,820 @@ export function findProfile(idOrSlug) {
   }
   return null;
 }
+
+/* ==========================================================
+ * OPERAÇÕES (modulo F3) - Designer V1.2 02-modulo-operacoes
+ * ========================================================== */
+
+export const OPERACOES_KPIS = [
+  { l: "Operações Ativas",       v: "14",       d: "+3 (mês)",            ok: true  },
+  { l: "Cobertura agregada",     v: "68%",      d: "+12pp 90d",           ok: true  },
+  { l: "Lideranças engajadas",   v: "2.847",    d: "+187 (sem)",          ok: true  },
+  { l: "Investimento ativo",     v: "R$ 14,2M", d: "orçamento aprovado",  ok: null  },
+];
+
+export const OPERACOES_ATIVAS = [
+  { id: "OP-2026-014", status: "live",  tipo: "Capilarização", nome: "Capilarização SP Cap · Zona Sul",   uf: "SP", mun: "São Paulo",   recorte: "Zona Sul · 14 distritos",        progresso: 67, lid: 147, cabos: 68,  fil: 2847,  alertas: 3, leader: "RT", leaderNome: "Rita Tavares"     },
+  { id: "OP-2026-013", status: "live",  tipo: "Eleitoral",     nome: "Pré-2026 · MG · Triângulo",         uf: "MG", mun: "12 mun.",     recorte: "Uberlândia + Uberaba metro",     progresso: 48, lid: 89,  cabos: 41,  fil: 1284,  alertas: 1, leader: "CB", leaderNome: "Carla Bessa"      },
+  { id: "OP-2026-012", status: "alert", tipo: "Crise",         nome: "Resposta · Pres. Mun. RO afastado", uf: "RO", mun: "Porto Velho", recorte: "capital + entorno",             progresso: 28, lid: 12,  cabos: 4,   fil: 187,   alertas: 7, leader: "MB", leaderNome: "M. Bertaiolli"    },
+  { id: "OP-2026-011", status: "live",  tipo: "Filiação",      nome: "Mutirão Filiação · CE",             uf: "CE", mun: "14 mun.",     recorte: "Fortaleza metropolitana",        progresso: 72, lid: 124, cabos: 58,  fil: 4124,  alertas: 0, leader: "PB", leaderNome: "P. Bezerra"       },
+  { id: "OP-2026-010", status: "live",  tipo: "Capilarização", nome: "Capilarização PE · Sertão",         uf: "PE", mun: "23 mun.",     recorte: "Vale do São Francisco",          progresso: 54, lid: 78,  cabos: 32,  fil: 1728,  alertas: 2, leader: "MS", leaderNome: "M. Souza"         },
+  { id: "OP-2026-009", status: "plan",  tipo: "Eleitoral",     nome: "Pré-Convenção · DF",                uf: "DF", mun: "Brasília",    recorte: "plano piloto + RA-7",            progresso: 12, lid: 24,  cabos: 8,   fil: 312,   alertas: 0, leader: "PR", leaderNome: "P. Roberto"       },
+];
+
+export const OPERACOES_CONCLUIDAS = [
+  { id: "OP-2025-007", status: "done", tipo: "Capilarização", nome: "Capilarização BA Metro",     uf: "BA", mun: "Salvador + RM", recorte: "47 bairros",                       progresso: 100, lid: 312, cabos: 128, fil: 14847, alertas: 0, leader: "JW", leaderNome: "J. Wagner"   },
+  { id: "OP-2025-006", status: "done", tipo: "Eleitoral",     nome: "Pós-2024 · MG Triângulo",    uf: "MG", mun: "8 mun.",        recorte: "Uberlândia + cidades-foco",        progresso: 100, lid: 87,  cabos: 38,  fil: 4280,  alertas: 0, leader: "CB", leaderNome: "Carla Bessa" },
+];
+
+export const OPERACOES_TIPOS = [
+  { k: "todas",          l: "Todas"          },
+  { k: "Capilarização",  l: "Capilarização"  },
+  { k: "Eleitoral",      l: "Eleitoral"      },
+  { k: "Crise",          l: "Crise"          },
+  { k: "Filiação",       l: "Filiação"       },
+];
+
+export const OPERACOES_STATUS_LABEL = {
+  live:  "AO VIVO",
+  plan:  "PLANEJ.",
+  done:  "CONCLUÍDA",
+  alert: "ALERTA",
+};
+
+/* ==========================================================
+ * HOME · DASHBOARD MILTON (Designer V1.2 F2-01 Variação A · Linear minimalista)
+ * ========================================================== */
+
+export const HOME_LINEAR_HEADLINE = {
+  greet: "Bom dia, Presidente",
+  cidade_pct: "78%",   // % SP coberta
+  mun_risco: 3,
+};
+
+export const HOME_LINEAR_KPIS = [
+  {
+    k: "filiados",
+    l: "Filiados SP",
+    v: "124.847",
+    deltas: [
+      { when: "7 dias",   v: "+412",    dir: "up" },
+      { when: "30 dias",  v: "+2.103",  dir: "up" },
+      { when: "vs 2022",  v: "+18%",    dir: "up" },
+    ],
+  },
+  {
+    k: "comissoes",
+    l: "Comissões Ativas",
+    v: "503",
+    suffix: "/645",
+    deltas: [
+      { when: "Esta semana", v: "+7",   dir: "up"   },
+      { when: "Pendentes",   v: "142",  dir: "down" },
+      { when: "Cobertura",   v: "78%",  dir: "flat" },
+    ],
+  },
+  {
+    k: "score",
+    l: "Score Médio Pres Mun.",
+    v: "71",
+    deltas: [
+      { when: "7 dias",  v: "+1.2",       dir: "up"   },
+      { when: "Top 10%", v: "≥87",        dir: "flat" },
+      { when: "Risco",   v: "23 mun.",    dir: "down" },
+    ],
+  },
+  {
+    k: "receita",
+    l: "Receita Partidária",
+    v: "R$ 4,2M",
+    deltas: [
+      { when: "30 dias",  v: "+R$ 320k",  dir: "up"   },
+      { when: "Meta 2026", v: "68%",      dir: "flat" },
+      { when: "vs 2024",  v: "+11%",      dir: "up"   },
+    ],
+  },
+];
+
+export const HOME_LINEAR_SUBORDINADOS = [
+  { mun: "São Paulo · Capital",       nome: "Bruno Covas Filho",     ovr: 94, delta: "+2.1", dir: "up",   status: "ok"   },
+  { mun: "Campinas",                  nome: "Roberto Lima",           ovr: 87, delta: "+0.8", dir: "up",   status: "ok"   },
+  { mun: "Santos",                    nome: "Priscila Gama",          ovr: 82, delta: "+1.4", dir: "up",   status: "ok"   },
+  { mun: "São Bernardo do Campo",     nome: "Carlos Mendes",          ovr: 76, delta: "−0.3", dir: "down", status: "ok"   },
+  { mun: "Itaquaquecetuba",           nome: "Alessandro Rotunno",     ovr: 68, delta: "+0.4", dir: "up",   status: "ok"   },
+  { mun: "Ribeirão Preto",            nome: "Vaga · Sem Pres há 14 dias", ovr: 42, delta: "−4.8", dir: "down", status: "crit", warn: true },
+  { mun: "Sorocaba",                  nome: "Nominata vencida",       ovr: 51, delta: "−2.1", dir: "down", status: "warn", warn: true },
+];
+
+export const HOME_LINEAR_SENTINELA = [
+  { bold: "Tarcísio assinou contrato",  rest: " — leva educação SP.",                                  when: "há 2h", kind: "ok"   },
+  { bold: "PSD anunciou pré-candidato", rest: " em Campinas.",                                          when: "há 5h", kind: "ok"   },
+  { bold: "Vereador Y ficha-suja",      rest: " · Itu — TSE julgamento 12/05.",                         when: "há 8h", kind: "crit" },
+  { bold: "847 novos filiados",          rest: " esta semana — Vale do Paraíba liderando.",             when: "ontem", kind: "ok"   },
+];
+
+export const HOME_LINEAR_DECISOES = [
+  { pri: "alta",  txt: "Substituir Pres Municipal de ", bold: "Ribeirão Preto", suffix: " — vago há 14 dias.",     meta: "3 candidatos sugeridos pela IA" },
+  { pri: "alta",  txt: "Aprovar verba ",                bold: "R$ 280k",         suffix: " para campanha Vale Paraíba.", meta: "Tesoureira aguardando há 5 dias" },
+  { pri: "media", txt: "Reagir ao anúncio do PSD em Campinas — IA sugere encontrar 3 lideranças locais.", bold: null, suffix: "", meta: "Janela: 72h" },
+];
+
+/* ==========================================================
+ * HOME · CENTRO DE COMANDO (Designer V1.2 F2-01 Variação C · Palantir)
+ * Mantida disponível pra rota alternativa /mazzel-preview/centro-comando
+ * caso voltemos a usar densidade Palantir.
+ * ========================================================== */
+
+export const HOME_PALANTIR_KPIS = [
+  // linha 1
+  { k: "filiados",   l: "Filiados Totais",  v: "124.847",  d: "+2.103 (30d)",        ok: true,  alert: false },
+  { k: "comissoes",  l: "Comissões Ativas", v: "503/645",  d: "+7 esta semana",      ok: true,  alert: false },
+  { k: "score",      l: "Score Médio",      v: "71.4",     d: "+1.2",                ok: true,  alert: false },
+  { k: "receita",    l: "Receita 30d",      v: "R$ 4,2M",  d: "+R$ 320k",            ok: true,  alert: false },
+  { k: "cabos",      l: "Cabos Ativos",     v: "3.412",    d: "+147",                ok: true,  alert: false },
+  { k: "operacoes",  l: "Operações",        v: "23",       d: "3 atrasadas",         ok: false, alert: false },
+  // linha 2
+  { k: "eleitos",    l: "Eleitos Mandato",  v: "147",      d: "12 sen+dep · 135 ver",ok: null,  alert: false },
+  { k: "emendas",    l: "Emendas Exec.",    v: "R$ 84M",   d: "62% empenhadas",      ok: true,  alert: false },
+  { k: "risco",      l: "Mun. em Risco",    v: "23",       d: "≤ 50 OVR · ⚠ ação",   ok: false, alert: true  },
+  { k: "nominatas",  l: "Nominatas Pend.",  v: "142",      d: "DocuSign",            ok: null,  alert: false },
+  { k: "alertas",    l: "Alertas Críticos", v: "12",       d: "7 jurídicos · 5 op.", ok: false, alert: true  },
+  { k: "ranking",    l: "Ranking BR",       v: "3º",       d: "↑1 vs trim. anterior",ok: true,  alert: false },
+];
+
+/* Heatmap SP - 20x9 = 180 celulas. Determinístico (mesma sequência sempre). */
+export const HOME_PALANTIR_HEATMAP = (() => {
+  const palette = ["#1e3a8a", "#1d4ed8", "#2563eb", "#3b82f6", "#f59e0b", "#fb923c", "#dc2626"];
+  const out = [];
+  for (let i = 0; i < 180; i++) {
+    const r = ((i * 137 + 42) % 100) / 100;
+    let idx;
+    if (r < 0.15) idx = 0;
+    else if (r < 0.35) idx = 2;
+    else if (r < 0.65) idx = 3;
+    else if (r < 0.85) idx = 4;
+    else if (r < 0.95) idx = 5;
+    else idx = 6;
+    out.push({ color: palette[idx], opacity: 0.4 + (idx / 6) * 0.6 });
+  }
+  return out;
+})();
+
+export const HOME_PALANTIR_FEED = [
+  { ts: "09:14:22", tag: "alt", bold: "Ribeirão Preto", rest: " · Pres vago há 14d · Score caiu para 42" },
+  { ts: "09:08:11", tag: "opp", bold: null,             rest: "Coord ABC concluiu visita aos 7 prefeitos" },
+  { ts: "08:54:43", tag: "pol", bold: "Tarcísio",       rest: " assinou contrato Educação SP" },
+  { ts: "08:33:09", tag: "fin", bold: null,             rest: "Receita 30d cruzou R$4M · meta 60% atingida" },
+  { ts: "08:21:55", tag: "pol", bold: null,             rest: "PSD anunciou pré-candidato em Campinas" },
+  { ts: "07:48:11", tag: "opp", bold: null,             rest: "847 filiados novos no Vale do Paraíba (sem)" },
+  { ts: "07:32:00", tag: "alt", bold: null,             rest: "Vereador Y · Itu · TSE julgamento ficha-suja 12/05" },
+  { ts: "07:14:33", tag: "opp", bold: null,             rest: "Cabo #3412 · check-in GPS · Itaquera Quadra 47" },
+  { ts: "06:58:21", tag: "fin", bold: null,             rest: "R$ 320k empenhados · Emenda Sen. Wagner" },
+  { ts: "06:42:08", tag: "pol", bold: null,             rest: "Acordo informal · Pref Santos × Vereador Z" },
+];
+
+export const HOME_PALANTIR_FEED_TAGS = {
+  alt: { label: "ALERTA",   color: "#fca5a5", bg: "rgba(239,68,68,0.12)"  },
+  opp: { label: "OPERAÇÃO", color: "#86efac", bg: "rgba(34,197,94,0.12)"  },
+  pol: { label: "POLÍTICA", color: "#93c5fd", bg: "rgba(59,130,246,0.12)" },
+  fin: { label: "FINANÇAS", color: "#fcd34d", bg: "rgba(251,191,36,0.12)" },
+};
+
+export const HOME_PALANTIR_ACOES = [
+  { icon: "!",  text: "Substituir Pres Mun Ribeirão",        href: null },
+  { icon: "$",  text: "Liberar R$ 280k Vale do Paraíba",     href: null },
+  { icon: "⚡", text: "Reagir a PSD Campinas",               href: null },
+  { icon: "📅", text: "Confirmar agenda Tarcísio · S. Vicente", href: null },
+  { icon: "+",  text: "Criar nova operação territorial",    href: "/mazzel-preview/operacoes" },
+  { icon: "M",  text: "Abrir Mapa Estratégico",             href: "/mazzel-preview/mapa" },
+  { icon: "R",  text: "Pedir relatório semanal aos 645",    href: null },
+  { icon: "📞", text: "Conferência Pres Municipais Top 20",  href: null },
+];
+
+/* ==========================================================
+ * CHAT (modulo F3 03-chat-evoluido) - 3 modos
+ * ========================================================== */
+
+export const CHAT_MODES = [
+  { k: "permanente", icon: "💬", label: "Permanente", sub: "Histórico auditável · LGPD",   qty: 142 },
+  { k: "sigiloso",   icon: "🔒", label: "Sigiloso",   sub: "E2EE · auto-destrói",           qty: 14  },
+  { k: "sos",        icon: "🚨", label: "SOS Cabo",   sub: "Pânico territorial · 24/7",     qty: 3   },
+];
+
+export const CHAT_FEATURES = {
+  permanente: {
+    title: "Recursos · Permanente",
+    items: [
+      { on: true, b: "Histórico ilimitado",  s: "Tudo gravado · auditável" },
+      { on: true, b: "Pesquisa full-text",   s: "Inclusive anexos OCR"     },
+      { on: true, b: "LGPD-compliant",       s: "Consentimento + retenção" },
+      { on: true, b: "Auditoria por DPO",    s: "Logs imutáveis · jurídico" },
+      { on: true, b: "Anexos ilimitados",    s: "Docs, áudio, foto, vídeo" },
+      { on: false, b: "Auto-destruição",     s: "Indisponível neste modo"  },
+    ],
+  },
+  sigiloso: {
+    title: "Recursos · Sigiloso",
+    items: [
+      { on: true, b: "E2EE · Signal protocol",   s: "Servidor sem chaves"        },
+      { on: true, b: "Auto-destruição 24h",      s: "Mensagem some dos 2 lados"  },
+      { on: true, b: "Print bloqueado",          s: "Tela apaga ao detectar"     },
+      { on: true, b: "Watermark dinâmica",       s: "Username + IP + hora"       },
+      { on: true, b: "Sem encaminhamento",       s: "Sem copiar texto"           },
+      { on: false, b: "Pesquisa de mensagens",   s: "Off por design"             },
+    ],
+  },
+  sos: {
+    title: "Recursos · SOS Cabo",
+    items: [
+      { crit: true, b: "Escalada automática",        s: "Coord + Jurídico + Seg"           },
+      { crit: true, b: "Localização em tempo real",  s: "Cabo é geolocalizado"             },
+      { crit: true, b: "Áudio direto · sirene",      s: "Toca em todos os celulares"       },
+      { on: true,   b: "Histórico forense",          s: "Gravado para denúncia/BO"         },
+      { on: true,   b: "Botão chamar PM",            s: "Disca 190 do app"                 },
+      { on: true,   b: "Buddy automático",           s: "3 cabos próximos notificados"     },
+    ],
+  },
+};
+
+export const CHAT_CONVERSATIONS = {
+  permanente: [
+    { id: "p1", avatar: "JM", name: "João Mendes",         sub: "Cabo · Capão Redondo · OP-2026-014",   preview: "Beleza, mando o relatório das 23 ruas hoje à noite.",          when: "09:14", online: true,  unread: 0, tag: "OP-014",  active: true },
+    { id: "p2", avatar: "OP", name: "OP-2026-014 · Coord", sub: "Grupo · 12 membros · Capilarização SP", preview: "Rita: Pessoal, reunião amanhã 10h confirmada?",                when: "08:42", unread: 4,    tag: "OP-014" },
+    { id: "p3", avatar: "RT", name: "Rita Tavares",        sub: "Líder Operação · OVR 94",              preview: "Recebido. Vou validar com Milton e te respondo.",              when: "08:18", unread: 0 },
+    { id: "p4", avatar: "TS", name: "Tesouraria UB",       sub: "Bot · Validações + Confirmações",      preview: "✓ Despesa R$ 38.400 (eventos abr) APROVADA — comprovação ok",  when: "ontem", unread: 1 },
+    { id: "p5", avatar: "PS", name: "Paula Silva",         sub: "Cabo · Cidade Ademar",                 preview: "Marquei 38 fichas pra entregar amanhã. Foto anexa.",           when: "ontem", unread: 0 },
+    { id: "p6", avatar: "DN", name: "Direção Nacional",    sub: "Grupo · 47 membros · Top brass",       preview: "Milton: Orientação para cabos sobre conduta TSE atualizada.",  when: "23/abr", unread: 0, tag: "OFICIAL" },
+  ],
+  sigiloso: [
+    { id: "s1", avatar: "ML", name: "Milton Leite",        sub: "Pres. Estadual SP",                    preview: "[mensagem expirada]",                                    when: "09:04", unread: 1, tag: "SIGIL", active: true },
+    { id: "s2", avatar: "WG", name: "Wagner BA",           sub: "Pres. Estadual BA · OVR 87",           preview: "[criptografada · auto-destrói em 14h]",                  when: "07:22", unread: 0, tag: "SIGIL" },
+    { id: "s3", avatar: "DN", name: "Núcleo Estratégico",  sub: "5 membros · OVR ≥ 85",                 preview: "[mensagem cifrada]",                                     when: "ontem", unread: 2, tag: "SIGIL" },
+    { id: "s4", avatar: "AD", name: "Advocacia · Dr. Ramos", sub: "Operação Confidencial",              preview: "[apenas leitura · expira em 6h]",                        when: "23/abr", unread: 0, tag: "SIGIL" },
+  ],
+  sos: [
+    { id: "x1", avatar: "LR", name: "Luiz Ribeiro · CABO", sub: "🚨 EM ESCALADA · M'Boi Mirim · há 12 min", preview: "SOS aberto · localização ativa · áudio gravando", when: "AGORA",  unread: 1, tag: "SOS", active: true, sos: true },
+    { id: "x2", avatar: "CD", name: "Carla Diniz · CABO",  sub: "Resolvido há 2h · BA · Periperi",       preview: "Cabo confirmou segurança · caso ENCERRADO pelo Coord.", when: "06:42", unread: 0, tag: "SOS" },
+    { id: "x3", avatar: "AS", name: "Antonio Santos · CABO", sub: "Resolvido ontem · CE · Maracanaú",    preview: "Falso alarme · botão acionado por engano · ENCERRADO", when: "24/abr", unread: 0, tag: "SOS" },
+  ],
+};
+
+/* ==========================================================
+ * EMENDAS (modulo F3 04-modulo-emendas) - Designer V1.2
+ * Caso real exemplar: Santa Bárbara d'Oeste (SP).
+ * ========================================================== */
+
+export const EMENDAS_MUNICIPIOS = [
+  { id: "sp",   nm: "São Paulo",                pop: 12330000, total: 89_400_000, score: 18, status: "ok",   area: "Capital · RM" },
+  { id: "cps",  nm: "Campinas",                 pop: 1223000,  total: 28_700_000, score: 24, status: "ok",   area: "RMC" },
+  { id: "sbo",  nm: "Santa Bárbara d'Oeste",    pop: 195000,   total: 78_200_000, score: 87, status: "crit", area: "RMC", flag: "INCONSISTÊNCIA · 2 emendas críticas" },
+  { id: "amer", nm: "Americana",                pop: 240000,   total: 11_400_000, score: 32, status: "ok",   area: "RMC" },
+  { id: "lim",  nm: "Limeira",                  pop: 308000,   total: 14_100_000, score: 38, status: "ok",   area: "RMC" },
+  { id: "pir",  nm: "Piracicaba",               pop: 410000,   total: 19_800_000, score: 28, status: "ok",   area: "Centro" },
+  { id: "rib",  nm: "Ribeirão Preto",           pop: 720000,   total: 42_600_000, score: 22, status: "ok",   area: "Norte" },
+  { id: "sjc",  nm: "São José dos Campos",      pop: 730000,   total: 38_900_000, score: 26, status: "ok",   area: "Vale" },
+  { id: "sant", nm: "Santos",                   pop: 433000,   total: 22_300_000, score: 30, status: "ok",   area: "Baixada" },
+  { id: "guar", nm: "Guarulhos",                pop: 1390000,  total: 31_800_000, score: 31, status: "ok",   area: "RMSP" },
+  { id: "sor",  nm: "Sorocaba",                 pop: 695000,   total: 26_700_000, score: 25, status: "ok",   area: "Sudoeste" },
+  { id: "bau",  nm: "Bauru",                    pop: 380000,   total: 16_400_000, score: 35, status: "ok",   area: "Centro-oeste" },
+  { id: "sjp",  nm: "São José do Rio Preto",    pop: 480000,   total: 22_900_000, score: 28, status: "ok",   area: "Noroeste" },
+  { id: "pres", nm: "Presidente Prudente",      pop: 230000,   total: 8_900_000,  score: 41, status: "high", area: "Oeste" },
+  { id: "frc",  nm: "Franca",                   pop: 360000,   total: 14_600_000, score: 36, status: "ok",   area: "Norte" },
+  { id: "jund", nm: "Jundiaí",                  pop: 420000,   total: 17_300_000, score: 24, status: "ok",   area: "RMSP" },
+  { id: "reg",  nm: "Registro",                 pop: 56000,    total: 22_400_000, score: 76, status: "crit", area: "Vale Ribeira", flag: "INCONSISTÊNCIA · Volume 7x acima do esperado" },
+  { id: "ita",  nm: "Itapeva",                  pop: 95000,    total: 18_600_000, score: 68, status: "high", area: "Sudoeste",     flag: "Volume acima do esperado · investigar" },
+];
+
+export const EMENDAS_LIST = [
+  {
+    id: "EMD-2025-014729",
+    titulo: "Apoio ao desenvolvimento social e estrutural do município",
+    autor: "André Amaral Filho",
+    autor_partido: "UNIÃO",
+    autor_uf: "PB",
+    autor_nota: "Sem ligação eleitoral com SP · 0 votos no estado",
+    municipio: "Santa Bárbara d'Oeste",
+    valor: 35_000_000,
+    valor_pago: 18_400_000,
+    rp: "RP-6",
+    categoria: "Infraestrutura urbana",
+    finalidade: "Apoio ao desenvolvimento — sem objeto especificado",
+    finalidade_score: 12,
+    score: 92,
+    tier: "crit",
+    status: "em_execucao",
+    motivos: [
+      { tipo: "danger", label: "Volume 8.4x acima do benchmark de cidades similares" },
+      { tipo: "danger", label: "Autor sem ligação eleitoral · 0 votos em SBO em 2022" },
+      { tipo: "danger", label: "Finalidade vaga · NLP score 12/100" },
+      { tipo: "warn",   label: "Liquidada sem nota fiscal pública vinculada" },
+    ],
+  },
+  {
+    id: "EMD-2025-018221",
+    titulo: "Programa de modernização administrativa",
+    autor: "Capitão Augusto",
+    autor_partido: "PL",
+    autor_uf: "SP",
+    municipio: "Santa Bárbara d'Oeste",
+    valor: 28_500_000,
+    valor_pago: 28_500_000,
+    rp: "RP-6",
+    categoria: "Modernização",
+    finalidade: "Software e equipamentos · objeto vago",
+    finalidade_score: 22,
+    score: 81,
+    tier: "crit",
+    status: "pago",
+    motivos: [
+      { tipo: "danger", label: "Pagamento integral sem nota fiscal pública na CGU" },
+      { tipo: "danger", label: "Cluster: 3º autor convergindo na mesma cidade em 12m" },
+      { tipo: "warn",   label: "Categoria 'Modernização' historicamente abusada" },
+    ],
+  },
+  {
+    id: "EMD-2025-021004",
+    titulo: "Apoio à infraestrutura de saúde",
+    autor: "André Amaral Filho",
+    autor_partido: "UNIÃO",
+    autor_uf: "PB",
+    municipio: "Registro",
+    valor: 22_400_000,
+    valor_pago: 4_800_000,
+    rp: "RP-6",
+    categoria: "Saúde",
+    finalidade: "Equipamentos hospitalares · sem licitação publicada",
+    finalidade_score: 28,
+    score: 76,
+    tier: "high",
+    status: "em_execucao",
+    motivos: [
+      { tipo: "danger", label: "Mesmo autor da EMD crítica em SBO · padrão" },
+      { tipo: "danger", label: "Volume 7x acima do esperado para Registro" },
+      { tipo: "warn",   label: "Licitação não localizada na CGU" },
+    ],
+  },
+  {
+    id: "EMD-2025-009872",
+    titulo: "Reforma de UBS em Itapeva",
+    autor: "Tabata Amaral",
+    autor_partido: "PSB",
+    autor_uf: "SP",
+    municipio: "Itapeva",
+    valor: 18_600_000,
+    valor_pago: 12_400_000,
+    rp: "RP-6",
+    categoria: "Saúde",
+    finalidade: "Reforma de Unidade Básica de Saúde · projeto detalhado",
+    finalidade_score: 72,
+    score: 56,
+    tier: "high",
+    status: "em_execucao",
+    motivos: [
+      { tipo: "warn", label: "Volume acima do esperado · investigar" },
+    ],
+  },
+  {
+    id: "EMD-2025-011503",
+    titulo: "Recuperação de estradas vicinais",
+    autor: "José Oliveira Junior",
+    autor_partido: "UNIÃO",
+    autor_uf: "SP",
+    municipio: "Presidente Prudente",
+    valor: 8_900_000,
+    valor_pago: 4_180_000,
+    rp: "RP-6",
+    categoria: "Infraestrutura",
+    finalidade: "Pavimentação · trecho 14km · projeto técnico anexo",
+    finalidade_score: 81,
+    score: 28,
+    tier: "ok",
+    status: "em_execucao",
+    motivos: [],
+  },
+  {
+    id: "EMD-2024-088712",
+    titulo: "Hospital Estadual de Ribeirão Preto · obra estrutural",
+    autor: "Mara Gabrilli",
+    autor_partido: "PSDB",
+    autor_uf: "SP",
+    municipio: "Ribeirão Preto",
+    valor: 42_600_000,
+    valor_pago: 41_800_000,
+    rp: "RP-8",
+    categoria: "Saúde",
+    finalidade: "Construção de centro cirúrgico · projeto licitado",
+    finalidade_score: 94,
+    score: 12,
+    tier: "ok",
+    status: "pago",
+    motivos: [],
+  },
+];
+
+export const EMENDAS_ALERTAS = [
+  { id: "AL-9821", sev: "crit", when: "Hoje · 09:14",  when_tag: "AGORA",
+    titulo: "Nova emenda com score 92 detectada · SBO",
+    desc: "EMD-2025-014729 · André Amaral (UNIÃO-PB) → Santa Bárbara d'Oeste · R$ 35M · finalidade vaga + autor sem ligação",
+    channels: ["push", "email", "whatsapp"],
+    target: "Pres Estadual + Tesoureiro Estadual",
+    emenda: "EMD-2025-014729" },
+  { id: "AL-9820", sev: "crit", when: "Hoje · 07:42",  when_tag: "AGORA",
+    titulo: "Padrão coordenado detectado · 3 autores → mesma cidade",
+    desc: "Cluster: Amaral (UNIÃO-PB) + Augusto (PL-SP) + Oliveira (UNIÃO-SP) → SBO · R$ 78.2M cumulativo em 12 meses",
+    channels: ["push", "email", "whatsapp"],
+    target: "Pres Estadual",
+    emenda: null },
+  { id: "AL-9815", sev: "high", when: "Ontem · 22:08", when_tag: "24h",
+    titulo: "Emenda paga sem nota fiscal pública",
+    desc: "EMD-2025-018221 · Capitão Augusto (PL-SP) → SBO · R$ 28.5M · pagamento integral sem comprovação na CGU",
+    channels: ["push", "email"],
+    target: "Pres Estadual + Pres Municipal SBO",
+    emenda: "EMD-2025-018221" },
+  { id: "AL-9810", sev: "high", when: "Ontem · 14:30", when_tag: "24h",
+    titulo: "Emenda Registro · score 76",
+    desc: "EMD-2025-021004 · André Amaral → Registro · R$ 22.4M · mesmo autor da EMD crítica em SBO",
+    channels: ["push", "email"],
+    target: "Pres Estadual",
+    emenda: "EMD-2025-021004" },
+  { id: "AL-9802", sev: "med", when: "23/04", when_tag: "semana",
+    titulo: "Nova emenda regular · Itapeva",
+    desc: "EMD-2025-009872 · Tabata Amaral → Itapeva · R$ 18.6M · Saúde · score 56",
+    channels: ["inapp", "email-digest"],
+    target: "Pres Municipal Itapeva",
+    emenda: "EMD-2025-009872" },
+  { id: "AL-9789", sev: "low", when: "21/04", when_tag: "semana",
+    titulo: "Emenda paga · Hospital de Ribeirão",
+    desc: "EMD-2024-088712 · pagamento final R$ 41.8M · obra estrutural",
+    channels: ["inapp"],
+    target: "Tesoureiro local",
+    emenda: "EMD-2024-088712" },
+];
+
+/* ==========================================================
+ * F4 ESTATUTÁRIO - Designer V1.2
+ * ========================================================== */
+
+export const DIRETORIOS_TREE = [
+  { lvl: "nac", icon: "N",  nome: "UB · Direção Nacional",  total: "RAIZ" },
+  { lvl: "est", icon: "SP", nome: "São Paulo",              total: "645", expanded: true },
+  { lvl: "mun", icon: "SP", nome: "São Paulo (capital)",    total: "96",  active: true },
+  { lvl: "mun", icon: "GR", nome: "Guarulhos",              total: "61"  },
+  { lvl: "mun", icon: "CP", nome: "Campinas",               total: "52"  },
+  { lvl: "mun", icon: "OS", nome: "Osasco",                 total: "38",  warn: true },
+  { lvl: "est", icon: "RJ", nome: "Rio de Janeiro",         total: "312" },
+  { lvl: "est", icon: "MG", nome: "Minas Gerais",           total: "418" },
+  { lvl: "est", icon: "BA", nome: "Bahia",                  total: "387", warn: true },
+  { lvl: "est", icon: "RS", nome: "Rio G. do Sul",          total: "324" },
+  { lvl: "est", icon: "RO", nome: "Rondônia",               total: "28",  warn: true },
+];
+
+export const DIRETORIO_MESA = [
+  { av: "ML", nome: "Milton Leite",       sub: "Vereador SP · OVR 78 · DEM/UB desde 1996",   role: "Pres.",  primary: true },
+  { av: "CV", nome: "Carla Vieira",       sub: "Vice · ex-Subprefeita Pinheiros",            role: "Vice"   },
+  { av: "RA", nome: "Rogério Almeida",    sub: "Tesoureiro · contador CRC-SP",                role: "Tes."   },
+  { av: "PS", nome: "Patrícia Souza",     sub: "Sec. Geral · advogada · OAB-SP",              role: "Sec."   },
+  { av: "JD", nome: "João Dias",          sub: "Sec. Adjunto · OVR 71",                       role: "Adj."   },
+  { av: "MR", nome: "Marina Rocha",       sub: "Vogal · zona leste",                          role: "Vogal"  },
+  { av: "EF", nome: "Eduardo Ferraz",     sub: "Vogal · zona sul",                            role: "Vogal"  },
+];
+
+export const DIRETORIO_COMISSOES = [
+  { icon: "E",  nome: "Comissão Executiva",     ocupacao: "11 / 11", coord: "Milton Leite (ex-officio)" },
+  { icon: "F",  nome: "Conselho Fiscal",        ocupacao: "3 / 3",   coord: "Rogério Almeida"          },
+  { icon: "É",  nome: "Comissão de Ética",      ocupacao: "4 / 5",   coord: "Patrícia Souza", vaga: 1   },
+  { icon: "JV", nome: "Juventude UB-SP",        ocupacao: "9 mem",   coord: "Vitória Reis · 23 anos"   },
+  { icon: "MU", nome: "Mulheres UB-SP",         ocupacao: "12 mem",  coord: "Carla Vieira"             },
+  { icon: "AF", nome: "Afro-UB SP",             ocupacao: "8 mem",   coord: "Jonas Nascimento"         },
+  { icon: "CR", nome: "Comissão Eleitoral 2026", ocupacao: "7 mem", coord: "Patrícia Souza · pres."   },
+];
+
+export const DIRETORIO_DOCUMENTOS = [
+  { ico: "PDF", nome: "Estatuto UB Nacional v3.2",       sub: "aprovado 12/03/2024",          status: "VIGENTE",         status_kind: "ok"   },
+  { ico: "PDF", nome: "Ata Convenção Mun. SP 2024",      sub: "21/jul/2024 · 96 votos",       status: "REGISTRADA",      status_kind: "ok"   },
+  { ico: "PDF", nome: "Resolução 04/2026 · Comissões",   sub: "vigência: 2026–2028",          status: "VIGENTE",         status_kind: "ok"   },
+  { ico: "DOC", nome: "Reg. Interno Comissão Ética",     sub: "aguardando 2 assinaturas",     status: "DOCUSIGN PEND.",  status_kind: "warn" },
+  { ico: "PDF", nome: "Procuração TSE · Pres. Mun.",     sub: "vencendo 30/jun/2026",         status: "RENOVAR",         status_kind: "warn" },
+  { ico: "DOC", nome: "Ata Vacância · Comissão Ética",   sub: "renúncia · necessita reposição", status: "REPOR",         status_kind: "warn" },
+];
+
+/* ==========================================================
+ * Saúde das Nominatas · 1:1 com Designer V1.2
+ * Fonte: codigo/frontend/public/mockups/v1.2/F4-estatutario/07-saude-nominatas.data.js
+ *
+ * - 7 sub-medidas com pesos (paridade 16, faixa 10, vinculação 18,
+ *   experiência 14, documental 18, ativação 12, histórico 12 = 100)
+ * - 3 casos âncora calibrados pra validação do método:
+ *   Bauru (87 saudável) · Marília (69 atenção) · Tatuí (30 crítica diligência aberta)
+ * - 18 secundárias pra heatmap/ranking
+ * - 6 alertas anti-fraude com linguagem NEUTRA ("padrão atípico", nunca "fraude")
+ * - 6 regras configuradas
+ * ========================================================== */
+
+export const NOMINATA_SUBMEDIDAS = [
+  { key: "paridade",    nm: "Paridade de gênero",      desc: "Cota mínima de 30% do gênero feminino, conforme Lei 9.504/97 art.10§3",                  peso: 16, short: "PARIDADE"     },
+  { key: "faixa",       nm: "Distribuição etária",     desc: "Heterogeneidade da nominata em faixas etárias — evita concentração 50+",                 peso: 10, short: "FAIXA ETÁRIA" },
+  { key: "vinculacao",  nm: "Vinculação territorial",  desc: "Candidatos com domicílio eleitoral e residência reais no município",                     peso: 18, short: "VINCULAÇÃO"   },
+  { key: "experiencia", nm: "Experiência política",    desc: "Mistura entre nomes consolidados e renovação · evita lista totalmente novata",          peso: 14, short: "EXPERIÊNCIA"  },
+  { key: "documental",  nm: "Conformidade documental", desc: "Filiação ≥ 6 meses, ficha limpa Lei Complementar 135/2010, prestação de contas TSE",     peso: 18, short: "CONFORMIDADE" },
+  { key: "ativacao",    nm: "Ativação de base",        desc: "Filiados ativos × candidatos · ratio mínimo · presença em diretório",                    peso: 12, short: "ATIVAÇÃO"     },
+  { key: "hist",        nm: "Histórico eleitoral",     desc: "Performance em pleitos anteriores · % votos candidato/coligação",                        peso: 12, short: "HISTÓRICO"    },
+];
+
+export const NOMINATA_COMISSOES = [
+  {
+    id: "bauru",
+    nm: "Bauru",
+    uf: "SP",
+    pop: 379_146,
+    area: "Centro-Oeste paulista",
+    pres: { nm: "Suéllen Rosim", cargo: "Pres. Municipal UB · Bauru", av: "SR" },
+    filiados: 4_287,
+    candidatos: 18,
+    mandato: "2024-2028",
+    scores: { paridade: 92, faixa: 88, vinculacao: 95, experiencia: 78, documental: 96, ativacao: 84, hist: 71 },
+    tier: "ok",
+    flags: [],
+    ult_atualizacao: "há 2h · cron Mazzel",
+  },
+  {
+    id: "marilia",
+    nm: "Marília",
+    uf: "SP",
+    pop: 240_590,
+    area: "Centro-Oeste paulista",
+    pres: { nm: "Daniel Alonso", cargo: "Pres. Municipal UB · Marília", av: "DA" },
+    filiados: 2_104,
+    candidatos: 16,
+    mandato: "2024-2028",
+    scores: { paridade: 62, faixa: 71, vinculacao: 88, experiencia: 65, documental: 70, ativacao: 58, hist: 62 },
+    tier: "high",
+    flags: [
+      { tipo: "warn", label: "Cota de gênero abaixo do mínimo legal · 25% < 30%" },
+      { tipo: "warn", label: "2 candidatos com pendência de Ficha Limpa em validação" },
+      { tipo: "info", label: "Ativação de base 58/100 · ratio de 131 filiados por candidato" },
+    ],
+    ult_atualizacao: "há 2h · cron Mazzel",
+  },
+  {
+    id: "tatui",
+    nm: "Tatuí",
+    uf: "SP",
+    pop: 124_815,
+    area: "Sudoeste paulista",
+    pres: { nm: "Luiz Sales", cargo: "Pres. Municipal UB · Tatuí · diligência aberta", av: "LS" },
+    filiados: 8_412,
+    candidatos: 22,
+    mandato: "2024-2028",
+    scores: { paridade: 38, faixa: 42, vinculacao: 28, experiencia: 35, documental: 22, ativacao: 18, hist: 31 },
+    tier: "crit",
+    flags: [
+      { tipo: "danger", label: "Pulso de filiação em massa · 412 novos filiados em 18/03/2025 (1 dia)" },
+      { tipo: "danger", label: "9 candidatos sem domicílio eleitoral local · acima do limite estatutário" },
+      { tipo: "danger", label: "4 candidatos com Ficha Limpa pendente · LC 135/2010" },
+      { tipo: "danger", label: "Prestação de contas TSE 2024 · em mora há 4 meses" },
+      { tipo: "warn",   label: "Cota de gênero 18% · muito abaixo do mínimo legal de 30%" },
+      { tipo: "warn",   label: "6 candidatos com mesma origem geográfica externa (Sorocaba)" },
+    ],
+    ult_atualizacao: "há 17min · cron Mazzel · prioridade ALTA",
+  },
+];
+
+export const NOMINATA_SECUNDARIAS = [
+  { id: "sao-paulo",    nm: "São Paulo",            pop: 12_400_000, score: 81, tier: "ok",   x: 525, y: 460 },
+  { id: "guarulhos",    nm: "Guarulhos",            pop: 1_400_000,  score: 78, tier: "ok",   x: 540, y: 450 },
+  { id: "campinas",     nm: "Campinas",             pop: 1_223_000,  score: 84, tier: "ok",   x: 458, y: 440 },
+  { id: "sao-jose",     nm: "São José dos Campos",  pop: 729_000,    score: 86, tier: "ok",   x: 580, y: 442 },
+  { id: "sorocaba",     nm: "Sorocaba",             pop: 689_000,    score: 65, tier: "high", x: 460, y: 478 },
+  { id: "ribeirao",     nm: "Ribeirão Preto",       pop: 720_000,    score: 80, tier: "ok",   x: 372, y: 358 },
+  { id: "sbo",          nm: "Santa Bárbara d'Oeste", pop: 197_000,   score: 48, tier: "high", x: 442, y: 432 },
+  { id: "santos",       nm: "Santos",               pop: 433_000,    score: 76, tier: "ok",   x: 530, y: 532 },
+  { id: "osasco",       nm: "Osasco",               pop: 731_000,    score: 67, tier: "high", x: 510, y: 458 },
+  { id: "piracicaba",   nm: "Piracicaba",           pop: 410_000,    score: 72, tier: "ok",   x: 432, y: 422 },
+  { id: "aracatuba",    nm: "Araçatuba",            pop: 199_000,    score: 70, tier: "ok",   x: 215, y: 380 },
+  { id: "pres-prud",    nm: "Pres. Prudente",       pop: 232_000,    score: 56, tier: "high", x: 175, y: 420 },
+  { id: "sjrp",         nm: "S.J. Rio Preto",       pop: 480_000,    score: 73, tier: "ok",   x: 305, y: 348 },
+  { id: "jundiai",      nm: "Jundiaí",              pop: 432_000,    score: 79, tier: "ok",   x: 488, y: 444 },
+  { id: "limeira",      nm: "Limeira",              pop: 311_000,    score: 38, tier: "crit", x: 425, y: 408 },
+  { id: "caraguatatuba", nm: "Caraguatatuba",       pop: 130_000,    score: 42, tier: "crit", x: 615, y: 488 },
+  { id: "itapeva",      nm: "Itapeva",              pop: 93_000,     score: 58, tier: "high", x: 380, y: 510 },
+  { id: "braganca",     nm: "Bragança Paulista",    pop: 167_000,    score: 81, tier: "ok",   x: 502, y: 422 },
+];
+
+export const NOMINATA_ALERTAS = [
+  {
+    id: "ALN-3829", sev: "crit",
+    titulo: "Pulso de filiação atípico detectado",
+    desc: "412 filiações registradas em 18/03/2025 (1 dia) na comissão Tatuí · 21× a média móvel histórica. Pode indicar mobilização legítima OU lista pré-fabricada. Investigar manualmente.",
+    target: "Tatuí · UB-SP", comissao: "tatui",
+    when: "há 17min", when_tag: "AGORA",
+    channels: ["push", "email", "in-app"],
+    logica: "Pulse > 5σ acima da média móvel de 90 dias",
+  },
+  {
+    id: "ALN-3825", sev: "crit",
+    titulo: "Concentração de origem geográfica na nominata",
+    desc: "6 dos 22 candidatos de Tatuí têm domicílio eleitoral em Sorocaba (cidade vizinha). Padrão pode indicar transferência de eleitores. Estatuto art. 38 · validar.",
+    target: "Tatuí · UB-SP", comissao: "tatui",
+    when: "há 1h", when_tag: "AGORA",
+    channels: ["push", "email", "whatsapp"],
+    logica: "Cluster K-means de origem por chapa",
+  },
+  {
+    id: "ALN-3820", sev: "crit",
+    titulo: "Prestação de contas TSE em mora prolongada",
+    desc: "Comissão Municipal Tatuí · prestação 2024 sem protocolo no TSE há 4 meses. Risco de indeferimento da nominata 2026. Notificar presidência.",
+    target: "Tatuí · UB-SP", comissao: "tatui",
+    when: "ontem 22:14", when_tag: "24h",
+    channels: ["push", "email", "in-app"],
+    logica: "Cron diário · cruza TSE × calendário estatutário",
+  },
+  {
+    id: "ALN-3815", sev: "high",
+    titulo: "Cota de gênero abaixo do mínimo legal",
+    desc: "Marília · 25% mulheres na nominata · Lei 9.504/97 art.10§3 exige 30% mínimo. Risco jurídico de impugnação. Sugestão: 2 candidaturas femininas adicionais.",
+    target: "Marília · UB-SP", comissao: "marilia",
+    when: "há 6h", when_tag: "24h",
+    channels: ["email", "in-app"],
+    logica: "Validador legal por nominata",
+  },
+  {
+    id: "ALN-3812", sev: "high",
+    titulo: "Ficha Limpa pendente em candidatos",
+    desc: "4 candidatos em Tatuí + 2 em Marília com pendências judiciais sob LC 135/2010. Validação manual obrigatória antes do registro de candidatura.",
+    target: "Tatuí + Marília · UB-SP", comissao: "tatui",
+    when: "há 8h", when_tag: "24h",
+    channels: ["email", "in-app"],
+    logica: "Cruzamento CNJ · TJ-SP · TRE",
+  },
+  {
+    id: "ALN-3805", sev: "med",
+    titulo: "Documentos estatutários vencendo · Limeira",
+    desc: "Procuração e Ata de eleição da Comissão Municipal de Limeira vencem em 28 dias. Renovação automática via DocuSign disponível.",
+    target: "Limeira · UB-SP", comissao: "limeira",
+    when: "há 2 dias", when_tag: "semana",
+    channels: ["in-app"],
+    logica: "Cron semanal · janela de vencimento 30d",
+  },
+];
+
+export const NOMINATA_REGRAS = [
+  { nm: "Pulso de filiação > 5σ",       desc: "Detecta picos diários de filiação 5+ desvios padrão acima da média móvel 90d", sev: "crit", channels: ["push", "email"], freq: "tempo real" },
+  { nm: "Cota de gênero < 30%",         desc: "Lei 9.504/97 art.10§3 · validador legal",                                       sev: "high", channels: ["email"],         freq: "a cada nominata" },
+  { nm: "Ficha Limpa pendente",         desc: "Cruza CNJ + TJ + TRE com nominata · LC 135/2010",                              sev: "high", channels: ["email"],         freq: "diário" },
+  { nm: "Prestação contas TSE em mora", desc: "Verifica protocolo TSE × calendário estatutário",                              sev: "crit", channels: ["push", "email"], freq: "diário" },
+  { nm: "Concentração geográfica",      desc: "K-means de domicílio eleitoral por chapa · alerta cluster externo",            sev: "high", channels: ["email"],         freq: "a cada nominata" },
+  { nm: "Documentos vencendo 30d",      desc: "Procuração, Ata, Estatuto local · renovação automática sugerida",              sev: "med",  channels: ["in-app"],        freq: "semanal" },
+];
+
+/* Tesouraria · KPIs + transações sample */
+export const TESOURARIA_KPIS = [
+  { l: "Saldo conta partidária",  v: "R$ 4.218.430", d: "30/04 · sincronizado",       ok: true  },
+  { l: "Receita 30d",             v: "R$ 320.812",   d: "filiações + doações",         ok: true  },
+  { l: "Despesas 30d",            v: "R$ 187.450",   d: "operações + estrutura",       ok: null  },
+  { l: "Pendentes aprovação",     v: "8",            d: "R$ 184k aguardando",          ok: false },
+];
+
+export const TESOURARIA_TRANSACOES = [
+  { id: "TES-2026-01428", data: "25/abr", tipo: "saida",  descricao: "Aluguel sede mun. SP · abril", valor: -8400,   categoria: "Estrutura",   status: "aprovado" },
+  { id: "TES-2026-01427", data: "25/abr", tipo: "entrada", descricao: "Doação PJ · Construtora ABC",   valor: 35000,  categoria: "Doação",      status: "aprovado" },
+  { id: "TES-2026-01426", data: "24/abr", tipo: "saida",  descricao: "OP-2026-014 · cabos abril",     valor: -38400, categoria: "Operações",   status: "aprovado" },
+  { id: "TES-2026-01425", data: "24/abr", tipo: "entrada", descricao: "Filiações abril (847 novas)",   valor: 84700,  categoria: "Filiações",   status: "aprovado" },
+  { id: "TES-2026-01424", data: "23/abr", tipo: "saida",  descricao: "Material gráfico · evento Cap. Redondo", valor: -12300, categoria: "Marketing", status: "pendente" },
+  { id: "TES-2026-01423", data: "23/abr", tipo: "saida",  descricao: "Honorários jurídicos · Dra Helena", valor: -18000, categoria: "Jurídico", status: "pendente" },
+];
+
+/* Documentos - lista geral */
+export const DOCUMENTOS_KPIS = [
+  { l: "DocuSign Pendentes", v: "12", ok: false, kind: "warn" },
+  { l: "Vigentes",           v: "19", ok: true                },
+  { l: "Vencendo",           v: "3",  ok: false, kind: "warn" },
+  { l: "Sigilosos",          v: "2",  ok: null               },
+];
+
+/* IDs + Convites · Discord-style.
+ * Cada entidade tem ID curto. 5 modos de adicionar pessoas, wizard 3 passos.
+ * Designer V1.2 06-ids-convites.html + briefing § 12. */
+
+export const CONVITES_KPIS = [
+  { l: "Convites pendentes", v: "23",  d: "aguardando aceite",         ok: null  },
+  { l: "Aceitos 30d",        v: "147", d: "+34 vs mês anterior",       ok: true  },
+  { l: "Recusados",          v: "8",   d: "histórico 30d",              ok: null  },
+  { l: "IDs ativos",         v: "1.284", d: "todos os perfis",          ok: true  },
+];
+
+export const CONVITES_LIST = [
+  { id: "CV-2026-0184", para: "Bruno Oliveira",  email: "bruno@email.com",   perfil: "Cabo Eleitoral",     escopo: "SP · Capão Redondo",   modo: "link",        status: "pendente",  enviado: "há 2 dias" },
+  { id: "CV-2026-0183", para: "Marina Costa",    email: "marina@email.com",  perfil: "Coord. Territorial", escopo: "SP · Zona Sul",        modo: "cpf",         status: "pendente",  enviado: "há 4 dias" },
+  { id: "CV-2026-0182", para: "Pedro Almeida",   email: "p.almeida@email.com", perfil: "Político Eleito",  escopo: "Mandato vereador SP",  modo: "designacao",  status: "aceito",    enviado: "há 6 dias" },
+  { id: "CV-2026-0181", para: "Helena Mota",     email: "helena@email.com",  perfil: "Equipe Gabinete",    escopo: "Gabinete Milton",      modo: "filiado",     status: "recusado",  enviado: "há 8 dias" },
+  { id: "CV-2026-0180", para: "André Carvalho",  email: "ac@email.com",      perfil: "Cabo Eleitoral",     escopo: "SP · Cidade Ademar",   modo: "link",        status: "aceito",    enviado: "há 12 dias" },
+];
+
+/* IDs Discord-style por entidade da plataforma (briefing § 12). */
+export const CONVITES_ID_EXAMPLES = [
+  { entidade: "Tenant (Partido)",          formato: "tenant:slug",            exemplo: "tenant:uniao-brasil",         icon: "🏛" },
+  { entidade: "Diretório Nacional",         formato: "dir:tenant:nacional",    exemplo: "dir:ub:nacional",             icon: "🇧🇷" },
+  { entidade: "Diretório Estadual",         formato: "dir:tenant:UF",          exemplo: "dir:ub:sp",                   icon: "📍" },
+  { entidade: "Diretório Municipal",        formato: "dir:tenant:UF:cod",      exemplo: "dir:ub:sp:3550308",           icon: "🏢" },
+  { entidade: "Cargo na Comissão",          formato: "cargo:dir:codigo",       exemplo: "cargo:dir:ub:sp:presidente",  icon: "👤" },
+  { entidade: "Painel Pessoal Político",    formato: "pol:slug",                exemplo: "pol:milton-leite",            icon: "🎯" },
+  { entidade: "Equipe de Gabinete",         formato: "gab:pol_id",              exemplo: "gab:milton-leite",            icon: "👥" },
+  { entidade: "Operação",                   formato: "op:tenant:hash",          exemplo: "op:ub:abc123",                icon: "⚡" },
+  { entidade: "Sala de Chat",               formato: "chat:contexto:hash",      exemplo: "chat:op:ub:abc123",           icon: "💬" },
+];
+
+/* 3 modos de adicionar pessoa (passo 1 do wizard). */
+export const CONVITES_MODOS = [
+  {
+    k: "cpf",
+    titulo: "Buscar pessoa",
+    sub: "CPF, e-mail ou título de eleitor",
+    desc: "Plataforma busca em filiados TSE + base interna. Se achar, atribui cargo direto. Se não achar, oferece convidar por e-mail.",
+    icon: "🔍",
+    placeholder: "CPF, e-mail ou título eleitoral",
+  },
+  {
+    k: "link",
+    titulo: "Gerar link",
+    sub: "Discord-style · expiração configurável",
+    desc: "Cria link convite tipo app.mazzelag.com/convite/dir:ub:sp:3550308?token=xyz · usa uma vez ou múltiplo · 24h / 7d / sem expiração.",
+    icon: "🔗",
+    placeholder: null,
+  },
+  {
+    k: "filiado",
+    titulo: "Designar filiado",
+    sub: "Pessoa já cadastrada como filiado UB",
+    desc: "Lista filiados ativos da região, selecione e atribua cargo. Cabo, Coord, Membro de comissão são designados assim.",
+    icon: "👤",
+    placeholder: null,
+  },
+];
+
+/* Lista de perfis com permissões pré-explicadas (passo 2 do wizard). */
+export const CONVITES_PERFIS = [
+  { k: "cabo_eleitoral",     label: "Cabo Eleitoral",       group: "Operacional", perms: "Agenda do dia · Mapa da área · Chat · Comando de campo · Metas semana · Registro rápido", escopo_label: "Quadra / microterritório" },
+  { k: "coord_territorial",  label: "Coord Territorial",    group: "Operacional", perms: "Operações do território · Cabos sob ele · Metas · Relatórios · Mapa território",        escopo_label: "Bairros / zonas" },
+  { k: "coord_regional",     label: "Coord Regional",       group: "Operacional", perms: "Operações da região · Coords territoriais · Cabos · Metas · Mapa região",                escopo_label: "Conjunto de municípios" },
+  { k: "membro_comissao",    label: "Membro de Comissão",    group: "Política",    perms: "Dashboard escopo (leitura) · Documentos públicos · Atas · Calendário",                   escopo_label: "Diretório do nível" },
+  { k: "secretario_geral",   label: "Secretário-Geral",     group: "Política",    perms: "Documentos · Diretórios · Atas · Comunicação Interna · Calendário · Filiados",          escopo_label: "Nacional / Estadual / Municipal" },
+  { k: "tesoureiro",         label: "Tesoureiro",            group: "Política",    perms: "Tesouraria · Prestação Contas TSE · Doações · Despesas · Patrimônio · Relatórios",      escopo_label: "Nacional / Estadual / Municipal" },
+  { k: "vice_presidente",    label: "Vice-Presidente",       group: "Política",    perms: "Idêntico ao Presidente em leitura · Pode propor e executar designado",                   escopo_label: "Mesmo do Presidente" },
+  { k: "chefe_gabinete",     label: "Chefe de Gabinete",     group: "Eletiva",     perms: "Quase total ao painel do político (exceto deletar conta) · Designa permissões dos demais", escopo_label: "Gabinete do político" },
+  { k: "assessor_comunicacao", label: "Assessor de Comunicação", group: "Eletiva", perms: "Clipping · Mídia · Agenda Pública · Alimenta blocos MID do Overall",                    escopo_label: "Gabinete" },
+  { k: "assessor_juridico",  label: "Assessor Jurídico",     group: "Eletiva",     perms: "Módulo Jurídico do dossiê · Alertas de processos · Documentos jurídicos",                escopo_label: "Gabinete" },
+  { k: "assessor_articulacao", label: "Assessor de Articulação Política", group: "Eletiva", perms: "Alianças · Lideranças · Operações que o político recebe · Cenário Político",  escopo_label: "Gabinete" },
+  { k: "outro_personalizado", label: "Outro / Personalizado", group: "Customizado", perms: "Permissões definidas manualmente pelo Chefe de Gabinete",                              escopo_label: "Configurável" },
+];
+
+export const EMENDAS_REGRAS = [
+  { sev: "crit", nm: "Nova emenda · score > 70",          desc: "Dispara push + email + WhatsApp em tempo real para Pres Estadual e Tesoureiro Estadual.", channels: ["push","email","whatsapp"], freq: "Real-time · debounce 5min", enabled: true },
+  { sev: "crit", nm: "Padrão coordenado detectado",       desc: "Cluster de ≥ 3 autores convergindo na mesma cidade em janela de 12 meses.",              channels: ["push","email","whatsapp"], freq: "Diário · 06h scan",         enabled: true },
+  { sev: "high", nm: "Pago sem nota fiscal",              desc: "Emenda liquidada/paga sem nota fiscal vinculada na CGU em até 90 dias.",                 channels: ["push","email"],            freq: "Diário",                    enabled: true },
+  { sev: "high", nm: "Atraso entre marcos > 6 meses",     desc: "Aprovada sem empenho ou liquidada sem pagamento por mais de 180 dias.",                  channels: ["push","email"],            freq: "Semanal",                   enabled: true },
+  { sev: "med",  nm: "Nova emenda aprovada · normal",     desc: "Emendas com score ≤ 40 entram no digest diário do Pres Municipal correspondente.",      channels: ["inapp","email-digest"],    freq: "Digest 07h",                enabled: true },
+  { sev: "low",  nm: "Atualização de status",             desc: "Mudanças de fase (paga, liquidada) sem anomalia. In-app apenas.",                       channels: ["inapp"],                   freq: "Tempo real",                enabled: true },
+];
+
+export const CHAT_MESSAGES = {
+  p1: [
+    { type: "date", val: "TER · 23 ABR" },
+    { from: "JM", name: "João Mendes", when: "14:32", body: "Bom dia, Coord. Acabei de fechar o levantamento da Vila Andrade — 23 ruas mapeadas, identifiquei 7 lideranças latentes que nunca filiaram." },
+    { from: "me", name: "Você",        when: "14:38", body: "Excelente, João. Pode mandar a planilha?" },
+    { from: "JM", name: "João Mendes", when: "14:39", body: "Mandei agora. Importante: 3 dessas 7 lideranças têm dúvida — pediram pra ouvir Milton diretamente.", attach: { ico: "XLS", b: "mapeamento-vila-andrade.xlsx", s: "32 KB · 23 ruas · 7 lid." } },
+    { type: "date", val: "HOJE · 25 ABR" },
+    { type: "system", val: "✓ Documento aprovado pelo Pres. Mun. · Milton Leite" },
+    { from: "me", name: "Você",        when: "08:41", body: "João, Milton confirma agenda dia 28 às 19h em Capão Redondo. Pode organizar local + encontro com as 7 lideranças?" },
+    { from: "JM", name: "João Mendes", when: "09:14", body: "Beleza, mando o relatório das 23 ruas hoje à noite." },
+  ],
+  p2: [
+    { type: "date", val: "HOJE · 25 ABR" },
+    { type: "system", val: "👥 Rita Tavares adicionou Carla Diniz ao grupo" },
+    { from: "RT", name: "Rita Tavares · Líder", when: "08:38", body: "Bom dia, equipe. Pequeno alinhamento: amanhã reunião 10h presencial no Diretório Municipal. Pauta: revisão Fase 4 + repactuação metas." },
+    { from: "JM", name: "João Mendes",          when: "08:40", body: "Confirmado." },
+    { from: "PS", name: "Paula Silva",          when: "08:41", body: "Confirmado." },
+    { from: "RT", name: "Rita Tavares · Líder", when: "08:42", body: "Pessoal, reunião amanhã 10h confirmada?" },
+  ],
+  s1: [
+    { type: "date", val: "HOJE · 25 ABR" },
+    { type: "system", val: "🔒 Conversa criptografada · E2EE · Mensagens expiram em 24h · Print BLOQUEADO" },
+    { type: "expired", val: "Mensagem auto-destruída · 09:01" },
+    { from: "ML", name: "Milton Leite", when: "09:03", body: "Confidencial: o nome para a chapa de 2026 ainda é o Pedro? Recebi sondagem do PSD oferecendo migração e quero entender nosso plano B.", expire: 0.78 },
+    { from: "me", name: "Você",         when: "09:04", body: "Confirmado o Pedro como nome principal. Plano B é Carla, mas ainda não está oficializada — só fala com você por enquanto.", expire: 0.85 },
+    { from: "ML", name: "Milton Leite", when: "09:04", body: "Entendido. Faço a contraposta com PSD ainda hoje e travo a janela.", expire: 0.92 },
+    { type: "expired", val: "Mensagem auto-destruída · 09:14" },
+  ],
+  x1: [
+    { type: "date", val: "HOJE · 25 ABR" },
+    { type: "system", val: "🚨 SOS aberto às 09:02 · Cabo Luiz Ribeiro · M'Boi Mirim · SP" },
+    { from: "LR",  name: "Luiz Ribeiro · CABO", when: "09:03", body: "Coord, situação tensa aqui. Grupo de 4 caras chegou no comício, falando agressivo. Tô com Carla e Bruno comigo, mas tô desconfortável." },
+    { from: "sys", name: "Sistema",             when: "09:03", body: "⚡ Escalada automática iniciada · Coord. Operação + Jurídico Local + Segurança · Notificados via push.", system: true },
+    { from: "sys", name: "Sistema",             when: "09:04", body: "📍 Localização travada: M'Boi Mirim · R. Augusto Carlos, 120 · pin enviado pra todos os notificados.", system: true },
+    { from: "sys", name: "Sistema",             when: "09:04", body: "👥 3 cabos mais próximos identificados: Paulo Silva (180m), Rita Tavares (340m), Maria Souza (520m). Notificados.", system: true },
+    { from: "me",  name: "Você (Coord.)",       when: "09:05", body: "Luiz, fica calmo. Paulo está chegando em 2 min. Já chamei a PM — código preto. Não saia do local. Mantém o áudio gravando." },
+    { from: "LR",  name: "Luiz Ribeiro · CABO", when: "09:06", body: "Ok. Eles já tão indo embora. Acho que viram o áudio gravando." },
+    { from: "sys", name: "Sistema",             when: "09:07", body: "✓ PM acionada · viatura 12 a caminho · ETA 4 min", system: true },
+    { from: "sys", name: "Sistema",             when: "09:08", body: "✓ Paulo Silva chegou ao local · cabo Luiz confirmou presença", system: true },
+  ],
+};

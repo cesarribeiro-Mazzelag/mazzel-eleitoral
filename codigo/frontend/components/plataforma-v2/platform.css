@@ -1,34 +1,68 @@
-/* theme tokens + shared component styles */
+/* ============================================================
+ * Aliases legados → tokens canônicos do Designer V1.2.
+ * Single source of truth = globals-mazzel.css (--mz-*).
+ * Cesar 27/04: unificação visual (briefing 25/04 docs/perfis_e_paineis.md).
+ *
+ * Componentes seguem usando var(--bg-card), var(--rule), etc, mas agora
+ * resolvem pro mesmo valor que o Designer entregou. Tema light/dark e
+ * tenant override (UB/PSD/PT/Mazzel) passam a ser controlados em UM lugar.
+ * ============================================================ */
+:root, [data-theme="dark"], [data-theme="light"] {
+  --bg-page:      var(--mz-bg-page);
+  --bg-page-2:    var(--mz-bg-page-2);
+  --bg-card:      var(--mz-bg-card);
+  --bg-card-2:    var(--mz-bg-card-2);
+  --bg-sidebar:   var(--mz-bg-sidebar);
+  --bg-topbar:    var(--mz-bg-topbar);
+  --bg-elevated:  var(--mz-bg-elevated);
+
+  --fg:           var(--mz-fg);
+  --fg-strong:    var(--mz-fg-strong);
+  --fg-muted:     var(--mz-fg-muted);
+  --fg-dim:       var(--mz-fg-dim);
+  --fg-faint:     var(--mz-fg-faint);
+  --fg-ghost:     var(--mz-fg-ghost);
+  --fg-on-tenant: var(--mz-fg-on-tenant, #ffffff);
+  --fg-on-accent: var(--mz-fg-on-accent, #0a0a0b);
+
+  --rule:         var(--mz-rule);
+  --rule-strong:  var(--mz-rule-strong);
+  --hairline:     var(--mz-hairline);
+
+  --ok:           var(--mz-ok);
+  --verified:     var(--mz-ok);
+  --warn:         var(--mz-warn);
+  --danger:       var(--mz-danger);
+
+  --tenant-primary:        var(--mz-tenant-primary);
+  --tenant-primary-rgb:    var(--mz-tenant-primary-rgb);
+  --tenant-primary-strong: var(--mz-tenant-primary-strong, var(--mz-tenant-primary));
+  --tenant-primary-soft:   var(--mz-tenant-primary-soft, rgba(var(--mz-tenant-primary-rgb), 0.18));
+  --tenant-accent:         var(--mz-tenant-accent);
+  --tenant-accent-rgb:     var(--mz-tenant-accent-rgb, var(--mz-tenant-primary-rgb));
+  --tenant-accent-strong:  var(--mz-tenant-accent-strong, var(--mz-tenant-accent));
+  --tenant-accent-soft:    var(--mz-tenant-accent-soft, rgba(var(--mz-tenant-accent-rgb), 0.16));
+  --tenant-nome:           var(--mz-tenant-nome, "União Brasil");
+  --tenant-sigla:          var(--mz-tenant-sigla, "UB");
+
+  --accent-blue:        var(--mz-accent);
+  --accent-blue-strong: var(--mz-accent-strong);
+
+  --kbd-bg: var(--mz-kbd-bg);
+  --kbd-fg: var(--mz-kbd-fg);
+}
+
+/* Tokens locais sem equivalente direto no Designer. */
 :root, [data-theme="dark"] {
-  --bg-page: #0a0a0b; --bg-page-2: #0c0c0e;
-  --bg-card: #0e0e11; --bg-card-2: rgba(255,255,255,0.015);
-  --bg-sidebar: #0b0b0d;
-  --fg: #e4e4e7; --fg-strong: #ffffff; --fg-muted: #a1a1aa;
-  --fg-dim: #71717a; --fg-faint: #52525b; --fg-ghost: #3f3f46;
-  --rule: rgba(255,255,255,0.05); --rule-strong: rgba(255,255,255,0.08);
-  --hairline: rgba(255,255,255,0.06);
-  --accent-blue: #93c5fd; --accent-blue-strong: #60a5fa;
   --overall-from: #ffffff; --overall-to: #d4d4d8;
   --overall-muted-from: #71717a; --overall-muted-to: #52525b;
   --page-grad-1: rgba(59,130,246,0.08); --page-grad-2: rgba(168,85,247,0.05);
-  --ok: #34d399; --verified: #34d399;
-  --warn: #fbbf24; --danger: #f87171;
   --chart-hover: rgba(255,255,255,0.08);
 }
 [data-theme="light"] {
-  --bg-page: #f4f4f5; --bg-page-2: #fafafa;
-  --bg-card: #ffffff; --bg-card-2: rgba(0,0,0,0.02);
-  --bg-sidebar: #fafafa;
-  --fg: #18181b; --fg-strong: #09090b; --fg-muted: #52525b;
-  --fg-dim: #71717a; --fg-faint: #a1a1aa; --fg-ghost: #d4d4d8;
-  --rule: rgba(0,0,0,0.06); --rule-strong: rgba(0,0,0,0.10);
-  --hairline: rgba(0,0,0,0.08);
-  --accent-blue: #1d4ed8; --accent-blue-strong: #1e40af;
   --overall-from: #09090b; --overall-to: #3f3f46;
   --overall-muted-from: #a1a1aa; --overall-muted-to: #71717a;
   --page-grad-1: rgba(59,130,246,0.07); --page-grad-2: rgba(168,85,247,0.05);
-  --ok: #059669; --verified: #059669;
-  --warn: #d97706; --danger: #dc2626;
   --chart-hover: rgba(0,0,0,0.04);
 }
 html,body { background: var(--bg-page); color: var(--fg); }
@@ -185,59 +219,67 @@ section[data-screen-label] { scroll-margin-top: 80px; }
   .shell-grid { grid-template-columns: 1fr; }
   .sidebar-col { display: none !important; }
 }
-/* ============ Mazzel theme tokens + shared styles ============ */
-
-:root, [data-theme="dark"] {
-  --bg-page: #0a0a0b; --bg-page-2: #0c0c0e;
-  --bg-card: #0e0e11; --bg-card-2: rgba(255,255,255,0.015);
-  --bg-sidebar: #0b0b0d; --bg-topbar: #09090b;
-  --bg-elevated: #131316;
-  --fg: #e4e4e7; --fg-strong: #ffffff; --fg-muted: #a1a1aa;
-  --fg-dim: #71717a; --fg-faint: #52525b; --fg-ghost: #3f3f46;
-  --rule: rgba(255,255,255,0.06); --rule-strong: rgba(255,255,255,0.10);
-  --hairline: rgba(255,255,255,0.06);
-  --accent-blue: #93c5fd; --accent-blue-strong: #60a5fa;
-  --overall-from: #ffffff; --overall-to: #d4d4d8;
-  --overall-muted-from: #71717a; --overall-muted-to: #52525b;
-  --page-grad-1: rgba(59,130,246,0.06); --page-grad-2: rgba(168,85,247,0.04);
-  --ok: #34d399; --verified: #34d399;
-  --warn: #fbbf24; --danger: #f87171;
-  --chart-hover: rgba(255,255,255,0.06);
-  --kbd-bg: rgba(255,255,255,0.08); --kbd-fg: #d4d4d8;
-}
-[data-theme="light"] {
-  --bg-page: #f4f4f5; --bg-page-2: #fafafa;
-  --bg-card: #ffffff; --bg-card-2: rgba(0,0,0,0.02);
-  --bg-sidebar: #fafafa; --bg-topbar: #ffffff;
-  --bg-elevated: #ffffff;
-  --fg: #18181b; --fg-strong: #09090b; --fg-muted: #52525b;
-  --fg-dim: #71717a; --fg-faint: #a1a1aa; --fg-ghost: #d4d4d8;
-  --rule: rgba(0,0,0,0.06); --rule-strong: rgba(0,0,0,0.10);
-  --hairline: rgba(0,0,0,0.08);
-  --accent-blue: #1d4ed8; --accent-blue-strong: #1e40af;
-  --overall-from: #09090b; --overall-to: #3f3f46;
-  --overall-muted-from: #a1a1aa; --overall-muted-to: #71717a;
-  --page-grad-1: rgba(59,130,246,0.05); --page-grad-2: rgba(168,85,247,0.04);
-  --ok: #059669; --verified: #059669;
-  --warn: #d97706; --danger: #dc2626;
-  --chart-hover: rgba(0,0,0,0.04);
-  --kbd-bg: rgba(0,0,0,0.06); --kbd-fg: #18181b;
-}
-
-/* white-label tenant tokens - overridden by JS */
-:root {
-  --tenant-primary: #002A7B;
-  --tenant-primary-rgb: 0, 42, 123;
-  --tenant-accent: #FFCC00;
-  --tenant-nome: "União Brasil";
-  --tenant-sigla: "UB";
-}
+/* Bloco duplicado removido em 27/04 — tokens agora vem de globals-mazzel.css
+ * via os aliases definidos no topo deste arquivo. */
 
 html, body { background: var(--bg-page); color: var(--fg); }
-body { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
-.tnum { font-variant-numeric: tabular-nums; font-feature-settings: "tnum","cv11"; }
-.font-display { letter-spacing: -0.02em; }
-.font-mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+body {
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: "cv11","ss01";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* tipografia canônica - Designer V1.2 */
+.font-display { font-family: 'Inter', sans-serif; letter-spacing: -0.02em; }
+.font-bebas   { font-family: 'Bebas Neue', 'Inter', sans-serif; letter-spacing: 0.04em; }
+.font-mono    { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+.tnum         { font-variant-numeric: tabular-nums; font-feature-settings: "tnum","cv11"; }
+
+/* utilitários tipográficos do Designer V1.2 (refletem 01-dashboard-milton-3v.html) */
+.mz-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--fg-faint);
+}
+.mz-label {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--fg-faint);
+}
+.mz-kpi-value {
+  font-family: 'Inter', sans-serif;
+  font-size: 44px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  color: var(--fg-strong);
+  font-variant-numeric: tabular-nums;
+}
+.mz-headline {
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  color: var(--fg-strong);
+}
+.mz-card-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--fg-strong);
+}
+.mz-card-hint {
+  font-size: 10px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--fg-faint);
+}
 
 .t-fg{color:var(--fg)} .t-fg-strong{color:var(--fg-strong)} .t-fg-muted{color:var(--fg-muted)}
 .t-fg-dim{color:var(--fg-dim)} .t-fg-faint{color:var(--fg-faint)} .t-fg-ghost{color:var(--fg-ghost)}

@@ -13,11 +13,11 @@ function initialsOf(nome) {
 
 const DEFAULT_STATE = {
   tenant: "uniao",
-  role: "presidente",
-  theme: "light",   // 27/04 (Cesar): default Light, nao Dark
-  userName: "Sessão local",
-  userInitials: "--",
-  sessionRole: null,   // role real do backend (null em dev)
+  role: "pres-est",   // Designer V1.2: Pres Estadual (Milton Leite, cliente real)
+  theme: "light",     // 27/04 (Cesar): default Light, nao Dark
+  userName: "Milton Leite",
+  userInitials: "ML",
+  sessionRole: null,  // role real do backend (null em dev)
 };
 
 const LS_KEY = "mazzel-preview-prefs";

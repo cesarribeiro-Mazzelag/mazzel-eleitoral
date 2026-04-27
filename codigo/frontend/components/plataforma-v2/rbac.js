@@ -10,46 +10,57 @@
  *
  * NAO inventar perfis ou modulos - qualquer ajuste exige alinhamento com Designer. */
 
+/* 10 perfis canônicos do Designer V1.2 (mockup 02-sidebar-condicional.html).
+ * Coord Regional/Territorial e Candidato ficaram FORA da V1 — Designer registrou
+ * essa decisão linhas 537-543 do mockup. NÃO reintroduzir.
+ * Filiado também fica de fora desta V1. */
 export const ROLES = {
-  presidente:         { label: "Presidente",        group: "Cadeia de comando",          scope: "Nacional irrestrito"      },
-  lideranca_estadual: { label: "Liderança UF",      group: "Cadeia de comando",          scope: "Estadual"                 },
-  coord_regional:     { label: "Coord Regional",    group: "Cadeia de comando",          scope: "Regional · múltiplos mun" },
-  coord_territorial:  { label: "Coord Territorial", group: "Cadeia de comando",          scope: "Bairros / zonas"          },
-  cabo_eleitoral:     { label: "Cabo Eleitoral",    group: "Cadeia de comando",          scope: "Quadra / microterritório" },
+  "mazzel-super":  { label: "Super Admin Mazzel", group: "Camada 1 · Mazzel",      scope: "Todos os Tenants"          },
+  "admin-tenant":  { label: "Admin do Partido",   group: "Camada 1 · Mazzel",      scope: "Tenant inteiro"             },
 
-  politico_eleito:    { label: "Político Eleito",   group: "Autoridades independentes",  scope: "Mandato ativo"            },
-  candidato:          { label: "Candidato",         group: "Autoridades independentes",  scope: "Campanha individual"      },
-  equipe_gabinete:    { label: "Equipe Gabinete",   group: "Autoridades independentes",  scope: "Gabinete"                 },
+  "pres-nac":      { label: "Pres Nacional",      group: "Camada 2 · Política",    scope: "Brasil · 27 UFs"            },
+  "pres-est":      { label: "Pres Estadual",      group: "Camada 2 · Política",    scope: "UF · 645 municípios (SP)"   },
+  "pres-mun":      { label: "Pres Municipal",     group: "Camada 2 · Política",    scope: "Município"                  },
+  "tesou":         { label: "Tesoureiro",         group: "Camada 2 · Política",    scope: "Tesouraria do nível"        },
+  "secgeral":      { label: "Sec-Geral",          group: "Camada 2 · Política",    scope: "Comissão do nível"          },
 
-  admin_partido:      { label: "Admin Partido",     group: "Operação",                   scope: "Time administrativo"      },
-  admin_mazzel:       { label: "Admin Mazzel",      group: "Super admin",                scope: "Plataforma · tenants"     },
+  "eleito":        { label: "Político Eleito",    group: "Camada 3 · Eletiva",     scope: "Mandato pessoal"            },
+  "gabinete":      { label: "Equipe Gabinete",    group: "Camada 3 · Eletiva",     scope: "Gabinete do político"       },
+
+  "cabo":          { label: "Cabo Eleitoral",     group: "Camada 4 · Operacional", scope: "Microterritório · mobile"   },
 };
 
 export const ROLE_ORDER = [
-  "presidente", "lideranca_estadual", "coord_regional", "coord_territorial", "cabo_eleitoral",
-  "politico_eleito", "candidato", "equipe_gabinete",
-  "admin_partido", "admin_mazzel",
+  "mazzel-super", "admin-tenant",
+  "pres-nac", "pres-est", "pres-mun", "tesou", "secgeral",
+  "eleito", "gabinete",
+  "cabo",
 ];
 
-/* Mapeamento do perfil real (backend) -> persona do RBAC. */
+/* Mapeamento do perfil real (backend) -> persona Designer V1.2.
+ * Backend ainda usa nomes antigos (PRESIDENTE, DIRETORIA, etc) — esse
+ * map traduz pra os 10 IDs canônicos. */
 export const ROLE_MAP = {
-  PRESIDENTE:   "presidente",
-  DIRETORIA:    "lideranca_estadual",
-  DELEGADO:     "coord_regional",
-  COORDENADOR:  "coord_territorial",
-  CABO:         "cabo_eleitoral",
-  POLITICO:     "politico_eleito",
-  CANDIDATO:    "candidato",
-  GABINETE:     "equipe_gabinete",
-  FUNCIONARIO:  "admin_partido",
-  ADMIN:        "admin_mazzel",
-  SUPER:        "admin_mazzel",
+  PRESIDENTE:   "pres-nac",
+  DIRETORIA:    "pres-est",      // Milton Leite (cliente real)
+  POLITICO:     "eleito",
+  CANDIDATO:    "eleito",        // Designer não tem perfil candidato na V1 — trata como eleito até decisão
+  GABINETE:     "gabinete",
+  FUNCIONARIO:  "admin-tenant",
+  ADMIN:        "admin-tenant",
+  SUPER:        "mazzel-super",
+  CABO:         "cabo",
+  // DELEGADO/COORDENADOR (backend antigo) → Designer eliminou na V1.
+  // Mapeio pra "pres-mun" como fallback mais próximo até ETL definir.
+  DELEGADO:     "pres-mun",
+  COORDENADOR:  "pres-mun",
 };
 
 export const SECTIONS = [
   "Inteligência",
   "Ação política",
   "Estrutura",
+  "Estatutário",
   "Campo",
   "Mandato",
   "Operação",
@@ -66,15 +77,23 @@ export const MODULES = [
   { id: "estudo",   label: "Módulo Estudo",  section: "Inteligência", href: "/mazzel-preview/estudo",   icon: "BarChart3" },
 
   // ── Ação política ──
-  { id: "campanha", label: "Campanha 2026",  section: "Ação política", href: "/mazzel-preview/campanha", icon: "Sparkles" },
-  { id: "chat",     label: "Chat",           section: "Ação política", href: "/mazzel-preview/chat",     icon: "Bell" },
-  { id: "ia",       label: "Mazzel IA",      section: "Ação política", href: "/mazzel-preview/ia",       icon: "Sparkles" },
+  { id: "campanha",  label: "Campanha 2026",  section: "Ação política", href: "/mazzel-preview/campanha",  icon: "Sparkles" },
+  { id: "operacoes", label: "Operações",      section: "Ação política", href: "/mazzel-preview/operacoes", icon: "Zap", badgeLabel: "NEW" },
+  { id: "chat",      label: "Chat",           section: "Ação política", href: "/mazzel-preview/chat",      icon: "Bell" },
+  { id: "ia",        label: "Mazzel IA",      section: "Ação política", href: "/mazzel-preview/ia",        icon: "Sparkles" },
 
   // ── Estrutura (cadeia de comando do partido) ──
   { id: "liderancas",    label: "Lideranças",        section: "Estrutura", href: "/mazzel-preview/liderancas",    icon: "Star" },
   { id: "filiados",      label: "Filiados",           section: "Estrutura", href: "/mazzel-preview/afiliados",     icon: "UserCheck", badgeLabel: "NEW" },
   { id: "delegados",     label: "Delegados",          section: "Estrutura", href: "/mazzel-preview/delegados",     icon: "Users" },
   { id: "cabos-gestao",  label: "Cabos Eleitorais",   section: "Estrutura", href: "/mazzel-preview/cabos-gestao",  icon: "Zap" },
+
+  // ── Estatutário (F4 Designer V1.2) ──
+  { id: "diretorios",        label: "Diretórios",         section: "Estatutário", href: "/mazzel-preview/diretorios",        icon: "GitBranch", badgeLabel: "NEW" },
+  { id: "documentos",        label: "Documentos",         section: "Estatutário", href: "/mazzel-preview/documentos",        icon: "FileText",  badgeLabel: "NEW" },
+  { id: "tesouraria",        label: "Tesouraria",         section: "Estatutário", href: "/mazzel-preview/tesouraria",        icon: "Banknote",  badgeLabel: "NEW" },
+  { id: "convites",          label: "IDs · Convites",     section: "Estatutário", href: "/mazzel-preview/convites",          icon: "UserCheck", badgeLabel: "NEW" },
+  { id: "saude_nominatas",   label: "Saúde Nominatas",    section: "Estatutário", href: "/mazzel-preview/saude-nominatas",   icon: "Target",    badgeLabel: "NEW" },
 
   // ── Campo (Cabo) ──
   { id: "agenda_dia", label: "Agenda do dia",   section: "Campo", href: "/mazzel-preview/cabo/agenda",   icon: "Calendar" },
@@ -89,6 +108,7 @@ export const MODULES = [
   // ── Operação ──
   { id: "agenda",     label: "Agenda",     section: "Operação", href: "/mazzel-preview/agenda",     icon: "Calendar", badgeLabel: "NEW" },
   { id: "alertas",    label: "Alertas",    section: "Operação", href: "/mazzel-preview/alertas",    icon: "Bell", badge: 7 },
+  { id: "emendas",    label: "Emendas",    section: "Operação", href: "/mazzel-preview/emendas",    icon: "Banknote", badgeLabel: "NEW" },
   { id: "relatorios", label: "Relatórios", section: "Operação", href: "/mazzel-preview/relatorios", icon: "FileText" },
 
   // ── Conta ──
@@ -110,14 +130,21 @@ export const RBAC_MATRIX = {
   aliancas: { presidente: "full",   lideranca_estadual: "filtered", coord_regional: "filtered", coord_territorial: "hidden",   cabo_eleitoral: "hidden",   politico_eleito: "full",   candidato: "filtered", equipe_gabinete: "full",     admin_partido: "full", admin_mazzel: "full" },
   estudo:   { presidente: "full",   lideranca_estadual: "filtered", coord_regional: "hidden",   coord_territorial: "hidden",   cabo_eleitoral: "hidden",   politico_eleito: "full",   candidato: "full",     equipe_gabinete: "full",     admin_partido: "full", admin_mazzel: "full" },
 
-  campanha: { presidente: "full",   lideranca_estadual: "filtered", coord_regional: "filtered", coord_territorial: "filtered", cabo_eleitoral: "filtered", politico_eleito: "hidden", candidato: "filtered", equipe_gabinete: "hidden",   admin_partido: "full", admin_mazzel: "full" },
-  chat:     { presidente: "full",   lideranca_estadual: "full",     coord_regional: "full",     coord_territorial: "full",     cabo_eleitoral: "full",     politico_eleito: "full",   candidato: "full",     equipe_gabinete: "full",     admin_partido: "full", admin_mazzel: "full" },
+  campanha:  { presidente: "full", lideranca_estadual: "filtered", coord_regional: "filtered", coord_territorial: "filtered", cabo_eleitoral: "filtered", politico_eleito: "hidden", candidato: "filtered", equipe_gabinete: "hidden",   admin_partido: "full", admin_mazzel: "full" },
+  operacoes: { presidente: "full", lideranca_estadual: "filtered", coord_regional: "filtered", coord_territorial: "filtered", cabo_eleitoral: "hidden",   politico_eleito: "hidden", candidato: "hidden",   equipe_gabinete: "hidden",   admin_partido: "full", admin_mazzel: "full" },
+  chat:      { presidente: "full", lideranca_estadual: "full",     coord_regional: "full",     coord_territorial: "full",     cabo_eleitoral: "full",     politico_eleito: "full",   candidato: "full",     equipe_gabinete: "full",     admin_partido: "full", admin_mazzel: "full" },
   ia:       { presidente: "full",   lideranca_estadual: "full",     coord_regional: "full",     coord_territorial: "hidden",   cabo_eleitoral: "hidden",   politico_eleito: "full",   candidato: "full",     equipe_gabinete: "full",     admin_partido: "full", admin_mazzel: "full" },
 
   liderancas: { presidente: "full", lideranca_estadual: "filtered", coord_regional: "filtered", coord_territorial: "hidden",   cabo_eleitoral: "hidden",   politico_eleito: "hidden", candidato: "hidden",   equipe_gabinete: "hidden",   admin_partido: "full", admin_mazzel: "full" },
   filiados:   { presidente: "full", lideranca_estadual: "filtered", coord_regional: "filtered", coord_territorial: "filtered", cabo_eleitoral: "hidden",   politico_eleito: "hidden", candidato: "hidden",   equipe_gabinete: "hidden",   admin_partido: "full", admin_mazzel: "full" },
   delegados:  { presidente: "full", lideranca_estadual: "filtered", coord_regional: "hidden",   coord_territorial: "hidden",   cabo_eleitoral: "hidden",   politico_eleito: "hidden", candidato: "hidden",   equipe_gabinete: "hidden",   admin_partido: "full", admin_mazzel: "full" },
   "cabos-gestao": { presidente: "full", lideranca_estadual: "full", coord_regional: "filtered", coord_territorial: "filtered", cabo_eleitoral: "hidden", politico_eleito: "hidden", candidato: "hidden", equipe_gabinete: "hidden", admin_partido: "full", admin_mazzel: "full" },
+
+  diretorios:        { presidente: "full", lideranca_estadual: "filtered", coord_regional: "hidden",   coord_territorial: "hidden", cabo_eleitoral: "hidden", politico_eleito: "full",   candidato: "hidden", equipe_gabinete: "full", admin_partido: "full", admin_mazzel: "full" },
+  documentos:        { presidente: "full", lideranca_estadual: "filtered", coord_regional: "filtered", coord_territorial: "hidden", cabo_eleitoral: "hidden", politico_eleito: "full",   candidato: "hidden", equipe_gabinete: "full", admin_partido: "full", admin_mazzel: "full" },
+  tesouraria:        { presidente: "full", lideranca_estadual: "filtered", coord_regional: "hidden",   coord_territorial: "hidden", cabo_eleitoral: "hidden", politico_eleito: "hidden", candidato: "hidden", equipe_gabinete: "hidden", admin_partido: "full", admin_mazzel: "full" },
+  convites:          { presidente: "full", lideranca_estadual: "filtered", coord_regional: "filtered", coord_territorial: "hidden", cabo_eleitoral: "hidden", politico_eleito: "hidden", candidato: "hidden", equipe_gabinete: "full", admin_partido: "full", admin_mazzel: "full" },
+  saude_nominatas:   { presidente: "full", lideranca_estadual: "filtered", coord_regional: "hidden",   coord_territorial: "hidden", cabo_eleitoral: "hidden", politico_eleito: "hidden", candidato: "hidden", equipe_gabinete: "hidden", admin_partido: "full", admin_mazzel: "full" },
 
   agenda_dia: { presidente: "hidden", lideranca_estadual: "hidden", coord_regional: "hidden", coord_territorial: "hidden", cabo_eleitoral: "full", politico_eleito: "hidden", candidato: "hidden", equipe_gabinete: "hidden", admin_partido: "full", admin_mazzel: "hidden" },
   minha_area: { presidente: "hidden", lideranca_estadual: "hidden", coord_regional: "hidden", coord_territorial: "hidden", cabo_eleitoral: "full", politico_eleito: "hidden", candidato: "hidden", equipe_gabinete: "hidden", admin_partido: "full", admin_mazzel: "hidden" },
@@ -129,6 +156,7 @@ export const RBAC_MATRIX = {
 
   agenda:     { presidente: "full", lideranca_estadual: "full",     coord_regional: "full",     coord_territorial: "full",     cabo_eleitoral: "hidden",   politico_eleito: "full", candidato: "full",     equipe_gabinete: "full", admin_partido: "full", admin_mazzel: "full" },
   alertas:    { presidente: "full", lideranca_estadual: "filtered", coord_regional: "filtered", coord_territorial: "filtered", cabo_eleitoral: "filtered", politico_eleito: "full", candidato: "filtered", equipe_gabinete: "full", admin_partido: "full", admin_mazzel: "full" },
+  emendas:    { presidente: "full", lideranca_estadual: "filtered", coord_regional: "hidden",   coord_territorial: "hidden",   cabo_eleitoral: "hidden",   politico_eleito: "full", candidato: "hidden",   equipe_gabinete: "full", admin_partido: "full", admin_mazzel: "full" },
   relatorios: { presidente: "full", lideranca_estadual: "filtered", coord_regional: "filtered", coord_territorial: "hidden",   cabo_eleitoral: "hidden",   politico_eleito: "full", candidato: "filtered", equipe_gabinete: "full", admin_partido: "full", admin_mazzel: "full" },
 
   portal:    { presidente: "full",   lideranca_estadual: "full",   coord_regional: "full",   coord_territorial: "full",   cabo_eleitoral: "full",   politico_eleito: "full",   candidato: "full",   equipe_gabinete: "full",   admin_partido: "full",   admin_mazzel: "full" },
