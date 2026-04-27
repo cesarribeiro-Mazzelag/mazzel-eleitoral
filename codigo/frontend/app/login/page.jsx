@@ -158,9 +158,9 @@ export default function LoginPage() {
         }
         .ub-input {
           width: 100%;
-          background: rgba(255,255,255,0.02);
-          border: 1px solid rgba(255,255,255,0.10);
-          color: #fff;
+          background: var(--mz-bg-card);
+          border: 1px solid var(--mz-rule-strong);
+          color: var(--mz-fg-strong);
           font-size: 14px;
           padding: 11px 14px;
           border-radius: 10px;
@@ -171,7 +171,7 @@ export default function LoginPage() {
           border-color: #002A7B;
           box-shadow: 0 0 0 3px rgba(0, 42, 123, 0.35);
         }
-        .ub-input::placeholder { color: rgba(255,255,255,0.34); }
+        .ub-input::placeholder { color: var(--mz-fg-faint); }
         .ub-btn-primary {
           width: 100%;
           background: #002A7B;
@@ -197,20 +197,20 @@ export default function LoginPage() {
         .ub-btn-primary:hover:not(:disabled)::before { transform: translateX(100%); }
         .ub-btn-sso {
           display: flex; align-items: center; justify-content: center; gap: 8px;
-          background: rgba(255,255,255,0.02);
-          border: 1px solid rgba(255,255,255,0.10);
-          color: #e4e4e7;
+          background: var(--mz-bg-card);
+          border: 1px solid var(--mz-rule-strong);
+          color: var(--mz-fg);
           padding: 10px;
           border-radius: 10px;
           font-size: 12px; font-weight: 500;
           cursor: pointer;
           transition: border-color 120ms;
         }
-        .ub-btn-sso:hover { border-color: rgba(255,255,255,0.30); }
+        .ub-btn-sso:hover { border-color: var(--mz-fg-muted); }
         .ub-btn-sso svg { width: 16px; height: 16px; }
       `}</style>
 
-      <div className="ub-login-stage" data-theme="dark">
+      <div className="ub-login-stage">
         {/* ============ BRAND SIDE ============ */}
         <aside className="ub-brand-side">
           <div className="ub-mesh"></div>
@@ -225,8 +225,8 @@ export default function LoginPage() {
             />
             <div style={{ width: 1, height: 28, background: "rgba(255,255,255,0.24)" }}></div>
             <div className="text-[11px] uppercase" style={{ color: "rgba(255,255,255,0.55)", letterSpacing: "0.16em" }}>
-              Plataforma <b className="font-bold text-white" style={{ letterSpacing: "0.08em" }}>MAZZEL</b>
-              <br />Eleitoral
+              <b className="font-bold text-white" style={{ letterSpacing: "0.08em", fontSize: 14 }}>UNIÃO CONECTA</b>
+              <br />Plataforma do partido
             </div>
           </header>
 
@@ -270,23 +270,23 @@ export default function LoginPage() {
 
         {/* ============ FORM SIDE ============ */}
         <main className="ub-form-side relative flex items-center justify-center p-[48px]"
-              style={{ background: "#0a0a0b" }}>
+              style={{ background: "var(--mz-bg-page)" }}>
           <div className="w-full max-w-[420px]">
 
             {!precisa2fa ? (
               <>
                 <div className="flex items-center gap-[10px] mb-[12px] uppercase"
-                     style={{ fontSize: 12, color: "#a1a1aa", letterSpacing: "0.06em", fontWeight: 500 }}>
-                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#34d399", boxShadow: "0 0 10px #34d399" }}></span>
+                     style={{ fontSize: 12, color: "var(--mz-fg-muted)", letterSpacing: "0.06em", fontWeight: 500 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--mz-ok)", boxShadow: "0 0 10px var(--mz-ok)" }}></span>
                   <span>Acesso autorizado · UB-44</span>
                 </div>
 
                 <h1 className="m-0 mb-[8px]"
-                    style={{ fontSize: 28, fontWeight: 800, letterSpacing: "-0.02em", color: "#fff" }}>
-                  Bem-vindo de volta
+                    style={{ fontSize: 28, fontWeight: 800, letterSpacing: "-0.02em", color: "var(--mz-fg-strong)" }}>
+                  Bem-vindo ao União Conecta
                 </h1>
                 <p className="mb-[28px]"
-                   style={{ fontSize: 13, color: "#a1a1aa", lineHeight: 1.55 }}>
+                   style={{ fontSize: 13, color: "var(--mz-fg-muted)", lineHeight: 1.55 }}>
                   Entre com suas credenciais do União Brasil. Cada perfil acessa só o que tem permissão —
                   Diretório, Comissão, Gabinete ou Operação.
                 </p>
@@ -294,7 +294,7 @@ export default function LoginPage() {
                 <form onSubmit={handleLogin}>
                   <div className="mb-[14px]">
                     <label htmlFor="email" className="flex items-center justify-between mb-[6px] uppercase"
-                           style={{ fontSize: 11, color: "#a1a1aa", fontWeight: 500, letterSpacing: "0.06em" }}>
+                           style={{ fontSize: 11, color: "var(--mz-fg-muted)", fontWeight: 500, letterSpacing: "0.06em" }}>
                       CPF ou e-mail institucional
                     </label>
                     <input
@@ -312,10 +312,10 @@ export default function LoginPage() {
 
                   <div className="mb-[14px]">
                     <label htmlFor="senha" className="flex items-center justify-between mb-[6px]">
-                      <span className="uppercase" style={{ fontSize: 11, color: "#a1a1aa", fontWeight: 500, letterSpacing: "0.06em" }}>
+                      <span className="uppercase" style={{ fontSize: 11, color: "var(--mz-fg-muted)", fontWeight: 500, letterSpacing: "0.06em" }}>
                         Senha
                       </span>
-                      <a href="#" style={{ fontSize: 11, color: "#71717a", textDecoration: "none" }}
+                      <a href="#" style={{ fontSize: 11, color: "var(--mz-fg-dim)", textDecoration: "none" }}
                          onClick={(e) => { e.preventDefault(); toast("Recuperação de senha em breve.", "info"); }}>
                         Esqueci minha senha
                       </a>
@@ -335,7 +335,7 @@ export default function LoginPage() {
                         type="button"
                         onClick={() => setMostraSenha(!mostraSenha)}
                         className="absolute right-3 top-1/2 -translate-y-1/2"
-                        style={{ color: "#a1a1aa", background: "transparent", border: 0, cursor: "pointer" }}
+                        style={{ color: "var(--mz-fg-muted)", background: "transparent", border: 0, cursor: "pointer" }}
                         tabIndex={-1}
                         aria-label={mostraSenha ? "Ocultar senha" : "Mostrar senha"}
                       >
@@ -346,15 +346,15 @@ export default function LoginPage() {
 
                   <div className="flex items-center justify-between my-[16px]" style={{ fontSize: 12 }}>
                     <label className="inline-flex items-center gap-[8px] cursor-pointer select-none"
-                           style={{ color: "#a1a1aa" }}>
+                           style={{ color: "var(--mz-fg-muted)" }}>
                       <input type="checkbox" checked={lembrar}
                              onChange={(e) => setLembrar(e.target.checked)}
                              className="sr-only" />
                       <span style={{
                         width: 14, height: 14,
-                        border: "1px solid rgba(255,255,255,0.10)",
+                        border: "1px solid var(--mz-rule-strong)",
                         borderRadius: 3,
-                        background: lembrar ? "#FFCC00" : "rgba(255,255,255,0.02)",
+                        background: lembrar ? "#FFCC00" : "var(--mz-bg-card)",
                         position: "relative",
                         display: "inline-block",
                       }}>
@@ -384,10 +384,10 @@ export default function LoginPage() {
                 </form>
 
                 <div className="flex items-center gap-[12px] my-[22px] uppercase"
-                     style={{ fontSize: 11, color: "#52525b", letterSpacing: "0.14em" }}>
-                  <span style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.06)" }}></span>
+                     style={{ fontSize: 11, color: "var(--mz-fg-faint)", letterSpacing: "0.14em" }}>
+                  <span style={{ flex: 1, height: 1, background: "var(--mz-rule)" }}></span>
                   ou continue com
-                  <span style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.06)" }}></span>
+                  <span style={{ flex: 1, height: 1, background: "var(--mz-rule)" }}></span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-[10px]">
@@ -414,10 +414,10 @@ export default function LoginPage() {
                     <ShieldCheck className="w-6 h-6" style={{ color: "#FFCC00" }} />
                   </div>
                   <h1 className="m-0 mb-[8px]"
-                      style={{ fontSize: 28, fontWeight: 800, letterSpacing: "-0.02em", color: "#fff" }}>
+                      style={{ fontSize: 28, fontWeight: 800, letterSpacing: "-0.02em", color: "var(--mz-fg-strong)" }}>
                     Verificação em 2 etapas
                   </h1>
-                  <p style={{ fontSize: 13, color: "#a1a1aa", lineHeight: 1.55 }}>
+                  <p style={{ fontSize: 13, color: "var(--mz-fg-muted)", lineHeight: 1.55 }}>
                     Digite o código de 6 dígitos do seu aplicativo autenticador.
                   </p>
                 </div>
@@ -425,7 +425,7 @@ export default function LoginPage() {
                 <form onSubmit={handle2fa}>
                   <div className="mb-[14px]">
                     <label className="flex items-center justify-between mb-[6px] uppercase"
-                           style={{ fontSize: 11, color: "#a1a1aa", fontWeight: 500, letterSpacing: "0.06em" }}>
+                           style={{ fontSize: 11, color: "var(--mz-fg-muted)", fontWeight: 500, letterSpacing: "0.06em" }}>
                       Código
                     </label>
                     <input
@@ -456,9 +456,9 @@ export default function LoginPage() {
                     onClick={() => { setPrecisa2fa(false); setCodigo2fa(""); }}
                     style={{
                       width: "100%", padding: "10px",
-                      background: "rgba(255,255,255,0.02)",
-                      border: "1px solid rgba(255,255,255,0.10)",
-                      borderRadius: 10, color: "#a1a1aa",
+                      background: "var(--mz-bg-card)",
+                      border: "1px solid var(--mz-rule-strong)",
+                      borderRadius: 10, color: "var(--mz-fg-muted)",
                       fontSize: 13, fontWeight: 500, cursor: "pointer",
                     }}
                   >
@@ -470,22 +470,22 @@ export default function LoginPage() {
           </div>
 
           <footer className="absolute left-0 right-0 bottom-[28px] flex justify-between items-center px-[48px]"
-                  style={{ fontSize: 11, color: "#52525b", letterSpacing: "0.04em" }}>
+                  style={{ fontSize: 11, color: "var(--mz-fg-faint, #52525b)", letterSpacing: "0.04em" }}>
             <span className="inline-flex items-center gap-[6px] uppercase" style={{ letterSpacing: "0.08em" }}>
               <span style={{
                 width: 14, height: 14, borderRadius: 3,
                 background: "linear-gradient(135deg, #7C3AED, #A78BFA)",
               }}></span>
-              Operado por Mazzel · v2.4
+              União Conecta · operado por Mazzel · v2.4
             </span>
             <div>
-              <a href="#" style={{ color: "#71717a", textDecoration: "none" }}
+              <a href="#" style={{ color: "var(--mz-fg-dim, #71717a)", textDecoration: "none" }}
                  onClick={(e) => e.preventDefault()}>Política de privacidade</a>
-              <span style={{ padding: "0 8px", color: "#3f3f46" }}>·</span>
-              <a href="#" style={{ color: "#71717a", textDecoration: "none" }}
+              <span style={{ padding: "0 8px", color: "var(--mz-fg-ghost, #3f3f46)" }}>·</span>
+              <a href="#" style={{ color: "var(--mz-fg-dim, #71717a)", textDecoration: "none" }}
                  onClick={(e) => e.preventDefault()}>Termos</a>
-              <span style={{ padding: "0 8px", color: "#3f3f46" }}>·</span>
-              <a href="#" style={{ color: "#71717a", textDecoration: "none" }}
+              <span style={{ padding: "0 8px", color: "var(--mz-fg-ghost, #3f3f46)" }}>·</span>
+              <a href="#" style={{ color: "var(--mz-fg-dim, #71717a)", textDecoration: "none" }}
                  onClick={(e) => e.preventDefault()}>Suporte</a>
             </div>
           </footer>

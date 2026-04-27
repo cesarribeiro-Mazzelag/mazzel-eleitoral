@@ -6,18 +6,35 @@ import { ToastProvider } from "@/lib/toast";
 import { AntiScrapingProvider } from "@/components/AntiScrapingProvider";
 
 export const metadata = {
-  title: "Inteligência Eleitoral | Mazzel Tech",
-  description: "Plataforma de Inteligência Eleitoral — Mazzel Tech",
+  title: "União Conecta · União Brasil",
+  description: "União Conecta — plataforma de inteligência político-partidária do União Brasil. Operada por Mazzel.",
   robots: "noindex, nofollow, noai, noimageai, noarchive",
 };
 
-// Script inline anti-FOUC: aplica data-theme no <html> antes do React hidratar,
-// lendo preferencia do localStorage. Evita flash branco em reload com tema light.
-const ANTI_FOUC_SCRIPT =
-  "(function(){try{var s=window.localStorage.getItem('mz-theme');" +
-  "var t=(s==='light'||s==='dark')?s:'dark';" +
-  "document.documentElement.setAttribute('data-theme',t);}" +
-  "catch(e){document.documentElement.setAttribute('data-theme','dark');}})();";
+// Script inline anti-FOUC: aplica data-theme + data-tenant no <html> ANTES do
+// React hidratar pra evitar flash. Cesar 27/04: prioridade do tema:
+//   1. ?theme=...                        (link explicito)
+//   2. localStorage["mz-theme"]          (escolha previa do usuario)
+//   3. prefers-color-scheme do sistema   (configuracao do equipamento)
+//   4. fallback Light                    (default conservador, escolha Cesar)
+const ANTI_FOUC_SCRIPT = `
+(function(){
+  try{
+    var qs=new URLSearchParams(location.search);
+    var q=qs.get('theme');
+    var ls=null; try{ls=localStorage.getItem('mz-theme');}catch(_){}
+    var t;
+    if(q==='light'||q==='dark'){t=q;}
+    else if(ls==='light'||ls==='dark'){t=ls;}
+    else if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){t='dark';}
+    else{t='light';}
+    document.documentElement.setAttribute('data-theme',t);
+    document.documentElement.setAttribute('data-tenant','uniao-brasil');
+  }catch(e){
+    document.documentElement.setAttribute('data-theme','light');
+    document.documentElement.setAttribute('data-tenant','uniao-brasil');
+  }
+})();`;
 
 export default function RootLayout({ children }) {
   return (

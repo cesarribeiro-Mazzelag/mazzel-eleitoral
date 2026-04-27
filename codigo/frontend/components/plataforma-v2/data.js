@@ -4,7 +4,8 @@
 export const TENANTS = {
   uniao: {
     id: "uniao",
-    nome: "União Brasil",
+    nome: "União Brasil",            // nome do partido
+    productName: "União Conecta",    // nome da plataforma pro UB (Cesar 27/04)
     sigla: "UB",
     primary: "#002A7B",
     primaryRgb: "0, 42, 123",
@@ -16,6 +17,7 @@ export const TENANTS = {
   pt: {
     id: "pt",
     nome: "PT",
+    productName: "PT Conecta",
     sigla: "PT",
     primary: "#E11D48",
     primaryRgb: "225, 29, 72",
@@ -27,6 +29,7 @@ export const TENANTS = {
   psdb: {
     id: "psdb",
     nome: "PSDB",
+    productName: "PSDB Conecta",
     sigla: "SD",
     primary: "#1E40AF",
     primaryRgb: "30, 64, 175",

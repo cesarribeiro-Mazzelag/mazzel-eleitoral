@@ -123,6 +123,19 @@ Próximo gargalo conhecido: `DISTINCT ON` em queries auxiliares e o `_anexar_tra
 
 ---
 
+## Pendência crítica — filtro de dados por tenant (27/04/2026)
+
+César, em 27/04: hoje a plataforma exibe **todos os candidatos** do TSE (~1M). Pra produção, o tenant `uniao-brasil` deve filtrar **apenas os dados do União Brasil**:
+
+- `/dossies` deve retornar apenas candidatos UB (filiação atual ou histórico — incluindo predecessores DEM nº 25 e PSL nº 17 conforme já mapeado em CLAUDE.md)
+- `/dashboard` big numbers (1.247 eleitos UB) já está correto — manter
+- Mapa Eleitoral deve permitir alternar **modo UB-only** (visão de comando) vs **modo geral** (inteligência competitiva)
+- Multi-tenant futuro: cada tenant verá apenas seus candidatos; opção de "ver adversários" libera dados cross-tenant nos módulos certos (Radar Político, Saúde de Nominatas adversárias)
+
+Por enquanto deixar todos os dados (não bloqueia o desenvolvimento atual, mas precisa ser ajustado antes do produto entrar em produção real). Sprint backend dedicado quando aprovado.
+
+---
+
 ## Checklist pra próxima sessão de dados
 
 - [ ] Backfill completo de `politico_overall_v9` (~70k eleitos restantes — comando: `docker exec ub_backend python -m scripts.backfill_overall_v9 --log-every 500`)

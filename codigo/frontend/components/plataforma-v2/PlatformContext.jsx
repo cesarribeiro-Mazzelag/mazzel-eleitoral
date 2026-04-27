@@ -14,7 +14,7 @@ function initialsOf(nome) {
 const DEFAULT_STATE = {
   tenant: "uniao",
   role: "presidente",
-  theme: "dark",
+  theme: "light",   // 27/04 (Cesar): default Light, nao Dark
   userName: "Sessão local",
   userInitials: "--",
   sessionRole: null,   // role real do backend (null em dev)
@@ -49,11 +49,22 @@ export function PlatformProvider({ children }) {
       const t = qs.get("theme");
       if (t === "light" || t === "dark") themeFromQS = t;
     } catch {}
-    // 3. tema global (mz-theme) - usado pelo anti-FOUC root
+    // 3. tema global (mz-theme) - escolha previa do usuario (anti-FOUC root)
     let themeGlobal = null;
     try {
       const t = localStorage.getItem("mz-theme");
       if (t === "dark" || t === "light") themeGlobal = t;
+    } catch {}
+    // 4. preferencia do sistema operacional (Cesar 27/04: respeitar
+    //    configuracao do equipamento do usuario quando ele nao escolheu).
+    //    Se OS reporta dark, usa dark. Senao, usa light (default).
+    let themeFromSystem = null;
+    try {
+      if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        themeFromSystem = "dark";
+      } else {
+        themeFromSystem = "light";
+      }
     } catch {}
     // 4. role real da sessao
     let sessionRole = null;
@@ -67,7 +78,18 @@ export function PlatformProvider({ children }) {
       }
     } catch {}
 
-    const finalTheme = themeFromQS || themeGlobal || prefs.theme || DEFAULT_STATE.theme;
+    // Ordem de prioridade do tema:
+    //   1. ?theme=...        (link explicito)
+    //   2. localStorage      (escolha previa do usuario)
+    //   3. prefs.theme       (preferencias do tweak panel - se houver)
+    //   4. prefers-color-scheme do SO
+    //   5. fallback Light    (default conservador, escolha Cesar 27/04)
+    const finalTheme =
+      themeFromQS ||
+      themeGlobal ||
+      prefs.theme ||
+      themeFromSystem ||
+      DEFAULT_STATE.theme;
     const finalTenant = prefs.tenant || DEFAULT_STATE.tenant;
 
     // Se veio de querystring, persiste pro proximo load
