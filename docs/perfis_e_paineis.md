@@ -192,6 +192,39 @@ Toda pessoa filiada ao UB tem acesso mínimo:
 
 ---
 
+---
+
+## Adições 27/04/2026 — Módulo Emendas + Saúde Nominatas
+
+### Módulo Emendas (RBAC restrito)
+
+Detalhe em `docs/modulo_emendas.md`. Resumo do RBAC:
+
+| Perfil | Acesso ao módulo Emendas |
+|--------|--------------------------|
+| Super Admin Mazzel, Pres Nacional | Total |
+| Pres Estadual / Vice-Pres | Sua UF |
+| Pres Municipal / Vice-Pres | Seu município |
+| Tesoureiros (todos níveis) | Emendas + financeiro do nível |
+| Político eleito parlamentar | Suas próprias emendas |
+| Equipe de Gabinete | Acessa apenas se Chefe + Político autorizou |
+| Secretários, Membros de Comissão, Coords, Cabos, Filiados | Não veem |
+
+### Saúde da Nominata (evolução do módulo Diretórios)
+
+Detalhe em `docs/api_sgip_descoberta.md`. Cruzamento automático SGIP3 TSE × atividade da plataforma → score de saúde por Comissão. **Dirigentes do PRÓPRIO tenant** seguem RBAC normal (Pres vê tudo do escopo). **Dirigentes de OUTROS partidos** (inteligência competitiva) só visíveis pra Pres Nacional + Pres Estaduais.
+
+### Painel de Compliance (cruzamento Emendas + Nominatas)
+
+Visível pro Pres Estadual e Pres Nacional. Combina:
+- Cidades com nominata fraca recebendo emendas altas → bandeira vermelha
+- Cidades com nominata forte mas zero emenda → "estamos perdendo aqui"
+- Cidades com nominata forte e emendas coerentes → ✓ verde
+
+Aparece como **Modo "Compliance"** do Mapa Estratégico (ver `docs/mapa_eleitoral_evolucao.md`).
+
+---
+
 ## Decisões registradas relacionadas
 
 - [[Decisao - Perfis RBAC e Cabo Eleitoral Cascata]] (16/04) — base original de 9 perfis
@@ -200,3 +233,6 @@ Toda pessoa filiada ao UB tem acesso mínimo:
 - `docs/anderson_milton_briefing.md` — Milton = Pres Estadual SP (caso real)
 - `docs/principio_portabilidade_perfil.md` — separação dado pessoal vs estratégico do partido
 - `docs/modulo_operacoes.md` — onde a cascata operacional entra em ação
+- `docs/modulo_emendas.md` — controle financeiro + auditoria + alertas
+- `docs/api_sgip_descoberta.md` — fonte oficial das nominatas (SGIP3 TSE)
+- `docs/mapa_eleitoral_evolucao.md` — 3 Modos do Mapa Estratégico

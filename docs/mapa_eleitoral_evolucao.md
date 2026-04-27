@@ -229,9 +229,52 @@ Estudar antes de redesenhar (todas têm features inspiradoras):
 - Posição da sidebar (esquerda/direita/fechada por padrão)
 - Comportamento ao clicar duas vezes (zoom in? abrir dossiê?)
 - Atalhos de teclado canônicos
-- Como apresentar camadas combinadas (todas visíveis? carrossel? pills?)
 - Bottom sheet mobile (snap points, comportamento ao deslizar)
-- Tema escuro (vale a pena agora ou pode ficar pra depois?)
+
+---
+
+## ⚠️ Decisões TOMADAS após sessão César 27/04/2026
+
+### Modos pré-configurados (não toggles)
+
+Em vez de checkboxes que combinam camadas livremente, o Mapa Estratégico abre num de **3 Modos pré-configurados** (radio button no Topbar do Mapa):
+
+| Modo | Pergunta que responde | Camadas ativas |
+|------|----------------------|----------------|
+| **Saúde Operacional** | "Onde o partido está vivo e onde está morto?" | Score Nominatas (cor) + densidade de cabos (intensidade) |
+| **Fluxo de Dinheiro** | "Pra onde o dinheiro está indo?" | Heat map Emendas (cor) + autores principais (símbolos) |
+| **Compliance** | "Onde tenho problema?" | Cruzamento dos 2 com regra: nominata fraca **+** emendas altas = **vermelho/roxo crítico** |
+
+Cada modo tem **hover G1 ajustado** ao contexto do modo (mostra o que importa pra aquela visão).
+
+Pra usuários técnicos que querem explorar (Tesoureiro, Secretário-Geral), **Modo Avançado** abre toggles individuais. Default = um dos 3 modos.
+
+### Bug crítico no Mapa do Dossiê — corrigir
+
+A entrega F1-F4 do Designer renderizou o "Mapa Eleitoral" dentro do Dossiê do Político como **grid de quadrados coloridos abstratos** (heatmap quadriculado matriz):
+
+```
+[Imagem: grid 6x18 de quadrados colorindos por cor partido — abstrato, NÃO geográfico]
+```
+
+Isso está **conceitualmente errado**. O mapa eleitoral em todo o produto deve ser o **mapa geográfico real** (polígonos do Brasil, UFs, municípios) com **gradiente de cor** estilo Globo G1.
+
+**Componente correto a usar:** `components/map/MapaEleitoral.tsx` (3.196 linhas, já no repo, com TODAS as automações: drill-down 5 níveis, foto-on-hover, tooltip X9, microbairros SP, escala farol percentil 0-5).
+
+Pra usar dentro do Dossiê em modo compacto, o componente aceita props específicas pra:
+- Modo "preview" (sem sidebar, sem topbar — só o mapa)
+- Filtro pré-aplicado (cargo + ciclo do candidato em foco)
+- Zoom pré-definido (UF de eleição do candidato)
+- Disabled drill-down profundo (mostra até município, mas não bairro/escola)
+
+**Ação pro Designer:** substituir o grid abstrato no Dossiê pelo `MapaEleitoral` em modo preview. Tamanho do retângulo permanece, mas o conteúdo passa a ser o mapa real com gradiente.
+
+### 2 camadas novas no Mapa Estratégico
+
+- **Saúde das Nominatas** (alimentada por dados SGIP3 TSE — `docs/api_sgip_descoberta.md`)
+- **Volume de Emendas** (alimentada por API Câmara/Senado/Portal Transparência — `docs/modulo_emendas.md`)
+
+Ambas com hover G1-style mostrando dados executivos relevantes ao perfil ativo.
 
 ---
 

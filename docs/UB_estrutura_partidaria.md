@@ -4,6 +4,8 @@ Documento de referência absorvendo o **Modelo de Nominata** e a **Ficha de Fili
 
 > Documentos originais: `docs/anderson_referencias/modelo_nominata_atual.docx` (papel timbrado oficial UB com logo + número 44) e `docs/anderson_referencias/ficha_filiacao_partidaria.pdf`
 
+> **Atualização 27/04/2026:** confirmamos que o SGIP3 do TSE expõe API REST pública sem autenticação com cobertura nacional COMPLETA das nominatas. Detalhe em `docs/api_sgip_descoberta.md`. **Fonte canônica das nominatas = SGIP3 TSE**, não entrada manual.
+
 ---
 
 ## Hierarquia organizacional
@@ -209,8 +211,10 @@ Características:
 
 ### O que falta
 
-- Modelo `diretorios` + `cargos_comissao` + `membros_comissao` (migration + service)
-- Endpoint CRUD pros 3 acima
+- Modelo `diretorios` + `cargos_comissao` + `membros_comissao` (migration + service) — **NOTA:** com SGIP descoberto, o modelo agora vem da API oficial. Ver `docs/api_sgip_descoberta.md` e `docs/etl_sgip_spec.md`. CRUD manual fica como complemento (notas internas, observações), não como fonte primária.
+- ETL SGIP3 TSE pra povoar nominatas automaticamente (sprint dedicado, ~14 dias úteis)
+- Algoritmo de Saúde da Nominata cruzando SGIP × atividade da plataforma (anti-fantasma)
+- Endpoint CRUD pros 3 acima (cobertura manual de complemento)
 - Frontend `/mazzel-preview/diretorios` (visualizar nominatas em árvore — drilldown nacional → estadual → municipal)
 - Fluxo de abonador no `/mazzel-preview/filiados` (campo abonador + validação que abonador pertence à Comissão Executiva local)
 - Módulo `/mazzel-preview/documentos` (storage + listagem + filtros + integração DocuSign)

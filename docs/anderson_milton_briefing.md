@@ -444,7 +444,65 @@ Cada usuário configura preferência por tipo de evento (convite recebido, opera
 
 ---
 
-## 13. Mapa Eleitoral — corrigido em 25/04/2026 (noite)
+## 14. Reunião com Anderson 27/04/2026 — Emendas e Nominatas como tema central
+
+Anderson trouxe (após reunião direta com ele):
+
+### 14.1 — Controle de Emendas é dor real do Milton
+
+Hoje Milton **demora mais de uma semana** pra saber pra onde as emendas estão indo. Caso real reportado: Santa Bárbara d'Oeste recebendo emendas de R$70-80mi sem contexto plausível. Milton não tem ferramenta pra detectar inconsistências.
+
+**Solução documentada:** novo módulo Emendas — `docs/modulo_emendas.md`. Componentes principais:
+- Mapa de Emendas (heat map sobre o Mapa Estratégico)
+- Dossiê da Emenda (perfil individual com 8+ seções de cruzamentos)
+- Painel de Inconsistências com algoritmo de score 0-100 (5 dimensões)
+- Sistema de alertas em tempo real priorizado (CRÍTICO / ALTO / MÉDIO / BAIXO)
+- Fluxo Sankey de origem → destino do dinheiro
+
+RBAC restrito a alta liderança partidária (Pres Nacional/Estadual/Municipal, Tesoureiros, parlamentares pra emendas próprias). Membros, Cabos, Coords, Filiados NÃO veem.
+
+### 14.2 — Nominatas fantasmas (caso anti-fraude)
+
+Anderson reportou: executivo do UB-SP estava **vendendo nominatas pra outros partidos**. Partido oponente comprava nominata UB e engavetava. Milton só descobria quando tentava mobilizar — aparecia corpo de diretório municipal, mas zero operação.
+
+**Solução documentada:** evolução do módulo Diretórios com Saúde da Nominata cruzando dados oficiais. Componentes:
+- Score de Saúde da Comissão (7 sub-medidas: OPER, CRES, RESP, TER, FIN, GOV, **PRES** — anti-fantasma)
+- Mapa de Nominatas (camada do Mapa Estratégico)
+- Sistema de alertas anti-fraude
+- Cruzamento automático com TSE pra detectar mudanças de filiação
+
+### 14.3 — DESCOBERTA crítica: SGIP3 do TSE expõe API pública
+
+Em 27/04 confirmamos que o SGIP (Sistema de Gerenciamento de Informações Partidárias do TSE) tem API REST pública sem autenticação com cobertura nacional COMPLETA: todos os partidos, todos os órgãos partidários (Nacional/Estadual/Municipal), composição completa com nome+CPF+título+cargo+datas+status.
+
+Detalhe em `docs/api_sgip_descoberta.md`. Implicação: Saúde da Nominata pode cruzar **dados oficiais TSE × atividade na plataforma** pra detectar fantasmas automaticamente, sem depender de reporte manual.
+
+Spec ETL completa em `docs/etl_sgip_spec.md`.
+
+### 14.4 — 3 Modos pré-configurados no Mapa Estratégico
+
+Decisão estrutural: Mapa Estratégico não tem checkboxes de camadas livres. Tem **3 Modos pré-configurados** (radio button no Topbar do Mapa):
+- **Saúde Operacional** (nominatas + cabos)
+- **Fluxo de Dinheiro** (emendas)
+- **Compliance** (cruzamento dos 2: nominata fraca + emendas altas = vermelho crítico)
+
+Modo Avançado abre toggles individuais pra técnicos.
+
+### 14.5 — Bug do Mapa no Dossiê (a corrigir)
+
+A entrega F1-F4 do Designer renderizou o "Mapa Eleitoral" dentro do Dossiê do Político como **grid de quadrados coloridos abstratos** (heatmap quadriculado matriz). Isso está conceitualmente errado.
+
+**Correção:** o mapa eleitoral em todo o produto deve ser o **mapa geográfico real** (polígonos do Brasil, UFs, municípios) com **gradiente de cor** estilo Globo G1. Componente correto: `components/map/MapaEleitoral.tsx` (3.196 linhas, já no repo, com TODAS as automações).
+
+Pra usar dentro do Dossiê em modo compacto, o componente aceita props específicas. Detalhes em `docs/mapa_eleitoral_evolucao.md`.
+
+### 14.6 — Modo Light + Dark
+
+Designer entregou só em Dark. Plataforma precisa dos 2 modos com toggle no Topbar. Enquadrar pro Designer como "completude do contrato" (escopo original cobre os 2 modos), não como ampliação. Critério: todo componente F1-F4 deve funcionar em Light também.
+
+---
+
+## 15. Mapa Eleitoral — corrigido em 25/04/2026 (noite)
 
 **Diagnóstico original:** o mapa eleitoral aparecia como rebatido mal feito na V2 — wrapper skeletal `plataforma-v2/modulos/Mapa.jsx` com ~10% das features (sem drill-down, sem foto-on-hover, sem tabs turno, sem tooltip X9, sem microbairros, sem 9 dos 11 endpoints).
 
