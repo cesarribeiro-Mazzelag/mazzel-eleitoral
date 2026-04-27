@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Map, { Layer, Source, NavigationControl } from "react-map-gl/maplibre";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { X, MapPin, ArrowLeft, Users, BarChart2, ChevronDown, Calendar, Flag, Vote, Flame } from "lucide-react";
@@ -124,7 +124,29 @@ const MAP_STYLE_BASE = "https://basemaps.cartocdn.com/gl/positron-gl-style/style
 // BotoesNavegacao movido para ./mapa/chrome/BotoesNavegacao.tsx (dead code local).
 
 // ── Componente principal ───────────────────────────────────────────────────────
-export function MapaEleitoral() {
+//
+// Props (Fase 0a refator 27/04/2026, mapas canon):
+//   - esconderTopbar / overlayTop  → wrappers como MapaEstrategico injetam sua
+//     própria topbar (3 Modos + camadas) sem duplicar a topbar nativa de filtros.
+//   - esconderSidebar / overlayRight → idem para BarraLateral. Wrapper provê
+//     painel de preview específico (ex: KPIs UB-state, score saúde nominata).
+//
+// Toda a lógica core (drill-down 5 níveis, Zustand store, hover, tooltip,
+// SWR fetches, MapLibre Sources/Layers) permanece intacta. Wrappers compõem o
+// engine; não substituem.
+export interface MapaEleitoralProps {
+  esconderTopbar?: boolean;
+  esconderSidebar?: boolean;
+  overlayTop?: ReactNode;
+  overlayRight?: ReactNode;
+}
+
+export function MapaEleitoral({
+  esconderTopbar = false,
+  esconderSidebar = false,
+  overlayTop,
+  overlayRight,
+}: MapaEleitoralProps = {}) {
   const mapRef          = useRef<any>(null);
   const clickTimer      = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Fase 4 (Globo-like): detector de duplo-clique (1 click = preview/zoom, 2 cliques = drill).
@@ -1726,6 +1748,9 @@ export function MapaEleitoral() {
       <style>{`.maplibregl-ctrl-bottom-left { margin-bottom: 8px !important; margin-left: 8px !important; }`}</style>
 
       {/* ── BARRA DE FILTROS ─────────────────────────────────────────────── */}
+      {/* Wrappers (MapaEstrategico/Nominata/etc) podem suprimir essa topbar
+          via prop esconderTopbar e injetar a própria via overlayTop. */}
+      {esconderTopbar ? overlayTop : (<>
       {/* Backdrop para fechar dropdowns */}
       {dropdownAberto && (
         <div className="fixed inset-0 z-40" onClick={() => setDropdownAberto(null)} />
@@ -2004,6 +2029,7 @@ export function MapaEleitoral() {
         </div>
       </header>
       </TopbarExpandivel>
+      </>)}
 
       {/* ── ÁREA DO MAPA + BARRA LATERAL ────────────────────────────────── */}
       <div className="flex-1 flex overflow-hidden">
@@ -3088,6 +3114,9 @@ export function MapaEleitoral() {
         </div>{/* fim flex-1 relative mapa */}
 
         {/* ── Barra lateral (candidatos / partidos por estado) ─────────── */}
+        {/* Wrappers (MapaEstrategico/Nominata/etc) podem suprimir essa sidebar
+            via prop esconderSidebar e injetar a própria via overlayRight. */}
+        {esconderSidebar ? overlayRight : (<>
         <BarraLateral
           nivel={nivel}
           ufSelecionada={ufSelecionada}
@@ -3179,6 +3208,7 @@ export function MapaEleitoral() {
         {/* Botão flutuante para reabrir sidebar — só renderiza se nenhum
             painel modal está ocupando a lateral direita. */}
         {!painelAberto && <BotaoSidebarFlutuante />}
+        </>)}
 
         {/* Fase 7 — Comparativo por Zona Eleitoral (side panel Globo-like) */}
         <ComparativoZonasPainel
