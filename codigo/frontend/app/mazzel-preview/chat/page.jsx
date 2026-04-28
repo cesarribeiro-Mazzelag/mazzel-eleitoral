@@ -1,5 +1,5 @@
-import { Chat } from "@/components/plataforma-v2/modulos/Chat";
+import { ChatEvoluido } from "@/components/plataforma-v2/modulos/chat-evoluido/ChatEvoluido";
 
 export default function Page() {
-  return <Chat />;
+  return <ChatEvoluido />;
 }
