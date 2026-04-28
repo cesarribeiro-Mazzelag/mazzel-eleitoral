@@ -1,4 +1,4 @@
-import { Operacoes } from "@/components/plataforma-v2/modulos/Operacoes";
+import { Operacoes } from "@/components/plataforma-v2/modulos/operacoes/Operacoes";
 
 export default function Page() {
   return <Operacoes />;
