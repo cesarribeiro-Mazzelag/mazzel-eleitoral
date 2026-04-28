@@ -65,7 +65,7 @@ function resolveHref(sid, role) {
     uf:      "/mazzel-preview/diretorios",     // Estados (27 UFs)
     mun:     "/mazzel-preview/diretorios",     // 645 Municípios
     nom:     "/mazzel-preview/nominata",
-    fil:     "/mazzel-preview/afiliados",
+    fil:     "/mazzel-preview/filiados",
     cab:     "/mazzel-preview/cabos-gestao",
     sec:     "/mazzel-preview/diretorios",
     memb:    "/mazzel-preview/diretorios",
