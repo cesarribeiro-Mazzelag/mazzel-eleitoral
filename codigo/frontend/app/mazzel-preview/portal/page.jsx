@@ -1,5 +1,5 @@
-import { Portal } from "@/components/plataforma-v2/modulos/Portal";
+import { PainelPessoal } from "@/components/plataforma-v2/modulos/painel-pessoal/PainelPessoal";
 
 export default function Page() {
-  return <Portal />;
+  return <PainelPessoal />;
 }
