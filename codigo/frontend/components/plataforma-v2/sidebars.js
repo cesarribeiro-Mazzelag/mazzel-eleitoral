@@ -64,7 +64,7 @@ function resolveHref(sid, role) {
     com:     "/mazzel-preview/diretorios",     // Comissão Nacional/Estadual/Executiva
     uf:      "/mazzel-preview/diretorios",     // Estados (27 UFs)
     mun:     "/mazzel-preview/diretorios",     // 645 Municípios
-    nom:     "/mazzel-preview/saude-nominatas",
+    nom:     "/mazzel-preview/nominata",
     fil:     "/mazzel-preview/afiliados",
     cab:     "/mazzel-preview/cabos-gestao",
     sec:     "/mazzel-preview/diretorios",

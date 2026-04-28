@@ -93,7 +93,7 @@ export const MODULES = [
   { id: "documentos",        label: "Documentos",         section: "Estatutário", href: "/mazzel-preview/documentos",        icon: "FileText",  badgeLabel: "NEW" },
   { id: "tesouraria",        label: "Tesouraria",         section: "Estatutário", href: "/mazzel-preview/tesouraria",        icon: "Banknote",  badgeLabel: "NEW" },
   { id: "convites",          label: "IDs · Convites",     section: "Estatutário", href: "/mazzel-preview/convites",          icon: "UserCheck", badgeLabel: "NEW" },
-  { id: "saude_nominatas",   label: "Saúde Nominatas",    section: "Estatutário", href: "/mazzel-preview/saude-nominatas",   icon: "Target",    badgeLabel: "NEW" },
+  { id: "nominata",          label: "Nominata",           section: "Estatutário", href: "/mazzel-preview/nominata",          icon: "Target",    badgeLabel: "NEW" },
 
   // ── Campo (Cabo) ──
   { id: "agenda_dia", label: "Agenda do dia",   section: "Campo", href: "/mazzel-preview/cabo/agenda",   icon: "Calendar" },
